@@ -38,7 +38,7 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
     private final String appId;
     private final String[] zones;
 
-    private AdAdapted(Context context, String appId, String[] zones) {
+    private AdAdapted(Context context, String appId, String[] zones, boolean prodMode) {
         this.listeners = new HashSet<>();
 
         this.context = context;
@@ -46,9 +46,16 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
         this.session = null;
         this.sessionLoaded = false;
 
-        this.sessionInitUrl = context.getString(R.string.session_init_object_url);
-        this.sessionReinitUrl = context.getString(R.string.session_reinit_object_url);
-        this.eventBatchUrl = context.getString(R.string.event_batch_object_url);
+        if(prodMode) {
+            this.sessionInitUrl = context.getString(R.string.prod_session_init_object_url);
+            this.sessionReinitUrl = context.getString(R.string.prod_session_reinit_object_url);
+            this.eventBatchUrl = context.getString(R.string.prod_event_batch_object_url);
+        }
+        else {
+            this.sessionInitUrl = context.getString(R.string.sandbox_session_init_object_url);
+            this.sessionReinitUrl = context.getString(R.string.sandbox_session_reinit_object_url);
+            this.eventBatchUrl = context.getString(R.string.sandbox_event_batch_object_url);
+        }
 
         this.appId = appId;
         this.zones = zones;
@@ -58,9 +65,9 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
         return instance;
     }
 
-    public static synchronized void init(Context context, String appId, String[] zones) {
+    public static synchronized void init(Context context, String appId, String[] zones, boolean prodMode) {
         Log.d(TAG, "init() called for appId: " + appId + " and zones: " + Arrays.toString(zones));
-        instance = new AdAdapted(context, appId, zones);
+        instance = new AdAdapted(context, appId, zones, prodMode);
 
         getInstance().initialize();
     }
