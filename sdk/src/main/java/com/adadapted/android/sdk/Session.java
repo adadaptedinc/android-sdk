@@ -28,7 +28,7 @@ class Session {
         this.sessionId = sessionId;
     }
 
-    public boolean isActiveCampaigns() {
+    public boolean hasActiveCampaigns() {
         return activeCampaigns;
     }
 
