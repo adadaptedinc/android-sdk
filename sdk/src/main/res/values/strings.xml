@@ -2,8 +2,13 @@
     <string name="app_name">sdk</string>
     <string name="action_settings">Settings</string>
 
-    <string name="session_init_object_url">http://192.168.97.147/v/0.9.3/android/session/init</string>
-    <string name="session_reinit_object_url">http://192.168.97.147/v/0.9.3/android/session/reinit</string>
-    <string name="ad_get_object_url">http://192.168.97.147/v/0.9.3/android/ad/get</string>
-    <string name="event_batch_object_url">http://192.168.97.147/v/0.9.3/android/event/batch</string>
+    <string name="prod_session_init_object_url">http://192.168.97.147/v/0.9.3/android/session/init</string>
+    <string name="prod_session_reinit_object_url">http://192.168.97.147/v/0.9.3/android/session/reinit</string>
+    <string name="prod_ad_get_object_url">http://192.168.97.147/v/0.9.3/android/ad/get</string>
+    <string name="prod_event_batch_object_url">http://192.168.97.147/v/0.9.3/android/event/batch</string>
+
+    <string name="sandbox_session_init_object_url">http://sandbox.adadapted.com/v/0.9.3/android/session/init</string>
+    <string name="sandbox_session_reinit_object_url">http://sandbox.adadapted.com/v/0.9.3/android/session/reinit</string>
+    <string name="sandbox_ad_get_object_url">http://sandbox.adadapted.com/v/0.9.3/android/ad/get</string>
+    <string name="sandbox_event_batch_object_url">http://sandbox.adadapted.com/v/0.9.3/android/event/batch</string>
 </resources>
