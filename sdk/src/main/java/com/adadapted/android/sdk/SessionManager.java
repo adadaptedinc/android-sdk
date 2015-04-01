@@ -15,9 +15,9 @@ class SessionManager implements HttpSessionAdapter.Listener {
         public void onSessionInitialized(Session session);
     }
 
-    private Set<Listener> listeners;
+    private final Set<Listener> listeners;
 
-    private SessionAdapter httpSessionAdapter;
+    private final SessionAdapter httpSessionAdapter;
 
     SessionManager(SessionAdapter httpSessionAdapter) {
         this.listeners = new HashSet<>();
@@ -26,7 +26,7 @@ class SessionManager implements HttpSessionAdapter.Listener {
         this.httpSessionAdapter.addListener(this);
     }
 
-    void initialize(DeviceInfo deviceInfo) throws SdkNotInitializedException {
+    void initialize(DeviceInfo deviceInfo) {
         JSONObject request = new SessionRequestBuilder().buildSessionRequestJson(deviceInfo);
         httpSessionAdapter.sendInit(request);
     }

@@ -7,7 +7,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
-import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 
@@ -83,91 +82,91 @@ class DeviceInfo {
                 Settings.Secure.ANDROID_ID);
     }
 
-    public String getAppId() {
+    String getAppId() {
         return appId;
     }
 
-    public void setAppId(String appId) {
+    void setAppId(String appId) {
         this.appId = appId;
     }
 
-    public String[] getZones() {
+    String[] getZones() {
         return zones;
     }
 
-    public void setZones(String[] zones) {
+    void setZones(String[] zones) {
         this.zones = zones;
     }
 
-    public String getBundleId() {
+    String getBundleId() {
         return bundleId;
     }
 
-    public void setBundleId(String bundleId) {
+    void setBundleId(String bundleId) {
         this.bundleId = bundleId;
     }
 
-    public String getUdid() {
+    String getUdid() {
         return udid;
     }
 
-    public void setUdid(String udid) {
+    void setUdid(String udid) {
         this.udid = udid;
     }
 
-    public String getDevice() {
+    String getDevice() {
         return device;
     }
 
-    public void setDevice(String device) {
+    void setDevice(String device) {
         this.device = device;
     }
 
-    public String getOs() {
+    String getOs() {
         return os;
     }
 
-    public void setOs(String os) {
+    void setOs(String os) {
         this.os = os;
     }
 
-    public String getOsv() {
+    String getOsv() {
         return osv;
     }
 
-    public void setOsv(String osv) {
+    void setOsv(String osv) {
         this.osv = osv;
     }
 
-    public String getLocale() {
+    String getLocale() {
         return locale;
     }
 
-    public void setLocale(String locale) {
+    void setLocale(String locale) {
         this.locale = locale;
     }
 
-    public String getTimezone() {
+    String getTimezone() {
         return timezone;
     }
 
-    public void setTimezone(String timezone) {
+    void setTimezone(String timezone) {
         this.timezone = timezone;
     }
 
-    public int getDw() {
+    int getDw() {
         return dw;
     }
 
-    public void setDw(int dw) {
+    void setDw(int dw) {
         this.dw = dw;
     }
 
-    public int getDh() {
+    int getDh() {
         return dh;
     }
 
-    public void setDh(int dh) {
+    void setDh(int dh) {
         this.dh = dh;
     }
 

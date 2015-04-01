@@ -13,7 +13,7 @@ class HttpRequestManager {
 
     private HttpRequestManager() { }
 
-    public static synchronized RequestQueue getQueue() throws SdkNotInitializedException {
+    public static synchronized RequestQueue getQueue() {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(AdAdapted.getInstance().getContext());
         }

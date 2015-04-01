@@ -7,7 +7,7 @@ import java.util.Map;
  * Created by chrisweeden on 3/30/15.
  */
 public class AdImage {
-    Map<String, String> orientations;
+    private final Map<String, String> orientations;
 
     public AdImage() {
         orientations = new HashMap<>();

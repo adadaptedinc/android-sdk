@@ -9,5 +9,5 @@ enum EventType {
     INTERACTION,
     POPUP_BEGIN,
     POPUP_END,
-    CUSTOM;
+    CUSTOM
 }

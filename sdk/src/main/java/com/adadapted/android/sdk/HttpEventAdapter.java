@@ -8,7 +8,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,9 +18,9 @@ import java.util.Set;
 class HttpEventAdapter implements EventAdapter {
     private static final String TAG = HttpEventAdapter.class.getName();
 
-    private Set<Listener> listeners;
+    private final Set<Listener> listeners;
 
-    private String batchUrl;
+    private final String batchUrl;
 
     HttpEventAdapter(String batchUrl) {
         this.listeners = new HashSet<>();
@@ -30,7 +29,7 @@ class HttpEventAdapter implements EventAdapter {
     }
 
     @Override
-    public void sendBatch(JSONArray json) throws SdkNotInitializedException {
+    public void sendBatch(JSONArray json) {
         JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST,
                 batchUrl, json, new Response.Listener<JSONArray>(){
 

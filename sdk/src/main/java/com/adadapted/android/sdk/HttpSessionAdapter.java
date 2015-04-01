@@ -18,10 +18,10 @@ import java.util.Set;
 class HttpSessionAdapter implements SessionAdapter {
     private static final String TAG = HttpSessionAdapter.class.getName();
 
-    private Set<Listener> listeners;
+    private final Set<Listener> listeners;
 
-    private String initUrl;
-    private String reinitUrl;
+    private final String initUrl;
+    private final String reinitUrl;
 
     HttpSessionAdapter(String initUrl, String reinitUrl) {
         this.listeners = new HashSet<>();
@@ -30,7 +30,7 @@ class HttpSessionAdapter implements SessionAdapter {
         this.reinitUrl = reinitUrl;
     }
 
-    public void sendInit(JSONObject json) throws SdkNotInitializedException {
+    public void sendInit(JSONObject json) {
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
                 initUrl, json, new Response.Listener<JSONObject>(){
 

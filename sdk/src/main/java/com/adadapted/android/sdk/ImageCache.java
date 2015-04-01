@@ -9,8 +9,11 @@ import android.support.v4.util.LruCache;
  * Created by chrisweeden on 3/23/15.
  */
 class ImageCache {
+    private static final String TAG = ImageCache.class.getName();
+
     private static ImageCache instance;
-    private LruCache<String, Bitmap> imageCache;
+
+    private final LruCache<String, Bitmap> imageCache;
 
     private ImageCache() {
         final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);

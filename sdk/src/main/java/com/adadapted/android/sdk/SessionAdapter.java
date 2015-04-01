@@ -10,7 +10,7 @@ interface SessionAdapter {
         void onSessionRequestCompleted(JSONObject response);
     }
 
-    void sendInit(JSONObject json) throws SdkNotInitializedException;
+    void sendInit(JSONObject json);
 
     void addListener(Listener listener);
     void removeListener(Listener listener);

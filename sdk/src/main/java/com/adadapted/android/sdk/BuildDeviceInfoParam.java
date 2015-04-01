@@ -7,26 +7,26 @@ import java.util.Arrays;
 /**
  * Created by chrisweeden on 3/26/15.
  */
-public class BuildDeviceInfoParam {
+class BuildDeviceInfoParam {
     private final Context context;
     private final String appId;
     private final String[] zones;
 
-    public BuildDeviceInfoParam(Context context, String appId, String[] zones) {
+    BuildDeviceInfoParam(Context context, String appId, String[] zones) {
         this.context = context;
         this.appId = appId;
         this.zones = zones;
     }
 
-    public Context getContext() {
+    Context getContext() {
         return context;
     }
 
-    public String getAppId() {
+    String getAppId() {
         return appId;
     }
 
-    public String[] getZones() {
+    String[] getZones() {
         return zones;
     }
 

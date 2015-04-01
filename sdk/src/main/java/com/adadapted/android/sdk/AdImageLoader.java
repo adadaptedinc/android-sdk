@@ -13,20 +13,20 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 3/30/15.
  */
-public class AdImageLoader {
+class AdImageLoader {
     private static final String TAG = AdImageLoader.class.getName();
 
-    private Set<Listener> listeners;
+    private final Set<Listener> listeners;
 
-    public static interface Listener {
+    static interface Listener {
         public void onAdImageLoaded(Bitmap bitmap);
     }
 
-    public AdImageLoader() {
-        listeners = new HashSet<Listener>();
+    AdImageLoader() {
+        listeners = new HashSet<>();
     }
 
-    public void getImage(String url) {
+    void getImage(String url) {
         if(url == null) {
             Log.w(TAG, "No URL has been provided.");
             return;
@@ -48,42 +48,39 @@ public class AdImageLoader {
         }
     }
 
-    public void loadRemoteImage(final String url) {
+    void loadRemoteImage(final String url) {
         ImageRequest imageRequest = new ImageRequest(url,
-        new Response.Listener<Bitmap>() {
+            new Response.Listener<Bitmap>() {
 
-            @Override
-            public void onResponse(Bitmap response) {
-                if(null == ImageCache.getInstance().getImage(url)) {
-                    Log.d(TAG, "Loaded image " + url);
-                    ImageCache.getInstance().putImage(url, response);
+                @Override
+                public void onResponse(Bitmap response) {
+                    if(null == ImageCache.getInstance().getImage(url)) {
+                        Log.d(TAG, "Loaded image " + url);
+                        ImageCache.getInstance().putImage(url, response);
+                    }
+
+                    notifyAdImageLoaded(response);
                 }
 
-                notifyAdImageLoaded(response);
+            }, 0, 0, Bitmap.Config.ARGB_8888,
+
+            new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.w(TAG, "Problem retrieving Ad Image.", error);
+                }
             }
+        );
 
-        }, 0, 0, Bitmap.Config.ARGB_8888, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.w(TAG, "Problem retrieving Ad Image.", error);
-            }
-
-        });
-
-        try {
-            HttpRequestManager.getQueue().add(imageRequest);
-        }
-        catch(SdkNotInitializedException ex) {
-            Log.d(TAG, "Problem queueing request.", ex);
-        }
+        HttpRequestManager.getQueue().add(imageRequest);
     }
 
-    public void addListener(AdImageLoader.Listener listener) {
+    void addListener(AdImageLoader.Listener listener) {
         listeners.add(listener);
     }
 
-    public void removeListener(AdImageLoader.Listener listener) {
+    void removeListener(AdImageLoader.Listener listener) {
         listeners.remove(listener);
     }
 

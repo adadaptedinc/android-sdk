@@ -9,14 +9,14 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 3/26/15.
  */
-public class DeviceInfoBuilder extends AsyncTask<BuildDeviceInfoParam, Void, DeviceInfo> {
+class DeviceInfoBuilder extends AsyncTask<BuildDeviceInfoParam, Void, DeviceInfo> {
     private static final String TAG = DeviceInfoBuilder.class.getName();
 
     interface Listener {
         void onDeviceInfoCollected(DeviceInfo deviceInfo);
     }
 
-    private Set<Listener> listeners;
+    private final Set<Listener> listeners;
 
     DeviceInfoBuilder() {
         listeners = new HashSet<>();

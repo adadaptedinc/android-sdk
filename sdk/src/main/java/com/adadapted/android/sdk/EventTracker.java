@@ -3,10 +3,6 @@ package com.adadapted.android.sdk;
 import android.util.Log;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by chrisweeden on 3/23/15.
@@ -14,8 +10,8 @@ import java.util.Set;
 class EventTracker {
     private static final String TAG = EventTracker.class.getName();
 
-    private EventAdapter eventAdapter;
-    private EventRequestBuilder builder;
+    private final EventAdapter eventAdapter;
+    private final EventRequestBuilder builder;
 
     private JSONArray queuedEvents;
 
@@ -42,17 +38,12 @@ class EventTracker {
     }
 
     void publishEvents() {
-        try {
-            if(queuedEvents.length() > 0) {
-                eventAdapter.sendBatch(queuedEvents);
-                queuedEvents = new JSONArray();
-            }
-            else {
-                Log.d(TAG, "Not items queued to publish.");
-            }
+        if(queuedEvents.length() > 0) {
+            eventAdapter.sendBatch(queuedEvents);
+            queuedEvents = new JSONArray();
         }
-        catch(SdkNotInitializedException ex) {
-            Log.e(TAG, "Problem sending events.", ex);
+        else {
+            Log.d(TAG, "No items queued to publish.");
         }
     }
 

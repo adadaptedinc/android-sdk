@@ -32,7 +32,6 @@ public class AAZoneView extends RelativeLayout
     private Zone zone;
 
     private int viewCount;
-    private int adPosition;
     private Ad currentAd;
 
     private AdImageLoader imageLoader;
@@ -105,7 +104,7 @@ public class AAZoneView extends RelativeLayout
 
                 isStoppingForPopup = true;
 
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(currentAd.getActionPath().toString()));
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(currentAd.getActionPath()));
                 getContext().startActivity(intent);
             }
         });
@@ -127,7 +126,7 @@ public class AAZoneView extends RelativeLayout
     }
 
     private void setNextAd() {
-        adPosition = (viewCount++) % zone.getAds().size();
+        int adPosition = (viewCount++) % zone.getAds().size();
         currentAd = zone.getAds().get(adPosition);
 
         Log.d(TAG, getZoneLabel() + " Displaying " + currentAd.getAdId());
@@ -150,6 +149,25 @@ public class AAZoneView extends RelativeLayout
             AdAdapted.getInstance().getEventTracker().trackImpressionEndEvent(sessionId, currentAd);
             currentAd = null;
         }
+    }
+
+    private void displayAdImageView(View view) {
+        Log.d(TAG, "Calling onDisplayAd()");
+
+        final View updatedView = view;
+
+        this.post(new Runnable() {
+            @Override
+            public void run() {
+                AAZoneView.this.removeAllViews();
+
+                RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(
+                        LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+                relativeParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+
+                AAZoneView.this.addView(updatedView);
+            }
+        });
     }
 
     public void onStart() {
@@ -212,24 +230,5 @@ public class AAZoneView extends RelativeLayout
         if(isActive) {
             displayNextAd();
         }
-    }
-
-    public void displayAdImageView(View view) {
-        Log.d(TAG, "Calling onDisplayAd()");
-
-        final View updatedView = view;
-
-        this.post(new Runnable() {
-            @Override
-            public void run() {
-                AAZoneView.this.removeAllViews();
-
-                RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(
-                        LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
-                relativeParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-
-                AAZoneView.this.addView(updatedView);
-            }
-        });
     }
 }

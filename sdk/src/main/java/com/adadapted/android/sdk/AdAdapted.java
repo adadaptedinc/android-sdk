@@ -19,9 +19,9 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
         void onSessionLoaded(Session session);
     }
 
-    private Set<Listener> listeners;
+    private final Set<Listener> listeners;
 
-    private Context context;
+    private final  Context context;
 
     private DeviceInfo deviceInfo;
 
@@ -31,14 +31,14 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
     private SessionManager sessionManager;
     private EventTracker eventTracker;
 
-    private String sessionInitUrl;
-    private String sessionReinitUrl;
-    private String eventBatchUrl;
+    private final String sessionInitUrl;
+    private final String sessionReinitUrl;
+    private final String eventBatchUrl;
 
-    private String appId;
-    private String[] zones;
+    private final String appId;
+    private final String[] zones;
 
-    AdAdapted(Context context, String appId, String[] zones) {
+    private AdAdapted(Context context, String appId, String[] zones) {
         this.listeners = new HashSet<>();
 
         this.context = context;
@@ -59,7 +59,7 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
     }
 
     public static synchronized void init(Context context, String appId, String[] zones) {
-        Log.d(TAG, "init() called for appId: " + appId + " and zones: " + zones);
+        Log.d(TAG, "init() called for appId: " + appId + " and zones: " + Arrays.toString(zones));
         instance = new AdAdapted(context, appId, zones);
 
         getInstance().initialize();
@@ -116,7 +116,7 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
         listeners.remove(listener);
     }
 
-    public void notifySessionLoaded() {
+    private void notifySessionLoaded() {
         for(Listener listener : listeners) {
             listener.onSessionLoaded(session);
         }
@@ -126,12 +126,7 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
     public void onDeviceInfoCollected(DeviceInfo deviceInfo) {
         this.deviceInfo = deviceInfo;
 
-        try {
-            getSessionManager().initialize(deviceInfo);
-        }
-        catch(SdkNotInitializedException ex) {
-            Log.e(TAG, "AdAdapted SDK has not been initialized.", ex);
-        }
+        getSessionManager().initialize(deviceInfo);
     }
 
     public void onSessionInitialized(Session session) {

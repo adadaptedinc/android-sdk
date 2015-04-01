@@ -31,11 +31,12 @@ class SessionRequestBuilder {
             json.put("allow_retargeting", 1);
 
             String[] zones = deviceInfo.getZones();
-            int zoneLen = zones.length;
+
             JSONArray zonesArray = new JSONArray();
-            for(int i = 0; i < zoneLen; i++) {
-                zonesArray.put(zones[i]);
+            for(String zone : zones) {
+                zonesArray.put(zone);
             }
+
             json.put("zones", zonesArray);
         }
         catch(JSONException ex) {
