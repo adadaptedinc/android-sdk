@@ -32,7 +32,7 @@ class EventTracker {
         DeviceInfo deviceInfo = AdAdapted.getInstance().getDeviceInfo();
         queuedEvents.put(builder.build(deviceInfo, sessionId, ad, eventType, eventName));
 
-        if(queuedEvents.length() > 2) {
+        if(queuedEvents.length() > 5) {
             publishEvents();
         }
     }
