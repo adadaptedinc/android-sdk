@@ -28,9 +28,12 @@ class SessionBuilder {
             session.setExpiresAt(response.getLong("session_expires_at"));
             session.setPollingInterval(response.getLong("polling_interval_ms"));
 
-            JSONObject jsonZones = response.getJSONObject("zones");
-            Map<String, Zone> zones = zoneBuilder.buildZones(jsonZones);
-            session.getZones().putAll(zones);
+            if(session.hasActiveCampaigns()) {
+                JSONObject jsonZones = response.getJSONObject("zones");
+                Map<String, Zone> zones = zoneBuilder.buildZones(jsonZones);
+
+                session.getZones().putAll(zones);
+            }
         }
         catch(JSONException ex) {
             Log.w(TAG, "Problem converting to JSON.", ex);
