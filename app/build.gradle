@@ -1,12 +1,28 @@
 apply plugin: 'com.android.application'
+apply plugin: 'android'
+apply plugin: 'newrelic'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "com.newrelic.agent.android:agent-gradle-plugin:4.244.0"
+    }
+}
+
+repositories {
+    mavenCentral()
+}
 
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        applicationId "com.adadapted.sdk"
-        minSdkVersion 10
+        applicationId "com.adadapted.sdktestapp"
+        minSdkVersion 11
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
@@ -21,6 +37,8 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:21.0.3'
     compile project(':sdk')
+    compile 'com.newrelic.agent.android:android-agent:4.244.0'
+    compile 'com.android.support:appcompat-v7:22.0.0'
+    compile 'com.android.support:support-v4:22.0.0'
 }

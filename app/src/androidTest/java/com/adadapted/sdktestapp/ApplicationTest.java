@@ -1,4 +1,4 @@
-package com.adadapted.adadaptedsdk;
+package com.adadapted.sdktestapp;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

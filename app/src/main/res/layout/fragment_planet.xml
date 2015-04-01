@@ -1,0 +1,17 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" tools:context="com.adadapted.sdktestapp.PlanetFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView android:id="@+id/planet_name" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="5dp"
+        android:text="Planet Name"/>
+
+    <com.adadapted.android.sdk.AAZoneView android:id="@+id/fragment_planet_zone"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom"
+        android:background="@color/background_material_dark" />
+
+</FrameLayout>
