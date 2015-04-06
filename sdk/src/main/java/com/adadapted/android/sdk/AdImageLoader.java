@@ -48,7 +48,7 @@ class AdImageLoader {
         }
     }
 
-    void loadRemoteImage(final String url) {
+    private void loadRemoteImage(final String url) {
         ImageRequest imageRequest = new ImageRequest(url,
             new Response.Listener<Bitmap>() {
 

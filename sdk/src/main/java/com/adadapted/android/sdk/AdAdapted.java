@@ -72,7 +72,7 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
         getInstance().initialize();
     }
 
-    void initialize() {
+    private void initialize() {
         DeviceInfoBuilder builder = new DeviceInfoBuilder();
         builder.addListener(this);
         builder.execute(new BuildDeviceInfoParam(context, appId, zones));
@@ -90,11 +90,11 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
         return session;
     }
 
-    boolean sessionIsLoaded() {
+    private boolean sessionIsLoaded() {
         return sessionLoaded;
     }
 
-    SessionManager getSessionManager() {
+    private SessionManager getSessionManager() {
         if(sessionManager == null) {
             this.sessionManager = new SessionManager(new HttpSessionAdapter(sessionInitUrl, sessionReinitUrl));
             this.sessionManager.addListener(this);

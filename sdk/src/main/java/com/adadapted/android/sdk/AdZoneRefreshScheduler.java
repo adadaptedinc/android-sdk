@@ -40,7 +40,7 @@ class AdZoneRefreshScheduler extends Timer {
         listeners.remove(listener);
     }
 
-    void notifyAdZoneRefreshTimer() {
+    private void notifyAdZoneRefreshTimer() {
         for(AdZoneRefreshScheduler.Listener listener : listeners) {
             listener.onAdZoneRefreshTimer();
         }

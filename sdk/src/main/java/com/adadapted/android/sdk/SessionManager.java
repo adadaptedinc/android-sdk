@@ -39,7 +39,7 @@ class SessionManager implements HttpSessionAdapter.Listener {
         listeners.remove(listener);
     }
 
-    void notifySessionInitialized(Session session) {
+    private void notifySessionInitialized(Session session) {
         for(Listener listener: listeners) {
            listener.onSessionInitialized(session);
         }

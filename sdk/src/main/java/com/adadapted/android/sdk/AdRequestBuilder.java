@@ -10,10 +10,10 @@ import java.util.Date;
 /**
  * Created by chrisweeden on 4/1/15.
  */
-public class AdRequestBuilder {
+class AdRequestBuilder {
     private static final String TAG = AdRequestBuilder.class.getName();
 
-    public JSONObject buildAdRequestJson(DeviceInfo deviceInfo, Session session) {
+    JSONObject buildAdRequestJson(DeviceInfo deviceInfo, Session session) {
         JSONObject json = new JSONObject();
 
         try {

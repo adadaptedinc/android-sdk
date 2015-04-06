@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -62,18 +63,18 @@ public class AAZoneView extends RelativeLayout
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public AAZoneView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    private AAZoneView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
     @Override
-    protected void onVisibilityChanged(View changedView, int visibility) {
+    protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
 
         Log.d(TAG, zoneLabel + " Visibility of AAZONE changed.");
     }
 
-    public String getZoneLabel() {
+    private String getZoneLabel() {
         return zoneLabel;
     }
 

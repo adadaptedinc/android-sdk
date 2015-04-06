@@ -15,7 +15,7 @@ class EventTracker {
 
     private JSONArray queuedEvents;
 
-    public EventTracker(EventAdapter eventAdapter) {
+    EventTracker(EventAdapter eventAdapter) {
         this.eventAdapter = eventAdapter;
 
         this.queuedEvents = new JSONArray();
@@ -26,7 +26,7 @@ class EventTracker {
         return queuedEvents;
     }
 
-    void trackEvent(String sessionId, Ad ad, EventType eventType, String eventName) {
+    private void trackEvent(String sessionId, Ad ad, EventType eventType, String eventName) {
         Log.d(TAG, "Queueing " + eventType + " for " + ad.getAdId());
 
         DeviceInfo deviceInfo = AdAdapted.getInstance().getDeviceInfo();
