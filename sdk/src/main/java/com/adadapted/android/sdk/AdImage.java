@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Created by chrisweeden on 3/30/15.
  */
-public class AdImage {
+class AdImage {
     private final Map<String, String> orientations;
 
     public AdImage() {

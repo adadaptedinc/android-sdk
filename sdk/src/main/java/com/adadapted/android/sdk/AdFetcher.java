@@ -5,7 +5,7 @@ import org.json.JSONObject;
 /**
  * Created by chrisweeden on 4/1/15.
  */
-public class AdFetcher implements AdAdapter.Listener {
+class AdFetcher implements AdAdapter.Listener {
     private static final String TAG = AdFetcher.class.getName();
 
     private final AdAdapter adAdapter;
