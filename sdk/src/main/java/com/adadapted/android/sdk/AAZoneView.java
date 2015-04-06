@@ -41,8 +41,8 @@ public class AAZoneView extends RelativeLayout
 
     private final Runnable buildAdRunnable = new Runnable() {
         public void run() {
-            Log.d(TAG, "Setting image view bitmap.");
-            adImageView.setImageBitmap(adImage);
+        Log.d(TAG, "Setting image view bitmap.");
+        adImageView.setImageBitmap(adImage);
         }
     };
 
@@ -64,6 +64,13 @@ public class AAZoneView extends RelativeLayout
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public AAZoneView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+    }
+
+    @Override
+    protected void onVisibilityChanged(View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+
+        Log.d(TAG, zoneLabel + " Visibility of AAZONE changed.");
     }
 
     public String getZoneLabel() {
@@ -94,18 +101,18 @@ public class AAZoneView extends RelativeLayout
         this.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(zone == null) {
-                    return;
-                }
+            if(zone == null) {
+                return;
+            }
 
-                Log.d(TAG, getZoneLabel() + " Ad clicked in Zone " + AAZoneView.this.zoneId);
-                AdAdapted.getInstance().getEventTracker().trackInteractionEvent(sessionId, currentAd);
-                AdAdapted.getInstance().getEventTracker().trackPopupBeginEvent(sessionId, currentAd);
+            Log.d(TAG, getZoneLabel() + " Ad clicked in Zone " + AAZoneView.this.zoneId);
+            AdAdapted.getInstance().getEventTracker().trackInteractionEvent(sessionId, currentAd);
+            AdAdapted.getInstance().getEventTracker().trackPopupBeginEvent(sessionId, currentAd);
 
-                isStoppingForPopup = true;
+            isStoppingForPopup = true;
 
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(currentAd.getActionPath()));
-                getContext().startActivity(intent);
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(currentAd.getActionPath()));
+            getContext().startActivity(intent);
             }
         });
     }
