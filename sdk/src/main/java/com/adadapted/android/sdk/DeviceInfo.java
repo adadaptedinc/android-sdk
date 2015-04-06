@@ -2,6 +2,7 @@ package com.adadapted.android.sdk;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -41,7 +42,7 @@ class DeviceInfo {
         deviceInfo.setAppId(appId);
         deviceInfo.setZones(zones);
 
-        deviceInfo.setUdid(deviceInfo.getAdvertisingId(context));
+        deviceInfo.setUdid(deviceInfo.captureAdvertisingId(context));
 
         deviceInfo.setBundleId(context.getPackageName());
         deviceInfo.setDevice(Build.MANUFACTURER + " " + Build.MODEL);
@@ -58,25 +59,25 @@ class DeviceInfo {
         return deviceInfo;
     }
 
-    private String getAdvertisingId(Context context) {
+    private String captureAdvertisingId(final Context context) {
         try {
             return AdvertisingIdClient.getAdvertisingIdInfo(context).getId();
         }
         catch (IOException ex) {
             Log.w(TAG, "Problem retrieving Google Play AdvertiserId", ex);
-            return getAndroidId(context);
+            return captureAndroidId(context);
         }
         catch (GooglePlayServicesNotAvailableException ex) {
             Log.w(TAG, "Problem retrieving Google Play AdvertiserId", ex);
-            return getAndroidId(context);
+            return captureAndroidId(context);
         }
         catch(GooglePlayServicesRepairableException ex) {
             Log.w(TAG, "Problem retrieving Google Play AdvertiserId", ex);
-            return getAndroidId(context);
+            return captureAndroidId(context);
         }
     }
 
-    private String getAndroidId(Context context) {
+    private String captureAndroidId(Context context) {
         return Settings.Secure.getString(
                 context.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
