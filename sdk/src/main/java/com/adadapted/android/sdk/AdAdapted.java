@@ -59,6 +59,8 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
 
         this.appId = appId;
         this.zones = zones;
+
+        ImageCache.getInstance().purgeCache();
     }
 
     static synchronized AdAdapted getInstance() {
