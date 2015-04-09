@@ -44,4 +44,8 @@ class ImageCache {
     public void putImage(String url, Bitmap bitmap) {
         imageCache.put(url, bitmap);
     }
+
+    public void purgeCache() {
+        imageCache.evictAll();
+    }
 }
