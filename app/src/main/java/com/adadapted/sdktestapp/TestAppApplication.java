@@ -1,6 +1,7 @@
 package com.adadapted.sdktestapp;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.adadapted.android.sdk.AdAdapted;
 import com.newrelic.agent.android.NewRelic;
@@ -18,6 +19,11 @@ public class TestAppApplication extends Application {
     @Override
     public void onCreate() {
         NewRelic.withApplicationToken("AAabde692c32523732801586d2c793895d9dae5e0d").start(this);
-        AdAdapted.init(this, "TESTAPPLICATION1", new String[]{"10", "12"});
+
+        String apiKey = getResources().getString(R.string.adadapted_api_key);
+        String[] zones = getResources().getStringArray(R.array.adadapted_zones);
+        boolean isProd = getResources().getBoolean(R.bool.adadapted_prod);
+
+        AdAdapted.init(this, apiKey, zones, isProd);
     }
 }
