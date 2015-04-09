@@ -3,6 +3,10 @@ package com.adadapted.android.sdk;
 import android.util.Log;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by chrisweeden on 3/23/15.
@@ -13,16 +17,16 @@ class EventTracker {
     private final EventAdapter eventAdapter;
     private final EventRequestBuilder builder;
 
-    private JSONArray queuedEvents;
+    private Set<JSONObject> queuedEvents;
 
     EventTracker(EventAdapter eventAdapter) {
         this.eventAdapter = eventAdapter;
 
-        this.queuedEvents = new JSONArray();
+        this.queuedEvents = new HashSet<>();
         this.builder = new EventRequestBuilder();
     }
 
-    public JSONArray getQueuedEvents() {
+    public Set<JSONObject> getQueuedEvents() {
         return queuedEvents;
     }
 
@@ -30,17 +34,20 @@ class EventTracker {
         Log.d(TAG, "Queueing " + eventType + " for " + ad.getAdId());
 
         DeviceInfo deviceInfo = AdAdapted.getInstance().getDeviceInfo();
-        queuedEvents.put(builder.build(deviceInfo, sessionId, ad, eventType, eventName));
+        queuedEvents.add(builder.build(deviceInfo, sessionId, ad, eventType, eventName));
 
-        if(queuedEvents.length() > 5) {
+        if(queuedEvents.size() > 5) {
             publishEvents();
         }
     }
 
     void publishEvents() {
-        if(queuedEvents.length() > 0) {
-            eventAdapter.sendBatch(queuedEvents);
-            queuedEvents = new JSONArray();
+        if(queuedEvents.size() > 0) {
+            Set<JSONObject> currentEvents = new HashSet<>(queuedEvents);
+            queuedEvents.clear();
+
+            JSONArray eventsArray = new JSONArray(currentEvents);
+            eventAdapter.sendBatch(eventsArray);
         }
         else {
             Log.d(TAG, "No items queued to publish.");
