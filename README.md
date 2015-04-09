@@ -1,0 +1,1 @@
+AdAdapted Android SDK
