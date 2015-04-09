@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.transition.Visibility;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -26,6 +27,7 @@ public class AAZoneView extends RelativeLayout
     private String zoneLabel;
 
     private boolean isActive;
+    private boolean isVisible = true;
     private boolean isStoppingForPopup = false;
 
     private String zoneId;
@@ -63,7 +65,7 @@ public class AAZoneView extends RelativeLayout
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private AAZoneView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public AAZoneView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
@@ -71,7 +73,26 @@ public class AAZoneView extends RelativeLayout
     protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
 
-        Log.d(TAG, zoneLabel + " Visibility of AAZONE changed.");
+        if(isStoppingForPopup) {
+            return;
+        }
+
+        switch(visibility) {
+            case View.GONE:
+            case View.INVISIBLE:
+                if(isVisible) {
+                    isVisible = false;
+                    onStop();
+                }
+                break;
+
+            case View.VISIBLE:
+                if(!isVisible) {
+                    isVisible = true;
+                    onStart();
+                }
+                break;
+        }
     }
 
     private String getZoneLabel() {
@@ -96,26 +117,28 @@ public class AAZoneView extends RelativeLayout
 
         this.adImageView = new ImageView(getContext());
         this.adImageView.setLayoutParams(new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
 
         this.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            if(zone == null) {
-                return;
-            }
+                if (zone == null || currentAd == null) {
+                    return;
+                }
 
-            Log.d(TAG, getZoneLabel() + " Ad clicked in Zone " + AAZoneView.this.zoneId);
-            AdAdapted.getInstance().getEventTracker().trackInteractionEvent(sessionId, currentAd);
-            AdAdapted.getInstance().getEventTracker().trackPopupBeginEvent(sessionId, currentAd);
+                Log.d(TAG, getZoneLabel() + " Ad " + currentAd.getAdId() + " clicked in Zone " + AAZoneView.this.zoneId);
+                AdAdapted.getInstance().getEventTracker().trackInteractionEvent(sessionId, currentAd);
+                AdAdapted.getInstance().getEventTracker().trackPopupBeginEvent(sessionId, currentAd);
 
-            isStoppingForPopup = true;
+                isStoppingForPopup = true;
 
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(currentAd.getActionPath()));
-            getContext().startActivity(intent);
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(currentAd.getActionPath()));
+                getContext().startActivity(intent);
             }
         });
+
+        onStart();
     }
 
     private void displayNextAd() {
@@ -126,11 +149,14 @@ public class AAZoneView extends RelativeLayout
             return;
         }
 
-        completeCurrentAd();
-
-        setNextAd();
-
-        displayAdImageView(adImageView);
+        if(isVisible) {
+            completeCurrentAd();
+            setNextAd();
+            displayAdImageView(adImageView);
+        }
+        else {
+            Log.i(TAG, getZoneLabel() + " is not Visible. Not displaying ad.");
+        }
     }
 
     private void setNextAd() {
@@ -234,6 +260,10 @@ public class AAZoneView extends RelativeLayout
     @Override
     public void onAdZoneRefreshTimer() {
         Log.d(TAG, getZoneLabel() + " Calling onAdZoneRefreshTimer()");
+
+        Log.d(TAG, getZoneLabel() + " isActive: " + isActive);
+        Log.d(TAG, getZoneLabel() + " isVisible: " + isVisible);
+        Log.d(TAG, getZoneLabel() + " isStoppingForPopup: " + isStoppingForPopup);
 
         if(isActive) {
             displayNextAd();
