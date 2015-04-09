@@ -1,10 +1,10 @@
 package com.adadapted.android.sdk;
 
-import static org.junit.Assert.*;
+import android.test.InstrumentationTestCase;
 
 /**
  * Created by chrisweeden on 4/6/15.
  */
-public class SessionBuilderTest {
+public class SessionBuilderTest extends InstrumentationTestCase {
 
 }
