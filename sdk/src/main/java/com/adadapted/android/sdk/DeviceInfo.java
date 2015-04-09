@@ -33,7 +33,7 @@ class DeviceInfo {
     private int dw;
     private int dh;
 
-    private DeviceInfo() {}
+    DeviceInfo() {}
 
     static DeviceInfo captureDeviceInfo(Context context, String appId, String[] zones) {
         DeviceInfo deviceInfo = new DeviceInfo();
@@ -64,16 +64,15 @@ class DeviceInfo {
         }
         catch (IOException ex) {
             Log.w(TAG, "Problem retrieving Google Play AdvertiserId", ex);
-            return captureAndroidId(context);
         }
         catch (GooglePlayServicesNotAvailableException ex) {
             Log.w(TAG, "Problem retrieving Google Play AdvertiserId", ex);
-            return captureAndroidId(context);
         }
         catch(GooglePlayServicesRepairableException ex) {
             Log.w(TAG, "Problem retrieving Google Play AdvertiserId", ex);
-            return captureAndroidId(context);
         }
+
+        return captureAndroidId(context);
     }
 
     private String captureAndroidId(Context context) {
@@ -86,7 +85,7 @@ class DeviceInfo {
         return appId;
     }
 
-    private void setAppId(String appId) {
+    void setAppId(String appId) {
         this.appId = appId;
     }
 
@@ -94,7 +93,7 @@ class DeviceInfo {
         return zones;
     }
 
-    private void setZones(String[] zones) {
+    void setZones(String[] zones) {
         this.zones = zones;
     }
 
@@ -102,7 +101,7 @@ class DeviceInfo {
         return bundleId;
     }
 
-    private void setBundleId(String bundleId) {
+    void setBundleId(String bundleId) {
         this.bundleId = bundleId;
     }
 
@@ -110,7 +109,7 @@ class DeviceInfo {
         return udid;
     }
 
-    private void setUdid(String udid) {
+    void setUdid(String udid) {
         this.udid = udid;
     }
 
@@ -118,7 +117,7 @@ class DeviceInfo {
         return device;
     }
 
-    private void setDevice(String device) {
+    void setDevice(String device) {
         this.device = device;
     }
 
@@ -126,7 +125,7 @@ class DeviceInfo {
         return os;
     }
 
-    private void setOs(String os) {
+    void setOs(String os) {
         this.os = os;
     }
 
@@ -134,7 +133,7 @@ class DeviceInfo {
         return osv;
     }
 
-    private void setOsv(String osv) {
+    void setOsv(String osv) {
         this.osv = osv;
     }
 
@@ -142,7 +141,7 @@ class DeviceInfo {
         return locale;
     }
 
-    private void setLocale(String locale) {
+    void setLocale(String locale) {
         this.locale = locale;
     }
 
@@ -150,7 +149,7 @@ class DeviceInfo {
         return timezone;
     }
 
-    private void setTimezone(String timezone) {
+    void setTimezone(String timezone) {
         this.timezone = timezone;
     }
 
@@ -158,7 +157,7 @@ class DeviceInfo {
         return dw;
     }
 
-    private void setDw(int dw) {
+    void setDw(int dw) {
         this.dw = dw;
     }
 
@@ -166,7 +165,7 @@ class DeviceInfo {
         return dh;
     }
 
-    private void setDh(int dh) {
+    void setDh(int dh) {
         this.dh = dh;
     }
 
