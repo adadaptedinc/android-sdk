@@ -11,4 +11,7 @@
     <string name="sandbox_session_reinit_object_url">http://sandbox.adadapted.com/v/0.9.3/android/session/reinit</string>
     <string name="sandbox_ad_get_object_url">http://sandbox.adadapted.com/v/0.9.3/android/ad/get</string>
     <string name="sandbox_event_batch_object_url">http://sandbox.adadapted.com/v/0.9.3/android/event/batch</string>
+    <string name="title_activity_web_view_popup">WebViewPopupActivity</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>

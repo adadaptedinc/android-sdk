@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.transition.Visibility;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -87,15 +88,18 @@ public class AAZoneView extends RelativeLayout
 
         this.zoneId = zoneId;
 
-        this.imageLoader = new AdImageLoader();
-        this.imageLoader.addListener(this);
+        imageLoader = new AdImageLoader();
+        imageLoader.addListener(this);
 
-        this.adImageView = new ImageView(getContext());
-        this.adImageView.setLayoutParams(new LinearLayout.LayoutParams(
+        adImageView = new ImageView(getContext());
+        adImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+        adImageView.setLayoutParams(new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        this.setOnClickListener(new View.OnClickListener() {
+        setGravity(Gravity.CENTER);
+
+        setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (zone == null || currentAd == null) {
@@ -108,7 +112,8 @@ public class AAZoneView extends RelativeLayout
 
                 isStoppingForPopup = true;
 
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(currentAd.getActionPath()));
+                Intent intent = new Intent(getContext(), WebViewPopupActivity.class);
+                intent.putExtra(WebViewPopupActivity.EXTRA_POPUP_URL, currentAd.getActionPath());
                 getContext().startActivity(intent);
             }
         });
@@ -261,10 +266,6 @@ public class AAZoneView extends RelativeLayout
     @Override
     public void onAdZoneRefreshTimer() {
         Log.d(TAG, getZoneLabel() + " Calling onAdZoneRefreshTimer()");
-
-        Log.d(TAG, getZoneLabel() + " isActive: " + isActive);
-        Log.d(TAG, getZoneLabel() + " isVisible: " + isVisible);
-        Log.d(TAG, getZoneLabel() + " isStoppingForPopup: " + isStoppingForPopup);
 
         if(isActive) {
             displayNextAd();
