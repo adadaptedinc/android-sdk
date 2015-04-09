@@ -25,6 +25,7 @@ class SessionRequestBuilder {
             json.put("os", deviceInfo.getOs());
             json.put("osv", deviceInfo.getOsv());
             json.put("locale", deviceInfo.getLocale());
+            json.put("timezone", deviceInfo.getTimezone());
             json.put("dh", deviceInfo.getDh());
             json.put("dw", deviceInfo.getDw());
             json.put("datetime", new Date().getTime());
