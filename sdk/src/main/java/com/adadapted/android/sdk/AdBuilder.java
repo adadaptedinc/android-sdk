@@ -18,6 +18,8 @@ import java.util.Set;
 class AdBuilder {
     private static final String TAG = AdBuilder.class.getName();
 
+    private static final int DEFAULT_REFRESH_TIME = 90;
+
     Set<Ad> buildAds(JSONArray jsonAds) {
         Set<Ad> ads = new HashSet<>();
 
@@ -42,7 +44,15 @@ class AdBuilder {
             ad.setAdId(jsonAd.getString("ad_id"));
             ad.setZoneId(jsonAd.getString("zone"));
             ad.setImpressionId(jsonAd.getString("impression_id"));
-            ad.setRefreshTime(Integer.parseInt(jsonAd.getString("refresh_time")));
+
+            try {
+                ad.setRefreshTime(Integer.parseInt(jsonAd.getString("refresh_time")));
+            }
+            catch(NumberFormatException ex) {
+                Log.w(TAG, "Ad " + ad.getAdId() + " has an improperly set refresh_time.");
+                ad.setRefreshTime(DEFAULT_REFRESH_TIME);
+            }
+
             ad.setAdType(jsonAd.getString("ad_type"));
             ad.setActionType(jsonAd.getString("act_type"));
             ad.setActionPath(jsonAd.getString("act_path"));
