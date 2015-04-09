@@ -1,6 +1,7 @@
 package com.adadapted.android.sdk;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -69,32 +70,6 @@ public class AAZoneView extends RelativeLayout
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
-    @Override
-    protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
-        super.onVisibilityChanged(changedView, visibility);
-
-        if(isStoppingForPopup) {
-            return;
-        }
-
-        switch(visibility) {
-            case View.GONE:
-            case View.INVISIBLE:
-                if(isVisible) {
-                    isVisible = false;
-                    onStop();
-                }
-                break;
-
-            case View.VISIBLE:
-                if(!isVisible) {
-                    isVisible = true;
-                    onStart();
-                }
-                break;
-        }
-    }
-
     private String getZoneLabel() {
         return zoneLabel;
     }
@@ -137,8 +112,6 @@ public class AAZoneView extends RelativeLayout
                 getContext().startActivity(intent);
             }
         });
-
-        onStart();
     }
 
     private void displayNextAd() {
@@ -236,6 +209,34 @@ public class AAZoneView extends RelativeLayout
         }
 
         AdAdapted.getInstance().getEventTracker().publishEvents();
+    }
+
+    @Override
+    protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+
+        if(isStoppingForPopup) {
+            return;
+        }
+
+        switch(visibility) {
+            case View.GONE:
+            case View.INVISIBLE:
+                Log.d(TAG, getZoneLabel() + " No Longer Visible");
+                if(isVisible && isActive) {
+                    isVisible = false;
+                    onStop();
+                }
+                break;
+
+            case View.VISIBLE:
+                Log.d(TAG, getZoneLabel() + " Is Visible");
+                if(!isVisible) {
+                    isVisible = true;
+                    onStart();
+                }
+                break;
+        }
     }
 
     @Override
