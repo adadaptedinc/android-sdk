@@ -14,6 +14,7 @@ class Ad {
     private String adType;
     private String actionType;
     private String actionPath;
+    private AdAction adAction;
     private String hideAfterInteraction;
     private String payload;
 
@@ -79,6 +80,14 @@ class Ad {
         this.actionPath = actionPath;
     }
 
+    public AdAction getAdAction() {
+        return adAction;
+    }
+
+    public void setAdAction(AdAction adAction) {
+        this.adAction = adAction;
+    }
+
     public String getHideAfterInteraction() {
         return hideAfterInteraction;
     }
@@ -125,6 +134,7 @@ class Ad {
                 ", adType='" + adType + '\'' +
                 ", actionType='" + actionType + '\'' +
                 ", actionPath='" + actionPath + '\'' +
+                ", adAction=" + adAction +
                 ", hideAfterInteraction='" + hideAfterInteraction + '\'' +
                 ", payload='" + payload + '\'' +
                 ", images=" + images +
