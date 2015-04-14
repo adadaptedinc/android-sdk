@@ -32,10 +32,11 @@ class DeviceInfo {
     private String timezone;
     private int dw;
     private int dh;
+    private String sdkVersion;
 
     DeviceInfo() {}
 
-    static DeviceInfo captureDeviceInfo(Context context, String appId, String[] zones) {
+    static DeviceInfo captureDeviceInfo(Context context, String appId, String[] zones, String sdkVersion) {
         DeviceInfo deviceInfo = new DeviceInfo();
 
         deviceInfo.setAppId(appId);
@@ -54,6 +55,8 @@ class DeviceInfo {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         deviceInfo.setDh(metrics.heightPixels);
         deviceInfo.setDw(metrics.widthPixels);
+
+        deviceInfo.setSdkVersion(sdkVersion);
 
         return deviceInfo;
     }
@@ -169,6 +172,14 @@ class DeviceInfo {
         this.dh = dh;
     }
 
+    public String getSdkVersion() {
+        return sdkVersion;
+    }
+
+    public void setSdkVersion(String sdkVersion) {
+        this.sdkVersion = sdkVersion;
+    }
+
     @Override
     public String toString() {
         return "DeviceInfo{" +
@@ -183,6 +194,7 @@ class DeviceInfo {
                 ", timezone='" + timezone + '\'' +
                 ", dw=" + dw +
                 ", dh=" + dh +
+                ", sdkVersion='" + sdkVersion + '\'' +
                 '}';
     }
 }
