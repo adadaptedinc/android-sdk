@@ -62,12 +62,43 @@ class AdBuilder {
                 Map<String, AdImage> images = parseImages(jsonAd.getJSONObject("images"));
                 ad.setImages(images);
             }
+            else if(ad.getAdType().equals("html")) {
+
+            }
+            else if(ad.getAdType().equals("json")) {
+
+            }
+
+            if(ad.getActionType().equals("p")) {
+                AdPopup popup = parseAdPopup(jsonAd.getJSONObject("popup"));
+                ad.setAdAction(popup);
+            }
         }
         catch(JSONException ex) {
             Log.w(TAG, "Problem converting to JSON.", ex);
         }
 
         return ad;
+    }
+
+    private AdPopup parseAdPopup(JSONObject popupJson) {
+        AdPopup popup = new AdPopup();
+
+        try {
+            popup.setHideBanner(Boolean.parseBoolean(popupJson.getString("hide_banner")));
+            popup.setTitle(popupJson.getString("title_text"));
+            popup.setBackgroundColor(popupJson.getString("background_color"));
+            popup.setTextColor(popupJson.getString("text_color"));
+            popup.setAltCloseButton(popupJson.getString("alt_close_btn"));
+            popup.setType(popupJson.getString("type"));
+            popup.setHideCloseButton(Boolean.parseBoolean(popupJson.getString("hide_close_btn")));
+            popup.setHideBrowserNavigation(Boolean.parseBoolean(popupJson.getString("hide_browser_nav")));
+        }
+        catch(JSONException ex) {
+            Log.w(TAG, "Problem converting to JSON.", ex);
+        }
+
+        return popup;
     }
 
     private Map<String, AdImage> parseImages(JSONObject jsonImages) {
