@@ -37,6 +37,7 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
 
     private final String appId;
     private final String[] zones;
+    private final String sdkVersion;
 
     private AdAdapted(Context context, String appId, String[] zones, boolean prodMode) {
         this.listeners = new HashSet<>();
@@ -59,6 +60,7 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
 
         this.appId = appId;
         this.zones = zones;
+        this.sdkVersion = context.getString(R.string.sdk_version);
 
         ImageCache.getInstance().purgeCache();
     }
