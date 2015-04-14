@@ -30,6 +30,7 @@ class SessionRequestBuilder {
             json.put("dw", deviceInfo.getDw());
             json.put("datetime", new Date().getTime());
             json.put("allow_retargeting", 1);
+            json.put("sdk_version", deviceInfo.getSdkVersion());
 
             String[] zones = deviceInfo.getZones();
 

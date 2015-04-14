@@ -25,6 +25,7 @@ class EventRequestBuilder {
             json.put("event_type", eventType.toString());
             json.put("event_name", eventName);
             json.put("datetime", new Date().getTime());
+            json.put("sdk_version", deviceInfo.getSdkVersion());
         }
         catch(JSONException ex) {
             Log.d(TAG, "Problem converting to JSON.", ex);

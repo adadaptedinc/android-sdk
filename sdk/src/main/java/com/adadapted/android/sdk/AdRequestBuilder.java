@@ -22,6 +22,7 @@ class AdRequestBuilder {
             json.put("session_id", session.getSessionId());
             json.put("zones", deviceInfo.getZones());
             json.put("datetime", new Date().getTime());
+            json.put("sdk_version", deviceInfo.getSdkVersion());
         }
         catch(JSONException ex) {
            Log.d(TAG, "Problem parsing JSON", ex);
