@@ -18,6 +18,9 @@ import java.util.Set;
 public class EventTracker {
     private static final String TAG = EventTracker.class.getName();
 
+    private static final int EMPTY_QUEUE_SIZE = 0;
+    private static final int MAX_QUEUE_SIZE = 10;
+
     private final EventAdapter eventAdapter;
     private final EventRequestBuilder builder;
 
@@ -40,13 +43,13 @@ public class EventTracker {
         DeviceInfo deviceInfo = AdAdapted.getInstance().getDeviceInfo();
         queuedEvents.add(builder.build(deviceInfo, sessionId, ad, eventType, eventName));
 
-        if(queuedEvents.size() > 5) {
+        if(queuedEvents.size() >= MAX_QUEUE_SIZE) {
             publishEvents();
         }
     }
 
     public void publishEvents() {
-        if(queuedEvents.size() > 0) {
+        if(queuedEvents.size() > EMPTY_QUEUE_SIZE) {
             Set<JSONObject> currentEvents = new HashSet<>(queuedEvents);
             queuedEvents.clear();
 
