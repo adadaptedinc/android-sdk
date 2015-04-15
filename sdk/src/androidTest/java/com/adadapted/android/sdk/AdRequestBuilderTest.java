@@ -2,6 +2,10 @@ package com.adadapted.android.sdk;
 
 import android.test.InstrumentationTestCase;
 
+import com.adadapted.android.sdk.core.ad.AdRequestBuilder;
+import com.adadapted.android.sdk.core.device.DeviceInfo;
+import com.adadapted.android.sdk.core.session.Session;
+
 import junit.framework.Assert;
 
 import org.json.JSONObject;

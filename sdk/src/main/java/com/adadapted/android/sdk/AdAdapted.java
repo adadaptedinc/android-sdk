@@ -3,6 +3,16 @@ package com.adadapted.android.sdk;
 import android.content.Context;
 import android.util.Log;
 
+import com.adadapted.android.sdk.core.device.BuildDeviceInfoParam;
+import com.adadapted.android.sdk.core.device.DeviceInfo;
+import com.adadapted.android.sdk.core.device.DeviceInfoBuilder;
+import com.adadapted.android.sdk.core.event.EventTracker;
+import com.adadapted.android.sdk.core.session.Session;
+import com.adadapted.android.sdk.core.session.SessionManager;
+import com.adadapted.android.sdk.ext.cache.ImageCache;
+import com.adadapted.android.sdk.ext.http.HttpEventAdapter;
+import com.adadapted.android.sdk.ext.http.HttpSessionAdapter;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,7 +25,7 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
 
     private static AdAdapted instance;
 
-    interface Listener {
+    public interface Listener {
         void onSessionLoaded(Session session);
     }
 
@@ -65,7 +75,7 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
         ImageCache.getInstance().purgeCache();
     }
 
-    static synchronized AdAdapted getInstance() {
+    public static synchronized AdAdapted getInstance() {
         return instance;
     }
 
@@ -79,18 +89,18 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
     private void initialize() {
         DeviceInfoBuilder builder = new DeviceInfoBuilder();
         builder.addListener(this);
-        builder.execute(new BuildDeviceInfoParam(context, appId, zones));
+        builder.execute(new BuildDeviceInfoParam(context, appId, zones, sdkVersion));
     }
 
-    Context getContext() {
+    public Context getContext() {
         return context;
     }
 
-    DeviceInfo getDeviceInfo() {
+    public DeviceInfo getDeviceInfo() {
         return deviceInfo;
     }
 
-    Session getSession() {
+    public Session getSession() {
         return session;
     }
 
@@ -107,7 +117,7 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
         return sessionManager;
     }
 
-    EventTracker getEventTracker() {
+    public EventTracker getEventTracker() {
         if(eventTracker == null) {
             this.eventTracker = new EventTracker(new HttpEventAdapter(eventBatchUrl));
         }
