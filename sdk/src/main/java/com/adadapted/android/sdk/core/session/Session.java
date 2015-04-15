@@ -38,6 +38,10 @@ public class Session {
         this.activeCampaigns = activeCampaigns;
     }
 
+    public boolean hasExpired() {
+        return expiresAt.getTime() <= (new Date().getTime());
+    }
+
     public Date getExpiresAt() {
         return expiresAt;
     }
