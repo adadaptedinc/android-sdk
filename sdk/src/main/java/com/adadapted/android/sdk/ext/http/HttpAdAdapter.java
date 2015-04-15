@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 4/1/15.
  */
-class HttpAdAdapter implements AdAdapter {
+public class HttpAdAdapter implements AdAdapter {
     private static final String TAG = HttpAdAdapter.class.getName();
 
     private final Set<Listener> listeners;
