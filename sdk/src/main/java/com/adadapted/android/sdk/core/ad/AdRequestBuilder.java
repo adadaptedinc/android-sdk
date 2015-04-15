@@ -5,6 +5,7 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.session.Session;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,9 +24,17 @@ class AdRequestBuilder {
             json.put("app_id", deviceInfo.getAppId());
             json.put("udid", deviceInfo.getUdid());
             json.put("session_id", session.getSessionId());
-            json.put("zones", deviceInfo.getZones());
             json.put("datetime", new Date().getTime());
             json.put("sdk_version", deviceInfo.getSdkVersion());
+
+            String[] zones = deviceInfo.getZones();
+
+            JSONArray zonesArray = new JSONArray();
+            for(String zone : zones) {
+                zonesArray.put(zone);
+            }
+
+            json.put("zones", zonesArray);
         }
         catch(JSONException ex) {
            Log.d(TAG, "Problem parsing JSON", ex);
