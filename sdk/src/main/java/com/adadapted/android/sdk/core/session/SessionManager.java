@@ -33,6 +33,11 @@ public class SessionManager implements SessionAdapter.Listener {
         httpSessionAdapter.sendInit(request);
     }
 
+    public void reinitialize(DeviceInfo deviceInfo) {
+        JSONObject request = new SessionRequestBuilder().buildSessionRequestJson(deviceInfo);
+        httpSessionAdapter.sendReinit(request);
+    }
+
     public void addListener(Listener listener) {
         listeners.add(listener);
     }
