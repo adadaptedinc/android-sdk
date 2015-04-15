@@ -11,6 +11,7 @@ public interface SessionAdapter {
     }
 
     void sendInit(JSONObject json);
+    void sendReinit(JSONObject request);
 
     void addListener(Listener listener);
     void removeListener(Listener listener);
