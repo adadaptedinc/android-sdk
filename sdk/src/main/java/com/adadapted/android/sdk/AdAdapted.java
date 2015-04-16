@@ -3,34 +3,44 @@ package com.adadapted.android.sdk;
 import android.content.Context;
 import android.util.Log;
 
+import com.adadapted.android.sdk.core.ad.Ad;
+import com.adadapted.android.sdk.core.ad.AdAdapter;
 import com.adadapted.android.sdk.core.ad.AdFetcher;
+import com.adadapted.android.sdk.core.ad.AdRefreshBuilder;
+import com.adadapted.android.sdk.core.ad.AdRequestBuilder;
 import com.adadapted.android.sdk.core.device.BuildDeviceInfoParam;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.device.DeviceInfoBuilder;
 import com.adadapted.android.sdk.core.event.EventTracker;
 import com.adadapted.android.sdk.core.session.Session;
+import com.adadapted.android.sdk.core.session.SessionBuilder;
 import com.adadapted.android.sdk.core.session.SessionManager;
+import com.adadapted.android.sdk.core.session.SessionRequestBuilder;
+import com.adadapted.android.sdk.core.zone.Zone;
 import com.adadapted.android.sdk.ext.cache.ImageCache;
 import com.adadapted.android.sdk.ext.http.HttpAdAdapter;
 import com.adadapted.android.sdk.ext.http.HttpEventAdapter;
 import com.adadapted.android.sdk.ext.http.HttpSessionAdapter;
+import com.adadapted.android.sdk.ext.json.JsonAdRequestBuilder;
 import com.adadapted.android.sdk.ext.scheduler.AdRefreshScheduler;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * Created by chrisweeden on 3/16/15.
  */
 public class AdAdapted implements DeviceInfoBuilder.Listener,
-        SessionManager.Listener, AdRefreshScheduler.Listener {
+        SessionManager.Listener, AdFetcher.Listener {
     private static final String TAG = "AdAdapted";
 
     private static AdAdapted instance;
 
     public interface Listener {
         void onSessionLoaded(Session session);
+        void onSessionAdsReloaded(Session session);
     }
 
     private final Set<Listener> listeners;
@@ -82,8 +92,8 @@ public class AdAdapted implements DeviceInfoBuilder.Listener,
         this.zones = zones;
         this.sdkVersion = context.getString(R.string.sdk_version);
 
-        adRefreshScheduler = new AdRefreshScheduler();
-        adRefreshScheduler.addListener(this);
+        adRefreshScheduler = new AdRefreshScheduler(getSessionManager(),
+                getEventTracker(), getAdFetcher());
 
         ImageCache.getInstance().purgeCache();
     }
@@ -121,9 +131,19 @@ public class AdAdapted implements DeviceInfoBuilder.Listener,
         return sessionLoaded;
     }
 
+    public Ad getNextAdForZone(String zoneId) {
+        Zone zone = session.getZone(zoneId);
+        return (zone != null) ? zone.getNextAd(session.getPollingInterval()) : null;
+    }
+
     private AdFetcher getAdFetcher() {
         if(adFetcher == null) {
-            adFetcher = new AdFetcher(new HttpAdAdapter(adGetUrl));
+            AdAdapter adapter = new HttpAdAdapter(adGetUrl);
+            AdRequestBuilder requestBuilder = new JsonAdRequestBuilder();
+            AdRefreshBuilder refreshBuilder = new AdRefreshBuilder();
+
+            adFetcher = new AdFetcher(adapter, requestBuilder, refreshBuilder );
+            adFetcher.addListener(this);
         }
 
         return adFetcher;
@@ -139,11 +159,19 @@ public class AdAdapted implements DeviceInfoBuilder.Listener,
 
     private SessionManager getSessionManager() {
         if(sessionManager == null) {
-            this.sessionManager = new SessionManager(new HttpSessionAdapter(sessionInitUrl, sessionReinitUrl));
-            this.sessionManager.addListener(this);
+            HttpSessionAdapter adapter = new HttpSessionAdapter(sessionInitUrl, sessionReinitUrl);
+            SessionRequestBuilder requestBuilder = new SessionRequestBuilder();
+            SessionBuilder sessionBuilder = new SessionBuilder();
+
+            sessionManager = new SessionManager(adapter, requestBuilder, sessionBuilder);
+            sessionManager.addListener(this);
         }
 
         return sessionManager;
+    }
+
+    private void scheduleAdRefreshTimer() {
+        adRefreshScheduler.schedule(session.getPollingInterval(), getSession(), getDeviceInfo());
     }
 
     public void addListener(AdAdapted.Listener listener) {
@@ -164,6 +192,12 @@ public class AdAdapted implements DeviceInfoBuilder.Listener,
         }
     }
 
+    private void notifySessionAdsReloaded() {
+        for(Listener listener : listeners) {
+            listener.onSessionAdsReloaded(session);
+        }
+    }
+
     @Override
     public void onDeviceInfoCollected(DeviceInfo deviceInfo) {
         this.deviceInfo = deviceInfo;
@@ -175,41 +209,22 @@ public class AdAdapted implements DeviceInfoBuilder.Listener,
         this.session = session;
         this.sessionLoaded = true;
 
-        adRefreshScheduler.schedule(session.getPollingInterval());
+        scheduleAdRefreshTimer();
 
         notifySessionLoaded();
     }
 
     @Override
-    public void onAdRefreshTimer() {
-        Log.d(TAG, "AdRefreshScheduler fired.");
+    public void onAdsRefreshed(Map<String, Zone> zones) {
+        this.session.updateZones(zones);
 
-        getEventTracker().publishEvents();
+        scheduleAdRefreshTimer();
 
-        if(session.hasExpired()) {
-            Log.d(TAG, "Session has expired.");
-            getSessionManager().reinitialize(deviceInfo);
-        }
-        else {
-            Log.d(TAG, "Session has NOT expired.");
-            getAdFetcher().fetchAdsFor(deviceInfo, session);
-        }
+        notifySessionAdsReloaded();
     }
 
     @Override
     public String toString() {
-        return "AdAdapted{" +
-                "listeners=" + listeners +
-                ", context=" + context +
-                ", deviceInfo=" + deviceInfo +
-                ", session=" + session +
-                ", sessionManager=" + sessionManager +
-                ", eventTracker=" + eventTracker +
-                ", sessionInitUrl='" + sessionInitUrl + '\'' +
-                ", sessionReinitUrl='" + sessionReinitUrl + '\'' +
-                ", eventBatchUrl='" + eventBatchUrl + '\'' +
-                ", appId='" + appId + '\'' +
-                ", zones=" + Arrays.toString(zones) +
-                '}';
+        return "AdAdapted{}";
     }
 }
