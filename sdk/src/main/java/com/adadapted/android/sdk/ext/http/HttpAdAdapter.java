@@ -1,5 +1,7 @@
 package com.adadapted.android.sdk.ext.http;
 
+import android.util.Log;
+
 import com.adadapted.android.sdk.core.ad.AdAdapter;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -31,12 +33,13 @@ public class HttpAdAdapter implements AdAdapter {
                 @Override
                 public void onResponse(JSONObject jsonObject) {
                     notifyAdGetRequestCompleted(jsonObject);
+                    Log.d(TAG, "Ad Get Request Succeeded.");
                 }
             },
             new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError volleyError) {
-
+                    Log.d(TAG, "Ad Get Request Failed.");
                 }
             }
         );
