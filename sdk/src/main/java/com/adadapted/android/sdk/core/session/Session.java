@@ -18,7 +18,7 @@ public class Session {
     private long pollingInterval;
     private final Map<String, Zone> zones;
 
-    Session() {
+    public Session() {
         this.zones = new HashMap<>();
     }
 
@@ -69,6 +69,11 @@ public class Session {
 
     public Zone getZone(String zoneId) {
         return zones.get(zoneId);
+    }
+
+    public void updateZones(Map<String, Zone> zones) {
+        zones.clear();
+        zones.putAll(zones);
     }
 
     @Override
