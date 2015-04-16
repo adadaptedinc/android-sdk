@@ -18,11 +18,11 @@ import android.widget.RelativeLayout;
 
 import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.ad.ImageAdType;
+import com.adadapted.android.sdk.core.zone.Zone;
 import com.adadapted.android.sdk.ext.http.AdImageLoader;
 import com.adadapted.android.sdk.core.ad.Ad;
 import com.adadapted.android.sdk.core.ad.AdImage;
 import com.adadapted.android.sdk.core.session.Session;
-import com.adadapted.android.sdk.core.zone.Zone;
 import com.adadapted.android.sdk.ext.scheduler.AdZoneRefreshScheduler;
 
 /**
@@ -40,9 +40,8 @@ public class AAZoneView extends RelativeLayout
 
     private String zoneId;
     private String sessionId;
-    private Zone zone;
+    private int adCountForZone;
 
-    private int viewCount;
     private Ad currentAd;
 
     private AdImageLoader imageLoader;
@@ -89,6 +88,10 @@ public class AAZoneView extends RelativeLayout
         return zoneId;
     }
 
+    public boolean zoneHasNoAds() {
+        return adCountForZone == 0;
+    }
+
     public void init(String zoneId) {
         Log.d(TAG, getZoneLabel() + " Calling init() with " + zoneId);
 
@@ -108,7 +111,7 @@ public class AAZoneView extends RelativeLayout
         setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (zone == null || currentAd == null) {
+                if (zoneHasNoAds() || currentAd == null) {
                     return;
                 }
 
@@ -128,7 +131,7 @@ public class AAZoneView extends RelativeLayout
     private void displayNextAd() {
         Log.d(TAG, getZoneLabel() + " Calling displayNextAd()");
 
-        if(zone == null) {
+        if(zoneHasNoAds()) {
             Log.d(TAG, getZoneLabel() + " No ads for zone " + zoneId);
             return;
         }
@@ -144,8 +147,8 @@ public class AAZoneView extends RelativeLayout
     }
 
     private void setNextAd() {
-        int adPosition = (viewCount++) % zone.getAds().size();
-        currentAd = zone.getAds().get(adPosition);
+        currentAd = AdAdapted.getInstance().getNextAdForZone(zoneId);
+
         loadNextAdAssets();
 
         AdAdapted.getInstance().getEventTracker().trackImpressionBeginEvent(sessionId, currentAd);
@@ -191,7 +194,7 @@ public class AAZoneView extends RelativeLayout
     }
 
     private void completeCurrentAd() {
-        if(currentAd != null && viewCount > 0) {
+        if(currentAd != null) {
             AdAdapted.getInstance().getEventTracker().trackImpressionEndEvent(sessionId, currentAd);
             currentAd = null;
         }
@@ -235,7 +238,7 @@ public class AAZoneView extends RelativeLayout
         isActive = false;
         AdAdapted.getInstance().removeListener(this);
 
-        if(zone == null) {
+        if(zoneHasNoAds()) {
             return;
         }
 
@@ -283,8 +286,9 @@ public class AAZoneView extends RelativeLayout
         Log.d(TAG, getZoneLabel() + " Calling onSessionLoaded()");
 
         this.sessionId = session.getSessionId();
-        this.zone = session.getZone(zoneId);
-        viewCount = 0;
+
+        Zone zone = session.getZone(zoneId);
+        this.adCountForZone = (zone != null) ? zone.getAdCount() : 0;
 
         displayNextAd();
     }

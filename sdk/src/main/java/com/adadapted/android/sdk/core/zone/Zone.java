@@ -1,6 +1,5 @@
 package com.adadapted.android.sdk.core.zone;
 
-
 import com.adadapted.android.sdk.core.ad.Ad;
 import com.adadapted.android.sdk.core.common.Dimension;
 
@@ -16,13 +15,21 @@ public class Zone {
     private static final String TAG = Zone.class.getName();
 
     private final String zoneId;
+
     private Map<String, Dimension> dimensions;
     private final List<Ad> ads;
 
+    private Map<String, Integer> adViews;
+    private int zoneViews;
+    private int adIndex;
+
     public Zone(String zoneId) {
         this.zoneId = zoneId;
+
         this.dimensions = new HashMap<>();
         this.ads = new ArrayList<>();
+
+        this.adViews = new HashMap<>();
     }
 
     public String getZoneId() {
@@ -39,6 +46,36 @@ public class Zone {
 
     public List<Ad> getAds() {
         return ads;
+    }
+
+    public void setAds(List<Ad> ads) {
+        this.ads.clear();
+        this.ads.addAll(ads);
+
+        for(Ad ad : ads) {
+            adViews.put(ad.getAdId(), 0);
+            adIndex = 0;
+        }
+    }
+
+    public int getAdCount() {
+        return ads.size();
+    }
+
+    public Ad getNextAd() {
+        adIndex = zoneViews % ads.size();
+
+        Ad ad = ads.get(adIndex);
+
+        int count = adViews.get(ad.getAdId());
+        ad.setImpressionViews(++count);
+        adViews.put(ad.getAdId(), count);
+
+        return ad;
+    }
+
+    public Ad getCurrentAd() {
+        return ads.get(adIndex);
     }
 
     @Override
