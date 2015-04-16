@@ -20,7 +20,7 @@ public class AdImageLoader {
     private final Set<Listener> listeners;
 
     public interface Listener {
-        public void onAdImageLoaded(Bitmap bitmap);
+        void onAdImageLoaded(Bitmap bitmap);
     }
 
     public AdImageLoader() {
