@@ -32,6 +32,7 @@ public class HttpSessionAdapter implements SessionAdapter {
     }
 
     public void sendInit(JSONObject json) {
+        Log.i(TAG, "session/init JSON: " + json);
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
                 initUrl, json, new Response.Listener<JSONObject>(){
 
@@ -55,6 +56,7 @@ public class HttpSessionAdapter implements SessionAdapter {
 
     @Override
     public void sendReinit(JSONObject json) {
+        Log.i(TAG, "session/reinit JSON: " + json);
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
                 reinitUrl, json, new Response.Listener<JSONObject>(){
 

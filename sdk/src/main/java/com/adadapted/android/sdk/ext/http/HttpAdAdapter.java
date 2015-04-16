@@ -28,6 +28,7 @@ public class HttpAdAdapter implements AdAdapter {
 
     @Override
     public void getAds(JSONObject json) {
+        Log.i(TAG, "ad/get JSON: " + json);
         JsonObjectRequest request = new JsonObjectRequest(adGetUrl, json,
             new Response.Listener<JSONObject>() {
                 @Override

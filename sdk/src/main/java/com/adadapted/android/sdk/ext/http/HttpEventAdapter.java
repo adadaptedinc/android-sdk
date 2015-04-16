@@ -31,6 +31,7 @@ public class HttpEventAdapter implements EventAdapter {
 
     @Override
     public void sendBatch(JSONArray json) {
+        Log.i(TAG, "event/batch JSON: " + json);
         JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST,
                 batchUrl, json, new Response.Listener<JSONArray>(){
 
