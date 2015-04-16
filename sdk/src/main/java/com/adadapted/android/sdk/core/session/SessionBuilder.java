@@ -14,16 +14,16 @@ import java.util.Map;
 /**
  * Created by chrisweeden on 3/23/15.
  */
-class SessionBuilder {
+public class SessionBuilder {
     private static final String TAG = SessionBuilder.class.getName();
 
     private final ZoneBuilder zoneBuilder;
 
-    SessionBuilder() {
+    public SessionBuilder() {
         this.zoneBuilder = new ZoneBuilder();
     }
 
-    Session buildSession(JSONObject response) {
+    public Session buildSession(JSONObject response) {
         Session session = new Session();
 
         try {
@@ -36,7 +36,7 @@ class SessionBuilder {
                 JSONObject jsonZones = response.getJSONObject("zones");
                 Map<String, Zone> zones = zoneBuilder.buildZones(jsonZones);
 
-                session.getZones().putAll(zones);
+                session.updateZones(zones);
             }
         }
         catch(JSONException ex) {
