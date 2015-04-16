@@ -37,7 +37,7 @@ public class HttpSessionAdapter implements SessionAdapter {
 
             @Override
             public void onResponse(JSONObject response) {
-                Log.d(TAG, "Session Request Succeeded.");
+                Log.d(TAG, "Session Init Request Succeeded.");
                 notifySessionRequestCompleted(response);
             }
 
@@ -45,7 +45,30 @@ public class HttpSessionAdapter implements SessionAdapter {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, "Session Request Failed.", error);
+                Log.d(TAG, "Session Init Request Failed.", error);
+            }
+
+        });
+
+        HttpRequestManager.getQueue().add(jsonRequest);
+    }
+
+    @Override
+    public void sendReinit(JSONObject json) {
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
+                reinitUrl, json, new Response.Listener<JSONObject>(){
+
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.d(TAG, "Session Reinit Request Succeeded.");
+                notifySessionRequestCompleted(response);
+            }
+
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, "Session Reinit Request Failed.", error);
             }
 
         });
