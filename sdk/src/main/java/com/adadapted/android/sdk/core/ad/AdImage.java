@@ -9,6 +9,9 @@ import java.util.Map;
 public class AdImage {
     private final Map<String, String> orientations;
 
+    public static final String PORTRAIT = "port";
+    public static final String LANDSCAPE = "land";
+
     public AdImage() {
         orientations = new HashMap<>();
     }

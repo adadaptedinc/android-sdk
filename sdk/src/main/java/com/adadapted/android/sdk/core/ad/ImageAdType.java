@@ -9,6 +9,9 @@ import java.util.Map;
 public class ImageAdType extends AdType {
     private Map<String, AdImage> images;
 
+    public static final String STANDARD_IMAGE = "standard";
+    public static final String RETINA_IMAGE = "retina";
+
     public ImageAdType() {
         images = new HashMap<>();
         setAdType(AdTypes.IMAGE);
@@ -19,14 +22,18 @@ public class ImageAdType extends AdType {
     }
 
     public AdImage getStandardImages() {
-        return images.get("standard");
+        return images.get(STANDARD_IMAGE);
     }
 
     public AdImage getRetinaImages() {
-        return images.get("retina");
+        return images.get(RETINA_IMAGE);
     }
 
     public void setImages(Map<String, AdImage> images) {
         this.images = images;
+    }
+
+    public String getImageUrlFor(String resolution, String orientation) {
+        return images.get(resolution).getOrientation(orientation);
     }
 }
