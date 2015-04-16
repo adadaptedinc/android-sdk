@@ -72,8 +72,8 @@ public class Session {
     }
 
     public void updateZones(Map<String, Zone> zones) {
-        zones.clear();
-        zones.putAll(zones);
+        this.zones.clear();
+        this.zones.putAll(zones);
     }
 
     @Override
