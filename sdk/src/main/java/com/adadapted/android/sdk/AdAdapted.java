@@ -3,6 +3,7 @@ package com.adadapted.android.sdk;
 import android.content.Context;
 import android.util.Log;
 
+import com.adadapted.android.sdk.core.ad.AdFetcher;
 import com.adadapted.android.sdk.core.device.BuildDeviceInfoParam;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.device.DeviceInfoBuilder;
@@ -10,8 +11,10 @@ import com.adadapted.android.sdk.core.event.EventTracker;
 import com.adadapted.android.sdk.core.session.Session;
 import com.adadapted.android.sdk.core.session.SessionManager;
 import com.adadapted.android.sdk.ext.cache.ImageCache;
+import com.adadapted.android.sdk.ext.http.HttpAdAdapter;
 import com.adadapted.android.sdk.ext.http.HttpEventAdapter;
 import com.adadapted.android.sdk.ext.http.HttpSessionAdapter;
+import com.adadapted.android.sdk.ext.scheduler.AdRefreshScheduler;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -20,7 +23,8 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 3/16/15.
  */
-public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Listener {
+public class AdAdapted implements DeviceInfoBuilder.Listener,
+        SessionManager.Listener, AdRefreshScheduler.Listener {
     private static final String TAG = "AdAdapted";
 
     private static AdAdapted instance;
@@ -38,12 +42,16 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
     private Session session;
     private boolean sessionLoaded;
 
-    private SessionManager sessionManager;
+    private AdFetcher adFetcher;
     private EventTracker eventTracker;
+    private SessionManager sessionManager;
 
+    private AdRefreshScheduler adRefreshScheduler;
+
+    private final String adGetUrl;
+    private final String eventBatchUrl;
     private final String sessionInitUrl;
     private final String sessionReinitUrl;
-    private final String eventBatchUrl;
 
     private final String appId;
     private final String[] zones;
@@ -58,19 +66,24 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
         this.sessionLoaded = false;
 
         if(prodMode) {
+            this.adGetUrl = context.getString(R.string.prod_ad_get_object_url);
+            this.eventBatchUrl = context.getString(R.string.prod_event_batch_object_url);
             this.sessionInitUrl = context.getString(R.string.prod_session_init_object_url);
             this.sessionReinitUrl = context.getString(R.string.prod_session_reinit_object_url);
-            this.eventBatchUrl = context.getString(R.string.prod_event_batch_object_url);
         }
         else {
+            this.adGetUrl = context.getString(R.string.sandbox_ad_get_object_url);
+            this.eventBatchUrl = context.getString(R.string.sandbox_event_batch_object_url);
             this.sessionInitUrl = context.getString(R.string.sandbox_session_init_object_url);
             this.sessionReinitUrl = context.getString(R.string.sandbox_session_reinit_object_url);
-            this.eventBatchUrl = context.getString(R.string.sandbox_event_batch_object_url);
         }
 
         this.appId = appId;
         this.zones = zones;
         this.sdkVersion = context.getString(R.string.sdk_version);
+
+        adRefreshScheduler = new AdRefreshScheduler();
+        adRefreshScheduler.addListener(this);
 
         ImageCache.getInstance().purgeCache();
     }
@@ -108,13 +121,12 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
         return sessionLoaded;
     }
 
-    private SessionManager getSessionManager() {
-        if(sessionManager == null) {
-            this.sessionManager = new SessionManager(new HttpSessionAdapter(sessionInitUrl, sessionReinitUrl));
-            this.sessionManager.addListener(this);
+    private AdFetcher getAdFetcher() {
+        if(adFetcher == null) {
+            adFetcher = new AdFetcher(new HttpAdAdapter(adGetUrl));
         }
 
-        return sessionManager;
+        return adFetcher;
     }
 
     public EventTracker getEventTracker() {
@@ -123,6 +135,15 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
         }
 
         return eventTracker;
+    }
+
+    private SessionManager getSessionManager() {
+        if(sessionManager == null) {
+            this.sessionManager = new SessionManager(new HttpSessionAdapter(sessionInitUrl, sessionReinitUrl));
+            this.sessionManager.addListener(this);
+        }
+
+        return sessionManager;
     }
 
     public void addListener(AdAdapted.Listener listener) {
@@ -154,7 +175,25 @@ public class AdAdapted implements DeviceInfoBuilder.Listener, SessionManager.Lis
         this.session = session;
         this.sessionLoaded = true;
 
+        adRefreshScheduler.schedule(session.getPollingInterval());
+
         notifySessionLoaded();
+    }
+
+    @Override
+    public void onAdRefreshTimer() {
+        Log.d(TAG, "AdRefreshScheduler fired.");
+
+        getEventTracker().publishEvents();
+
+        if(session.hasExpired()) {
+            Log.d(TAG, "Session has expired.");
+            getSessionManager().reinitialize(deviceInfo);
+        }
+        else {
+            Log.d(TAG, "Session has NOT expired.");
+            getAdFetcher().fetchAdsFor(deviceInfo, session);
+        }
     }
 
     @Override
