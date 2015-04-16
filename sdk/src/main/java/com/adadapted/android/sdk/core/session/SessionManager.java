@@ -20,21 +20,29 @@ public class SessionManager implements SessionAdapter.Listener {
     private final Set<Listener> listeners;
 
     private final SessionAdapter httpSessionAdapter;
+    private final SessionRequestBuilder requestBuilder;
+    private final SessionBuilder sessionBuilder;
 
-    public SessionManager(SessionAdapter httpSessionAdapter) {
+    public SessionManager(SessionAdapter httpSessionAdapter,
+                          SessionRequestBuilder requestBuilder,
+                          SessionBuilder sessionBuilder) {
         this.listeners = new HashSet<>();
 
         this.httpSessionAdapter = httpSessionAdapter;
         this.httpSessionAdapter.addListener(this);
+
+        this.requestBuilder = requestBuilder;
+
+        this.sessionBuilder = sessionBuilder;
     }
 
     public void initialize(DeviceInfo deviceInfo) {
-        JSONObject request = new SessionRequestBuilder().buildSessionRequestJson(deviceInfo);
+        JSONObject request = requestBuilder.buildSessionRequestJson(deviceInfo);
         httpSessionAdapter.sendInit(request);
     }
 
     public void reinitialize(DeviceInfo deviceInfo) {
-        JSONObject request = new SessionRequestBuilder().buildSessionRequestJson(deviceInfo);
+        JSONObject request = requestBuilder.buildSessionRequestJson(deviceInfo);
         httpSessionAdapter.sendReinit(request);
     }
 
@@ -54,9 +62,7 @@ public class SessionManager implements SessionAdapter.Listener {
 
     @Override
     public void onSessionRequestCompleted(JSONObject response) {
-        SessionBuilder builder = new SessionBuilder();
-        Session session = builder.buildSession(response);
-
+        Session session = sessionBuilder.buildSession(response);
         notifySessionInitialized(session);
     }
 
