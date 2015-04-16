@@ -68,7 +68,7 @@ public class ZoneBuilder {
             }
 
             JSONArray jsonAds = jsonZone.getJSONArray("ads");
-            zone.getAds().addAll(adBuilder.buildAds(jsonAds));
+            zone.setAds(adBuilder.buildAds(jsonAds));
         }
         catch(JSONException ex) {
             Log.w(TAG, "Problem converting to JSON.", ex);
