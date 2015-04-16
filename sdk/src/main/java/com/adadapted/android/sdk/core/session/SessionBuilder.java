@@ -2,7 +2,6 @@ package com.adadapted.android.sdk.core.session;
 
 import android.util.Log;
 
-
 import com.adadapted.android.sdk.core.zone.Zone;
 import com.adadapted.android.sdk.core.zone.ZoneBuilder;
 
