@@ -6,11 +6,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by chrisweeden on 3/27/15.
@@ -37,8 +37,8 @@ public class AdBuilder {
 
     private static final String ACTION_TYPE_POPUP = "p";
 
-    public Set<Ad> buildAds(JSONArray jsonAds) {
-        Set<Ad> ads = new HashSet<>();
+    public List<Ad> buildAds(JSONArray jsonAds) {
+        List<Ad> ads = new ArrayList<>();
 
         try {
             int adCount = jsonAds.length();
