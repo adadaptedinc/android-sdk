@@ -1,5 +1,7 @@
 package com.adadapted.android.sdk.core.zone;
 
+import android.util.Log;
+
 import com.adadapted.android.sdk.core.ad.Ad;
 import com.adadapted.android.sdk.core.common.Dimension;
 
@@ -54,6 +56,8 @@ public class Zone {
 
         for(Ad ad : ads) {
             adViews.put(ad.getAdId(), 0);
+
+            zoneViews = 0;
             adIndex = 0;
         }
     }
@@ -62,16 +66,22 @@ public class Zone {
         return ads.size();
     }
 
-    public Ad getNextAd() {
+    public Ad getNextAd(long adRefreshTime) {
         adIndex = zoneViews % ads.size();
 
         Ad ad = ads.get(adIndex);
-
         int count = adViews.get(ad.getAdId());
-        ad.setImpressionViews(++count);
-        adViews.put(ad.getAdId(), count);
 
-        return ad;
+        if(ad.getMaxImpressions(adRefreshTime) < count) {
+            ad.setImpressionViews(++count);
+            adViews.put(ad.getAdId(), count);
+
+            return ad;
+        }
+        else {
+            Log.w(TAG, "Views for Ad " + ad.getAdId() + " in Zone " + zoneId + " have been exhausted for this period");
+            return null;
+        }
     }
 
     public Ad getCurrentAd() {
