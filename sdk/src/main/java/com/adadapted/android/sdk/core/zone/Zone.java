@@ -72,7 +72,7 @@ public class Zone {
         Ad ad = ads.get(adIndex);
         int count = adViews.get(ad.getAdId());
 
-        if(ad.getMaxImpressions(adRefreshTime) < count) {
+        if(ad.getMaxImpressions(adRefreshTime) >= count) {
             ad.setImpressionViews(++count);
             adViews.put(ad.getAdId(), count);
 
