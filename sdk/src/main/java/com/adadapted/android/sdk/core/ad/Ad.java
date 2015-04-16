@@ -6,6 +6,7 @@ package com.adadapted.android.sdk.core.ad;
 public class Ad {
     private String adId;
     private String zoneId;
+    private String baseImpressionId;
     private String impressionId;
     private int refreshTime;
     private AdType adType;
@@ -37,10 +38,27 @@ public class Ad {
 
     public void setImpressionId(String impressionId) {
         this.impressionId = impressionId;
+        this.baseImpressionId = impressionId;
+    }
+
+    public void setImpressionViews(int impressionViews) {
+        impressionId = baseImpressionId + ":" + impressionViews;
+    }
+
+    public long getMaxImpressions(long adRefreshTime) {
+        return (adRefreshTime / getRefreshTimeInMs());
     }
 
     public int getRefreshTime() {
         return refreshTime;
+    }
+
+    public int getRefreshTimeInSec() {
+        return refreshTime;
+    }
+
+    public long getRefreshTimeInMs() {
+        return refreshTime * 1000L;
     }
 
     public void setRefreshTime(int refreshTime) {
