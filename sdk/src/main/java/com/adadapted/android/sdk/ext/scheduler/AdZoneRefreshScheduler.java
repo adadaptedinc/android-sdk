@@ -11,6 +11,8 @@ import java.util.TimerTask;
  * Created by chrisweeden on 3/23/15.
  */
 public class AdZoneRefreshScheduler extends Timer {
+    private static final String TAG = AdZoneRefreshScheduler.class.getName();
+
     private final Set<Listener> listeners;
 
     public interface Listener {
@@ -22,7 +24,7 @@ public class AdZoneRefreshScheduler extends Timer {
     }
 
     public void schedule(Ad ad) {
-        int interval = ad.getRefreshTime() * 1000;
+        long interval = ad.getRefreshTimeInMs();
 
         this.schedule(new TimerTask() {
 
