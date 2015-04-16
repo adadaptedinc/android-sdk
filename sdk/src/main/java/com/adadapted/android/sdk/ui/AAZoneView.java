@@ -255,9 +255,11 @@ public class AAZoneView extends RelativeLayout
             return;
         }
 
-        refreshScheduler.removeListener(this);
-        refreshScheduler.cancel();
-        refreshScheduler.purge();
+        if(refreshScheduler != null) {
+            refreshScheduler.removeListener(this);
+            refreshScheduler.cancel();
+            refreshScheduler.purge();
+        }
 
         if(!isStoppingForPopup) {
             completeCurrentAd();
