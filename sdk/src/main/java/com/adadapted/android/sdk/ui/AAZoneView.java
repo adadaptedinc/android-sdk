@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.adadapted.android.sdk.AdAdapted;
+import com.adadapted.android.sdk.core.ad.HtmlAdType;
 import com.adadapted.android.sdk.core.ad.ImageAdType;
 import com.adadapted.android.sdk.core.zone.Zone;
 import com.adadapted.android.sdk.ext.http.AdImageLoader;
@@ -139,7 +140,6 @@ public class AAZoneView extends RelativeLayout
         if(isVisible) {
             completeCurrentAd();
             setNextAd();
-            displayAdImageView(adImageView);
         }
         else {
             Log.i(TAG, getZoneLabel() + " is not Visible. Not displaying ad.");
@@ -149,14 +149,18 @@ public class AAZoneView extends RelativeLayout
     private void setNextAd() {
         currentAd = AdAdapted.getInstance().getNextAdForZone(zoneId);
 
+        if(currentAd == null) {
+            return;
+        }
+
         loadNextAdAssets();
-
         AdAdapted.getInstance().getEventTracker().trackImpressionBeginEvent(sessionId, currentAd);
-
         scheduleAd();
     }
 
     private void loadNextAdAssets() {
+        Log.d(TAG, getZoneLabel() + " Displaying " + currentAd.getAdId());
+
         switch(currentAd.getAdType().getAdType()) {
             case HTML:
                 loadHtml();
@@ -173,14 +177,16 @@ public class AAZoneView extends RelativeLayout
     }
 
     private void loadHtml() {
-
+        HtmlAdType adType = (HtmlAdType) currentAd.getAdType();
     }
 
     private void loadImage() {
-        Log.d(TAG, getZoneLabel() + " Displaying " + currentAd.getAdId());
         ImageAdType adType = (ImageAdType) currentAd.getAdType();
-        AdImage adImage = adType.getStandardImages();
-        imageLoader.getImage(adImage.getOrientation("port"));
+
+        String imageUrl = adType.getImageUrlFor(ImageAdType.STANDARD_IMAGE, AdImage.PORTRAIT);
+        imageLoader.getImage(imageUrl);
+
+        displayAdImageView(adImageView);
     }
 
     private void loadJson() {
@@ -195,6 +201,13 @@ public class AAZoneView extends RelativeLayout
 
     private void completeCurrentAd() {
         if(currentAd != null) {
+            this.post(new Runnable() {
+                @Override
+                public void run() {
+                  AAZoneView.this.removeAllViews();
+                }
+            });
+
             AdAdapted.getInstance().getEventTracker().trackImpressionEndEvent(sessionId, currentAd);
             currentAd = null;
         }
@@ -291,6 +304,18 @@ public class AAZoneView extends RelativeLayout
         this.adCountForZone = (zone != null) ? zone.getAdCount() : 0;
 
         displayNextAd();
+    }
+
+    @Override
+    public void onSessionAdsReloaded(Session session) {
+        Log.d(TAG, getZoneLabel() + " Calling onSessionAdsReloaded()");
+
+        Zone zone = session.getZone(zoneId);
+        this.adCountForZone = (zone != null) ? zone.getAdCount() : 0;
+
+        if(currentAd == null) {
+            displayNextAd();
+        }
     }
 
     @Override
