@@ -1,6 +1,4 @@
-package com.adadapted.android.sdk;
-
-import android.test.InstrumentationTestCase;
+package com.adadapted.android.sdk.ext.json;
 
 import com.adadapted.android.sdk.core.ad.AdRequestBuilder;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
@@ -9,14 +7,16 @@ import com.adadapted.android.sdk.core.session.Session;
 import junit.framework.Assert;
 
 import org.json.JSONObject;
+import org.junit.Test;
 
 import java.util.Date;
 
 /**
  * Created by chrisweeden on 4/6/15.
  */
-public class AdRequestBuilderTest extends InstrumentationTestCase {
+public class JsonAdRequestBuilderTest {
 
+    @Test
     public void testBuildAdRequestJson_ReturnsJson() throws Exception {
         DeviceInfo deviceInfo = new DeviceInfo();
         deviceInfo.setAppId("TESTAPPLICATION");
@@ -34,8 +34,8 @@ public class AdRequestBuilderTest extends InstrumentationTestCase {
         session.setActiveCampaigns(true);
         session.setExpiresAt(new Date());
 
-        AdRequestBuilder builder = new AdRequestBuilder();
-        JSONObject json = builder.buildAdRequestJson(deviceInfo, new Session());
+        AdRequestBuilder builder = new JsonAdRequestBuilder();
+        JSONObject json = builder.buildAdRequest(deviceInfo, new Session());
 
         Assert.assertEquals("TESTAPPLICATION", json.getString("app_id"));
         Assert.assertEquals("TESTSESSION", json.getString("session_id"));
