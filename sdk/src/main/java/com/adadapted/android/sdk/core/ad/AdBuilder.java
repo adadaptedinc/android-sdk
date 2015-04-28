@@ -37,6 +37,11 @@ public class AdBuilder {
 
     private static final String ACTION_TYPE_POPUP = "p";
 
+    private static final String FIELD_AD_URL = "ad_url";
+
+    private static final String FIELD_IMAGE_ORIENTATION = "orientation";
+    private static final String FIELD_IMAGE_URL = "url";
+
     public List<Ad> buildAds(JSONArray jsonAds) {
         List<Ad> ads = new ArrayList<>();
 
@@ -141,6 +146,13 @@ public class AdBuilder {
     private HtmlAdType parseHtmlAd(JSONObject jsonAd) {
         HtmlAdType adType = new HtmlAdType();
 
+        try {
+            adType.setAdUrl(jsonAd.getString(FIELD_AD_URL));
+        }
+        catch(JSONException ex) {
+            Log.w(TAG, "Problem converting to JSON.", ex);
+        }
+
         return adType;
     }
 
@@ -175,7 +187,8 @@ public class AdBuilder {
                 AdImage image = new AdImage();
                 for(int i = 0; i < orientation.length(); i++) {
                     JSONObject orien = orientation.getJSONObject(i);
-                    image.addOrientation(orien.getString("orientation"), orien.getString("url"));
+                    image.addOrientation(orien.getString(FIELD_IMAGE_ORIENTATION),
+                            orien.getString(FIELD_IMAGE_URL));
                 }
 
                 images.put(resKey, image);
