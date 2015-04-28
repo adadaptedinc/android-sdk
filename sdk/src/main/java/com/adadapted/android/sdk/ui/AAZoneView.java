@@ -3,6 +3,7 @@ package com.adadapted.android.sdk.ui;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Handler;
@@ -10,8 +11,10 @@ import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -45,10 +48,13 @@ public class AAZoneView extends RelativeLayout
 
     private Ad currentAd;
 
-    private AdImageLoader imageLoader;
     private AdZoneRefreshScheduler refreshScheduler;
+
     private ImageView adImageView;
+    private AdImageLoader imageLoader;
     private Bitmap adImage;
+
+    private WebView adWebView;
 
     private final Runnable buildAdRunnable = new Runnable() {
         public void run() {
@@ -101,11 +107,16 @@ public class AAZoneView extends RelativeLayout
         imageLoader = new AdImageLoader();
         imageLoader.addListener(this);
 
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+
         adImageView = new ImageView(getContext());
         adImageView.setScaleType(ImageView.ScaleType.FIT_XY);
-        adImageView.setLayoutParams(new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
+        adImageView.setLayoutParams(layoutParams);
+
+        adWebView = new WebView(getContext());
+        adWebView.setLayoutParams(layoutParams);
 
         setGravity(Gravity.CENTER);
 
@@ -178,19 +189,51 @@ public class AAZoneView extends RelativeLayout
 
     private void loadHtml() {
         HtmlAdType adType = (HtmlAdType) currentAd.getAdType();
+        adWebView.loadUrl(adType.getAdUrl());
+
+        displayAdView(adWebView);
     }
 
     private void loadImage() {
         ImageAdType adType = (ImageAdType) currentAd.getAdType();
 
+        int orientation = getContext().getResources().getConfiguration().orientation;
+        switch(orientation) {
+            case Configuration.ORIENTATION_PORTRAIT:
+            case Configuration.ORIENTATION_UNDEFINED:
+                break;
+
+            case Configuration.ORIENTATION_LANDSCAPE:
+                break;
+        }
+
         String imageUrl = adType.getImageUrlFor(ImageAdType.STANDARD_IMAGE, AdImage.PORTRAIT);
         imageLoader.getImage(imageUrl);
 
-        displayAdImageView(adImageView);
+        displayAdView(adImageView);
     }
 
     private void loadJson() {
 
+    }
+
+    private void displayAdView(View view) {
+        Log.d(TAG, "Calling displayAdView()");
+
+        final View updatedView = view;
+
+        this.post(new Runnable() {
+            @Override
+            public void run() {
+                AAZoneView.this.removeAllViews();
+
+                RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(
+                        LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+                relativeParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+
+                AAZoneView.this.addView(updatedView);
+            }
+        });
     }
 
     private void scheduleAd() {
@@ -211,25 +254,6 @@ public class AAZoneView extends RelativeLayout
             AdAdapted.getInstance().getEventTracker().trackImpressionEndEvent(sessionId, currentAd);
             currentAd = null;
         }
-    }
-
-    private void displayAdImageView(View view) {
-        Log.d(TAG, "Calling onDisplayAd()");
-
-        final View updatedView = view;
-
-        this.post(new Runnable() {
-            @Override
-            public void run() {
-                AAZoneView.this.removeAllViews();
-
-                RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(
-                        LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
-                relativeParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-
-                AAZoneView.this.addView(updatedView);
-            }
-        });
     }
 
     public void onStart() {
