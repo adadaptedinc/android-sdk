@@ -34,7 +34,7 @@ import java.util.Set;
  */
 public class AdAdapted implements DeviceInfoBuilder.Listener,
         SessionManager.Listener, AdFetcher.Listener {
-    private static final String TAG = "AdAdapted";
+    private static final String TAG = AdAdapted.class.getName();
 
     private static AdAdapted instance;
 
@@ -45,7 +45,7 @@ public class AdAdapted implements DeviceInfoBuilder.Listener,
 
     private final Set<Listener> listeners;
 
-    private final  Context context;
+    private final Context context;
 
     private DeviceInfo deviceInfo;
 
