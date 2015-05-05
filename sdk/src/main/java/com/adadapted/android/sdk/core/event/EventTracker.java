@@ -5,6 +5,7 @@ import android.util.Log;
 import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.ad.Ad;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
+import com.adadapted.android.sdk.ext.json.JsonEventRequestBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,11 +27,11 @@ public class EventTracker {
 
     private Set<JSONObject> queuedEvents;
 
-    public EventTracker(EventAdapter eventAdapter) {
+    public EventTracker(EventAdapter eventAdapter, EventRequestBuilder builder) {
         this.eventAdapter = eventAdapter;
 
         this.queuedEvents = new HashSet<>();
-        this.builder = new EventRequestBuilder();
+        this.builder = builder;
     }
 
     public Set<JSONObject> getQueuedEvents() {
