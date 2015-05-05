@@ -11,6 +11,8 @@ import com.adadapted.android.sdk.core.ad.AdRequestBuilder;
 import com.adadapted.android.sdk.core.device.BuildDeviceInfoParam;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.device.DeviceInfoBuilder;
+import com.adadapted.android.sdk.core.event.EventAdapter;
+import com.adadapted.android.sdk.core.event.EventRequestBuilder;
 import com.adadapted.android.sdk.core.event.EventTracker;
 import com.adadapted.android.sdk.core.session.Session;
 import com.adadapted.android.sdk.core.session.SessionBuilder;
@@ -22,6 +24,8 @@ import com.adadapted.android.sdk.ext.http.HttpAdAdapter;
 import com.adadapted.android.sdk.ext.http.HttpEventAdapter;
 import com.adadapted.android.sdk.ext.http.HttpSessionAdapter;
 import com.adadapted.android.sdk.ext.json.JsonAdRequestBuilder;
+import com.adadapted.android.sdk.ext.json.JsonEventRequestBuilder;
+import com.adadapted.android.sdk.ext.json.JsonSessionRequestBuilder;
 import com.adadapted.android.sdk.ext.scheduler.AdRefreshScheduler;
 
 import java.util.Arrays;
@@ -151,7 +155,10 @@ public class AdAdapted implements DeviceInfoBuilder.Listener,
 
     public EventTracker getEventTracker() {
         if(eventTracker == null) {
-            this.eventTracker = new EventTracker(new HttpEventAdapter(eventBatchUrl));
+            EventAdapter adapter = new HttpEventAdapter(eventBatchUrl);
+            EventRequestBuilder builder = new JsonEventRequestBuilder();
+
+            eventTracker = new EventTracker(adapter, builder);
         }
 
         return eventTracker;
@@ -160,7 +167,7 @@ public class AdAdapted implements DeviceInfoBuilder.Listener,
     private SessionManager getSessionManager() {
         if(sessionManager == null) {
             HttpSessionAdapter adapter = new HttpSessionAdapter(sessionInitUrl, sessionReinitUrl);
-            SessionRequestBuilder requestBuilder = new SessionRequestBuilder();
+            SessionRequestBuilder requestBuilder = new JsonSessionRequestBuilder();
             SessionBuilder sessionBuilder = new SessionBuilder();
 
             sessionManager = new SessionManager(adapter, requestBuilder, sessionBuilder);
