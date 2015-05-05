@@ -22,11 +22,11 @@ public class JsonAdRequestBuilder implements AdRequestBuilder {
         JSONObject json = new JSONObject();
 
         try {
-            json.put("app_id", deviceInfo.getAppId());
-            json.put("udid", deviceInfo.getUdid());
-            json.put("session_id", session.getSessionId());
-            json.put("datetime", new Date().getTime());
-            json.put("sdk_version", deviceInfo.getSdkVersion());
+            json.put(JsonFields.APPID, deviceInfo.getAppId());
+            json.put(JsonFields.UDID, deviceInfo.getUdid());
+            json.put(JsonFields.SESSIONID, session.getSessionId());
+            json.put(JsonFields.DATETIME, new Date().getTime());
+            json.put(JsonFields.SDKVERSION, deviceInfo.getSdkVersion());
 
             String[] zones = deviceInfo.getZones();
 
@@ -35,7 +35,7 @@ public class JsonAdRequestBuilder implements AdRequestBuilder {
                 zonesArray.put(zone);
             }
 
-            json.put("zones", zonesArray);
+            json.put(JsonFields.ZONES, zonesArray);
         }
         catch(JSONException ex) {
             Log.d(TAG, "Problem parsing JSON", ex);
