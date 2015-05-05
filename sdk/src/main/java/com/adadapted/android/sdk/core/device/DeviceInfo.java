@@ -71,7 +71,7 @@ public class DeviceInfo {
         catch (GooglePlayServicesNotAvailableException ex) {
             Log.w(TAG, "Problem retrieving Google Play AdvertiserId", ex);
         }
-        catch(GooglePlayServicesRepairableException ex) {
+        catch (GooglePlayServicesRepairableException ex) {
             Log.w(TAG, "Problem retrieving Google Play AdvertiserId", ex);
         }
 
