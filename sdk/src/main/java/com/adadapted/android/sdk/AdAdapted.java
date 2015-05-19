@@ -230,6 +230,13 @@ public class AdAdapted implements DeviceInfoBuilder.Listener,
         notifySessionAdsReloaded();
     }
 
+
+    @Override
+    public void onAdsNotRefreshed() {
+        scheduleAdRefreshTimer();
+        notifySessionAdsReloaded();
+    }
+
     @Override
     public String toString() {
         return "AdAdapted{}";

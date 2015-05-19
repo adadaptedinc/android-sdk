@@ -40,6 +40,7 @@ public class HttpAdAdapter implements AdAdapter {
             new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError volleyError) {
+                    notifyAdGetRequestFailed();
                     Log.d(TAG, "Ad Get Request Failed.");
                 }
             }
@@ -62,6 +63,13 @@ public class HttpAdAdapter implements AdAdapter {
     public void notifyAdGetRequestCompleted(JSONObject adJson) {
         for(Listener listener : listeners) {
             listener.onAdGetRequestCompleted(adJson);
+        }
+    }
+
+    @Override
+    public void notifyAdGetRequestFailed() {
+        for(Listener listener : listeners) {
+            listener.onAdGetRequestFailed();
         }
     }
 }

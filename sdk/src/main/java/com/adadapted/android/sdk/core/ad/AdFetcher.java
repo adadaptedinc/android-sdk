@@ -20,6 +20,7 @@ public class AdFetcher implements AdAdapter.Listener {
 
     public interface Listener {
         void onAdsRefreshed(Map<String, Zone> zones);
+        void onAdsNotRefreshed();
     }
 
     private final AdAdapter adAdapter;
@@ -49,6 +50,11 @@ public class AdFetcher implements AdAdapter.Listener {
         notifyOnAdsRefreshed(zones);
     }
 
+    @Override
+    public void onAdGetRequestFailed() {
+        notifyOnAdsNotRefreshed();
+    }
+
     public void addListener(Listener listener) {
         listeners.add(listener);
     }
@@ -60,6 +66,12 @@ public class AdFetcher implements AdAdapter.Listener {
     private void notifyOnAdsRefreshed(Map<String, Zone> zones) {
         for(Listener listener : listeners) {
             listener.onAdsRefreshed(zones);
+        }
+    }
+
+    private void notifyOnAdsNotRefreshed() {
+        for(Listener listener : listeners) {
+            listener.onAdsNotRefreshed();
         }
     }
 }

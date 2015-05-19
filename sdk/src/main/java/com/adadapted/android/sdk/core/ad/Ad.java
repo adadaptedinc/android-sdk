@@ -46,7 +46,7 @@ public class Ad {
     }
 
     public long getMaxImpressions(long adRefreshTime) {
-        return (adRefreshTime / getRefreshTimeInMs());
+        return (adRefreshTime / getRefreshTimeInMs()) * 2;
     }
 
     public int getRefreshTime() {

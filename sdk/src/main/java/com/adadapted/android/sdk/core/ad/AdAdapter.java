@@ -8,6 +8,7 @@ import org.json.JSONObject;
 public interface AdAdapter {
     interface Listener {
         void onAdGetRequestCompleted(JSONObject adJson);
+        void onAdGetRequestFailed();
     }
 
     void getAds(JSONObject json);
@@ -15,4 +16,5 @@ public interface AdAdapter {
     void addListener(Listener listener);
     void removeListener(Listener listener);
     void notifyAdGetRequestCompleted(JSONObject adJson);
+    void notifyAdGetRequestFailed();
 }
