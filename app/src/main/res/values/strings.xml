@@ -9,12 +9,15 @@
         <item>Recipes</item>
     </string-array>
 
-    <string name="adadapted_api_key">TESTAPPLICATION1</string>
+    <string name="adadapted_api_key">NTU1YJG3ZMNKYZQ0</string>
     <bool name="adadapted_prod">false</bool>
     <string-array name="adadapted_zones">
-        <item>12</item>
-        <item>13</item>
+        <item>100668</item>
+        <item>100669</item>
+        <item>100670</item>
+        <item>100671</item>
     </string-array>
+
     <string name="title_activity_item_detail">ItemDetailActivity</string>
     <string name="title_activity_todo_lists">Lists</string>
     <string name="title_activity_todo_list">Lists</string>

@@ -4,7 +4,6 @@
     tools:context="com.adadapted.sdktestapp.ui.todo.TodoListDetailFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-         />
+    <TextView android:layout_width="match_parent" android:layout_height="match_parent" />
 
 </FrameLayout>

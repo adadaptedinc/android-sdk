@@ -1,6 +1,5 @@
 package com.adadapted.sdktestapp.ui.todo;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -12,10 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import com.adadapted.android.sdk.AAZoneView;
+import com.adadapted.android.sdk.ui.AAZoneView;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.todo.TodoList;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;
@@ -56,15 +54,15 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        aaZoneView = new AAZoneView(getActivity());
+        aaZoneView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, 120));
+        aaZoneView.setZoneLabel("TodoListsFragment");
+        aaZoneView.init("100668");
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_todo_lists, container, false);
-
-        aaZoneView = new AAZoneView(getActivity());
-        aaZoneView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, 50));
-        aaZoneView.setZoneLabel("TodoListsFragment");
-        aaZoneView.init("12");
 
         ListView listView = (ListView)view.findViewById(android.R.id.list);
         listView.addFooterView(aaZoneView);
@@ -78,21 +76,21 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
 
         TodoListManager.getInstance(getActivity()).addListener(this);
 
-        //aaZoneView.onStart();
+        aaZoneView.onStart();
     }
 
     @Override
-    public void onStop() {
+    public void onPause() {
         super.onPause();
 
         TodoListManager.getInstance(getActivity()).removeListener(this);
 
-        //aaZoneView.onStop();
+        aaZoneView.onStop();
     }
 
     // TODO: Rename method, update argument and hook method into UI event

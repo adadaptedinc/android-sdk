@@ -1,40 +1,26 @@
 package com.adadapted.sdktestapp.ui.recipe;
 
-import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
-import android.view.Menu;
+import android.content.Intent;
+import android.support.v4.app.Fragment;
 import android.view.MenuItem;
 
-import com.adadapted.sdktestapp.R;
+import com.adadapted.sdktestapp.ui.SingleFragmentActivity;
 
-public class RecipeDetailActivity extends ActionBarActivity {
+import java.util.UUID;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recipe_detail);
-    }
-
+public class RecipeDetailActivity extends SingleFragmentActivity {
+    public static final String RECIPE_ID = RecipeDetailActivity.class.getName() + ".RECIPE_ID";
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_recipe_detail, menu);
-        return true;
+    protected Fragment createFragment() {
+        Intent intent = getIntent();
+        UUID recipeId = (UUID)intent.getSerializableExtra(RECIPE_ID);
+
+        return RecipeDetailActivityFragment.newInstance(recipeId);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 }

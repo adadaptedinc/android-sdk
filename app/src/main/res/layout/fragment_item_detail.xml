@@ -10,20 +10,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <com.adadapted.android.sdk.AAZoneView android:id="@+id/fragment_item_detail_aa_zone"
+    <com.adadapted.android.sdk.ui.AAZoneView
+        android:id="@+id/fragment_item_detail_aa_zone"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_gravity="center_horizontal|bottom"
         android:backgroundTint="@color/background_material_dark">
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/imageView"
-            android:layout_gravity="left|bottom"
-            android:src="@drawable/detroit"
-            android:scaleType="centerCrop" />
-
-    </com.adadapted.android.sdk.AAZoneView>
+    </com.adadapted.android.sdk.ui.AAZoneView>
 
 </RelativeLayout>

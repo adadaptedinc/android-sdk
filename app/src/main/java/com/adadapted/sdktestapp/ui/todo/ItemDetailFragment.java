@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.adadapted.android.sdk.AAZoneView;
+import com.adadapted.android.sdk.ui.AAZoneView;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.todo.TodoItem;
 import com.adadapted.sdktestapp.core.todo.TodoList;
