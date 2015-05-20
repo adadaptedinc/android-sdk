@@ -8,6 +8,8 @@ import org.json.JSONArray;
 public interface EventAdapter {
     interface Listener {
         void onEventsPublished();
+        void onEventsPublishFailed(JSONArray json);
+
     }
 
     void sendBatch(JSONArray events);
@@ -15,4 +17,5 @@ public interface EventAdapter {
     void addListener(Listener listener);
     void removeListener(Listener listener);
     void notifyEventsPublished();
+    void notifyEventsFailed(JSONArray json);
 }

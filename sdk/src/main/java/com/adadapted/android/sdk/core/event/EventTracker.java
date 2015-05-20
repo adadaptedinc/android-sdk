@@ -16,49 +16,49 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 3/23/15.
  */
-public class EventTracker {
+public class EventTracker implements EventAdapter.Listener {
     private static final String TAG = EventTracker.class.getName();
 
-    private static final int EMPTY_QUEUE_SIZE = 0;
     private static final int MAX_QUEUE_SIZE = 10;
+    private static final int MAX_FAILED_RETRIES = 2;
 
     private final EventAdapter eventAdapter;
     private final EventRequestBuilder builder;
 
     private Set<JSONObject> queuedEvents;
+    private int failedRetries;
 
     public EventTracker(EventAdapter eventAdapter, EventRequestBuilder builder) {
         this.eventAdapter = eventAdapter;
+        this.builder = builder;
 
         this.queuedEvents = new HashSet<>();
-        this.builder = builder;
+        failedRetries = 0;
     }
 
     public Set<JSONObject> getQueuedEvents() {
         return queuedEvents;
     }
 
-    private void trackEvent(String sessionId, Ad ad, EventTypes eventType, String eventName) {
-        Log.d(TAG, "Queueing " + eventType + " for " + ad.getAdId());
-
-        DeviceInfo deviceInfo = AdAdapted.getInstance().getDeviceInfo();
-        queuedEvents.add(builder.build(deviceInfo, sessionId, ad, eventType, eventName));
-
-        if(queuedEvents.size() >= MAX_QUEUE_SIZE) {
-            publishEvents();
-        }
-    }
-
     public void publishEvents() {
-        if(queuedEvents.size() > EMPTY_QUEUE_SIZE) {
+        if(queuedEvents.isEmpty()) {
+            Log.d(TAG, "No items queued to publish.");
+        }
+        else {
             Set<JSONObject> currentEvents = new HashSet<>(queuedEvents);
             queuedEvents.clear();
 
             JSONArray eventsArray = new JSONArray(currentEvents);
             eventAdapter.sendBatch(eventsArray);
         }
+    }
+
+    private void sendBatchRetry(JSONArray json) {
+        if(failedRetries <= MAX_FAILED_RETRIES) {
+            eventAdapter.sendBatch(json);
+        }
         else {
-            Log.d(TAG, "No items queued to publish.");
+            Log.d(TAG, "Maximum failed retries. No longer sending batch retries.");
         }
     }
 
@@ -85,6 +85,28 @@ public class EventTracker {
 
     public void trackCustomEvent(String sessionId, Ad ad, String eventName) {
         trackEvent(sessionId, ad, EventTypes.IMPRESSION, eventName);
+    }
+
+    private void trackEvent(String sessionId, Ad ad, EventTypes eventType, String eventName) {
+        Log.d(TAG, "Queueing " + eventType + " for " + ad.getAdId());
+
+        DeviceInfo deviceInfo = AdAdapted.getInstance().getDeviceInfo();
+        queuedEvents.add(builder.build(deviceInfo, sessionId, ad, eventType, eventName));
+
+        if(queuedEvents.size() >= MAX_QUEUE_SIZE) {
+            publishEvents();
+        }
+    }
+
+    @Override
+    public void onEventsPublished() {
+        failedRetries = 0;
+    }
+
+    @Override
+    public void onEventsPublishFailed(JSONArray json) {
+        failedRetries++;
+        sendBatchRetry(json);
     }
 
     @Override
