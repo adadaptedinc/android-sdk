@@ -63,8 +63,6 @@ public class DeviceInfo {
 
         deviceInfo.setSdkVersion(sdkVersion);
 
-        Log.d(TAG, deviceInfo.toString());
-
         return deviceInfo;
     }
 
