@@ -197,17 +197,19 @@ public class AAZoneView extends RelativeLayout
     private void loadImage() {
         ImageAdType adType = (ImageAdType) currentAd.getAdType();
 
+        String imageUrl = "";
         int orientation = getContext().getResources().getConfiguration().orientation;
         switch(orientation) {
             case Configuration.ORIENTATION_PORTRAIT:
             case Configuration.ORIENTATION_UNDEFINED:
+                imageUrl = adType.getImageUrlFor(ImageAdType.STANDARD_IMAGE, AdImage.PORTRAIT);
                 break;
 
             case Configuration.ORIENTATION_LANDSCAPE:
+                imageUrl = adType.getImageUrlFor(ImageAdType.STANDARD_IMAGE, AdImage.LANDSCAPE);
                 break;
         }
 
-        String imageUrl = adType.getImageUrlFor(ImageAdType.STANDARD_IMAGE, AdImage.PORTRAIT);
         imageLoader.getImage(imageUrl);
 
         displayAdView(adImageView);
