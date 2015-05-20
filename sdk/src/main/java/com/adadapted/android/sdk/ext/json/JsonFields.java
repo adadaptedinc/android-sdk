@@ -16,6 +16,7 @@ public class JsonFields {
     public static final String DATETIME = "datetime";
     public static final String DH = "dh";
     public static final String DW = "dw";
+    public static final String DENSITY = "density";
     public static final String ALLOWRETARGETING = "allow_retargeting";
     public static final String SDKVERSION = "sdk_version";
 
