@@ -11,7 +11,6 @@ import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
@@ -22,6 +21,7 @@ import android.widget.RelativeLayout;
 import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.ad.HtmlAdType;
 import com.adadapted.android.sdk.core.ad.ImageAdType;
+import com.adadapted.android.sdk.core.device.ScreenDensity;
 import com.adadapted.android.sdk.core.zone.Zone;
 import com.adadapted.android.sdk.ext.http.AdImageLoader;
 import com.adadapted.android.sdk.core.ad.Ad;
@@ -33,7 +33,7 @@ import com.adadapted.android.sdk.ext.scheduler.AdZoneRefreshScheduler;
  * Created by chrisweeden on 3/30/15.
  */
 public class AAZoneView extends RelativeLayout
-        implements AdAdapted.Listener, AdImageLoader.Listener, AdZoneRefreshScheduler.Listener {
+        implements AdAdapted.Listener, AdZoneRefreshScheduler.Listener {
     private static final String TAG = AAZoneView.class.getName();
 
     private String zoneLabel;
@@ -50,20 +50,8 @@ public class AAZoneView extends RelativeLayout
 
     private AdZoneRefreshScheduler refreshScheduler;
 
-    private ImageView adImageView;
-    private AdImageLoader imageLoader;
-    private Bitmap adImage;
-
-    private WebView adWebView;
-
-    private final Runnable buildAdRunnable = new Runnable() {
-        public void run() {
-        Log.d(TAG, "Setting image view bitmap.");
-        adImageView.setImageBitmap(adImage);
-        }
-    };
-
-    private final Handler buildAdHandler = new Handler();
+    private AAImageAdView adImageView;
+    private AAHtmlAdView adWebView;
 
     public AAZoneView(Context context) {
         super(context);
@@ -104,19 +92,12 @@ public class AAZoneView extends RelativeLayout
 
         this.zoneId = zoneId;
 
-        imageLoader = new AdImageLoader();
-        imageLoader.addListener(this);
-
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
 
-        adImageView = new ImageView(getContext());
-        adImageView.setScaleType(ImageView.ScaleType.FIT_XY);
-        adImageView.setLayoutParams(layoutParams);
-
-        adWebView = new WebView(getContext());
-        adWebView.setLayoutParams(layoutParams);
+        adImageView = new AAImageAdView(getContext());
+        adWebView = new AAHtmlAdView(getContext());
 
         setGravity(Gravity.CENTER);
 
@@ -188,30 +169,12 @@ public class AAZoneView extends RelativeLayout
     }
 
     private void loadHtml() {
-        HtmlAdType adType = (HtmlAdType) currentAd.getAdType();
-        adWebView.loadUrl(adType.getAdUrl());
-
+        adWebView.loadHtml(currentAd);
         displayAdView(adWebView);
     }
 
     private void loadImage() {
-        ImageAdType adType = (ImageAdType) currentAd.getAdType();
-
-        String imageUrl = "";
-        int orientation = getContext().getResources().getConfiguration().orientation;
-        switch(orientation) {
-            case Configuration.ORIENTATION_PORTRAIT:
-            case Configuration.ORIENTATION_UNDEFINED:
-                imageUrl = adType.getImageUrlFor(ImageAdType.STANDARD_IMAGE, AdImage.PORTRAIT);
-                break;
-
-            case Configuration.ORIENTATION_LANDSCAPE:
-                imageUrl = adType.getImageUrlFor(ImageAdType.STANDARD_IMAGE, AdImage.LANDSCAPE);
-                break;
-        }
-
-        imageLoader.getImage(imageUrl);
-
+        adImageView.loadImage(currentAd);
         displayAdView(adImageView);
     }
 
@@ -344,14 +307,6 @@ public class AAZoneView extends RelativeLayout
         if(currentAd == null) {
             displayNextAd();
         }
-    }
-
-    @Override
-    public void onAdImageLoaded(Bitmap bitmap) {
-        Log.d(TAG, getZoneLabel() + " Calling onAdImageLoaded()");
-
-        adImage = bitmap;
-        buildAdHandler.post(buildAdRunnable);
     }
 
     @Override
