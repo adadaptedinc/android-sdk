@@ -6,6 +6,8 @@ import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
+import com.adadapted.android.sdk.AdAdapted;
+import com.adadapted.android.sdk.core.ad.ImageAdType;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -32,6 +34,7 @@ public class DeviceInfo {
     private String timezone;
     private int dw;
     private int dh;
+    private ScreenDensity density;
     private String sdkVersion;
 
     public DeviceInfo() {}
@@ -56,7 +59,11 @@ public class DeviceInfo {
         deviceInfo.setDh(metrics.heightPixels);
         deviceInfo.setDw(metrics.widthPixels);
 
+        deviceInfo.setDensity(deviceInfo.determineScreenDensity(context));
+
         deviceInfo.setSdkVersion(sdkVersion);
+
+        Log.d(TAG, deviceInfo.toString());
 
         return deviceInfo;
     }
@@ -82,6 +89,39 @@ public class DeviceInfo {
         return Settings.Secure.getString(
                 context.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
+    }
+
+    private ScreenDensity determineScreenDensity(final Context context) {
+        int density = context.getResources().getDisplayMetrics().densityDpi;
+        switch (density)
+        {
+            case DisplayMetrics.DENSITY_MEDIUM:
+                return ScreenDensity.MDPI;
+            case DisplayMetrics.DENSITY_HIGH:
+                return ScreenDensity.HPDI;
+            case DisplayMetrics.DENSITY_LOW:
+                return ScreenDensity.LDPI;
+            case DisplayMetrics.DENSITY_XHIGH:
+                return ScreenDensity.XHDPI;
+            case DisplayMetrics.DENSITY_TV:
+                return ScreenDensity.TV;
+            case DisplayMetrics.DENSITY_XXHIGH:
+                return ScreenDensity.XXHDPI;
+            case DisplayMetrics.DENSITY_XXXHIGH:
+                return ScreenDensity.XXXHDPI;
+            default:
+                return ScreenDensity.UNKNOWN;
+        }
+    }
+
+    public String chooseImageSize() {
+        if(density == ScreenDensity.XHDPI ||
+                density == ScreenDensity.XXHDPI ||
+                density == ScreenDensity.XXXHDPI) {
+            return ImageAdType.RETINA_IMAGE;
+        }
+
+        return ImageAdType.STANDARD_IMAGE;
     }
 
     public String getAppId() {
@@ -172,6 +212,14 @@ public class DeviceInfo {
         this.dh = dh;
     }
 
+    public ScreenDensity getDensity() {
+        return density;
+    }
+
+    public void setDensity(ScreenDensity density) {
+        this.density = density;
+    }
+
     public String getSdkVersion() {
         return sdkVersion;
     }
@@ -194,6 +242,7 @@ public class DeviceInfo {
                 ", timezone='" + timezone + '\'' +
                 ", dw=" + dw +
                 ", dh=" + dh +
+                ", density=" + density.toString() +
                 ", sdkVersion='" + sdkVersion + '\'' +
                 '}';
     }
