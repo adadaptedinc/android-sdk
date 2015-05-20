@@ -21,6 +21,7 @@ public class AdImageLoader {
 
     public interface Listener {
         void onAdImageLoaded(Bitmap bitmap);
+        void onAdImageLoadFailed();
     }
 
     public AdImageLoader() {
@@ -30,6 +31,7 @@ public class AdImageLoader {
     public void getImage(String url) {
         if(url == null) {
             Log.w(TAG, "No URL has been provided.");
+            notifyAdImageLoadFailed();
             return;
         }
 
@@ -69,7 +71,8 @@ public class AdImageLoader {
 
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.w(TAG, "Problem retrieving Ad Image.", error);
+                    Log.d(TAG, "Problem retrieving Ad Image.", error);
+                    notifyAdImageLoadFailed();
                 }
             }
         );
@@ -93,6 +96,12 @@ public class AdImageLoader {
         }
         else {
             Log.w(TAG, "No Bitmap to return.");
+        }
+    }
+
+    private void notifyAdImageLoadFailed() {
+        for(AdImageLoader.Listener listener : listeners) {
+            listener.onAdImageLoadFailed();
         }
     }
 }
