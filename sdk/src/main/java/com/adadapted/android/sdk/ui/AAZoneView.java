@@ -33,7 +33,7 @@ import com.adadapted.android.sdk.ext.scheduler.AdZoneRefreshScheduler;
  * Created by chrisweeden on 3/30/15.
  */
 public class AAZoneView extends RelativeLayout
-        implements AdAdapted.Listener, AdZoneRefreshScheduler.Listener {
+        implements AdAdapted.Listener, AdZoneRefreshScheduler.Listener, AdViewListener {
     private static final String TAG = AAZoneView.class.getName();
 
     private String zoneLabel;
@@ -97,7 +97,10 @@ public class AAZoneView extends RelativeLayout
                 ViewGroup.LayoutParams.WRAP_CONTENT);
 
         adImageView = new AAImageAdView(getContext());
+        adImageView.addListener(this);
+
         adWebView = new AAHtmlAdView(getContext());
+        adWebView.addListener(this);
 
         setGravity(Gravity.CENTER);
 
@@ -146,7 +149,6 @@ public class AAZoneView extends RelativeLayout
         }
 
         loadNextAdAssets();
-        AdAdapted.getInstance().getEventTracker().trackImpressionBeginEvent(sessionId, currentAd);
         scheduleAd();
     }
 
@@ -316,5 +318,10 @@ public class AAZoneView extends RelativeLayout
         if(isActive) {
             displayNextAd();
         }
+    }
+
+    @Override
+    public void onViewLoaded() {
+        AdAdapted.getInstance().getEventTracker().trackImpressionBeginEvent(sessionId, currentAd);
     }
 }

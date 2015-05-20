@@ -18,14 +18,19 @@ import com.adadapted.android.sdk.core.ad.AdImage;
 import com.adadapted.android.sdk.core.ad.ImageAdType;
 import com.adadapted.android.sdk.ext.http.AdImageLoader;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created by chrisweeden on 5/20/15.
  */
-class AAImageAdView extends ImageView implements AdImageLoader.Listener {
+class AAImageAdView extends ImageView implements AdViewListenable, AdImageLoader.Listener {
     private static final String TAG = AAImageAdView.class.getName();
 
     private AdImageLoader imageLoader;
     private Bitmap adImage;
+
+    private Set<AdViewListener> listeners;
 
     private final Runnable buildAdRunnable = new Runnable() {
         public void run() {
@@ -61,6 +66,8 @@ class AAImageAdView extends ImageView implements AdImageLoader.Listener {
         imageLoader = new AdImageLoader();
         imageLoader.addListener(this);
 
+        listeners = new HashSet<>();
+
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -88,11 +95,32 @@ class AAImageAdView extends ImageView implements AdImageLoader.Listener {
         imageLoader.getImage(imageUrl);
     }
 
+    public void addListener(AdViewListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeListener(AdViewListener listener) {
+        listeners.remove(listener);
+    }
+
+    private void notifyOnViewLoaded() {
+        for(AdViewListener listener : listeners) {
+            listener.onViewLoaded();
+        }
+    }
+
     @Override
     public void onAdImageLoaded(Bitmap bitmap) {
         Log.d(TAG, "Calling onAdImageLoaded()");
 
         adImage = bitmap;
         buildAdHandler.post(buildAdRunnable);
+
+        notifyOnViewLoaded();
+    }
+
+    @Override
+    public void onAdImageLoadFailed() {
+        Log.d(TAG, "Calling onAdImageLoadFailed()");
     }
 }
