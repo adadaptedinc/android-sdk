@@ -3,29 +3,20 @@ package com.adadapted.android.sdk.ui;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.os.Build;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.adadapted.android.sdk.AdAdapted;
-import com.adadapted.android.sdk.core.ad.HtmlAdType;
-import com.adadapted.android.sdk.core.ad.ImageAdType;
-import com.adadapted.android.sdk.core.device.ScreenDensity;
+import com.adadapted.android.sdk.core.event.EventTracker;
 import com.adadapted.android.sdk.core.zone.Zone;
-import com.adadapted.android.sdk.ext.http.AdImageLoader;
 import com.adadapted.android.sdk.core.ad.Ad;
-import com.adadapted.android.sdk.core.ad.AdImage;
 import com.adadapted.android.sdk.core.session.Session;
 import com.adadapted.android.sdk.ext.scheduler.AdZoneRefreshScheduler;
 
@@ -52,6 +43,8 @@ public class AAZoneView extends RelativeLayout
 
     private AAImageAdView adImageView;
     private AAHtmlAdView adWebView;
+
+    private EventTracker eventTracker;
 
     public AAZoneView(Context context) {
         super(context);
@@ -92,36 +85,38 @@ public class AAZoneView extends RelativeLayout
 
         this.zoneId = zoneId;
 
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-
         adImageView = new AAImageAdView(getContext());
         adImageView.addListener(this);
 
         adWebView = new AAHtmlAdView(getContext());
         adWebView.addListener(this);
 
-        setGravity(Gravity.CENTER);
+        eventTracker = AdAdapted.getInstance().getEventTracker();
 
+        setGravity(Gravity.CENTER);
         setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (zoneHasNoAds() || currentAd == null) {
-                    return;
-                }
-
-                Log.d(TAG, getZoneLabel() + " Ad " + currentAd.getAdId() + " clicked in Zone " + AAZoneView.this.zoneId);
-                AdAdapted.getInstance().getEventTracker().trackInteractionEvent(sessionId, currentAd);
-                AdAdapted.getInstance().getEventTracker().trackPopupBeginEvent(sessionId, currentAd);
-
-                isStoppingForPopup = true;
-
-                Intent intent = new Intent(getContext(), WebViewPopupActivity.class);
-                intent.putExtra(WebViewPopupActivity.EXTRA_POPUP_URL, currentAd.getAdAction().getActionPath());
-                getContext().startActivity(intent);
+                processAdInteraction();
             }
         });
+    }
+
+    private void processAdInteraction() {
+        if (zoneHasNoAds() || currentAd == null) {
+            return;
+        }
+
+        isStoppingForPopup = true;
+
+        Log.d(TAG, getZoneLabel() + " Ad " + currentAd.getAdId() + " clicked in Zone " + zoneId);
+        eventTracker.trackInteractionEvent(sessionId, currentAd);
+        eventTracker.trackPopupBeginEvent(sessionId, currentAd);
+
+        Intent intent = new Intent(getContext(), WebViewPopupActivity.class);
+        intent.putExtra(WebViewPopupActivity.EXTRA_POPUP_URL,
+                currentAd.getAdAction().getActionPath());
+        getContext().startActivity(intent);
     }
 
     private void displayNextAd() {
@@ -193,11 +188,6 @@ public class AAZoneView extends RelativeLayout
             @Override
             public void run() {
                 AAZoneView.this.removeAllViews();
-
-                RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(
-                        LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
-                relativeParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-
                 AAZoneView.this.addView(updatedView);
             }
         });
@@ -218,7 +208,7 @@ public class AAZoneView extends RelativeLayout
                 }
             });
 
-            AdAdapted.getInstance().getEventTracker().trackImpressionEndEvent(sessionId, currentAd);
+            eventTracker.trackImpressionEndEvent(sessionId, currentAd);
             currentAd = null;
         }
     }
@@ -227,7 +217,7 @@ public class AAZoneView extends RelativeLayout
         Log.d(TAG, getZoneLabel() + " Calling onStart()");
 
         if(isStoppingForPopup) {
-            AdAdapted.getInstance().getEventTracker().trackPopupEndEvent(sessionId, currentAd);
+            eventTracker.trackPopupEndEvent(sessionId, currentAd);
             completeCurrentAd();
             isStoppingForPopup = false;
         }
@@ -256,7 +246,7 @@ public class AAZoneView extends RelativeLayout
             completeCurrentAd();
         }
 
-        AdAdapted.getInstance().getEventTracker().publishEvents();
+        eventTracker.publishEvents();
     }
 
     @Override
@@ -322,6 +312,6 @@ public class AAZoneView extends RelativeLayout
 
     @Override
     public void onViewLoaded() {
-        AdAdapted.getInstance().getEventTracker().trackImpressionBeginEvent(sessionId, currentAd);
+        eventTracker.trackImpressionBeginEvent(sessionId, currentAd);
     }
 }

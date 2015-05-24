@@ -16,7 +16,7 @@ import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.ad.Ad;
 import com.adadapted.android.sdk.core.ad.AdImage;
 import com.adadapted.android.sdk.core.ad.ImageAdType;
-import com.adadapted.android.sdk.ext.http.AdImageLoader;
+import com.adadapted.android.sdk.ext.http.HttpAdImageLoader;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -24,10 +24,10 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 5/20/15.
  */
-class AAImageAdView extends ImageView implements AdViewListenable, AdImageLoader.Listener {
+class AAImageAdView extends ImageView implements AdViewListenable, HttpAdImageLoader.Listener {
     private static final String TAG = AAImageAdView.class.getName();
 
-    private AdImageLoader imageLoader;
+    private HttpAdImageLoader imageLoader;
     private Bitmap adImage;
 
     private Set<AdViewListener> listeners;
@@ -63,7 +63,7 @@ class AAImageAdView extends ImageView implements AdViewListenable, AdImageLoader
     }
 
     private void init() {
-        imageLoader = new AdImageLoader();
+        imageLoader = new HttpAdImageLoader();
         imageLoader.addListener(this);
 
         listeners = new HashSet<>();

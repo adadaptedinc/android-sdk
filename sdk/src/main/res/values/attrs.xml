@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="AAImageView">
+    <declare-styleable name="AAImageAdView">
         <attr name="zone_id" format="string" />
     </declare-styleable>
 </resources>

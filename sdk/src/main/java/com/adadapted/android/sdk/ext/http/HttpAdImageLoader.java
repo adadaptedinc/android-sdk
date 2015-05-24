@@ -3,6 +3,7 @@ package com.adadapted.android.sdk.ext.http;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.adadapted.android.sdk.core.ad.AdImageLoader;
 import com.adadapted.android.sdk.ext.cache.ImageCache;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -14,17 +15,12 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 3/30/15.
  */
-public class AdImageLoader {
-    private static final String TAG = AdImageLoader.class.getName();
+public class HttpAdImageLoader implements AdImageLoader {
+    private static final String TAG = HttpAdImageLoader.class.getName();
 
     private final Set<Listener> listeners;
 
-    public interface Listener {
-        void onAdImageLoaded(Bitmap bitmap);
-        void onAdImageLoadFailed();
-    }
-
-    public AdImageLoader() {
+    public HttpAdImageLoader() {
         listeners = new HashSet<>();
     }
 
@@ -80,17 +76,17 @@ public class AdImageLoader {
         HttpRequestManager.getQueue().add(imageRequest);
     }
 
-    public void addListener(AdImageLoader.Listener listener) {
+    public void addListener(HttpAdImageLoader.Listener listener) {
         listeners.add(listener);
     }
 
-    public void removeListener(AdImageLoader.Listener listener) {
+    public void removeListener(HttpAdImageLoader.Listener listener) {
         listeners.remove(listener);
     }
 
     private void notifyAdImageLoaded(Bitmap bitmap) {
         if(bitmap != null) {
-            for(AdImageLoader.Listener listener : listeners) {
+            for(HttpAdImageLoader.Listener listener : listeners) {
                 listener.onAdImageLoaded(bitmap);
             }
         }
@@ -100,7 +96,7 @@ public class AdImageLoader {
     }
 
     private void notifyAdImageLoadFailed() {
-        for(AdImageLoader.Listener listener : listeners) {
+        for(HttpAdImageLoader.Listener listener : listeners) {
             listener.onAdImageLoadFailed();
         }
     }

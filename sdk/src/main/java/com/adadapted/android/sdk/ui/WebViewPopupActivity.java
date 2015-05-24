@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import com.adadapted.android.sdk.R;
 
@@ -23,6 +24,7 @@ public class WebViewPopupActivity extends ActionBarActivity {
         String url = intent.getStringExtra(EXTRA_POPUP_URL);
 
         webView = (WebView)findViewById(R.id.activity_web_view_popup_webView);
+        webView.getSettings().setJavaScriptEnabled(true);
         webView.loadUrl(url);
     }
 }
