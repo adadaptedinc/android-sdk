@@ -1,6 +1,6 @@
 package com.adadapted.android.sdk.ext.scheduler;
 
-import com.adadapted.android.sdk.core.ad.Ad;
+import com.adadapted.android.sdk.core.ad.model.Ad;
 
 import java.util.HashSet;
 import java.util.Set;

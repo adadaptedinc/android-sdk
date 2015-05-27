@@ -38,6 +38,11 @@
             android:name=".ui.recipe.RecipeDetailActivity"
             android:label="@string/title_activity_recipe_detail" >
         </activity>
+
+        <activity
+            android:name="com.adadapted.android.sdk.ui.view.WebViewPopupActivity"
+            android:label="Popup Activity">
+        </activity>
     </application>
 
 </manifest>

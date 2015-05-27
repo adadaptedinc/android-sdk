@@ -1,4 +1,4 @@
-package com.adadapted.android.sdk.ui;
+package com.adadapted.android.sdk.ui.view;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -9,16 +9,16 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.adadapted.android.sdk.AdAdapted;
-import com.adadapted.android.sdk.core.event.EventTracker;
-import com.adadapted.android.sdk.core.zone.Zone;
-import com.adadapted.android.sdk.core.ad.Ad;
-import com.adadapted.android.sdk.core.session.Session;
+import com.adadapted.android.sdk.R;
+import com.adadapted.android.sdk.core.ad.model.Ad;
+import com.adadapted.android.sdk.core.zone.model.Zone;
+import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.ext.scheduler.AdZoneRefreshScheduler;
+import com.adadapted.android.sdk.ui.listener.AdViewListener;
+import com.adadapted.android.sdk.ui.model.CurrentAd;
 
 /**
  * Created by chrisweeden on 3/30/15.
@@ -29,22 +29,23 @@ public class AAZoneView extends RelativeLayout
 
     private String zoneLabel;
 
-    private boolean isActive;
+    private boolean isInitialized = false;
+    private boolean isActive = false;
     private boolean isVisible = true;
-    private boolean isStoppingForPopup = false;
 
     private String zoneId;
     private String sessionId;
     private int adCountForZone;
 
-    private Ad currentAd;
+    private CurrentAd currentAd;
 
     private AdZoneRefreshScheduler refreshScheduler;
 
     private AAImageAdView adImageView;
     private AAHtmlAdView adWebView;
 
-    private EventTracker eventTracker;
+    private int layoutResourceId;
+    private AAJsonAdView aaJsonView;
 
     public AAZoneView(Context context) {
         super(context);
@@ -72,26 +73,15 @@ public class AAZoneView extends RelativeLayout
         this.zoneLabel = zoneLabel;
     }
 
-    public String getZoneId() {
-        return zoneId;
-    }
-
     public boolean zoneHasNoAds() {
         return adCountForZone == 0;
     }
 
     public void init(String zoneId) {
-        Log.d(TAG, getZoneLabel() + " Calling init() with " + zoneId);
-
         this.zoneId = zoneId;
 
-        adImageView = new AAImageAdView(getContext());
-        adImageView.addListener(this);
-
-        adWebView = new AAHtmlAdView(getContext());
-        adWebView.addListener(this);
-
-        eventTracker = AdAdapted.getInstance().getEventTracker();
+        this.layoutResourceId = R.layout.default_json_ad_zone;
+        this.currentAd = CurrentAd.createEmptyCurrentAd(getContext(), sessionId);
 
         setGravity(Gravity.CENTER);
         setOnClickListener(new View.OnClickListener() {
@@ -100,30 +90,31 @@ public class AAZoneView extends RelativeLayout
                 processAdInteraction();
             }
         });
+
+        isInitialized = true;
+    }
+
+    public void init(String zoneId, int layoutResourceId) {
+        init(zoneId);
+
+        this.layoutResourceId = layoutResourceId;
     }
 
     private void processAdInteraction() {
-        if (zoneHasNoAds() || currentAd == null) {
+        if (zoneHasNoAds() || !currentAd.hasAd()) {
             return;
         }
 
-        isStoppingForPopup = true;
-
-        Log.d(TAG, getZoneLabel() + " Ad " + currentAd.getAdId() + " clicked in Zone " + zoneId);
-        eventTracker.trackInteractionEvent(sessionId, currentAd);
-        eventTracker.trackPopupBeginEvent(sessionId, currentAd);
+        currentAd.trackInteraction();
 
         Intent intent = new Intent(getContext(), WebViewPopupActivity.class);
-        intent.putExtra(WebViewPopupActivity.EXTRA_POPUP_URL,
-                currentAd.getAdAction().getActionPath());
+        intent.putExtra(WebViewPopupActivity.EXTRA_POPUP_URL, currentAd.getActionPath());
         getContext().startActivity(intent);
     }
 
     private void displayNextAd() {
-        Log.d(TAG, getZoneLabel() + " Calling displayNextAd()");
-
         if(zoneHasNoAds()) {
-            Log.d(TAG, getZoneLabel() + " No ads for zone " + zoneId);
+            Log.i(TAG, getZoneLabel() + " No ads for zone " + zoneId);
             return;
         }
 
@@ -137,9 +128,10 @@ public class AAZoneView extends RelativeLayout
     }
 
     private void setNextAd() {
-        currentAd = AdAdapted.getInstance().getNextAdForZone(zoneId);
+        Ad ad = AdAdapted.getInstance().getNextAdForZone(zoneId);
+        currentAd = new CurrentAd(getContext(), sessionId, ad);
 
-        if(currentAd == null) {
+        if(!currentAd.hasAd()) {
             return;
         }
 
@@ -148,9 +140,7 @@ public class AAZoneView extends RelativeLayout
     }
 
     private void loadNextAdAssets() {
-        Log.d(TAG, getZoneLabel() + " Displaying " + currentAd.getAdId());
-
-        switch(currentAd.getAdType().getAdType()) {
+        switch(currentAd.getAdType()) {
             case HTML:
                 loadHtml();
                 break;
@@ -166,22 +156,36 @@ public class AAZoneView extends RelativeLayout
     }
 
     private void loadHtml() {
-        adWebView.loadHtml(currentAd);
+        if(adWebView == null) {
+            adWebView = new AAHtmlAdView(getContext());
+            adWebView.addListener(this);
+        }
+
+        adWebView.loadHtml(currentAd.getAd());
         displayAdView(adWebView);
     }
 
     private void loadImage() {
-        adImageView.loadImage(currentAd);
+        if(adImageView == null) {
+            adImageView = new AAImageAdView(getContext());
+            adImageView.addListener(this);
+        }
+
+        adImageView.loadImage(currentAd.getAd());
         displayAdView(adImageView);
     }
 
     private void loadJson() {
+        if(aaJsonView == null) {
+            aaJsonView = new AAJsonAdView(getContext(), layoutResourceId);
+            aaJsonView.addListener(this);
+        }
 
+        aaJsonView.buildView(currentAd.getAd());
+        displayAdView(aaJsonView);
     }
 
     private void displayAdView(View view) {
-        Log.d(TAG, "Calling displayAdView()");
-
         final View updatedView = view;
 
         this.post(new Runnable() {
@@ -196,30 +200,36 @@ public class AAZoneView extends RelativeLayout
     private void scheduleAd() {
         refreshScheduler = new AdZoneRefreshScheduler();
         refreshScheduler.addListener(this);
-        refreshScheduler.schedule(currentAd);
+        refreshScheduler.schedule(currentAd.getAd());
     }
 
     private void completeCurrentAd() {
-        if(currentAd != null) {
+        if(currentAd != null && currentAd.hasAd()) {
             this.post(new Runnable() {
                 @Override
                 public void run() {
-                  AAZoneView.this.removeAllViews();
+                    AAZoneView.this.removeAllViews();
                 }
             });
 
-            eventTracker.trackImpressionEndEvent(sessionId, currentAd);
-            currentAd = null;
+            currentAd.completeAdTracking();
+            currentAd = CurrentAd.createEmptyCurrentAd(getContext(), sessionId);
+        }
+    }
+
+    public void purgeScheduler() {
+        if(refreshScheduler != null) {
+            refreshScheduler.removeListener(this);
+            refreshScheduler.cancel();
+            refreshScheduler.purge();
         }
     }
 
     public void onStart() {
-        Log.d(TAG, getZoneLabel() + " Calling onStart()");
+        if(!isInitialized) { return; }
 
-        if(isStoppingForPopup) {
-            eventTracker.trackPopupEndEvent(sessionId, currentAd);
-            completeCurrentAd();
-            isStoppingForPopup = false;
+        if(!currentAd.hasAd()) {
+            currentAd.trackPopupEnd();
         }
 
         isActive = true;
@@ -227,33 +237,27 @@ public class AAZoneView extends RelativeLayout
     }
 
     public void onStop() {
-        Log.d(TAG, getZoneLabel() + " Calling onStop()");
-
         isActive = false;
         AdAdapted.getInstance().removeListener(this);
 
-        if(zoneHasNoAds()) {
+        if(!isInitialized || zoneHasNoAds()) {
             return;
         }
 
-        if(refreshScheduler != null) {
-            refreshScheduler.removeListener(this);
-            refreshScheduler.cancel();
-            refreshScheduler.purge();
-        }
+        purgeScheduler();
 
-        if(!isStoppingForPopup) {
+        if(!currentAd.isStoppingForPopup()) {
             completeCurrentAd();
         }
 
-        eventTracker.publishEvents();
+        currentAd.flush();
     }
 
     @Override
     protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
 
-        if(isStoppingForPopup) {
+        if(currentAd.isStoppingForPopup()) {
             return;
         }
 
@@ -279,8 +283,6 @@ public class AAZoneView extends RelativeLayout
 
     @Override
     public void onSessionLoaded(Session session) {
-        Log.d(TAG, getZoneLabel() + " Calling onSessionLoaded()");
-
         this.sessionId = session.getSessionId();
 
         Zone zone = session.getZone(zoneId);
@@ -291,20 +293,16 @@ public class AAZoneView extends RelativeLayout
 
     @Override
     public void onSessionAdsReloaded(Session session) {
-        Log.d(TAG, getZoneLabel() + " Calling onSessionAdsReloaded()");
-
         Zone zone = session.getZone(zoneId);
         this.adCountForZone = (zone != null) ? zone.getAdCount() : 0;
 
-        if(currentAd == null) {
+        if(!currentAd.hasAd()) {
             displayNextAd();
         }
     }
 
     @Override
     public void onAdZoneRefreshTimer() {
-        Log.d(TAG, getZoneLabel() + " Calling onAdZoneRefreshTimer()");
-
         if(isActive) {
             displayNextAd();
         }
@@ -312,6 +310,6 @@ public class AAZoneView extends RelativeLayout
 
     @Override
     public void onViewLoaded() {
-        eventTracker.trackImpressionBeginEvent(sessionId, currentAd);
+        currentAd.beginAdTracking();
     }
 }

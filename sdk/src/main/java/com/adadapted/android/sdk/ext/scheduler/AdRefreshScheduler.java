@@ -1,13 +1,16 @@
 package com.adadapted.android.sdk.ext.scheduler;
 
+import android.content.Context;
 import android.util.Log;
 
-import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.ad.AdFetcher;
-import com.adadapted.android.sdk.core.device.DeviceInfo;
+import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.event.EventTracker;
-import com.adadapted.android.sdk.core.session.Session;
+import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.core.session.SessionManager;
+import com.adadapted.android.sdk.ext.factory.AdFetcherFactory;
+import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
+import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,24 +23,14 @@ import java.util.TimerTask;
 public class AdRefreshScheduler extends Timer {
     private static final String TAG = AdRefreshScheduler.class.getName();
 
-    private Set<Listener> listeners;
-
-    public interface Listener {
-        void onAdRefreshTimer();
-    }
-
     private final SessionManager sessionManager;
     private final EventTracker eventTracker;
     private final AdFetcher adFetcher;
 
-    public AdRefreshScheduler(SessionManager sessionManager,
-                              EventTracker eventTracker,
-                              AdFetcher adFetcher) {
-        listeners = new HashSet<>();
-
-        this.sessionManager = sessionManager;
-        this.eventTracker = eventTracker;
-        this.adFetcher = adFetcher;
+    public AdRefreshScheduler(Context context) {
+        this.sessionManager = SessionManagerFactory.getInstance(context).createSessionManager();
+        this.eventTracker = EventTrackerFactory.getInstance(context).createEventTracker();
+        this.adFetcher = AdFetcherFactory.getInstance(context).createAdFetcher();
     }
 
     public void schedule(long interval, final Session session, final DeviceInfo deviceInfo) {

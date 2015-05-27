@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.AdBuilder;
 import com.adadapted.android.sdk.core.common.Dimension;
+import com.adadapted.android.sdk.core.zone.model.Zone;
 
 import org.json.JSONArray;
 import org.json.JSONException;

@@ -1,4 +1,4 @@
-package com.adadapted.android.sdk.core.ad;
+package com.adadapted.android.sdk.core.ad.model;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +14,7 @@ public class ImageAdType extends AdType {
 
     public ImageAdType() {
         images = new HashMap<>();
-        setAdType(AdTypes.IMAGE);
+        setType(AdTypes.IMAGE);
     }
 
     public Map<String, AdImage> getImages() {

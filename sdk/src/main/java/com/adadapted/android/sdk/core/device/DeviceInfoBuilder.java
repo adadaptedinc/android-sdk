@@ -3,6 +3,8 @@ package com.adadapted.android.sdk.core.device;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.adadapted.android.sdk.core.device.model.DeviceInfo;
+
 import java.util.HashSet;
 import java.util.Set;
 

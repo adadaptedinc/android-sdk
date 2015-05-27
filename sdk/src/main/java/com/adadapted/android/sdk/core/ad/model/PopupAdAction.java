@@ -1,17 +1,17 @@
-package com.adadapted.android.sdk.core.ad;
+package com.adadapted.android.sdk.core.ad.model;
 
 /**
  * Created by chrisweeden on 4/9/15.
  */
-class PopupAdAction extends AdAction {
-    private boolean hideBanner;
-    private String title;
-    private String backgroundColor;
-    private String textColor;
-    private String altCloseButton;
-    private String type;
-    private boolean hideCloseButton;
-    private boolean hideBrowserNavigation;
+public class PopupAdAction extends AdAction {
+    private String title = "Unknown";
+    private String backgroundColor = "Unknown";
+    private String textColor = "Unknown";
+    private String altCloseButton = "Unknown";
+    private String type = "Unknown";
+    private boolean hideBanner = false;
+    private boolean hideCloseButton = false;
+    private boolean hideBrowserNavigation = false;
 
     public boolean shouldHideBanner() {
         return hideBanner;

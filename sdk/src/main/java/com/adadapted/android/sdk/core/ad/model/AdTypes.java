@@ -1,4 +1,4 @@
-package com.adadapted.android.sdk.core.ad;
+package com.adadapted.android.sdk.core.ad.model;
 
 /**
  * Created by chrisweeden on 4/15/15.
@@ -6,5 +6,6 @@ package com.adadapted.android.sdk.core.ad;
 public enum AdTypes {
     HTML,
     IMAGE,
-    JSON
+    JSON,
+    NULL
 }

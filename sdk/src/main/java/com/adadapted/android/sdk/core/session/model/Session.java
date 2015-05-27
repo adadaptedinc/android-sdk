@@ -1,6 +1,6 @@
-package com.adadapted.android.sdk.core.session;
+package com.adadapted.android.sdk.core.session.model;
 
-import com.adadapted.android.sdk.core.zone.Zone;
+import com.adadapted.android.sdk.core.zone.model.Zone;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -12,10 +12,10 @@ import java.util.Map;
 public class Session {
     private static final String TAG = Session.class.getName();
 
-    private String sessionId;
-    private boolean activeCampaigns;
+    private String sessionId = "";
+    private boolean activeCampaigns = false;
     private Date expiresAt;
-    private long pollingInterval;
+    private long pollingInterval = 300000;
     private final Map<String, Zone> zones;
 
     public Session() {

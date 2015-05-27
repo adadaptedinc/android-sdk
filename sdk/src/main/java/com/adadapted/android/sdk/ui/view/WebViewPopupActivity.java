@@ -1,4 +1,4 @@
-package com.adadapted.android.sdk.ui;
+package com.adadapted.android.sdk.ui.view;
 
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
@@ -25,6 +25,12 @@ public class WebViewPopupActivity extends ActionBarActivity {
 
         webView = (WebView)findViewById(R.id.activity_web_view_popup_webView);
         webView.getSettings().setJavaScriptEnabled(true);
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return false;
+            }
+        });
         webView.loadUrl(url);
     }
 }

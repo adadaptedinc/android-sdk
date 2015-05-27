@@ -1,8 +1,8 @@
-package com.adadapted.android.sdk.core.zone;
+package com.adadapted.android.sdk.core.zone.model;
 
 import android.util.Log;
 
-import com.adadapted.android.sdk.core.ad.Ad;
+import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.common.Dimension;
 
 import java.util.ArrayList;
@@ -17,20 +17,18 @@ public class Zone {
     private static final String TAG = Zone.class.getName();
 
     private final String zoneId;
-
-    private Map<String, Dimension> dimensions;
     private final List<Ad> ads;
 
+    private Map<String, Dimension> dimensions;
     private Map<String, Integer> adViews;
-    private int zoneViews;
-    private int adIndex;
+    private int zoneViews = 0;
+    private int adIndex = 0;
 
     public Zone(String zoneId) {
-        this.zoneId = zoneId;
+        this.zoneId = (zoneId == null) ? "" : zoneId;
 
         this.dimensions = new HashMap<>();
         this.ads = new ArrayList<>();
-
         this.adViews = new HashMap<>();
     }
 

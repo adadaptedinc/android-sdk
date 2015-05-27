@@ -1,18 +1,18 @@
-package com.adadapted.android.sdk.core.ad;
+package com.adadapted.android.sdk.core.ad.model;
 
 /**
  * Created by chrisweeden on 3/23/15.
  */
 public class Ad {
-    private String adId;
-    private String zoneId;
-    private String baseImpressionId;
-    private String impressionId;
-    private int refreshTime;
-    private AdType adType;
-    private AdAction adAction;
-    private String hideAfterInteraction;
-    private String payload;
+    private String adId = "";
+    private String zoneId = "";
+    private String baseImpressionId = "";
+    private String impressionId = "";
+    private String hideAfterInteraction = "";
+    private String payload = "";
+    private int refreshTime = 0;
+    private AdType adType = new NullAdType();
+    private AdAction adAction = new NullAdAction();
 
     public Ad() {}
 

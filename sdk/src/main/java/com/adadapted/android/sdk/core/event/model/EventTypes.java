@@ -1,4 +1,4 @@
-package com.adadapted.android.sdk.core.event;
+package com.adadapted.android.sdk.core.event.model;
 
 /**
  * Created by chrisweeden on 3/23/15.

@@ -1,11 +1,11 @@
-package com.adadapted.android.sdk.core.ad;
+package com.adadapted.android.sdk.core.ad.model;
 
 /**
  * Created by chrisweeden on 4/9/15.
  */
 public abstract class AdAction {
-    private String actionType;
-    private String actionPath;
+    private String actionType = "";
+    private String actionPath = "";
 
     public String getActionType() {
         return actionType;

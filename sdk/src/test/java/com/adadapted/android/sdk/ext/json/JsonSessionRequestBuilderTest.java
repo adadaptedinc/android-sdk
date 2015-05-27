@@ -1,6 +1,6 @@
 package com.adadapted.android.sdk.ext.json;
 
-import com.adadapted.android.sdk.core.device.DeviceInfo;
+import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.session.SessionRequestBuilder;
 
 import junit.framework.Assert;

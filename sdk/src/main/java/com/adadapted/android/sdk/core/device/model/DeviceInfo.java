@@ -1,4 +1,4 @@
-package com.adadapted.android.sdk.core.device;
+package com.adadapted.android.sdk.core.device.model;
 
 import android.content.Context;
 import android.os.Build;
@@ -6,8 +6,7 @@ import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
-import com.adadapted.android.sdk.AdAdapted;
-import com.adadapted.android.sdk.core.ad.ImageAdType;
+import com.adadapted.android.sdk.core.ad.model.ImageAdType;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -22,6 +21,8 @@ import java.util.TimeZone;
  */
 public class DeviceInfo {
     private static final String TAG = DeviceInfo.class.getName();
+
+    private static final String UNKNOWN_VALUE = "Unknown";
 
     private String appId;
     private String[] zones;
@@ -39,7 +40,7 @@ public class DeviceInfo {
 
     public DeviceInfo() {}
 
-    static DeviceInfo captureDeviceInfo(Context context, String appId, String[] zones, String sdkVersion) {
+    public static DeviceInfo captureDeviceInfo(Context context, String appId, String[] zones, String sdkVersion) {
         DeviceInfo deviceInfo = new DeviceInfo();
 
         deviceInfo.setAppId(appId);
@@ -70,13 +71,13 @@ public class DeviceInfo {
         try {
             return AdvertisingIdClient.getAdvertisingIdInfo(context).getId();
         }
-        catch (IOException ex) {
-            Log.w(TAG, "Problem retrieving Google Play AdvertiserId", ex);
-        }
         catch (GooglePlayServicesNotAvailableException ex) {
             Log.w(TAG, "Problem retrieving Google Play AdvertiserId", ex);
         }
         catch (GooglePlayServicesRepairableException ex) {
+            Log.w(TAG, "Problem retrieving Google Play AdvertiserId", ex);
+        }
+        catch (IOException ex) {
             Log.w(TAG, "Problem retrieving Google Play AdvertiserId", ex);
         }
 
@@ -96,7 +97,7 @@ public class DeviceInfo {
             case DisplayMetrics.DENSITY_MEDIUM:
                 return ScreenDensity.MDPI;
             case DisplayMetrics.DENSITY_HIGH:
-                return ScreenDensity.HPDI;
+                return ScreenDensity.HDPI;
             case DisplayMetrics.DENSITY_LOW:
                 return ScreenDensity.LDPI;
             case DisplayMetrics.DENSITY_XHIGH:
@@ -113,13 +114,11 @@ public class DeviceInfo {
     }
 
     public String chooseImageSize() {
-        if(density == ScreenDensity.XHDPI ||
-                density == ScreenDensity.XXHDPI ||
-                density == ScreenDensity.XXXHDPI) {
-            return ImageAdType.RETINA_IMAGE;
+        if(density == ScreenDensity.MDPI || density == ScreenDensity.HDPI) {
+            return ImageAdType.STANDARD_IMAGE;
         }
 
-        return ImageAdType.STANDARD_IMAGE;
+        return ImageAdType.RETINA_IMAGE;
     }
 
     public String getAppId() {
@@ -143,7 +142,7 @@ public class DeviceInfo {
     }
 
     public void setBundleId(String bundleId) {
-        this.bundleId = bundleId;
+        this.bundleId = (bundleId == null) ? UNKNOWN_VALUE : bundleId;
     }
 
     public String getUdid() {
@@ -151,7 +150,7 @@ public class DeviceInfo {
     }
 
     public void setUdid(String udid) {
-        this.udid = udid;
+        this.udid = (udid == null) ? UNKNOWN_VALUE : udid;
     }
 
     public String getDevice() {
@@ -159,7 +158,7 @@ public class DeviceInfo {
     }
 
     public void setDevice(String device) {
-        this.device = device;
+        this.device = (device == null) ? UNKNOWN_VALUE : device;
     }
 
     public String getOs() {
@@ -167,7 +166,7 @@ public class DeviceInfo {
     }
 
     public void setOs(String os) {
-        this.os = os;
+        this.os = (os == null) ? UNKNOWN_VALUE : os;
     }
 
     public String getOsv() {
@@ -175,7 +174,7 @@ public class DeviceInfo {
     }
 
     public void setOsv(String osv) {
-        this.osv = osv;
+        this.osv = (osv == null) ? UNKNOWN_VALUE : osv;
     }
 
     public String getLocale() {
@@ -183,7 +182,7 @@ public class DeviceInfo {
     }
 
     public void setLocale(String locale) {
-        this.locale = locale;
+        this.locale = (locale == null) ? UNKNOWN_VALUE : locale;
     }
 
     public String getTimezone() {
@@ -191,7 +190,7 @@ public class DeviceInfo {
     }
 
     public void setTimezone(String timezone) {
-        this.timezone = timezone;
+        this.timezone = (timezone == null) ? UNKNOWN_VALUE : timezone;
     }
 
     public int getDw() {
@@ -223,7 +222,7 @@ public class DeviceInfo {
     }
 
     public void setSdkVersion(String sdkVersion) {
-        this.sdkVersion = sdkVersion;
+        this.sdkVersion = (sdkVersion == null) ? UNKNOWN_VALUE : sdkVersion;
     }
 
     @Override

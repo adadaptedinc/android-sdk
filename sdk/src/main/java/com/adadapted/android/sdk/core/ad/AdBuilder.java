@@ -2,6 +2,17 @@ package com.adadapted.android.sdk.core.ad;
 
 import android.util.Log;
 
+import com.adadapted.android.sdk.core.ad.model.HtmlAdType;
+import com.adadapted.android.sdk.core.ad.model.ImageAdType;
+import com.adadapted.android.sdk.core.ad.model.JsonAdType;
+import com.adadapted.android.sdk.core.ad.model.NullAdAction;
+import com.adadapted.android.sdk.core.ad.model.NullAdType;
+import com.adadapted.android.sdk.core.ad.model.PopupAdAction;
+import com.adadapted.android.sdk.core.ad.model.Ad;
+import com.adadapted.android.sdk.core.ad.model.AdAction;
+import com.adadapted.android.sdk.core.ad.model.AdImage;
+import com.adadapted.android.sdk.core.ad.model.AdType;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,6 +47,7 @@ public class AdBuilder {
     private static final String AD_TYPE_JSON = "json";
 
     private static final String ACTION_TYPE_POPUP = "p";
+    private static final String ACTION_TYPE_DELEGATE = "d";
 
     private static final String FIELD_AD_URL = "ad_url";
 

@@ -1,4 +1,4 @@
-package com.adadapted.android.sdk.core.ad;
+package com.adadapted.android.sdk.core.ad.model;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -2,10 +2,10 @@ package com.adadapted.android.sdk.ext.json;
 
 import android.util.Log;
 
-import com.adadapted.android.sdk.core.ad.Ad;
-import com.adadapted.android.sdk.core.device.DeviceInfo;
+import com.adadapted.android.sdk.core.ad.model.Ad;
+import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.event.EventRequestBuilder;
-import com.adadapted.android.sdk.core.event.EventTypes;
+import com.adadapted.android.sdk.core.event.model.EventTypes;
 
 import org.json.JSONException;
 import org.json.JSONObject;

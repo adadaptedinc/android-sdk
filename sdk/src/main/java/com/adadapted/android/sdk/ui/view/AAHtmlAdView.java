@@ -1,4 +1,4 @@
-package com.adadapted.android.sdk.ui;
+package com.adadapted.android.sdk.ui.view;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -6,10 +6,13 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 
-import com.adadapted.android.sdk.core.ad.Ad;
-import com.adadapted.android.sdk.core.ad.HtmlAdType;
+import com.adadapted.android.sdk.core.ad.model.Ad;
+import com.adadapted.android.sdk.core.ad.model.HtmlAdType;
+import com.adadapted.android.sdk.ui.listener.AdViewListenable;
+import com.adadapted.android.sdk.ui.listener.AdViewListener;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -57,6 +60,12 @@ class AAHtmlAdView extends WebView implements AdViewListenable {
                 ViewGroup.LayoutParams.WRAP_CONTENT);
 
         setLayoutParams(layoutParams);
+        setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return false;
+            }
+        });
     }
 
     void loadHtml(Ad ad) {

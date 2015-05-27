@@ -1,6 +1,7 @@
 package com.adadapted.android.sdk.core.session;
 
-import com.adadapted.android.sdk.core.zone.Zone;
+import com.adadapted.android.sdk.core.session.model.Session;
+import com.adadapted.android.sdk.core.zone.model.Zone;
 
 import junit.framework.Assert;
 

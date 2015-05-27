@@ -3,8 +3,8 @@ package com.adadapted.android.sdk.ext.json;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.AdRequestBuilder;
-import com.adadapted.android.sdk.core.device.DeviceInfo;
-import com.adadapted.android.sdk.core.session.Session;
+import com.adadapted.android.sdk.core.device.model.DeviceInfo;
+import com.adadapted.android.sdk.core.session.model.Session;
 
 import org.json.JSONArray;
 import org.json.JSONException;

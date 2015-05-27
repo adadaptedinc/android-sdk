@@ -1,4 +1,4 @@
-package com.adadapted.android.sdk.ui;
+package com.adadapted.android.sdk.ui.view;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -13,10 +13,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.adadapted.android.sdk.AdAdapted;
-import com.adadapted.android.sdk.core.ad.Ad;
-import com.adadapted.android.sdk.core.ad.AdImage;
-import com.adadapted.android.sdk.core.ad.ImageAdType;
+import com.adadapted.android.sdk.core.ad.model.Ad;
+import com.adadapted.android.sdk.core.ad.model.AdImage;
+import com.adadapted.android.sdk.core.ad.model.ImageAdType;
 import com.adadapted.android.sdk.ext.http.HttpAdImageLoader;
+import com.adadapted.android.sdk.ui.listener.AdViewListenable;
+import com.adadapted.android.sdk.ui.listener.AdViewListener;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -4,8 +4,8 @@ package com.adadapted.android.sdk.core.common;
  * Created by chrisweeden on 3/26/15.
  */
 public class Dimension {
-    private int height;
-    private int width;
+    private int height = 0;
+    private int width = 0;
 
     public int getHeight() {
         return height;

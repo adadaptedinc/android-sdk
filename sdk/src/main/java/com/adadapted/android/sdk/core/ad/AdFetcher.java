@@ -1,8 +1,8 @@
 package com.adadapted.android.sdk.core.ad;
 
-import com.adadapted.android.sdk.core.device.DeviceInfo;
-import com.adadapted.android.sdk.core.session.Session;
-import com.adadapted.android.sdk.core.zone.Zone;
+import com.adadapted.android.sdk.core.device.model.DeviceInfo;
+import com.adadapted.android.sdk.core.session.model.Session;
+import com.adadapted.android.sdk.core.zone.model.Zone;
 
 import org.json.JSONObject;
 

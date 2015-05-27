@@ -1,6 +1,7 @@
 package com.adadapted.android.sdk.core.session;
 
-import com.adadapted.android.sdk.core.device.DeviceInfo;
+import com.adadapted.android.sdk.core.device.model.DeviceInfo;
+import com.adadapted.android.sdk.core.session.model.Session;
 
 import org.json.JSONObject;
 
