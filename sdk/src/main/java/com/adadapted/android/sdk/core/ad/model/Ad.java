@@ -1,9 +1,13 @@
 package com.adadapted.android.sdk.core.ad.model;
 
+import java.io.Serializable;
+
 /**
  * Created by chrisweeden on 3/23/15.
  */
-public class Ad {
+public class Ad implements Serializable {
+    static final long serialVersionUID = 42L;
+
     private String adId = "";
     private String zoneId = "";
     private String baseImpressionId = "";

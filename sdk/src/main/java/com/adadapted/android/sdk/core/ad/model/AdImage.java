@@ -1,12 +1,15 @@
 package com.adadapted.android.sdk.core.ad.model;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by chrisweeden on 3/30/15.
  */
-public class AdImage {
+public class AdImage implements Serializable {
+    static final long serialVersionUID = 42L;
+
     private final Map<String, String> orientations;
 
     public static final String PORTRAIT = "port";
