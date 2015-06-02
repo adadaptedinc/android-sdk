@@ -3,6 +3,7 @@ package com.adadapted.android.sdk.core.device.model;
 import android.content.Context;
 import android.os.Build;
 import android.provider.Settings;
+import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -33,6 +34,7 @@ public class DeviceInfo {
     private String osv;
     private String locale;
     private String timezone;
+    private String carrier;
     private int dw;
     private int dh;
     private ScreenDensity density;
@@ -55,6 +57,10 @@ public class DeviceInfo {
 
         deviceInfo.setTimezone(TimeZone.getDefault().getID());
         deviceInfo.setLocale(Locale.getDefault().toString());
+
+        TelephonyManager manager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+        String carrier = manager.getNetworkOperatorName().length() > 0 ? manager.getNetworkOperatorName() : "None";
+        deviceInfo.setCarrier(carrier);
 
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         deviceInfo.setDh(metrics.heightPixels);
@@ -191,6 +197,14 @@ public class DeviceInfo {
 
     public void setTimezone(String timezone) {
         this.timezone = (timezone == null) ? UNKNOWN_VALUE : timezone;
+    }
+
+    public String getCarrier() {
+        return carrier;
+    }
+
+    public void setCarrier(String carrier) {
+        this.carrier = (carrier == null) ? UNKNOWN_VALUE : carrier;
     }
 
     public int getDw() {
