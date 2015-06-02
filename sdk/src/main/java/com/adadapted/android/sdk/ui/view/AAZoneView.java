@@ -18,7 +18,7 @@ import com.adadapted.android.sdk.core.zone.model.Zone;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.ext.scheduler.AdZoneRefreshScheduler;
 import com.adadapted.android.sdk.ui.listener.AdViewListener;
-import com.adadapted.android.sdk.ui.model.CurrentAd;
+import com.adadapted.android.sdk.ui.model.ViewAd;
 
 /**
  * Created by chrisweeden on 3/30/15.
@@ -37,7 +37,7 @@ public class AAZoneView extends RelativeLayout
     private String sessionId;
     private int adCountForZone;
 
-    private CurrentAd currentAd;
+    private ViewAd currentAd;
 
     private AdZoneRefreshScheduler refreshScheduler;
 
@@ -81,7 +81,7 @@ public class AAZoneView extends RelativeLayout
         this.zoneId = zoneId;
 
         this.layoutResourceId = R.layout.default_json_ad_zone;
-        this.currentAd = CurrentAd.createEmptyCurrentAd(getContext(), sessionId);
+        this.currentAd = ViewAd.createEmptyCurrentAd(getContext(), sessionId);
 
         setGravity(Gravity.CENTER);
         setOnClickListener(new View.OnClickListener() {
@@ -108,7 +108,7 @@ public class AAZoneView extends RelativeLayout
         currentAd.trackInteraction();
 
         Intent intent = new Intent(getContext(), WebViewPopupActivity.class);
-        intent.putExtra(WebViewPopupActivity.EXTRA_POPUP_URL, currentAd.getActionPath());
+        intent.putExtra(WebViewPopupActivity.EXTRA_POPUP_AD, currentAd.getAd());
         getContext().startActivity(intent);
     }
 
@@ -129,7 +129,7 @@ public class AAZoneView extends RelativeLayout
 
     private void setNextAd() {
         Ad ad = AdAdapted.getInstance().getNextAdForZone(zoneId);
-        currentAd = new CurrentAd(getContext(), sessionId, ad);
+        currentAd = new ViewAd(getContext(), sessionId, ad);
 
         if(!currentAd.hasAd()) {
             return;
@@ -142,20 +142,20 @@ public class AAZoneView extends RelativeLayout
     private void loadNextAdAssets() {
         switch(currentAd.getAdType()) {
             case HTML:
-                loadHtml();
+                loadHtmlView();
                 break;
 
             case IMAGE:
-                loadImage();
+                loadImageView();
                 break;
 
             case JSON:
-                loadJson();
+                loadJsonView();
                 break;
         }
     }
 
-    private void loadHtml() {
+    private void loadHtmlView() {
         if(adWebView == null) {
             adWebView = new AAHtmlAdView(getContext());
             adWebView.addListener(this);
@@ -165,7 +165,7 @@ public class AAZoneView extends RelativeLayout
         displayAdView(adWebView);
     }
 
-    private void loadImage() {
+    private void loadImageView() {
         if(adImageView == null) {
             adImageView = new AAImageAdView(getContext());
             adImageView.addListener(this);
@@ -175,7 +175,7 @@ public class AAZoneView extends RelativeLayout
         displayAdView(adImageView);
     }
 
-    private void loadJson() {
+    private void loadJsonView() {
         if(aaJsonView == null) {
             aaJsonView = new AAJsonAdView(getContext(), layoutResourceId);
             aaJsonView.addListener(this);
@@ -213,7 +213,7 @@ public class AAZoneView extends RelativeLayout
             });
 
             currentAd.completeAdTracking();
-            currentAd = CurrentAd.createEmptyCurrentAd(getContext(), sessionId);
+            currentAd = ViewAd.createEmptyCurrentAd(getContext(), sessionId);
         }
     }
 
