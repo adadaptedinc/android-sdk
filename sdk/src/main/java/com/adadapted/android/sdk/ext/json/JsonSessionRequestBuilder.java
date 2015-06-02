@@ -29,6 +29,7 @@ public class JsonSessionRequestBuilder implements SessionRequestBuilder {
             json.put(JsonFields.OSV, deviceInfo.getOsv());
             json.put(JsonFields.LOCALE, deviceInfo.getLocale());
             json.put(JsonFields.TIMEZONE, deviceInfo.getTimezone());
+            json.put(JsonFields.CARRIER, deviceInfo.getCarrier());
             json.put(JsonFields.DH, deviceInfo.getDh());
             json.put(JsonFields.DW, deviceInfo.getDw());
             json.put(JsonFields.DENSITY, deviceInfo.getDensity());
