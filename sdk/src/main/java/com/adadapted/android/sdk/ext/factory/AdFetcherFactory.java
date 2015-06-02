@@ -17,7 +17,7 @@ public class AdFetcherFactory {
 
     private static AdFetcherFactory instance;
 
-    public static AdFetcherFactory getInstance(Context context) {
+    public static synchronized AdFetcherFactory getInstance(Context context) {
         if(instance == null) {
             instance = new AdFetcherFactory(context);
         }

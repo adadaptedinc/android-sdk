@@ -16,7 +16,7 @@ import com.adadapted.android.sdk.ext.json.JsonSessionRequestBuilder;
 public class SessionManagerFactory {
     private static SessionManagerFactory instance;
 
-    public static SessionManagerFactory getInstance(Context context) {
+    public static synchronized SessionManagerFactory getInstance(Context context) {
         if(instance == null) {
             instance = new SessionManagerFactory(context);
         }

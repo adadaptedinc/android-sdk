@@ -14,7 +14,7 @@ import com.adadapted.android.sdk.ext.json.JsonEventRequestBuilder;
 public class EventTrackerFactory {
     private static EventTrackerFactory instance;
 
-    public static EventTrackerFactory getInstance(Context context) {
+    public static synchronized EventTrackerFactory getInstance(Context context) {
         if(instance == null) {
             instance = new EventTrackerFactory(context);
         }
