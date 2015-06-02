@@ -14,6 +14,7 @@ public class JsonFields {
     public static final String LOCALE = "locale";
     public static final String TIMEZONE = "timezone";
     public static final String DATETIME = "datetime";
+    public static final String CARRIER = "carrier";
     public static final String DH = "dh";
     public static final String DW = "dw";
     public static final String DENSITY = "density";
