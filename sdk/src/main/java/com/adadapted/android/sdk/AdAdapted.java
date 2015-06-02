@@ -43,8 +43,6 @@ public class AdAdapted implements DeviceInfoBuilder.Listener,
     private Session session = null;
     private boolean sessionLoaded = false;
 
-    private AdRefreshScheduler adRefreshScheduler;
-
     private final boolean isProdMode;
     private final String sdkVersion;
 
@@ -55,8 +53,6 @@ public class AdAdapted implements DeviceInfoBuilder.Listener,
 
         this.isProdMode = isProdMode;
         this.sdkVersion = context.getString(R.string.sdk_version);
-
-        //adRefreshScheduler = ;
 
         ImageCache.getInstance().purgeCache();
 
