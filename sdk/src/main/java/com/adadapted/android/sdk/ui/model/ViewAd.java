@@ -10,7 +10,7 @@ import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
 /**
  * Created by chrisweeden on 5/26/15.
  */
-public class CurrentAd {
+public class ViewAd {
     private final Context context;
     private final String sessionId;
     private final Ad ad;
@@ -18,14 +18,14 @@ public class CurrentAd {
     private boolean trackingHasStarted = false;
     private boolean isStoppingForPopup = false;
 
-    public CurrentAd(Context context, String sessionId, Ad ad) {
+    public ViewAd(Context context, String sessionId, Ad ad) {
         this.context = context;
         this.sessionId = sessionId;
         this.ad = ad;
     }
 
-    public static CurrentAd createEmptyCurrentAd(Context context, String sessionId) {
-        return new CurrentAd(context, sessionId, null);
+    public static ViewAd createEmptyCurrentAd(Context context, String sessionId) {
+        return new ViewAd(context, sessionId, null);
     }
 
     public Ad getAd() {
@@ -36,8 +36,8 @@ public class CurrentAd {
         return (ad != null);
     }
 
-    public String getActionPath() {
-        return ad.getAdAction().getActionPath();
+    public String getAdId() {
+        return hasAd() ? ad.getAdId() : "";
     }
 
     public AdTypes getAdType() {
