@@ -34,6 +34,8 @@ public class AdRefreshScheduler extends Timer {
     }
 
     public void schedule(long interval, final Session session, final DeviceInfo deviceInfo) {
+        Log.d(TAG, "Scheduling next Ad refresh.");
+
         this.schedule(new TimerTask() {
 
             @Override
