@@ -44,9 +44,9 @@ public class AdFetcherFactory {
 
     private String determineEndpoint() {
         if(AdAdapted.getInstance().isProd()) {
-            return context.getString(R.string.prod_event_batch_object_url);
+            return context.getString(R.string.prod_ad_get_object_url);
         }
 
-        return context.getString(R.string.sandbox_event_batch_object_url);
+        return context.getString(R.string.sandbox_ad_get_object_url);
     }
 }
