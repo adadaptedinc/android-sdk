@@ -12,6 +12,7 @@ import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.core.session.SessionManager;
 import com.adadapted.android.sdk.core.zone.model.Zone;
 import com.adadapted.android.sdk.ext.cache.ImageCache;
+import com.adadapted.android.sdk.ext.factory.AdFetcherFactory;
 import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
 import com.adadapted.android.sdk.ext.scheduler.AdRefreshScheduler;
 
@@ -143,6 +144,8 @@ public class AdAdapted implements DeviceInfoBuilder.Listener,
     public void onSessionInitialized(Session session) {
         this.session = session;
         this.sessionLoaded = true;
+
+        AdFetcherFactory.getInstance(context).createAdFetcher().addListener(instance);
 
         scheduleAdRefreshTimer();
         notifySessionLoaded();
