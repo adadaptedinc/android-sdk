@@ -1,6 +1,7 @@
 package com.adadapted.android.sdk.core.session;
 
 import com.adadapted.android.sdk.core.device.model.DeviceInfo;
+import com.adadapted.android.sdk.core.session.model.Session;
 
 import org.json.JSONObject;
 
@@ -8,5 +9,6 @@ import org.json.JSONObject;
  * Created by chrisweeden on 3/23/15.
  */
 public interface SessionRequestBuilder {
-    JSONObject buildSessionRequest(DeviceInfo deviceInfo);
+    JSONObject buildSessionInitRequest(DeviceInfo deviceInfo);
+    JSONObject buildSessionReinitRequest(DeviceInfo deviceInfo, Session session);
 }
