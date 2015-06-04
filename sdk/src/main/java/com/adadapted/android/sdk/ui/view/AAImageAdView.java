@@ -45,26 +45,26 @@ class AAImageAdView extends ImageView implements AdViewListenable, HttpAdImageLo
 
     public AAImageAdView(Context context) {
         super(context);
-        init();
+        initView();
     }
 
     public AAImageAdView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        initView();
     }
 
     public AAImageAdView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        initView();
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public AAImageAdView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init();
+        initView();
     }
 
-    private void init() {
+    private void initView() {
         imageLoader = new HttpAdImageLoader();
         imageLoader.addListener(this);
 

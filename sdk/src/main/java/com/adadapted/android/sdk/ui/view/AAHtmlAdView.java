@@ -27,32 +27,32 @@ class AAHtmlAdView extends WebView implements AdViewListenable {
 
     public AAHtmlAdView(Context context) {
         super(context);
-        init();
+        initView();
     }
 
     public AAHtmlAdView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        initView();
     }
 
     public AAHtmlAdView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        initView();
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public AAHtmlAdView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init();
+        initView();
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public AAHtmlAdView(Context context, AttributeSet attrs, int defStyleAttr, boolean privateBrowsing) {
         super(context, attrs, defStyleAttr, privateBrowsing);
-        init();
+        initView();
     }
 
-    private void init() {
+    private void initView() {
         listeners = new HashSet<>();
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
