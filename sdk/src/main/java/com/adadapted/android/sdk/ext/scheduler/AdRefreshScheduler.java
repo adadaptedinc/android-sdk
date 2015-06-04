@@ -46,7 +46,7 @@ public class AdRefreshScheduler extends Timer {
 
                 if(session.hasExpired()) {
                     Log.d(TAG, "Session has expired.");
-                    sessionManager.reinitialize(deviceInfo);
+                    sessionManager.reinitialize(deviceInfo, session);
                 }
                 else {
                     Log.d(TAG, "Session has NOT expired.");
