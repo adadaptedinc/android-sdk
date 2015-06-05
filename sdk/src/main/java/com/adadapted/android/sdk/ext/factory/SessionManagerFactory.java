@@ -8,6 +8,7 @@ import com.adadapted.android.sdk.core.session.SessionBuilder;
 import com.adadapted.android.sdk.core.session.SessionManager;
 import com.adadapted.android.sdk.core.session.SessionRequestBuilder;
 import com.adadapted.android.sdk.ext.http.HttpSessionAdapter;
+import com.adadapted.android.sdk.ext.json.JsonSessionBuilder;
 import com.adadapted.android.sdk.ext.json.JsonSessionRequestBuilder;
 
 /**
@@ -36,9 +37,9 @@ public class SessionManagerFactory {
             HttpSessionAdapter adapter = new HttpSessionAdapter(determineInitEndpoint(),
                     determineReinitEndpoint());
             SessionRequestBuilder requestBuilder = new JsonSessionRequestBuilder();
-            SessionBuilder sessionBuilder = new SessionBuilder();
+            SessionBuilder sessionBuilder = new JsonSessionBuilder();
 
-            sessionManager = new SessionManager(adapter, requestBuilder, sessionBuilder);
+            sessionManager = new SessionManager(context, adapter, requestBuilder, sessionBuilder);
         }
 
         return sessionManager;
