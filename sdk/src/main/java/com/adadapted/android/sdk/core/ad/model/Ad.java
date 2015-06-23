@@ -18,7 +18,11 @@ public class Ad implements Serializable {
     private AdType adType = new NullAdType();
     private AdAction adAction = new NullAdAction();
 
-    public Ad() {}
+    private boolean isHidden;
+
+    public Ad() {
+        isHidden = false;
+    }
 
     public String getAdId() {
         return adId;
@@ -103,6 +107,14 @@ public class Ad implements Serializable {
 
     public boolean hasPayload() {
         return (payload != null);
+    }
+
+    public void hideAd() {
+        isHidden = true;
+    }
+
+    public boolean isHidden() {
+        return isHidden;
     }
 
     @Override
