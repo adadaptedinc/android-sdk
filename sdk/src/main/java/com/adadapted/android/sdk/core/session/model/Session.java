@@ -68,7 +68,13 @@ public class Session {
     }
 
     public Zone getZone(String zoneId) {
-        return zones.get(zoneId);
+        Zone zone = zones.get(zoneId);
+
+        if(zone == null) {
+            zone = Zone.createEmptyZone(zoneId);
+        }
+
+        return zone;
     }
 
     public void updateZones(Map<String, Zone> zones) {
