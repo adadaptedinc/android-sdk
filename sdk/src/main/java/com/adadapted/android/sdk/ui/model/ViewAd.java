@@ -36,10 +36,6 @@ public class ViewAd {
         return (ad != null);
     }
 
-    public String getAdId() {
-        return hasAd() ? ad.getAdId() : "";
-    }
-
     public AdTypes getAdType() {
         return ad.getAdType().getType();
     }
