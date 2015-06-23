@@ -1,7 +1,5 @@
 package com.adadapted.android.sdk.core.zone.model;
 
-import android.util.Log;
-
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.common.Dimension;
 
@@ -20,7 +18,6 @@ public class Zone {
     private final List<Ad> ads;
 
     private Map<String, Dimension> dimensions;
-    private Map<String, Integer> adViews;
     private int zoneViews = 0;
     private int adIndex = 0;
 
@@ -29,7 +26,10 @@ public class Zone {
 
         this.dimensions = new HashMap<>();
         this.ads = new ArrayList<>();
-        this.adViews = new HashMap<>();
+    }
+
+    public static Zone createEmptyZone(String zoneId) {
+        return new Zone(zoneId);
     }
 
     public String getZoneId() {
@@ -52,34 +52,23 @@ public class Zone {
         this.ads.clear();
         this.ads.addAll(ads);
 
-        for(Ad ad : ads) {
-            adViews.put(ad.getAdId(), 0);
-
-            zoneViews = 0;
-            adIndex = 0;
-        }
+        zoneViews = 0;
+        adIndex = 0;
     }
 
     public int getAdCount() {
         return ads.size();
     }
 
-    public Ad getNextAd(long adRefreshTime) {
-        adIndex = zoneViews % ads.size();
-
+    public Ad getNextAd() {
+        adIndex = ++zoneViews % getAdCount();
         Ad ad = ads.get(adIndex);
-        int count = adViews.get(ad.getAdId());
 
-        if(ad.getMaxImpressions(adRefreshTime) >= count) {
-            ad.setImpressionViews(++count);
-            adViews.put(ad.getAdId(), count);
+        if(ad.isHidden()) {
+            return getNextAd();
+        }
 
-            return ad;
-        }
-        else {
-            Log.w(TAG, "Views for Ad " + ad.getAdId() + " in Zone " + zoneId + " have been exhausted for this period");
-            return null;
-        }
+        return ad;
     }
 
     public Ad getCurrentAd() {
