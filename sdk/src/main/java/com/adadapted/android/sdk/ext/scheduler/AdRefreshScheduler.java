@@ -12,8 +12,6 @@ import com.adadapted.android.sdk.ext.factory.AdFetcherFactory;
 import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
 import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
