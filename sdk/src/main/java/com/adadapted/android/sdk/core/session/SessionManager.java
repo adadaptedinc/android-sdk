@@ -1,7 +1,11 @@
 package com.adadapted.android.sdk.core.session;
 
+import android.content.Context;
+
+import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.session.model.Session;
+import com.adadapted.android.sdk.ext.scheduler.AdRefreshScheduler;
 
 import org.json.JSONObject;
 
@@ -11,23 +15,31 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 3/23/15.
  */
-public class SessionManager implements SessionAdapter.Listener {
+public class SessionManager implements SessionAdapter.Listener<JSONObject> {
     private static final String TAG = SessionManager.class.getName();
 
     public interface Listener {
         void onSessionInitialized(Session session);
+        void onSessionInitFailed();
+        void onSessionNotReinitialized();
     }
 
     private final Set<Listener> listeners;
 
+    private Session currentSession;
+    private boolean sessionLoaded = false;
+
+    private final Context context;
     private final SessionAdapter httpSessionAdapter;
     private final SessionRequestBuilder requestBuilder;
     private final SessionBuilder sessionBuilder;
 
-    public SessionManager(SessionAdapter httpSessionAdapter,
+    public SessionManager(Context context, SessionAdapter httpSessionAdapter,
                           SessionRequestBuilder requestBuilder,
                           SessionBuilder sessionBuilder) {
         this.listeners = new HashSet<>();
+
+        this.context = context;
 
         this.httpSessionAdapter = httpSessionAdapter;
         this.httpSessionAdapter.addListener(this);
@@ -47,7 +59,18 @@ public class SessionManager implements SessionAdapter.Listener {
         httpSessionAdapter.sendReinit(request);
     }
 
+    private void scheduleAdRefreshTimer() {
+        new AdRefreshScheduler(context).schedule(
+                currentSession.getPollingInterval(),
+                currentSession,
+                AdAdapted.getInstance().getDeviceInfo());
+    }
+
     public void addListener(Listener listener) {
+        if(sessionLoaded) {
+            listener.onSessionInitialized(currentSession);
+        }
+
         listeners.add(listener);
     }
 
@@ -55,16 +78,45 @@ public class SessionManager implements SessionAdapter.Listener {
         listeners.remove(listener);
     }
 
-    private void notifySessionInitialized(Session session) {
+    private void notifySessionInitialized() {
         for(Listener listener: listeners) {
-           listener.onSessionInitialized(session);
+           listener.onSessionInitialized(currentSession);
+        }
+    }
+
+    private void notifySessionInitFailed() {
+        for(Listener listener: listeners) {
+            listener.onSessionInitFailed();
+        }
+    }
+
+    private void notifySessionNotReinitialized() {
+        for(Listener listener: listeners) {
+            listener.onSessionNotReinitialized();
         }
     }
 
     @Override
-    public void onSessionRequestCompleted(JSONObject response) {
-        Session session = sessionBuilder.buildSession(response);
-        notifySessionInitialized(session);
+    public void onSessionInitRequestCompleted(JSONObject response) {
+        currentSession = sessionBuilder.buildSession(response);
+        sessionLoaded = true;
+        scheduleAdRefreshTimer();
+        notifySessionInitialized();
+    }
+
+    @Override
+    public void onSessionInitRequestFailed() {
+        notifySessionInitFailed();
+    }
+
+    @Override
+    public void onSessionReinitRequestNoContent() {
+        notifySessionNotReinitialized();
+    }
+
+    @Override
+    public void onSessionReinitRequestFailed() {
+        notifySessionNotReinitialized();
     }
 
     @Override
