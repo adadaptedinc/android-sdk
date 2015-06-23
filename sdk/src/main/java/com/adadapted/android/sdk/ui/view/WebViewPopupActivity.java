@@ -3,9 +3,9 @@ package com.adadapted.android.sdk.ui.view;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -14,12 +14,10 @@ import com.adadapted.android.sdk.R;
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.PopupAdAction;
 
-public class WebViewPopupActivity extends ActionBarActivity {
+public class WebViewPopupActivity extends AppCompatActivity {
     private static final String TAG = WebViewPopupActivity.class.getName();
 
     public static final String EXTRA_POPUP_AD = WebViewPopupActivity.class.getName() + ".EXTRA_POPUP_AD";
-
-    private WebView webView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +33,7 @@ public class WebViewPopupActivity extends ActionBarActivity {
     }
 
     private void loadPopup(String url) {
-        webView = (WebView)findViewById(R.id.activity_web_view_popup_webView);
+        WebView webView = (WebView)findViewById(R.id.activity_web_view_popup_webView);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient() {
             @Override
