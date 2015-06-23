@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.ui.adapter;
 
+import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -12,13 +13,14 @@ import com.adadapted.android.sdk.ui.view.AAZoneView;
 public class AAFeedAdapter extends BaseAdapter {
     private static final String TAG = AAFeedAdapter.class.getName();
 
-    private BaseAdapter adapter;
-    private AAFeedAdPlacement placement;
+    private final BaseAdapter adapter;
+    private final AAFeedAdPlacement placement;
+
     private AAZoneView currentZoneView;
 
-    public AAFeedAdapter(BaseAdapter adapter, AAFeedAdPlacement placement) {
+    public AAFeedAdapter(Context context, BaseAdapter adapter, String zoneId, int placement, int height) {
         this.adapter = adapter;
-        this.placement = placement;
+        this.placement = new AAFeedAdPlacement(context, zoneId, placement, height);
     }
 
     @Override
