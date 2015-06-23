@@ -34,7 +34,8 @@ public class SessionManager implements SessionAdapter.Listener<JSONObject> {
     private final SessionRequestBuilder requestBuilder;
     private final SessionBuilder sessionBuilder;
 
-    public SessionManager(Context context, SessionAdapter httpSessionAdapter,
+    public SessionManager(Context context,
+                          SessionAdapter httpSessionAdapter,
                           SessionRequestBuilder requestBuilder,
                           SessionBuilder sessionBuilder) {
         this.listeners = new HashSet<>();
