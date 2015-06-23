@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 3/23/15.
  */
-public class HttpSessionAdapter implements SessionAdapter {
+public class HttpSessionAdapter implements SessionAdapter<JSONObject> {
     private static final String TAG = HttpSessionAdapter.class.getName();
 
     private final Set<Listener> listeners;
@@ -47,6 +47,7 @@ public class HttpSessionAdapter implements SessionAdapter {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d(TAG, "Session Init Request Failed.", error);
+                notifySessionRequestFailed();
             }
 
         });
@@ -63,7 +64,12 @@ public class HttpSessionAdapter implements SessionAdapter {
             @Override
             public void onResponse(JSONObject response) {
                 Log.d(TAG, "Session Reinit Request Succeeded.");
-                notifySessionRequestCompleted(response);
+                if(response.length() > 0) {
+                    notifySessionRequestCompleted(response);
+                }
+                else {
+                    notifySessionReinitRequestNoContent();
+                }
             }
 
         }, new Response.ErrorListener() {
@@ -71,6 +77,7 @@ public class HttpSessionAdapter implements SessionAdapter {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d(TAG, "Session Reinit Request Failed.", error);
+                notifySessionReinitRequestFailed();
             }
 
         });
@@ -79,16 +86,34 @@ public class HttpSessionAdapter implements SessionAdapter {
     }
 
     public void addListener(Listener listener) {
-        this.listeners.add(listener);
+        listeners.add(listener);
     }
 
     public void removeListener(Listener listener) {
-        this.listeners.remove(listener);
+        listeners.remove(listener);
     }
 
     public void notifySessionRequestCompleted(JSONObject response) {
         for(Listener listener : listeners) {
-            listener.onSessionRequestCompleted(response);
+            listener.onSessionInitRequestCompleted(response);
+        }
+    }
+
+    public void notifySessionRequestFailed() {
+        for(Listener listener : listeners) {
+            listener.onSessionInitRequestFailed();
+        }
+    }
+
+    public void notifySessionReinitRequestNoContent() {
+        for(Listener listener : listeners) {
+            listener.onSessionReinitRequestNoContent();
+        }
+    }
+
+    public void notifySessionReinitRequestFailed() {
+        for(Listener listener : listeners) {
+            listener.onSessionReinitRequestFailed();
         }
     }
 
