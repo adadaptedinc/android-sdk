@@ -40,6 +40,10 @@ public class ViewAd {
         return ad.getAdType().getType();
     }
 
+    public boolean actionIs(String content) {
+        return ad.getAdAction().getActionType().equalsIgnoreCase(content);
+    }
+
     public boolean isStoppingForPopup() {
         return isStoppingForPopup;
     }
@@ -59,6 +63,8 @@ public class ViewAd {
     public void trackInteraction() {
         getEventTracker().trackInteractionEvent(sessionId, getAd());
         trackPopupBegin();
+
+        ad.hideAd();
 
         isStoppingForPopup = true;
     }
