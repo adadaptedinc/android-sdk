@@ -22,4 +22,8 @@ public class JsonFields {
     public static final String SDKVERSION = "sdk_version";
 
     public static final String SESSIONID = "session_id";
+
+    public static final String TERM = "term";
+    public static final String USERINPUT = "user_input";
+    public static final String EVENTTYPE = "event_type";
 }
