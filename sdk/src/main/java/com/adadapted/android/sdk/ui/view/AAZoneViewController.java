@@ -5,8 +5,12 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 
+import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.ad.AdFetcher;
 import com.adadapted.android.sdk.core.ad.model.Ad;
+import com.adadapted.android.sdk.core.ad.model.AdAction;
+import com.adadapted.android.sdk.core.ad.model.ContentAdAction;
+import com.adadapted.android.sdk.core.content.ContentPayload;
 import com.adadapted.android.sdk.core.session.SessionManager;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.core.zone.model.ManagedZone;
@@ -16,6 +20,10 @@ import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
 import com.adadapted.android.sdk.ext.scheduler.AdZoneRefreshScheduler;
 import com.adadapted.android.sdk.ui.listener.AdViewListener;
 import com.adadapted.android.sdk.ui.model.ViewAd;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Map;
 
@@ -103,12 +111,33 @@ public class AAZoneViewController implements SessionManager.Listener, AdFetcher.
             return;
         }
 
-        stoppingForPopup = true;
         currentAd.trackInteraction();
+        AdAdapted.getInstance().publishAdClick(zoneId);
 
-        Intent intent = new Intent(context, WebViewPopupActivity.class);
-        intent.putExtra(WebViewPopupActivity.EXTRA_POPUP_AD, currentAd.getAd());
-        context.startActivity(intent);
+        if(currentAd.actionIs(AdAction.CONTENT)) {
+            ContentAdAction action = (ContentAdAction)currentAd.getAd().getAdAction();
+            try {
+                JSONArray jsonArray = new JSONArray(action.getItems());
+                ContentPayload payload = new ContentPayload(ContentPayload.ADD_TO_LIST,
+                        new JSONObject().put("list-items", jsonArray));
+                AdAdapted.getInstance().publishContent(zoneId, payload);
+            }
+            catch(JSONException ex) {
+                Log.w(TAG, "Problem parsing JSON.");
+            }
+
+            Log.i(TAG, "Would handle CONTENT interaction here.");
+        }
+        else if(currentAd.actionIs(AdAction.DELEGATE)) {
+            Log.i(TAG, "Would handle DELEGATE interaction here.");
+        }
+        else if(currentAd.actionIs(AdAction.POPUP)) {
+            stoppingForPopup = true;
+
+            Intent intent = new Intent(context, WebViewPopupActivity.class);
+            intent.putExtra(WebViewPopupActivity.EXTRA_POPUP_AD, currentAd.getAd());
+            context.startActivity(intent);
+        }
     }
 
     private void setNextAd() {
@@ -231,7 +260,9 @@ public class AAZoneViewController implements SessionManager.Listener, AdFetcher.
         sessionId = session.getSessionId();
         zone = new ManagedZone(session.getZone(zoneId));
 
-        displayNextAd();
+        if(!currentAd.hasAd()) {
+            displayNextAd();
+        }
     }
 
     @Override
@@ -274,5 +305,6 @@ public class AAZoneViewController implements SessionManager.Listener, AdFetcher.
     @Override
     public void onViewLoaded() {
         currentAd.beginAdTracking();
+        AdAdapted.getInstance().publishAdImpression(zoneId);
     }
 }
