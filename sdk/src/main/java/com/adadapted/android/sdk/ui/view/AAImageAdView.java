@@ -1,12 +1,9 @@
 package com.adadapted.android.sdk.ui.view;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.os.Handler;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -29,10 +26,10 @@ import java.util.Set;
 class AAImageAdView extends ImageView implements AdViewListenable, HttpAdImageLoader.Listener {
     private static final String TAG = AAImageAdView.class.getName();
 
-    private HttpAdImageLoader imageLoader;
-    private Bitmap adImage;
+    private final HttpAdImageLoader imageLoader;
+    private final Set<AdViewListener> listeners;
 
-    private Set<AdViewListener> listeners;
+    private Bitmap adImage;
 
     private final Runnable buildAdRunnable = new Runnable() {
         public void run() {
@@ -45,36 +42,15 @@ class AAImageAdView extends ImageView implements AdViewListenable, HttpAdImageLo
 
     public AAImageAdView(Context context) {
         super(context);
-        initView();
-    }
 
-    public AAImageAdView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        initView();
-    }
-
-    public AAImageAdView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        initView();
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public AAImageAdView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        initView();
-    }
-
-    private void initView() {
         imageLoader = new HttpAdImageLoader();
         imageLoader.addListener(this);
 
         listeners = new HashSet<>();
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        setScaleType(ImageView.ScaleType.FIT_XY);
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
         setLayoutParams(layoutParams);
     }
 
