@@ -13,6 +13,10 @@ public class PopupAdAction extends AdAction {
     private boolean hideCloseButton = false;
     private boolean hideBrowserNavigation = false;
 
+    public PopupAdAction() {
+        super(POPUP);
+    }
+
     public boolean shouldHideBanner() {
         return hideBanner;
     }
