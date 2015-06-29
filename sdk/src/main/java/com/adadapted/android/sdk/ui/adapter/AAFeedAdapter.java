@@ -1,6 +1,7 @@
 package com.adadapted.android.sdk.ui.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -18,9 +19,13 @@ public class AAFeedAdapter extends BaseAdapter {
 
     private AAZoneView currentZoneView;
 
-    public AAFeedAdapter(Context context, BaseAdapter adapter, String zoneId, int placement, int height) {
+    public AAFeedAdapter(Context context, BaseAdapter adapter, String zoneId, int placement, int height, int padding) {
         this.adapter = adapter;
-        this.placement = new AAFeedAdPlacement(context, zoneId, placement, height);
+        this.placement = new AAFeedAdPlacement(context, zoneId, placement, height, padding);
+    }
+
+    public AAFeedAdapter(Context context, BaseAdapter adapter, String zoneId, int placement, int height) {
+        this(context, adapter, zoneId, placement, height, 0);
     }
 
     @Override
@@ -30,14 +35,7 @@ public class AAFeedAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        AAFeedItem feedItem = placement.getItem(position);
-
-        if(feedItem == null) {
-            int modPos = placement.getModifiedPosition(position);
-            return adapter.getItem(modPos);
-        }
-
-        return feedItem;
+        return position;
     }
 
     @Override
@@ -63,6 +61,25 @@ public class AAFeedAdapter extends BaseAdapter {
         currentZoneView = view;
         onStart();
         return currentZoneView;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        int count = placement.getModifiedViewTypeCount(adapter.getViewTypeCount());
+        Log.d(TAG, "getViewTypeCount() Called. -> " + count);
+        return count;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        AAFeedItem feedItem = placement.getItem(position);
+        if(feedItem == null) {
+            return adapter.getViewTypeCount();
+        }
+        else {
+            int modPos = placement.getModifiedPosition(position);
+            return adapter.getItemViewType(modPos);
+        }
     }
 
     public void onStart() {
