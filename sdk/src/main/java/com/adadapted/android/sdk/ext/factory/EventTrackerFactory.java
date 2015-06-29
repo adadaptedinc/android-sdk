@@ -22,7 +22,7 @@ public class EventTrackerFactory {
         return instance;
     }
 
-    private Context context;
+    private final Context context;
     private EventTracker eventTracker;
 
     private EventTrackerFactory(Context context) {

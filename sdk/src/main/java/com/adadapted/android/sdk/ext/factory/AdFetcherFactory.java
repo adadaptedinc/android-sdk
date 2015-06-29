@@ -25,7 +25,7 @@ public class AdFetcherFactory {
         return instance;
     }
 
-    private Context context;
+    private final Context context;
     private AdFetcher adFetcher;
 
     private AdFetcherFactory(Context context) {

@@ -25,7 +25,7 @@ public class SessionManagerFactory {
         return instance;
     }
 
-    private Context context;
+    private final Context context;
     private SessionManager sessionManager;
 
     private SessionManagerFactory(Context context) {
