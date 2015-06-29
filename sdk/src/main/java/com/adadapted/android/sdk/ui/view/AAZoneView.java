@@ -52,6 +52,7 @@ public class AAZoneView extends RelativeLayout implements AAZoneViewController.L
     }
 
     public void init(String zoneId, int layoutResourceId) {
+        //viewController = AAZoneViewControllerFactory.getInstance().getController(context, zoneId, layoutResourceId);
         viewController = new AAZoneViewController(context, zoneId, layoutResourceId);
         viewController.setListener(this);
 
@@ -75,15 +76,6 @@ public class AAZoneView extends RelativeLayout implements AAZoneViewController.L
     }
 
     private void displayAdView(View view) {
-        //Dimension dimension = viewController.getDimensions();
-
-        //Log.d(TAG, "Setting zone height: " + dimension.getHeight());
-
-        //LayoutParams layoutParams = (RelativeLayout.LayoutParams)getLayoutParams();
-        //requestLayout();
-
-        //setLayoutParams(new LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,
-        //        dimension.getHeight()));
         final View updatedView = view;
 
         this.post(new Runnable() {
