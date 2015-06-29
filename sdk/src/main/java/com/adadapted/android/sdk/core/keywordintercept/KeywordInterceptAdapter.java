@@ -11,7 +11,7 @@ public interface KeywordInterceptAdapter {
         void onInitSuccess(JSONObject response);
         void onInitFailed();
         void onTrackSuccess();
-        void onTrackFailed();
+        void onTrackFailed(JSONArray json);
     }
 
     void init(JSONObject request);
