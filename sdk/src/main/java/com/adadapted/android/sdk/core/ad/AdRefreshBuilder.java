@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.adadapted.android.sdk.core.zone.model.Zone;
 import com.adadapted.android.sdk.core.zone.ZoneBuilder;
+import com.adadapted.android.sdk.ext.json.JsonZoneBuilder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,8 +20,8 @@ public class AdRefreshBuilder {
 
     private final ZoneBuilder zoneBuilder;
 
-    public AdRefreshBuilder() {
-        zoneBuilder = new ZoneBuilder();
+    public AdRefreshBuilder(ZoneBuilder zoneBuilder) {
+        this.zoneBuilder = zoneBuilder;
     }
 
     public Map<String, Zone> buildRefreshedAds(JSONObject adJson) {
