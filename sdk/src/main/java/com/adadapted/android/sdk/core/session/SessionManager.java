@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 3/23/15.
  */
-public class SessionManager implements SessionAdapter.Listener<JSONObject> {
+public class SessionManager implements SessionAdapter.Listener {
     private static final String TAG = SessionManager.class.getName();
 
     public interface Listener {
