@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Created by chrisweeden on 6/25/15.
  */
-public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder<JSONObject> {
+public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
     public KeywordIntercept build(JSONObject json) {
         return new KeywordIntercept("", 0L, parseAutofill(json), parseTrigger(json));
     }

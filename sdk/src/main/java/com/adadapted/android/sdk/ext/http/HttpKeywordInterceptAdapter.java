@@ -5,6 +5,7 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptAdapter;
 import com.adadapted.android.sdk.core.keywordintercept.model.KeywordIntercept;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -15,7 +16,7 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 6/23/15.
  */
-public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter<JSONObject> {
+public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
     private static final String TAG = HttpKeywordInterceptAdapter.class.getName();
 
     private final String initUrl;
@@ -54,7 +55,7 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter<JSON
     }
 
     @Override
-    public void track(JSONObject json) {
+    public void track(JSONArray json) {
         Log.i(TAG, "ki/track JSON: " + json);
         //JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
         //        trackUrl, json, new Response.Listener<JSONObject>(){

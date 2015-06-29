@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 3/23/15.
  */
-public class HttpSessionAdapter implements SessionAdapter<JSONObject> {
+public class HttpSessionAdapter implements SessionAdapter {
     private static final String TAG = HttpSessionAdapter.class.getName();
 
     private final Set<Listener> listeners;
@@ -93,25 +93,25 @@ public class HttpSessionAdapter implements SessionAdapter<JSONObject> {
         listeners.remove(listener);
     }
 
-    public void notifySessionRequestCompleted(JSONObject response) {
+    private void notifySessionRequestCompleted(JSONObject response) {
         for(Listener listener : listeners) {
             listener.onSessionInitRequestCompleted(response);
         }
     }
 
-    public void notifySessionRequestFailed() {
+    private void notifySessionRequestFailed() {
         for(Listener listener : listeners) {
             listener.onSessionInitRequestFailed();
         }
     }
 
-    public void notifySessionReinitRequestNoContent() {
+    private void notifySessionReinitRequestNoContent() {
         for(Listener listener : listeners) {
             listener.onSessionReinitRequestNoContent();
         }
     }
 
-    public void notifySessionReinitRequestFailed() {
+    private void notifySessionReinitRequestFailed() {
         for(Listener listener : listeners) {
             listener.onSessionReinitRequestFailed();
         }

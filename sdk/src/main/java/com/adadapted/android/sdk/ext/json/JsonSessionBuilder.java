@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * Created by chrisweeden on 6/5/15.
  */
-public class JsonSessionBuilder implements SessionBuilder<JSONObject> {
+public class JsonSessionBuilder implements SessionBuilder {
     private static final String TAG = JsonSessionBuilder.class.getName();
 
     private final ZoneBuilder zoneBuilder;
