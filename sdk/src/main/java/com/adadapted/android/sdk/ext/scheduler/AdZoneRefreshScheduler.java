@@ -26,14 +26,16 @@ public class AdZoneRefreshScheduler extends Timer {
     public void schedule(Ad ad) {
         long interval = ad.getRefreshTimeInMs();
 
-        this.schedule(new TimerTask() {
+        if(interval > 0) {
+            this.schedule(new TimerTask() {
 
-            @Override
-            public void run() {
-                notifyAdZoneRefreshTimer();
-            }
+                @Override
+                public void run() {
+                    notifyAdZoneRefreshTimer();
+                }
 
-        }, interval);
+            }, interval);
+        }
     }
 
     public void addListener(Listener listener) {
