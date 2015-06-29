@@ -8,6 +8,7 @@ import com.adadapted.android.sdk.core.ad.AdFetcher;
 import com.adadapted.android.sdk.core.ad.AdRefreshBuilder;
 import com.adadapted.android.sdk.ext.http.HttpAdAdapter;
 import com.adadapted.android.sdk.ext.json.JsonAdRequestBuilder;
+import com.adadapted.android.sdk.ext.json.JsonZoneBuilder;
 
 /**
  * Created by chrisweeden on 5/26/15.
@@ -36,7 +37,7 @@ public class AdFetcherFactory {
         if(adFetcher == null) {
             adFetcher = new AdFetcher(new HttpAdAdapter(determineEndpoint()),
                     new JsonAdRequestBuilder(),
-                    new AdRefreshBuilder());
+                    new AdRefreshBuilder(new JsonZoneBuilder()));
         }
 
         return adFetcher;
