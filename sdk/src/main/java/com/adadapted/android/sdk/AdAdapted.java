@@ -23,13 +23,22 @@ public class AdAdapted implements DeviceInfoBuilder.Listener {
 
     private static AdAdapted instance;
 
-    public interface Listener {
-        void onAdImpression(String zoneId, String eventType);
-        void onAdClick(String zoneId, String eventType);
-        void onContentAvailable(ContentPayload contentPayload);
+    public interface AdEventListener {
+        void onAdImpression(String zoneId);
+        void onAdClick(String zoneId);
     }
 
-    private final Set<Listener> listeners;
+    public interface ContentListener {
+        void onContentAvailable(String zoneId, ContentPayload contentPayload);
+    }
+
+    public interface DelegateListener {
+        void onDelegateAvailable(String zoneId, String delegate);
+    }
+
+    private final Set<AdEventListener> adEventListeners;
+    private final Set<ContentListener> contentListeners;
+    private final Set<DelegateListener> delegateListeners;
 
     private final Context context;
 
@@ -38,7 +47,9 @@ public class AdAdapted implements DeviceInfoBuilder.Listener {
     private final boolean isProdMode;
 
     private AdAdapted(Context context, String appId, String[] zones, boolean isProdMode) {
-        this.listeners = new HashSet<>();
+        this.adEventListeners = new HashSet<>();
+        this.contentListeners = new HashSet<>();
+        this.delegateListeners = new HashSet<>();
 
         this.context = context;
 
@@ -63,6 +74,30 @@ public class AdAdapted implements DeviceInfoBuilder.Listener {
         }
     }
 
+    public static synchronized void addAdListener(AdEventListener listener) {
+        getInstance().addListener(listener);
+    }
+
+    public static synchronized void removeAdListener(AdEventListener listener) {
+        getInstance().removeListener(listener);
+    }
+
+    public static synchronized void addContentListener(ContentListener listener) {
+        getInstance().addListener(listener);
+    }
+
+    public static synchronized void removeContentListener(ContentListener listener) {
+        getInstance().removeListener(listener);
+    }
+
+    public static synchronized void addDelegateListener(DelegateListener listener) {
+        getInstance().addListener(listener);
+    }
+
+    public static synchronized void removeDelegateListener(DelegateListener listener) {
+        getInstance().removeListener(listener);
+    }
+
     public Context getContext() {
         return context;
     }
@@ -79,12 +114,52 @@ public class AdAdapted implements DeviceInfoBuilder.Listener {
         return SessionManagerFactory.getInstance(context).createSessionManager();
     }
 
-    public void addListener(AdAdapted.Listener listener) {
-        listeners.add(listener);
+    public void addListener(AdEventListener listener) {
+        adEventListeners.add(listener);
     }
 
-    public void removeListener(AdAdapted.Listener listener) {
-        listeners.remove(listener);
+    public void addListener(ContentListener listener) {
+        contentListeners.add(listener);
+    }
+
+    public void addListener(DelegateListener listener) {
+        delegateListeners.add(listener);
+    }
+
+    public void removeListener(AdEventListener listener) {
+        adEventListeners.remove(listener);
+    }
+
+    public void removeListener(ContentListener listener) {
+        contentListeners.remove(listener);
+    }
+
+    public void removeListener(DelegateListener listener) {
+        delegateListeners.remove(listener);
+    }
+
+    public void publishAdImpression(String zoneId) {
+        for(AdEventListener listener : adEventListeners) {
+            listener.onAdImpression(zoneId);
+        }
+    }
+
+    public void publishAdClick(String zoneId) {
+        for(AdEventListener listener : adEventListeners) {
+            listener.onAdClick(zoneId);
+        }
+    }
+
+    public void publishContent(String zoneId, ContentPayload payload) {
+        for(ContentListener listener : contentListeners) {
+            listener.onContentAvailable(zoneId, payload);
+        }
+    }
+
+    public void publishDelegate(String zoneId, String delegate) {
+        for(DelegateListener listener : delegateListeners) {
+            listener.onDelegateAvailable(zoneId, delegate);
+        }
     }
 
     @Override
