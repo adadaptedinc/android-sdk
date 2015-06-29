@@ -6,15 +6,18 @@ import org.json.JSONObject;
  * Created by chrisweeden on 6/5/15.
  */
 public class ContentPayload {
-    private final String type;
+    public static final int ADD_TO_LIST = 0;
+    public static final int RECIPE_FAVORITE = 1;
+
+    private final int type;
     private final JSONObject payload;
 
-    public ContentPayload(String type, JSONObject payload) {
+    public ContentPayload(int type, JSONObject payload) {
         this.type = type;
         this.payload = payload;
     }
 
-    public String getType() {
+    public int getType() {
         return type;
     }
 
@@ -24,9 +27,6 @@ public class ContentPayload {
 
     @Override
     public String toString() {
-        return "ContentPayload{" +
-                "type='" + type + '\'' +
-                ", payload=" + payload +
-                '}';
+        return "ContentPayload";
     }
 }
