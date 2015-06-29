@@ -17,7 +17,7 @@ public class ManagedZone {
 
     private final Zone zone;
 
-    private Map<String, Integer> adViews;
+    private final Map<String, Integer> adViews;
 
     public ManagedZone(final Zone zone) {
         this.zone = zone;
