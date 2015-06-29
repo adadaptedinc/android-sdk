@@ -56,6 +56,8 @@ public class WebViewPopupActivity extends AppCompatActivity {
 
         try {
             bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(action.getBackgroundColor())));
+        } catch (NullPointerException ex) {
+            Log.d(TAG, "Problem setting background color " + action.getBackgroundColor(), ex);
         } catch (Exception ex) {
             Log.d(TAG, "Problem setting background color " + action.getBackgroundColor(), ex);
         }
