@@ -35,6 +35,7 @@ public class WebViewPopupActivity extends AppCompatActivity {
     private void loadPopup(String url) {
         WebView webView = (WebView)findViewById(R.id.activity_web_view_popup_webView);
         webView.getSettings().setJavaScriptEnabled(true);
+        webView.addJavascriptInterface(new WebAppInterface(this), "AdAdapted");
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -57,8 +58,6 @@ public class WebViewPopupActivity extends AppCompatActivity {
         try {
             bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(action.getBackgroundColor())));
         } catch (NullPointerException ex) {
-            Log.d(TAG, "Problem setting background color " + action.getBackgroundColor(), ex);
-        } catch (Exception ex) {
             Log.d(TAG, "Problem setting background color " + action.getBackgroundColor(), ex);
         }
     }
