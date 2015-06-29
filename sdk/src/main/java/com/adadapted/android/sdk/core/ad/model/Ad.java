@@ -12,7 +12,7 @@ public class Ad implements Serializable {
     private String zoneId = "";
     private String baseImpressionId = "";
     private String impressionId = "";
-    private String hideAfterInteraction = "";
+    private boolean hideAfterInteraction = false;
     private String payload = "";
     private int refreshTime = 0;
     private AdType adType = new NullAdType();
@@ -89,11 +89,11 @@ public class Ad implements Serializable {
         this.adAction = adAction;
     }
 
-    public String getHideAfterInteraction() {
+    public boolean isHiddenAfterInteraction() {
         return hideAfterInteraction;
     }
 
-    public void setHideAfterInteraction(String hideAfterInteraction) {
+    public void setHideAfterInteraction(boolean hideAfterInteraction) {
         this.hideAfterInteraction = hideAfterInteraction;
     }
 
@@ -110,7 +110,9 @@ public class Ad implements Serializable {
     }
 
     public void hideAd() {
-        isHidden = true;
+        if(isHiddenAfterInteraction()) {
+            isHidden = true;
+        }
     }
 
     public boolean isHidden() {
