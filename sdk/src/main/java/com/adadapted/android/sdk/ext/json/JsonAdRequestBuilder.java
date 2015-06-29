@@ -16,7 +16,7 @@ import java.util.Date;
  * Created by chrisweeden on 4/16/15.
  */
 public class JsonAdRequestBuilder implements AdRequestBuilder {
-    public static final String TAG = JsonAdRequestBuilder.class.getName();
+    private static final String TAG = JsonAdRequestBuilder.class.getName();
 
     public JSONObject buildAdRequest(DeviceInfo deviceInfo, Session session) {
         JSONObject json = new JSONObject();
