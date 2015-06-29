@@ -16,5 +16,4 @@ public interface SessionAdapter<T> {
 
     void addListener(Listener listener);
     void removeListener(Listener listener);
-    void notifySessionRequestCompleted(T response);
 }
