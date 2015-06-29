@@ -67,6 +67,7 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
         //    @Override
         //    public void onErrorResponse(VolleyError volleyError) {
         //        Log.d(TAG, "KI Track Request Failed.");
+        //            notifyTrackFailed(json);
         //    }
         //});
 
@@ -99,9 +100,9 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
         }
     }
 
-    private void notifyTrackFailed() {
+    private void notifyTrackFailed(JSONArray json) {
         for(Listener listener : listeners) {
-            listener.onTrackFailed();
+            listener.onTrackFailed(json);
         }
     }
 }
