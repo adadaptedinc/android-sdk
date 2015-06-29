@@ -33,6 +33,7 @@ public class AdRefreshScheduler extends Timer {
 
     public void schedule(long interval, final Session session, final DeviceInfo deviceInfo) {
         Log.d(TAG, "Scheduling next Ad refresh.");
+        if(interval <= 0L) { return; }
 
         this.schedule(new TimerTask() {
 

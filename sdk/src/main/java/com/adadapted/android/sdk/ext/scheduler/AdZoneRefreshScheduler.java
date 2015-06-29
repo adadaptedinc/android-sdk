@@ -1,5 +1,7 @@
 package com.adadapted.android.sdk.ext.scheduler;
 
+import android.util.Log;
+
 import com.adadapted.android.sdk.core.ad.model.Ad;
 
 import java.util.HashSet;
@@ -24,18 +26,19 @@ public class AdZoneRefreshScheduler extends Timer {
     }
 
     public void schedule(Ad ad) {
+        Log.d(TAG, "Scheduling next Zone refresh.");
+
         long interval = ad.getRefreshTimeInMs();
+        if(interval <= 0) { return; }
 
-        if(interval > 0) {
-            this.schedule(new TimerTask() {
+        this.schedule(new TimerTask() {
 
-                @Override
-                public void run() {
-                    notifyAdZoneRefreshTimer();
-                }
+            @Override
+            public void run() {
+                notifyAdZoneRefreshTimer();
+            }
 
-            }, interval);
-        }
+        }, interval);
     }
 
     public void addListener(Listener listener) {
