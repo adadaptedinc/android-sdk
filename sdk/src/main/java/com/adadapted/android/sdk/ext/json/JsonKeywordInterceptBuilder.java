@@ -19,10 +19,10 @@ public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
 
     private Map<String, String> parseAutofill(JSONObject json) {
         Map<String, String> interceptMap = new HashMap<>();
-        interceptMap.put(":Yogurt", "Chobani® Greek Yogurt");
-        interceptMap.put(":Sour Cream", "Chobani® Greek Yogurt");
-        interceptMap.put(":Mayonaise", "Chobani® Greek Yogurt");
-        interceptMap.put(":Chobani® Greek Yogurt", "Chobani® Greek Yogurt");
+        interceptMap.put("Yogurt", "Chobani® Greek Yogurt");
+        interceptMap.put("Sour Cream", "Chobani® Greek Yogurt");
+        interceptMap.put("Mayonaise", "Chobani® Greek Yogurt");
+        interceptMap.put("Chobani® Greek Yogurt", "Chobani® Greek Yogurt");
 
         return interceptMap;
     }
