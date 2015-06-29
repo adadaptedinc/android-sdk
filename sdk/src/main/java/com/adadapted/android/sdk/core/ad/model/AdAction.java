@@ -8,8 +8,17 @@ import java.io.Serializable;
 public abstract class AdAction implements Serializable {
     static final long serialVersionUID = 42L;
 
+    public static final String CONTENT = "content";
+    public static final String DELEGATE = "delegate";
+    public static final String NULLACTION = "null";
+    public static final String POPUP = "popup";
+
     private String actionType = "";
     private String actionPath = "";
+
+    public AdAction(String actionType) {
+        this.actionType = actionType;
+    }
 
     public String getActionType() {
         return actionType;
