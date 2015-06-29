@@ -21,7 +21,7 @@ public class JsonSessionBuilder implements SessionBuilder {
     private final ZoneBuilder zoneBuilder;
 
     public JsonSessionBuilder() {
-        this.zoneBuilder = new ZoneBuilder();
+        this.zoneBuilder = new JsonZoneBuilder();
     }
 
     public Session buildSession(JSONObject response) {
