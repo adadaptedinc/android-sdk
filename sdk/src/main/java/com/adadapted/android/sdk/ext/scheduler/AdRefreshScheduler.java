@@ -6,10 +6,12 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.ad.AdFetcher;
 import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.event.EventTracker;
+import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptManager;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.core.session.SessionManager;
 import com.adadapted.android.sdk.ext.factory.AdFetcherFactory;
 import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
+import com.adadapted.android.sdk.ext.factory.KeywordInterceptManagerFactory;
 import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
 
 import java.util.Timer;
@@ -22,13 +24,15 @@ public class AdRefreshScheduler extends Timer {
     private static final String TAG = AdRefreshScheduler.class.getName();
 
     private final SessionManager sessionManager;
+    private final KeywordInterceptManager keywordInterceptManager;
     private final EventTracker eventTracker;
     private final AdFetcher adFetcher;
 
     public AdRefreshScheduler(Context context) {
-        this.sessionManager = SessionManagerFactory.getInstance(context).createSessionManager();
-        this.eventTracker = EventTrackerFactory.getInstance(context).createEventTracker();
-        this.adFetcher = AdFetcherFactory.getInstance(context).createAdFetcher();
+        sessionManager = SessionManagerFactory.getInstance(context).createSessionManager();
+        keywordInterceptManager = KeywordInterceptManagerFactory.getInstance(context).createKeywordInterceptManager();
+        eventTracker = EventTrackerFactory.getInstance(context).createEventTracker();
+        adFetcher = AdFetcherFactory.getInstance(context).createAdFetcher();
     }
 
     public void schedule(long interval, final Session session, final DeviceInfo deviceInfo) {
@@ -42,6 +46,7 @@ public class AdRefreshScheduler extends Timer {
                 Log.d(TAG, "AdRefreshScheduler fired.");
 
                 eventTracker.publishEvents();
+                keywordInterceptManager.publishEvents();
 
                 if(session.hasExpired()) {
                     Log.d(TAG, "Session has expired.");
