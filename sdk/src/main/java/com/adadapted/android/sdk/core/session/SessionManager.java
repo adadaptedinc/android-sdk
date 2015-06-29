@@ -26,13 +26,13 @@ public class SessionManager implements SessionAdapter.Listener {
 
     private final Set<Listener> listeners;
 
-    private Session currentSession;
-    private boolean sessionLoaded = false;
-
     private final Context context;
     private final SessionAdapter httpSessionAdapter;
     private final SessionRequestBuilder requestBuilder;
     private final SessionBuilder sessionBuilder;
+
+    private Session currentSession;
+    private boolean sessionLoaded = false;
 
     public SessionManager(Context context,
                           SessionAdapter httpSessionAdapter,
