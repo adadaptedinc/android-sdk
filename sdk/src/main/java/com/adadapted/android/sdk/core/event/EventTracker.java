@@ -25,7 +25,7 @@ public class EventTracker implements EventAdapter.Listener {
     private final EventAdapter eventAdapter;
     private final EventRequestBuilder builder;
 
-    private Set<JSONObject> queuedEvents;
+    private final Set<JSONObject> queuedEvents;
     private int failedRetries;
 
     public EventTracker(EventAdapter eventAdapter, EventRequestBuilder builder) {
