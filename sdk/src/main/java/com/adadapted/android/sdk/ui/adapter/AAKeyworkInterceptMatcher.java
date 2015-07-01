@@ -28,7 +28,7 @@ public class AAKeyworkInterceptMatcher implements SessionManager.Listener, Keywo
 
     public AAKeyworkInterceptMatcher(Context context) {
         manager = KeywordInterceptManagerFactory.getInstance(context).createKeywordInterceptManager();
-        manager.addListener(this);
+        manager.setListener(this);
 
         SessionManagerFactory.getInstance(context).createSessionManager().addListener(this);
     }
@@ -53,7 +53,7 @@ public class AAKeyworkInterceptMatcher implements SessionManager.Listener, Keywo
     }
 
     @Override
-    public void onInitSuccess(KeywordIntercept keywordIntercept) {
+    public void onKeywordInterceptInitSuccess(KeywordIntercept keywordIntercept) {
         Log.d(TAG, "Keyword Matcher Initialized.");
         this.keywordIntercept = keywordIntercept;
         this.loaded = true;
@@ -61,7 +61,8 @@ public class AAKeyworkInterceptMatcher implements SessionManager.Listener, Keywo
 
     @Override
     public void onSessionInitialized(Session session) {
-        Log.d(TAG, "Session Initialized.");
+        Log.d(TAG, "Called onSessionInitialized()");
+
         this.session = session;
         manager.init(session, AdAdapted.getInstance().getDeviceInfo());
     }
