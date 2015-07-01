@@ -23,10 +23,10 @@ public class KeywordInterceptManager implements KeywordInterceptAdapter.Listener
     private static final int MAX_FAILED_RETRIES = 2;
 
     public interface Listener {
-        void onInitSuccess(KeywordIntercept keywordIntercept);
+        void onKeywordInterceptInitSuccess(KeywordIntercept keywordIntercept);
     }
 
-    private final Set<Listener> listeners;
+    private Listener listener;
 
     private final KeywordInterceptAdapter adapter;
     private final KeywordInterceptBuilder builder;
@@ -42,8 +42,6 @@ public class KeywordInterceptManager implements KeywordInterceptAdapter.Listener
     public KeywordInterceptManager(KeywordInterceptAdapter adapter,
                                    KeywordInterceptBuilder builder,
                                    KeywordInterceptRequestBuilder requestBuilder) {
-        this.listeners = new HashSet<>();
-
         this.adapter = adapter;
         this.adapter.addListener(this);
 
@@ -131,22 +129,16 @@ public class KeywordInterceptManager implements KeywordInterceptAdapter.Listener
         return initialized;
     }
 
-    public void addListener(Listener listener) {
-        listeners.add(listener);
-
-        if(isInitialized()) {
-            listener.onInitSuccess(keywordIntercept);
-        }
+    public void setListener(Listener listener) {
+        this.listener = listener;
     }
 
-    public void removeListener(Listener listener) {
-        listeners.remove(listener);
+    public void removeListener() {
+        this.listener = null;
     }
 
     private void notifyInitSuccess() {
-        for(Listener listener : listeners) {
-            listener.onInitSuccess(keywordIntercept);
-        }
+       listener.onKeywordInterceptInitSuccess(keywordIntercept);
     }
 
     @Override
