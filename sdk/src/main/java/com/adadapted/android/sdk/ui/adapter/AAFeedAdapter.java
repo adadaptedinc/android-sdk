@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.ui.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -65,9 +64,7 @@ public class AAFeedAdapter extends BaseAdapter {
 
     @Override
     public int getViewTypeCount() {
-        int count = placement.getModifiedViewTypeCount(adapter.getViewTypeCount());
-        Log.d(TAG, "getViewTypeCount() Called. -> " + count);
-        return count;
+        return placement.getModifiedViewTypeCount(adapter.getViewTypeCount());
     }
 
     @Override
