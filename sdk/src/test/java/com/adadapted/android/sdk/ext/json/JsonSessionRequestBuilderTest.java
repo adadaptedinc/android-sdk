@@ -41,7 +41,7 @@ public class JsonSessionRequestBuilderTest {
         deviceInfo.setSdkVersion(SDKVERSION);
 
         SessionRequestBuilder builder = new JsonSessionRequestBuilder();
-        JSONObject json = builder.buildSessionRequest(deviceInfo);
+        JSONObject json = builder.buildSessionInitRequest(deviceInfo);
 
         Assert.assertEquals(APPID, json.getString(JsonFields.APPID));
     }

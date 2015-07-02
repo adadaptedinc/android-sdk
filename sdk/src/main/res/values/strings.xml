@@ -8,11 +8,15 @@
     <string name="prod_session_reinit_object_url">http://ads.adadapted.com/v/0.9.3/android/session/reinit</string>
     <string name="prod_ad_get_object_url">http://ads.adadapted.com/v/0.9.3/android/ad/get</string>
     <string name="prod_event_batch_object_url">http://ads.adadapted.com/v/0.9.3/android/event/batch</string>
+    <string name="prod_autofill_init_object_url">http://172.16.8.101:8000/v/0.9.3/android/search/init</string>
+    <string name="prod_autofill_track_object_url">http://172.16.8.101:8000/v/0.9.3/android/search/track</string>
 
     <string name="sandbox_session_init_object_url">http://sandbox.adadapted.com/v/0.9.3/android/session/init</string>
     <string name="sandbox_session_reinit_object_url">http://sandbox.adadapted.com/v/0.9.3/android/session/reinit</string>
     <string name="sandbox_ad_get_object_url">http://sandbox.adadapted.com/v/0.9.3/android/ad/get</string>
     <string name="sandbox_event_batch_object_url">http://sandbox.adadapted.com/v/0.9.3/android/event/batch</string>
+    <string name="sandbox_autofill_init_object_url">http://172.16.8.101:8000/v/0.9.3/android/search/init</string>
+    <string name="sandbox_autofill_track_object_url">http://172.16.8.101:8000/v/0.9.3/android/search/track</string>
 
     <string name="title_activity_web_view_popup">WebViewPopupActivity</string>
 </resources>
