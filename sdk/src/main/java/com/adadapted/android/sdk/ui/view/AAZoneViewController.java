@@ -1,268 +1,163 @@
 package com.adadapted.android.sdk.ui.view;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 
-import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.ad.AdFetcher;
 import com.adadapted.android.sdk.core.ad.model.Ad;
-import com.adadapted.android.sdk.core.ad.model.AdAction;
-import com.adadapted.android.sdk.core.ad.model.ContentAdAction;
-import com.adadapted.android.sdk.core.content.ContentPayload;
 import com.adadapted.android.sdk.core.session.SessionManager;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.core.zone.model.ManagedZone;
 import com.adadapted.android.sdk.core.zone.model.Zone;
-import com.adadapted.android.sdk.ext.factory.AdFetcherFactory;
 import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
 import com.adadapted.android.sdk.ext.scheduler.AdZoneRefreshScheduler;
-import com.adadapted.android.sdk.ui.listener.AdViewListener;
 import com.adadapted.android.sdk.ui.model.ViewAd;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.Map;
 
 /**
- * Created by chrisweeden on 6/2/15.
+ * Created by chrisweeden on 7/1/15.
  */
 public class AAZoneViewController implements SessionManager.Listener, AdFetcher.Listener,
-        AdZoneRefreshScheduler.Listener, AdViewListener {
+        AdZoneRefreshScheduler.Listener, AdViewBuilder.Listener {
     private static final String TAG = AAZoneViewController.class.getName();
 
-    public ManagedZone getZone() {
-        return zone;
-    }
-
     public interface Listener {
-        void onViewReadyForDisplay(View view);
+        void onViewReadyForDisplay(View v);
         void onResetDisplayView();
     }
-
-    private Listener listener;
 
     private final Context context;
     private final String zoneId;
     private final int resourceId;
 
-    private AdZoneRefreshScheduler refreshScheduler;
+    private AdViewBuilder adViewBuilder;
+    private AdActionHandler adActionHandler;
 
-    private String sessionId;
-    private ManagedZone zone;
+    private Listener listener;
+
+    private String sessionId = "";
+    private ManagedZone managedZone;
     private ViewAd currentAd;
-
-    private AAImageAdView adImageView;
-    private AAHtmlAdView adWebView;
-    private AAJsonAdView aaJsonView;
-
-    private boolean active;
-    private boolean visibility = true;
-    private boolean stoppingForPopup = false;
+    private boolean timerRunning = false;
 
     public AAZoneViewController(final Context context, final String zoneId, final int resourceId) {
         this.context = context;
         this.zoneId = zoneId;
         this.resourceId = resourceId;
 
+        adViewBuilder = new AdViewBuilder(context);
+        adViewBuilder.setListener(this);
+
+        adActionHandler = new AdActionHandler(context);
+
+        this.managedZone = ManagedZone.createEmptyManagedZone();
         this.currentAd = ViewAd.createEmptyCurrentAd(context, sessionId);
-    }
 
-    public boolean isActive() {
-        return active;
-    }
-
-    public boolean isVisible() {
-        return visibility;
-    }
-
-    public boolean isNotVisible() {
-        return !isVisible();
-    }
-
-    public boolean isStoppingForPopup() {
-        return stoppingForPopup;
-    }
-
-    public void setVisibility(boolean visibility) {
-        this.visibility = visibility;
-    }
-
-    private void displayNextAd() {
-        if(zone == null || zone.hasNoAds()) {
-            Log.i(TAG, "No ads for zone " + zoneId);
-            return;
-        }
-
-        if(isVisible()) {
-            completeCurrentAd();
-            setNextAd();
-        }
-        else {
-            Log.i(TAG, "Is not Visible. Not displaying ad.");
-        }
-    }
-
-    public void processAdInteraction() {
-        if (zone.hasNoAds() || !currentAd.hasAd()) {
-            return;
-        }
-
-        currentAd.trackInteraction();
-        AdAdapted.getInstance().publishAdClick(zoneId);
-
-        if(currentAd.actionIs(AdAction.CONTENT)) {
-            ContentAdAction action = (ContentAdAction)currentAd.getAd().getAdAction();
-            try {
-                JSONArray jsonArray = new JSONArray(action.getItems());
-                ContentPayload payload = new ContentPayload(ContentPayload.ADD_TO_LIST,
-                        new JSONObject().put("list-items", jsonArray));
-                AdAdapted.getInstance().publishContent(zoneId, payload);
-            }
-            catch(JSONException ex) {
-                Log.w(TAG, "Problem parsing JSON.");
-            }
-
-            Log.i(TAG, "Would handle CONTENT interaction here.");
-        }
-        else if(currentAd.actionIs(AdAction.DELEGATE)) {
-            Log.i(TAG, "Would handle DELEGATE interaction here.");
-        }
-        else if(currentAd.actionIs(AdAction.POPUP)) {
-            stoppingForPopup = true;
-
-            Intent intent = new Intent(context, WebViewPopupActivity.class);
-            intent.putExtra(WebViewPopupActivity.EXTRA_POPUP_AD, currentAd.getAd());
-            context.startActivity(intent);
-        }
+        SessionManagerFactory.getInstance(context).createSessionManager().addListener(this);
     }
 
     private void setNextAd() {
-        Ad ad = zone.getNextAd();
-        currentAd = new ViewAd(context, sessionId, ad);
+        Log.d(TAG, zoneId + ": setNextAd() Called.");
 
-        if(!currentAd.hasAd()) {
-            return;
+        Ad ad = managedZone.getNextAd();
+        if(ad != null) {
+            currentAd = new ViewAd(context, sessionId, ad);
         }
-
-        loadNextAdAssets();
-        scheduleAd();
-    }
-
-    private void loadNextAdAssets() {
-        switch(currentAd.getAdType()) {
-            case HTML:
-                loadHtmlView();
-                break;
-
-            case IMAGE:
-                loadImageView();
-                break;
-
-            case JSON:
-                loadJsonView();
-                break;
-        }
-    }
-
-    private void loadHtmlView() {
-        if(adWebView == null) {
-            adWebView = new AAHtmlAdView(context);
-            adWebView.addListener(this);
-        }
-
-        adWebView.loadHtml(currentAd.getAd());
-        notifyViewReadyForDisplay(adWebView);
-    }
-
-    private void loadImageView() {
-        if(adImageView == null) {
-            adImageView = new AAImageAdView(context);
-            adImageView.addListener(this);
-        }
-
-        adImageView.loadImage(currentAd.getAd());
-        notifyViewReadyForDisplay(adImageView);
-    }
-
-    private void loadJsonView() {
-        if(aaJsonView == null) {
-            aaJsonView = new AAJsonAdView(context, resourceId);
-            aaJsonView.addListener(this);
-        }
-
-        aaJsonView.buildView(currentAd.getAd());
-        notifyViewReadyForDisplay(aaJsonView);
-    }
-
-    private void scheduleAd() {
-        refreshScheduler = new AdZoneRefreshScheduler();
-        refreshScheduler.addListener(this);
-        refreshScheduler.schedule(currentAd.getAd());
-    }
-
-    private void completeCurrentAd() {
-        if(currentAd != null && currentAd.hasAd()) {
-            notifyResetDisplayView();
-
-            currentAd.completeAdTracking();
+        else {
             currentAd = ViewAd.createEmptyCurrentAd(context, sessionId);
         }
     }
 
-    public void purgeScheduler() {
-        if(refreshScheduler != null) {
-            refreshScheduler.removeListener(this);
-            refreshScheduler.cancel();
-            refreshScheduler.purge();
+    private void completeCurrentAd() {
+        Log.d(TAG, zoneId + ": completeAd() Called.");
+
+        currentAd.completeAdTracking();
+        notifyResetDisplayView();
+    }
+
+    private void displayAd() {
+        Log.d(TAG, zoneId + ": displayAd() Called.");
+
+        if(currentAd.hasAd()) {
+            buildAdView();
         }
     }
 
-    public void onStart() {
-        if(!currentAd.hasAd() && isStoppingForPopup()) {
-            currentAd.trackPopupEnd();
-            stoppingForPopup = false;
-        }
+    private void buildAdView() {
+        Log.d(TAG, zoneId + ": buildAdView() Called.");
 
-        active = true;
-
-        SessionManager sessionManager = SessionManagerFactory.getInstance(context).createSessionManager();
-        sessionManager.addListener(this);
+        adViewBuilder.buildView(currentAd, resourceId);
     }
 
-    public void onStop() {
-        active = false;
+    public void setTimer() {
+        Log.d(TAG, zoneId + ": setTimer() Called.");
 
-        if(zone.hasNoAds()) {
-            return;
+        new AdZoneRefreshScheduler(this).schedule(currentAd.getAd());
+        timerRunning = true;
+    }
+
+    public void acknowledgeDisplay() {
+        Log.d(TAG, zoneId + ": acknowledgeDisplay() Called.");
+
+        if(!timerRunning) {
+            currentAd.beginAdTracking();
+            setTimer();
         }
+    }
 
-        purgeScheduler();
+    public void handleAdAction() {
+        Log.d(TAG, zoneId + ": handleAdAction() Called.");
 
-        if(!currentAd.isStoppingForPopup()) {
-            completeCurrentAd();
+        currentAd.trackInteraction();
+        adActionHandler.handleAction(currentAd);
+    }
+
+    public void setListener(Listener listener) {
+        Log.d(TAG, zoneId + ": setListener() Called.");
+
+        this.listener = listener;
+        displayAd();
+    }
+
+    public void removeListener(Listener listener) {
+        Log.d(TAG, zoneId + ": removeListener() Called.");
+
+        if(this.listener != null && this.listener.equals(listener)) {
+            this.listener = null;
+            notifyResetDisplayView();
         }
+    }
 
-        currentAd.flush();
+    private void notifyViewReadyForDisplay(final View v) {
+        Log.d(TAG, zoneId + ": notifyViewReadyForDisplay() Called.");
 
-        SessionManager sessionManager = SessionManagerFactory.getInstance(context).createSessionManager();
-        sessionManager.removeListener(this);
+        if(listener != null) {
+            listener.onViewReadyForDisplay(v);
+        }
+    }
+
+    private void notifyResetDisplayView() {
+        Log.d(TAG, zoneId + ": notifyResetDisplayView() Called.");
+
+        if(listener != null) {
+            listener.onResetDisplayView();
+        }
     }
 
     @Override
-    public void onSessionInitialized(Session session) {
-        AdFetcher adFetcher = AdFetcherFactory.getInstance(context).createAdFetcher();
-        adFetcher.addListener(this);
+    public void onSessionInitialized(final Session session) {
+        Log.d(TAG, zoneId + ": onSessionInitialized() Called.");
 
         sessionId = session.getSessionId();
-        zone = new ManagedZone(session.getZone(zoneId));
+        managedZone = new ManagedZone(session.getZone(zoneId));
 
-        if(!currentAd.hasAd()) {
-            displayNextAd();
+        if(!timerRunning) {
+            setNextAd();
         }
+
+        displayAd();
     }
 
     @Override
@@ -273,38 +168,25 @@ public class AAZoneViewController implements SessionManager.Listener, AdFetcher.
 
     @Override
     public void onAdsRefreshed(Map<String, Zone> zones) {
-        zone.setAds(zones.get(zoneId).getAds());
-
-        if(!currentAd.hasAd()) {
-            displayNextAd();
-        }
+        managedZone.setAds(zones.get(zoneId).getAds());
     }
 
     @Override
-    public void onAdsNotRefreshed() { }
-
-    public void setListener(Listener listener) {
-        this.listener = listener;
-    }
-
-    private void notifyViewReadyForDisplay(View view) {
-        listener.onViewReadyForDisplay(view);
-    }
-
-    private void notifyResetDisplayView() {
-        listener.onResetDisplayView();
-    }
+    public void onAdsNotRefreshed() {}
 
     @Override
     public void onAdZoneRefreshTimer() {
-        if(isActive()) {
-            displayNextAd();
-        }
+        Log.d(TAG, zoneId + ": onAdZoneRefreshTimer() Called.");
+
+        timerRunning = false;
+
+        completeCurrentAd();
+        setNextAd();
+        displayAd();
     }
 
     @Override
-    public void onViewLoaded() {
-        currentAd.beginAdTracking();
-        AdAdapted.getInstance().publishAdImpression(zoneId);
+    public void onViewLoaded(View v) {
+        notifyViewReadyForDisplay(v);
     }
 }

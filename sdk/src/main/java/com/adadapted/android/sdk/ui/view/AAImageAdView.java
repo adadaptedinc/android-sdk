@@ -14,20 +14,14 @@ import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.AdImage;
 import com.adadapted.android.sdk.core.ad.model.ImageAdType;
 import com.adadapted.android.sdk.ext.http.HttpAdImageLoader;
-import com.adadapted.android.sdk.ui.listener.AdViewListenable;
-import com.adadapted.android.sdk.ui.listener.AdViewListener;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by chrisweeden on 5/20/15.
  */
-class AAImageAdView extends ImageView implements AdViewListenable, HttpAdImageLoader.Listener {
+class AAImageAdView extends ImageView implements HttpAdImageLoader.Listener {
     private static final String TAG = AAImageAdView.class.getName();
 
     private final HttpAdImageLoader imageLoader;
-    private final Set<AdViewListener> listeners;
 
     private Bitmap adImage;
 
@@ -40,13 +34,19 @@ class AAImageAdView extends ImageView implements AdViewListenable, HttpAdImageLo
 
     private final Handler buildAdHandler = new Handler();
 
-    public AAImageAdView(Context context) {
+    public interface Listener {
+        void onImageViewLoaded();
+    }
+
+    private Listener listener;
+
+    public AAImageAdView(Listener listener, Context context) {
         super(context);
+
+        this.listener = listener;
 
         imageLoader = new HttpAdImageLoader();
         imageLoader.addListener(this);
-
-        listeners = new HashSet<>();
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -73,20 +73,6 @@ class AAImageAdView extends ImageView implements AdViewListenable, HttpAdImageLo
         imageLoader.getImage(imageUrl);
     }
 
-    public void addListener(AdViewListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeListener(AdViewListener listener) {
-        listeners.remove(listener);
-    }
-
-    private void notifyOnViewLoaded() {
-        for(AdViewListener listener : listeners) {
-            listener.onViewLoaded();
-        }
-    }
-
     @Override
     public void onAdImageLoaded(Bitmap bitmap) {
         Log.d(TAG, "Calling onAdImageLoaded()");
@@ -94,7 +80,7 @@ class AAImageAdView extends ImageView implements AdViewListenable, HttpAdImageLo
         adImage = bitmap;
         buildAdHandler.post(buildAdRunnable);
 
-        notifyOnViewLoaded();
+        listener.onImageViewLoaded();
     }
 
     @Override

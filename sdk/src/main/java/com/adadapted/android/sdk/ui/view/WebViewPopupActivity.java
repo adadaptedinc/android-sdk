@@ -13,11 +13,16 @@ import android.webkit.WebViewClient;
 import com.adadapted.android.sdk.R;
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.PopupAdAction;
+import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
 
 public class WebViewPopupActivity extends AppCompatActivity {
     private static final String TAG = WebViewPopupActivity.class.getName();
 
     public static final String EXTRA_POPUP_AD = WebViewPopupActivity.class.getName() + ".EXTRA_POPUP_AD";
+    public static final String EXTRA_SESSSION_ID = WebViewPopupActivity.class.getName() + ".EXTRA_SESSSION_ID";
+
+    private Ad ad;
+    private String sessionId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,17 +30,31 @@ public class WebViewPopupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_web_view_popup);
 
         Intent intent = getIntent();
-        Ad ad = (Ad)intent.getSerializableExtra(EXTRA_POPUP_AD);
+        ad = (Ad)intent.getSerializableExtra(EXTRA_POPUP_AD);
+        sessionId = intent.getStringExtra(EXTRA_SESSSION_ID);
+
         PopupAdAction action = (PopupAdAction)ad.getAdAction();
 
         loadPopup(action.getActionPath());
         styleActivity(action);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        EventTrackerFactory.getInstance(this).createEventTracker().trackPopupBeginEvent(sessionId, ad);
+    }
+
+    public void onPause() {
+        super.onPause();
+        EventTrackerFactory.getInstance(this).createEventTracker().trackPopupEndEvent(sessionId, ad);
+    }
+
     private void loadPopup(String url) {
         WebView webView = (WebView)findViewById(R.id.activity_web_view_popup_webView);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.addJavascriptInterface(new WebAppInterface(this), "AdAdapted");
+        //webView.addJavascriptInterface(new WebAppInterface(this), "AdAdapted");
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -57,7 +76,7 @@ public class WebViewPopupActivity extends AppCompatActivity {
 
         try {
             bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(action.getBackgroundColor())));
-        } catch (NullPointerException ex) {
+        } catch (Exception ex) {
             Log.d(TAG, "Problem setting background color " + action.getBackgroundColor(), ex);
         }
     }

@@ -8,27 +8,23 @@ import android.widget.LinearLayout;
 
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.HtmlAdType;
-import com.adadapted.android.sdk.ui.listener.AdViewListenable;
-import com.adadapted.android.sdk.ui.listener.AdViewListener;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by chrisweeden on 5/20/15.
  */
-class AAHtmlAdView extends WebView implements AdViewListenable {
+class AAHtmlAdView extends WebView {
     private static final String TAG = AAHtmlAdView.class.getName();
 
-    private Set<AdViewListener> listeners;
-
-    public AAHtmlAdView(Context context) {
-        super(context);
-        initView();
+    public interface Listener {
+        void onHtmlViewLoaded();
     }
 
-    private void initView() {
-        listeners = new HashSet<>();
+    private Listener listener;
+
+    public AAHtmlAdView(Listener listener, Context context) {
+        super(context);
+
+        this.listener = listener;
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -47,20 +43,6 @@ class AAHtmlAdView extends WebView implements AdViewListenable {
         HtmlAdType adType = (HtmlAdType) ad.getAdType();
         loadUrl(adType.getAdUrl());
 
-        notifyOnViewLoaded();
-    }
-
-    public void addListener(AdViewListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeListener(AdViewListener listener) {
-        listeners.remove(listener);
-    }
-
-    private void notifyOnViewLoaded() {
-        for(AdViewListener listener : listeners) {
-            listener.onViewLoaded();
-        }
+        listener.onHtmlViewLoaded();
     }
 }

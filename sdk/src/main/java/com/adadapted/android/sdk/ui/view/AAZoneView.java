@@ -8,11 +8,10 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.AbsListView;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.adadapted.android.sdk.R;
-import com.adadapted.android.sdk.core.common.Dimension;
 
 /**
  * Created by chrisweeden on 3/30/15.
@@ -21,9 +20,12 @@ public class AAZoneView extends RelativeLayout implements AAZoneViewController.L
     private static final String TAG = AAZoneView.class.getName();
 
     private final Context context;
-    private boolean initialized = false;
+
+    private String zoneId;
+    private int layoutResourceId;
 
     private AAZoneViewController viewController;
+    private boolean visible = true;
 
     public AAZoneView(Context context) {
         super(context);
@@ -52,44 +54,41 @@ public class AAZoneView extends RelativeLayout implements AAZoneViewController.L
     }
 
     public void init(String zoneId, int layoutResourceId) {
-        //viewController = AAZoneViewControllerFactory.getInstance().getController(context, zoneId, layoutResourceId);
-        viewController = new AAZoneViewController(context, zoneId, layoutResourceId);
-        viewController.setListener(this);
+        this.zoneId = zoneId;
+        this.layoutResourceId = layoutResourceId;
 
         setGravity(Gravity.CENTER);
         setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewController.processAdInteraction();
+                if (viewController != null) {
+                    viewController.handleAdAction();
+                }
             }
         });
-
-        initialized = true;
     }
 
-    public boolean isInitialized() {
-        return initialized;
-    }
-
-    public boolean isNotInitialized() {
-        return !isInitialized();
-    }
-
-    private void displayAdView(View view) {
-        final View updatedView = view;
-
+    private void displayAdView(final View view) {
         this.post(new Runnable() {
             @Override
             public void run() {
+                ViewGroup parent = ((ViewGroup)view.getParent());
+                if(parent != null) {
+                    parent.removeView(view);
+                }
+
                 AAZoneView.this.removeAllViews();
-                AAZoneView.this.addView(updatedView);
+                AAZoneView.this.addView(view);
             }
         });
     }
 
     @Override
-    public void onViewReadyForDisplay(View view) {
-        displayAdView(view);
+    public void onViewReadyForDisplay(final View view) {
+        if(visible) {
+            displayAdView(view);
+            viewController.acknowledgeDisplay();
+        }
     }
 
     @Override
@@ -103,41 +102,30 @@ public class AAZoneView extends RelativeLayout implements AAZoneViewController.L
     }
 
     public void onStart() {
-        if(isNotInitialized()) { return; }
-
-        viewController.onStart();
+        viewController = AAZoneViewControllerFactory.getInstance(context).getController(zoneId, layoutResourceId);
+        viewController.setListener(this);
     }
 
     public void onStop() {
-        if (isNotInitialized()) { return; }
-
-        viewController.onStop();
+        viewController.removeListener(this);
     }
 
     @Override
     protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
 
-        if(viewController.isStoppingForPopup()) {
-            return;
-        }
-
         switch(visibility) {
             case View.GONE:
             case View.INVISIBLE:
                 Log.d(TAG, "No Longer Visible");
-                if(viewController.isVisible() && viewController.isActive()) {
-                    viewController.setVisibility(false);
-                    onStop();
-                }
+                visible = false;
+                onStop();
                 break;
 
             case View.VISIBLE:
                 Log.d(TAG, "Is Visible");
-                if(viewController.isNotVisible()) {
-                    viewController.setVisibility(true);
-                    onStart();
-                }
+                onStart();
+                visible = true;
                 break;
         }
     }
