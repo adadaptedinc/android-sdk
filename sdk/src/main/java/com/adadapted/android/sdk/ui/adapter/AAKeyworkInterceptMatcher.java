@@ -61,8 +61,6 @@ public class AAKeyworkInterceptMatcher implements SessionManager.Listener, Keywo
 
     @Override
     public void onSessionInitialized(Session session) {
-        Log.d(TAG, "Called onSessionInitialized()");
-
         this.session = session;
         manager.init(session, AdAdapted.getInstance().getDeviceInfo());
     }
