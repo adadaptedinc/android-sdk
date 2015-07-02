@@ -37,11 +37,15 @@ public class ViewAd {
     }
 
     public AdTypes getAdType() {
-        return ad.getAdType().getType();
+        if(hasAd()) {
+            return ad.getAdType().getType();
+        }
+
+        return AdTypes.NULL;
     }
 
-    public boolean actionIs(String content) {
-        return ad.getAdAction().getActionType().equalsIgnoreCase(content);
+    public String getSessionId() {
+        return sessionId;
     }
 
     public boolean isStoppingForPopup() {
@@ -49,28 +53,34 @@ public class ViewAd {
     }
 
     public void beginAdTracking() {
-        getEventTracker().trackImpressionBeginEvent(sessionId, getAd());
-        trackingHasStarted = true;
+        if(hasAd()) {
+            getEventTracker().trackImpressionBeginEvent(sessionId, getAd());
+            trackingHasStarted = true;
+        }
     }
 
     public void completeAdTracking() {
-        if(trackingHasStarted) {
+        if(hasAd() && trackingHasStarted) {
             getEventTracker().trackImpressionEndEvent(sessionId, getAd());
             trackingHasStarted = false;
         }
     }
 
     public void trackInteraction() {
-        getEventTracker().trackInteractionEvent(sessionId, getAd());
-        trackPopupBegin();
+        if(hasAd()) {
+            getEventTracker().trackInteractionEvent(sessionId, getAd());
+            trackPopupBegin();
 
-        ad.hideAd();
+            ad.hideAd();
 
-        isStoppingForPopup = true;
+            isStoppingForPopup = true;
+        }
     }
 
     public void trackPopupBegin() {
-        getEventTracker().trackPopupBeginEvent(sessionId, getAd());
+        if(hasAd()) {
+            getEventTracker().trackPopupBeginEvent(sessionId, getAd());
+        }
     }
 
     public void trackPopupEnd() {
