@@ -1,7 +1,5 @@
 package com.adadapted.android.sdk.core.zone.model;
 
-import android.util.Log;
-
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.common.Dimension;
 
@@ -24,15 +22,19 @@ public class ManagedZone {
         this.adViews = new HashMap<>();
     }
 
+    public static ManagedZone createEmptyManagedZone() {
+        return new ManagedZone(null);
+    }
+
     public Ad getNextAd() {
         return zone.getNextAd();
 
         //int count = adViews.get(ad.getAdId());
-//
+
         //if(ad.getMaxImpressions(adRefreshTime) >= count) {
         //    ad.setImpressionViews(++count);
         //    adViews.put(ad.getAdId(), count);
-//
+
         //    return ad;
         //}
         //else {
