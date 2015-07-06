@@ -6,15 +6,8 @@ import android.util.Log;
 
 import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.ad.model.AdAction;
-import com.adadapted.android.sdk.core.ad.model.ContentAdAction;
 import com.adadapted.android.sdk.core.content.ContentPayload;
 import com.adadapted.android.sdk.ui.model.ViewAd;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.List;
 
 /**
  * Created by chrisweeden on 7/1/15.
@@ -51,24 +44,12 @@ public class AdActionHandler {
     }
 
     private void handleContentAction(ViewAd ad) {
-        List items = ((ContentAdAction)ad.getAd().getAdAction()).getItems();
-        JSONObject json = new JSONObject();
-
-        try {
-            json.put("add_to_list_items", new JSONArray(items));
-        }
-        catch(JSONException ex) {
-            Log.w(TAG, "Problem parsing JSON");
-        }
-
-        ContentPayload payload = new ContentPayload(ContentPayload.ADD_TO_LIST, json);
+        ContentPayload payload = ContentPayload.createAddToListContent(ad);
         AdAdapted.getInstance().publishContent(ad.getAd().getZoneId(), payload);
     }
 
     private void handlePopupAction(ViewAd ad) {
-        Intent intent = new Intent(context, WebViewPopupActivity.class);
-        intent.putExtra(WebViewPopupActivity.EXTRA_POPUP_AD, ad.getAd());
-        intent.putExtra(WebViewPopupActivity.EXTRA_SESSSION_ID, ad.getSessionId());
+        Intent intent = WebViewPopupActivity.createActivity(context, ad);
         context.startActivity(intent);
     }
 }
