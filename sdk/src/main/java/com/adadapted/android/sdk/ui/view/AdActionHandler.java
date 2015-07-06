@@ -32,20 +32,7 @@ public class AdActionHandler {
         switch(ad.getAd().getAdAction().getActionType()) {
             case AdAction.CONTENT:
                 Log.d(TAG, "Handling CONTENT Ad Action");
-
-                List items = ((ContentAdAction)ad.getAd().getAdAction()).getItems();
-                JSONObject json = new JSONObject();
-
-                try {
-                    json.put("add_to_list_items", new JSONArray(items));
-                }
-                catch(JSONException ex) {
-                    Log.w(TAG, "Problem parsing JSON");
-                }
-
-                ContentPayload payload = new ContentPayload(ContentPayload.ADD_TO_LIST, json);
-                AdAdapted.getInstance().publishContent(ad.getAd().getZoneId(), payload);
-
+                handleContentAction(ad);
                 break;
 
             case AdAction.DELEGATE:
@@ -58,13 +45,30 @@ public class AdActionHandler {
 
             case AdAction.POPUP:
                 Log.d(TAG, "Handling POPUP Ad Action");
-
-                Intent intent = new Intent(context, WebViewPopupActivity.class);
-                intent.putExtra(WebViewPopupActivity.EXTRA_POPUP_AD, ad.getAd());
-                intent.putExtra(WebViewPopupActivity.EXTRA_SESSSION_ID, ad.getSessionId());
-                context.startActivity(intent);
-
+                handlePopupAction(ad);
                 break;
         }
+    }
+
+    private void handleContentAction(ViewAd ad) {
+        List items = ((ContentAdAction)ad.getAd().getAdAction()).getItems();
+        JSONObject json = new JSONObject();
+
+        try {
+            json.put("add_to_list_items", new JSONArray(items));
+        }
+        catch(JSONException ex) {
+            Log.w(TAG, "Problem parsing JSON");
+        }
+
+        ContentPayload payload = new ContentPayload(ContentPayload.ADD_TO_LIST, json);
+        AdAdapted.getInstance().publishContent(ad.getAd().getZoneId(), payload);
+    }
+
+    private void handlePopupAction(ViewAd ad) {
+        Intent intent = new Intent(context, WebViewPopupActivity.class);
+        intent.putExtra(WebViewPopupActivity.EXTRA_POPUP_AD, ad.getAd());
+        intent.putExtra(WebViewPopupActivity.EXTRA_SESSSION_ID, ad.getSessionId());
+        context.startActivity(intent);
     }
 }
