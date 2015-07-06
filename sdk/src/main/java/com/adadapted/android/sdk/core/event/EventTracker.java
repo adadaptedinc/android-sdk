@@ -84,7 +84,7 @@ public class EventTracker implements EventAdapter.Listener {
     }
 
     public void trackCustomEvent(String sessionId, Ad ad, String eventName) {
-        trackEvent(sessionId, ad, EventTypes.IMPRESSION, eventName);
+        trackEvent(sessionId, ad, EventTypes.CUSTOM, eventName);
     }
 
     private void trackEvent(String sessionId, Ad ad, EventTypes eventType, String eventName) {
