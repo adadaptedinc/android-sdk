@@ -60,6 +60,7 @@ public class AAZoneViewController implements SessionManager.Listener, AdFetcher.
 
     private void setNextAd() {
         Log.d(TAG, zoneId + ": setNextAd() Called.");
+        currentAd.flush();
 
         Ad ad = managedZone.getNextAd();
         if(ad != null) {
