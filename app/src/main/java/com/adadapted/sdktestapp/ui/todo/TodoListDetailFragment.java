@@ -169,6 +169,8 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
 
                 feedAdapter.notifyDataSetChanged();
             }
+
+            contentPayload.acknowledge();
         }
         catch(JSONException ex) {
             Log.w(TAG, "Problem parsing JSON.");
