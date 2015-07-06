@@ -38,8 +38,17 @@ public class FileTodoLoader implements TodoLoader {
     public void loadData() {
         List<TodoList> lists = new ArrayList<>();
 
-        lists.add(new TodoList("Default List"));
-        lists.add(new TodoList("Grocery List"));
+        TodoList defaultList = new TodoList("Default List");
+        defaultList.addNewItem("Item 1");
+        defaultList.addNewItem("Item 2");
+        lists.add(defaultList);
+
+        TodoList groceryList = new TodoList("Grocery List");
+        groceryList.addNewItem("Milk");
+        groceryList.addNewItem("Bread");
+        groceryList.addNewItem("Eggs");
+        groceryList.addNewItem("Cheese");
+        lists.add(groceryList);
 
         try {
             FileInputStream fis = context.openFileInput(FILENAME);

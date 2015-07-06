@@ -21,7 +21,6 @@
             android:label="@string/title_activity_todo_lists" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -36,7 +35,8 @@
         </activity>
         <activity
             android:name=".ui.recipe.RecipeDetailActivity"
-            android:label="@string/title_activity_recipe_detail" >
+            android:label="@string/title_activity_recipe_detail"
+            android:parentActivityName=".ui.recipe.RecipesActivity">
         </activity>
 
         <activity

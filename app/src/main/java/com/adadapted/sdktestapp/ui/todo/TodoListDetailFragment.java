@@ -1,25 +1,27 @@
 package com.adadapted.sdktestapp.ui.todo;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.support.v4.app.ListFragment;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
+import android.view.View;
+import android.widget.ListView;
 
-import com.adadapted.android.sdk.ui.view.AAZoneView;
+import com.adadapted.android.sdk.AdAdapted;
+import com.adadapted.android.sdk.core.content.ContentPayload;
+import com.adadapted.android.sdk.ui.adapter.AAFeedAdapter;
 import com.adadapted.sdktestapp.R;
-import com.adadapted.sdktestapp.core.todo.TodoItem;
 import com.adadapted.sdktestapp.core.todo.TodoList;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.util.UUID;
 
@@ -31,8 +33,7 @@ import java.util.UUID;
  * Use the {@link TodoListDetailFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TodoListDetailFragment extends ListFragment
-        implements TodoListManager.Listener {
+public class TodoListDetailFragment extends ListFragment implements AdAdapted.ContentListener {
     private static final String TAG = TodoListDetailFragment.class.getName();
 
     private static final String ARG_LIST_ID = "listId";
@@ -40,7 +41,8 @@ public class TodoListDetailFragment extends ListFragment
     private UUID listId;
     private TodoList list;
 
-    private AAZoneView aaZoneView;
+    private AAFeedAdapter feedAdapter;
+    private DialogFragment dialog;
 
     private OnFragmentInteractionListener mListener;
 
@@ -62,12 +64,12 @@ public class TodoListDetailFragment extends ListFragment
         return fragment;
     }
 
-    public TodoListDetailFragment() {
-        // Required empty public constructor
-    }
+    public TodoListDetailFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate() called.");
+
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
@@ -75,9 +77,35 @@ public class TodoListDetailFragment extends ListFragment
             listId = (UUID)getArguments().getSerializable(ARG_LIST_ID);
         }
 
-        aaZoneView = new AAZoneView(getActivity());
-        aaZoneView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, 120));
-        aaZoneView.init("100670");
+        list = TodoListManager.getInstance(getActivity()).getList(listId);
+
+        getActivity().setTitle(list.getName());
+
+        TodoListItemAdapter adapter = new TodoListItemAdapter(getActivity(), list.getItems());
+        feedAdapter = new AAFeedAdapter(getActivity(), adapter, "100682", 3, 320, 8);
+        setListAdapter(feedAdapter);
+
+        dialog = new NewListItemDialogFragment();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        Log.w(TAG, "onResume() called.");
+
+        AdAdapted.getInstance().addListener(this);
+        feedAdapter.onStart();
+    }
+
+    @Override
+    public void onPause() {
+        Log.w(TAG, "onPause() called.");
+
+        super.onPause();
+
+        AdAdapted.getInstance().removeListener(this);
+        feedAdapter.onStop();
     }
 
     @Override
@@ -88,7 +116,6 @@ public class TodoListDetailFragment extends ListFragment
     public boolean onOptionsItemSelected (MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_new_list_item:
-                DialogFragment dialog = new NewListItemDialogFragment();
                 dialog.show(getActivity().getFragmentManager(), "NewListItemDialogFragment");
                 return true;
 
@@ -97,6 +124,15 @@ public class TodoListDetailFragment extends ListFragment
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+        Object item = feedAdapter.getItem(position);
+
+        Log.d(TAG, "Feed Item Clicked: " + item);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -124,16 +160,19 @@ public class TodoListDetailFragment extends ListFragment
     }
 
     @Override
-    public void onTodoListsAvailable() {
-        list = TodoListManager.getInstance(getActivity()).getList(listId);
+    public void onContentAvailable(String zoneId, ContentPayload contentPayload) {
+        try {
+            JSONArray array = contentPayload.getPayload().getJSONArray("add_to_list_items");
+            for(int i = 0; i < array.length(); i++) {
+                String item = array.getString(i);
+                TodoListManager.getInstance(getActivity()).addItemToList(listId, item);
 
-        getActivity().setTitle(list.getName());
-
-        ArrayAdapter<TodoItem> adapter = new ArrayAdapter<TodoItem>(getActivity(),
-                android.R.layout.simple_list_item_1, list.getItems());
-        setListAdapter(adapter);
-
-        aaZoneView.setZoneLabel("TodoListDetailFragment:" + list.getName());
+                feedAdapter.notifyDataSetChanged();
+            }
+        }
+        catch(JSONException ex) {
+            Log.w(TAG, "Problem parsing JSON.");
+        }
     }
 
     /**
@@ -148,47 +187,5 @@ public class TodoListDetailFragment extends ListFragment
      */
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
-    }
-
-    public static class NewListItemDialogFragment extends DialogFragment {
-        public interface NewListItemDialogListener {
-            void onDialogPositiveClick(DialogFragment dialog);
-            void onDialogNegativeClick(DialogFragment dialog);
-        }
-
-        // Use this instance of the interface to deliver action events
-        NewListItemDialogListener mListener;
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setMessage("Fire Missiles?")
-                    .setPositiveButton("Fire", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            mListener.onDialogPositiveClick(NewListItemDialogFragment.this);
-                        }
-                    })
-                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            mListener.onDialogNegativeClick(NewListItemDialogFragment.this);
-                        }
-                    });
-            // Create the AlertDialog object and return it
-            return builder.create();
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            // Verify that the host activity implements the callback interface
-            try {
-                // Instantiate the NoticeDialogListener so we can send events to the host
-                mListener = (NewListItemDialogListener) activity;
-            } catch (ClassCastException e) {
-                // The activity doesn't implement the interface, throw exception
-                throw new ClassCastException(activity.toString()
-                        + " must implement NoticeDialogListener");
-            }
-        }
     }
 }

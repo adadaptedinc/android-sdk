@@ -57,8 +57,7 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
 
         aaZoneView = new AAZoneView(getActivity());
         aaZoneView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, 120));
-        aaZoneView.setZoneLabel("TodoListsFragment");
-        aaZoneView.init("100668");
+        aaZoneView.init("100680");
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

@@ -53,7 +53,7 @@ public class RecipeDetailActivityFragment extends Fragment implements RecipeMana
         View view = inflater.inflate(R.layout.fragment_recipe_detail, container, false);
 
         aaZoneView = (AAZoneView)view.findViewById(R.id.recipeDetail_aaZoneView);
-        aaZoneView.init("100671");
+        aaZoneView.init("100681");
 
         return view;
     }
@@ -81,7 +81,5 @@ public class RecipeDetailActivityFragment extends Fragment implements RecipeMana
         recipe = RecipeManager.getInstance(getActivity()).getRecipe(recipeId);
 
         getActivity().setTitle(recipe.getName());
-
-        aaZoneView.setZoneLabel("RecipeDetailActivityFragment:"+recipe.getName());
     }
 }

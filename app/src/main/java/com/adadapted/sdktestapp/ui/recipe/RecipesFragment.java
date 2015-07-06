@@ -74,9 +74,8 @@ public class RecipesFragment extends ListFragment implements RecipeManager.Liste
         }
 
         aaZoneView = new AAZoneView(getActivity());
-        aaZoneView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, 120));
-        aaZoneView.setZoneLabel("RecipesFragment");
-        aaZoneView.init("100669");
+        aaZoneView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, 320));
+        aaZoneView.init("100680");
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

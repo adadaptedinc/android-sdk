@@ -92,6 +92,7 @@ public class TodoListManager implements TodoLoader.Listener {
     }
 
     public void addItemToList(UUID listId, String itemName) {
+        Log.d(TAG, "Called addItemToList() " + listId + " " + itemName);
         TodoList list = getList(listId);
         list.addNewItem(itemName);
 
