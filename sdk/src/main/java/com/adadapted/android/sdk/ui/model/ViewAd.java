@@ -11,15 +11,17 @@ import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
  * Created by chrisweeden on 5/26/15.
  */
 public class ViewAd {
-    private final Context context;
+    private static final String TAG = ViewAd.class.getName();
+
+    private EventTracker eventTracker;
     private final String sessionId;
     private final Ad ad;
 
     private boolean trackingHasStarted = false;
-    private boolean isStoppingForPopup = false;
 
     public ViewAd(Context context, String sessionId, Ad ad) {
-        this.context = context;
+        eventTracker = EventTrackerFactory.getInstance(context).createEventTracker();
+
         this.sessionId = sessionId;
         this.ad = ad;
     }
@@ -48,53 +50,37 @@ public class ViewAd {
         return sessionId;
     }
 
-    public boolean isStoppingForPopup() {
-        return isStoppingForPopup;
-    }
-
     public void beginAdTracking() {
         if(hasAd()) {
-            getEventTracker().trackImpressionBeginEvent(sessionId, getAd());
+            eventTracker.trackImpressionBeginEvent(sessionId, getAd());
             trackingHasStarted = true;
         }
     }
 
     public void completeAdTracking() {
         if(hasAd() && trackingHasStarted) {
-            getEventTracker().trackImpressionEndEvent(sessionId, getAd());
+            eventTracker.trackImpressionEndEvent(sessionId, getAd());
             trackingHasStarted = false;
         }
     }
 
     public void trackInteraction() {
-        if(hasAd()) {
-            getEventTracker().trackInteractionEvent(sessionId, getAd());
-            trackPopupBegin();
+        if(hasAd() && trackingHasStarted) {
+            eventTracker.trackInteractionEvent(sessionId, getAd());
 
-            ad.hideAd();
-
-            isStoppingForPopup = true;
+            if(ad.isHiddenAfterInteraction()) {
+                ad.hideAd();
+            }
         }
     }
 
-    public void trackPopupBegin() {
-        if(hasAd()) {
-            getEventTracker().trackPopupBeginEvent(sessionId, getAd());
-        }
-    }
-
-    public void trackPopupEnd() {
-        if(isStoppingForPopup()) {
-            getEventTracker().trackPopupEndEvent(sessionId, getAd());
-            isStoppingForPopup = false;
+    public void trackPayloadDelivered() {
+        if(hasAd() && trackingHasStarted) {
+            eventTracker.trackCustomEvent(sessionId, getAd(), "payload_delivered");
         }
     }
 
     public void flush() {
-        getEventTracker().publishEvents();
-    }
-
-    private EventTracker getEventTracker() {
-        return EventTrackerFactory.getInstance(context).createEventTracker();
+        eventTracker.publishEvents();
     }
 }
