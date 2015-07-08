@@ -16,7 +16,7 @@ public class JsonAdType extends AdType {
         return json;
     }
 
-    public void json(JSONObject json) {
-
+    public void setJson(JSONObject json) {
+        this.json = json;
     }
 }

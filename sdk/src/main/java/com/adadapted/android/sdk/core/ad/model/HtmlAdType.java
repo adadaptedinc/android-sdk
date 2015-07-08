@@ -15,6 +15,6 @@ public class HtmlAdType extends AdType {
     }
 
     public void setAdUrl(String adUrl) {
-        this.adUrl = adUrl;
+        this.adUrl = (adUrl == null) ? "" : adUrl;
     }
 }

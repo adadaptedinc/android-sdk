@@ -17,18 +17,6 @@ public class ImageAdType extends AdType {
         setType(AdTypes.IMAGE);
     }
 
-    public Map<String, AdImage> getImages() {
-        return images;
-    }
-
-    public AdImage getStandardImages() {
-        return images.get(STANDARD_IMAGE);
-    }
-
-    public AdImage getRetinaImages() {
-        return images.get(RETINA_IMAGE);
-    }
-
     public void setImages(Map<String, AdImage> images) {
         this.images = images;
     }

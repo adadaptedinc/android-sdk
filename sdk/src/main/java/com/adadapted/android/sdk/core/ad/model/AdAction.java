@@ -13,7 +13,7 @@ public abstract class AdAction implements Serializable {
     public static final String NULLACTION = "null";
     public static final String POPUP = "popup";
 
-    private String actionType = "";
+    private final String actionType;
     private String actionPath = "";
 
     public AdAction(String actionType) {
@@ -22,10 +22,6 @@ public abstract class AdAction implements Serializable {
 
     public String getActionType() {
         return actionType;
-    }
-
-    public void setActionType(String actionType) {
-        this.actionType = actionType;
     }
 
     public String getActionPath() {

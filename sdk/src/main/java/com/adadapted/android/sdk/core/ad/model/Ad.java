@@ -10,10 +10,8 @@ public class Ad implements Serializable {
 
     private String adId = "";
     private String zoneId = "";
-    private String baseImpressionId = "";
     private String impressionId = "";
     private boolean hideAfterInteraction = false;
-    private String payload = "";
     private int refreshTime = 0;
     private AdType adType = new NullAdType();
     private AdAction adAction = new NullAdAction();
@@ -46,31 +44,18 @@ public class Ad implements Serializable {
 
     public void setImpressionId(String impressionId) {
         this.impressionId = impressionId;
-        this.baseImpressionId = impressionId;
-    }
-
-    public void setImpressionViews(int impressionViews) {
-        impressionId = baseImpressionId + ":" + impressionViews;
-    }
-
-    public long getMaxImpressions(long adRefreshTime) {
-        return (adRefreshTime / getRefreshTimeInMs()) * 2;
     }
 
     public int getRefreshTime() {
         return refreshTime;
     }
 
-    public int getRefreshTimeInSec() {
-        return refreshTime;
+    public void setRefreshTime(int refreshTime) {
+        this.refreshTime = refreshTime;
     }
 
     public long getRefreshTimeInMs() {
-        return refreshTime * 1000L;
-    }
-
-    public void setRefreshTime(int refreshTime) {
-        this.refreshTime = refreshTime;
+        return getRefreshTime() * 1000L;
     }
 
     public AdType getAdType() {
@@ -97,18 +82,6 @@ public class Ad implements Serializable {
         this.hideAfterInteraction = hideAfterInteraction;
     }
 
-    public String getPayload() {
-        return payload;
-    }
-
-    public void setPayload(String payload) {
-        this.payload = payload;
-    }
-
-    public boolean hasPayload() {
-        return (payload != null);
-    }
-
     public void hideAd() {
         if(isHiddenAfterInteraction()) {
             isHidden = true;
@@ -119,17 +92,7 @@ public class Ad implements Serializable {
         return isHidden;
     }
 
-    @Override
-    public String toString() {
-        return "Ad{" +
-                "adId='" + adId + '\'' +
-                ", zoneId='" + zoneId + '\'' +
-                ", impressionId='" + impressionId + '\'' +
-                ", refreshTime=" + refreshTime +
-                ", adType=" + adType +
-                ", adAction=" + adAction +
-                ", hideAfterInteraction='" + hideAfterInteraction + '\'' +
-                ", payload='" + payload + '\'' +
-                '}';
+    public boolean isNotHidden() {
+        return !isHidden();
     }
 }
