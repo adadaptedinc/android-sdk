@@ -10,6 +10,7 @@ public abstract class AdAction implements Serializable {
 
     public static final String CONTENT = "content";
     public static final String DELEGATE = "delegate";
+    public static final String LINK = "link";
     public static final String NULLACTION = "null";
     public static final String POPUP = "popup";
 
