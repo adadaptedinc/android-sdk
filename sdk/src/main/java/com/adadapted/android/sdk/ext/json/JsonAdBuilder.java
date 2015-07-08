@@ -238,7 +238,7 @@ public class JsonAdBuilder implements AdBuilder {
         JsonAdType adType = new JsonAdType();
 
         try {
-            adType.json(jsonAd.getJSONObject(FIELD_JSON));
+            adType.setJson(jsonAd.getJSONObject(FIELD_JSON));
         }
         catch(JSONException ex) {
             Log.w(TAG, "Problem converting to JSON.", ex);
