@@ -13,7 +13,7 @@ import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
 public class ViewAd {
     private static final String TAG = ViewAd.class.getName();
 
-    private EventTracker eventTracker;
+    private final EventTracker eventTracker;
     private final String sessionId;
     private final Ad ad;
 
@@ -44,6 +44,10 @@ public class ViewAd {
         }
 
         return AdTypes.NULL;
+    }
+
+    public boolean isHiddenOnInteraction() {
+        return hasAd() && ad.isHiddenAfterInteraction();
     }
 
     public String getSessionId() {
