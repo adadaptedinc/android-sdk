@@ -88,13 +88,4 @@ public class Zone {
     public Ad getCurrentAd() {
         return ads.get(adIndex);
     }
-
-    @Override
-    public String toString() {
-        return "Zone{" +
-                "zoneId='" + zoneId + '\'' +
-                ", dimensions=" + dimensions +
-                ", ads=" + ads +
-                '}';
-    }
 }
