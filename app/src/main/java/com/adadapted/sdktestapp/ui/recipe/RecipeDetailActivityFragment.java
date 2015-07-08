@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.adadapted.android.sdk.ui.view.AAZoneView;
+import com.adadapted.android.sdk.ui.view.AaZoneView;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.recipe.Recipe;
 import com.adadapted.sdktestapp.core.recipe.RecipeManager;
@@ -21,7 +21,7 @@ public class RecipeDetailActivityFragment extends Fragment implements RecipeMana
 
     private UUID recipeId;
     private Recipe recipe;
-    private AAZoneView aaZoneView;
+    private AaZoneView aaZoneView;
 
     public static RecipeDetailActivityFragment newInstance(UUID recipeId) {
         RecipeDetailActivityFragment fragment = new RecipeDetailActivityFragment();
@@ -52,7 +52,7 @@ public class RecipeDetailActivityFragment extends Fragment implements RecipeMana
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_recipe_detail, container, false);
 
-        aaZoneView = (AAZoneView)view.findViewById(R.id.recipeDetail_aaZoneView);
+        aaZoneView = (AaZoneView)view.findViewById(R.id.recipeDetail_aaZoneView);
         aaZoneView.init("100681");
 
         return view;

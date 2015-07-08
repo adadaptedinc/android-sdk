@@ -13,7 +13,7 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.adadapted.android.sdk.ui.view.AAZoneView;
+import com.adadapted.android.sdk.ui.view.AaZoneView;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.recipe.Recipe;
 import com.adadapted.sdktestapp.core.recipe.RecipeManager;
@@ -40,7 +40,7 @@ public class RecipesFragment extends ListFragment implements RecipeManager.Liste
 
     private OnFragmentInteractionListener mListener;
 
-    private AAZoneView aaZoneView;
+    private AaZoneView aaZoneView;
 
     /**
      * Use this factory method to create a new instance of
@@ -73,7 +73,7 @@ public class RecipesFragment extends ListFragment implements RecipeManager.Liste
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        aaZoneView = new AAZoneView(getActivity());
+        aaZoneView = new AaZoneView(getActivity());
         aaZoneView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, 320));
         aaZoneView.init("100680");
     }

@@ -15,7 +15,7 @@ import android.widget.ListView;
 
 import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.content.ContentPayload;
-import com.adadapted.android.sdk.ui.adapter.AAFeedAdapter;
+import com.adadapted.android.sdk.ui.view.AaZoneView;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.todo.TodoList;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;
@@ -41,7 +41,9 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
     private UUID listId;
     private TodoList list;
 
-    private AAFeedAdapter feedAdapter;
+    private TodoListItemAdapter adapter;
+    private AaZoneView aaZoneView;
+    //private AaFeedAdapter feedAdapter;
     private DialogFragment dialog;
 
     private OnFragmentInteractionListener mListener;
@@ -81,11 +83,22 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
 
         getActivity().setTitle(list.getName());
 
-        TodoListItemAdapter adapter = new TodoListItemAdapter(getActivity(), list.getItems());
-        feedAdapter = new AAFeedAdapter(getActivity(), adapter, "100682", 3, 320, 8);
-        setListAdapter(feedAdapter);
-
         dialog = new NewListItemDialogFragment();
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        adapter = new TodoListItemAdapter(getActivity(), list.getItems());
+        //feedAdapter = new AaFeedAdapter(getActivity(), adapter, "100682", 3, 90, 8);
+        //setListAdapter(feedAdapter);
+        setListAdapter(adapter);
+
+        aaZoneView = new AaZoneView(getActivity());
+        aaZoneView.init("100682");
+        ListView listView = getListView();
+        listView.addFooterView(aaZoneView);
     }
 
     @Override
@@ -95,7 +108,8 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
         Log.w(TAG, "onResume() called.");
 
         AdAdapted.getInstance().addListener(this);
-        feedAdapter.onStart();
+        //feedAdapter.onStart();
+        aaZoneView.onStart();
     }
 
     @Override
@@ -105,7 +119,8 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
         super.onPause();
 
         AdAdapted.getInstance().removeListener(this);
-        feedAdapter.onStop();
+        //feedAdapter.onStop();
+        aaZoneView.onStop();
     }
 
     @Override
@@ -130,7 +145,8 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
-        Object item = feedAdapter.getItem(position);
+        //Object item = feedAdapter.getItem(position);
+        Object item = adapter.getItem(position);
 
         Log.d(TAG, "Feed Item Clicked: " + item);
     }
@@ -167,7 +183,8 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
                 String item = array.getString(i);
                 TodoListManager.getInstance(getActivity()).addItemToList(listId, item);
 
-                feedAdapter.notifyDataSetChanged();
+                //feedAdapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged();
             }
 
             contentPayload.acknowledge();

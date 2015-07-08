@@ -13,7 +13,7 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.adadapted.android.sdk.ui.view.AAZoneView;
+import com.adadapted.android.sdk.ui.view.AaZoneView;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.todo.TodoList;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;
@@ -35,7 +35,7 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
 
     private ArrayAdapter<TodoList> adapter;
     private List<TodoList> lists;
-    private AAZoneView aaZoneView;
+    private AaZoneView aaZoneView;
 
     /**
      * Use this factory method to create a new instance of
@@ -55,8 +55,8 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        aaZoneView = new AAZoneView(getActivity());
-        aaZoneView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, 120));
+        aaZoneView = new AaZoneView(getActivity());
+        aaZoneView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, 320));
         aaZoneView.init("100680");
     }
 
