@@ -61,6 +61,10 @@ public class Zone {
     }
 
     public Ad getNextAd() {
+        if(!hasVisibleAds()) {
+            return null;
+        }
+
         adIndex = ++zoneViews % getAdCount();
         Ad ad = ads.get(adIndex);
 
@@ -69,6 +73,16 @@ public class Zone {
         }
 
         return ad;
+    }
+
+    public boolean hasVisibleAds() {
+        boolean result = true;
+
+        for(Ad ad : getAds()) {
+            result |= ad.isNotHidden();
+        }
+
+        return result;
     }
 
     public Ad getCurrentAd() {
