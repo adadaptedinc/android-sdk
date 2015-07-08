@@ -1,4 +1,4 @@
-package com.adadapted.android.sdk.ui.view;
+package com.adadapted.android.sdk.ui.activity;
 
 import android.content.Context;
 import android.util.Log;
@@ -8,7 +8,7 @@ import android.widget.Toast;
 /**
  * Created by chrisweeden on 6/29/15.
  */
-public class WebAppInterface {
+class WebAppInterface {
     private static final String TAG = WebAppInterface.class.getName();
 
     Context mContext;

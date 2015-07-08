@@ -1,4 +1,4 @@
-package com.adadapted.android.sdk.ui.view;
+package com.adadapted.android.sdk.ui.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,16 +17,16 @@ import com.adadapted.android.sdk.core.ad.model.PopupAdAction;
 import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
 import com.adadapted.android.sdk.ui.model.ViewAd;
 
-public class WebViewPopupActivity extends AppCompatActivity {
-    private static final String TAG = WebViewPopupActivity.class.getName();
+public class AaWebViewPopupActivity extends AppCompatActivity {
+    private static final String TAG = AaWebViewPopupActivity.class.getName();
 
-    public static final String EXTRA_POPUP_AD = WebViewPopupActivity.class.getName() + ".EXTRA_POPUP_AD";
-    public static final String EXTRA_SESSSION_ID = WebViewPopupActivity.class.getName() + ".EXTRA_SESSSION_ID";
+    public static final String EXTRA_POPUP_AD = AaWebViewPopupActivity.class.getName() + ".EXTRA_POPUP_AD";
+    public static final String EXTRA_SESSSION_ID = AaWebViewPopupActivity.class.getName() + ".EXTRA_SESSSION_ID";
 
     public static Intent createActivity(Context context, ViewAd ad) {
-        Intent intent = new Intent(context, WebViewPopupActivity.class);
-        intent.putExtra(WebViewPopupActivity.EXTRA_POPUP_AD, ad.getAd());
-        intent.putExtra(WebViewPopupActivity.EXTRA_SESSSION_ID, ad.getSessionId());
+        Intent intent = new Intent(context, AaWebViewPopupActivity.class);
+        intent.putExtra(AaWebViewPopupActivity.EXTRA_POPUP_AD, ad.getAd());
+        intent.putExtra(AaWebViewPopupActivity.EXTRA_SESSSION_ID, ad.getSessionId());
 
         return intent;
     }
@@ -64,7 +64,7 @@ public class WebViewPopupActivity extends AppCompatActivity {
     private void loadPopup(String url) {
         WebView webView = (WebView)findViewById(R.id.activity_web_view_popup_webView);
         webView.getSettings().setJavaScriptEnabled(true);
-        //webView.addJavascriptInterface(new WebAppInterface(this), "AdAdapted");
+        webView.addJavascriptInterface(new WebAppInterface(this), "AdAdapted");
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
