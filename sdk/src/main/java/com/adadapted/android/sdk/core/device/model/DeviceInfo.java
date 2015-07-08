@@ -238,23 +238,4 @@ public class DeviceInfo {
     public void setSdkVersion(String sdkVersion) {
         this.sdkVersion = (sdkVersion == null) ? UNKNOWN_VALUE : sdkVersion;
     }
-
-    @Override
-    public String toString() {
-        return "DeviceInfo{" +
-                "appId='" + appId + '\'' +
-                ", zones=" + Arrays.toString(zones) +
-                ", bundleId='" + bundleId + '\'' +
-                ", udid='" + udid + '\'' +
-                ", device='" + device + '\'' +
-                ", os='" + os + '\'' +
-                ", osv='" + osv + '\'' +
-                ", locale='" + locale + '\'' +
-                ", timezone='" + timezone + '\'' +
-                ", dw=" + dw +
-                ", dh=" + dh +
-                ", density=" + density.toString() +
-                ", sdkVersion='" + sdkVersion + '\'' +
-                '}';
-    }
 }
