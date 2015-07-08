@@ -2,17 +2,17 @@ package com.adadapted.android.sdk.ui.view;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.ad.model.AdAction;
 import com.adadapted.android.sdk.core.content.ContentPayload;
+import com.adadapted.android.sdk.ui.activity.AaWebViewPopupActivity;
 import com.adadapted.android.sdk.ui.model.ViewAd;
 
 /**
  * Created by chrisweeden on 7/1/15.
  */
-public class AdActionHandler {
+class AdActionHandler {
     private static final String TAG = AdActionHandler.class.getName();
 
     private final Context context;
@@ -22,22 +22,25 @@ public class AdActionHandler {
     }
 
     public void handleAction(ViewAd ad) {
+        if(!ad.hasAd()) { return; }
+
         switch(ad.getAd().getAdAction().getActionType()) {
             case AdAction.CONTENT:
-                Log.d(TAG, "Handling CONTENT Ad Action");
                 handleContentAction(ad);
                 break;
 
             case AdAction.DELEGATE:
-                Log.d(TAG, "Handling DELEGATE Ad Action");
+                handleDelegateAction(ad);
+                break;
+
+            case AdAction.LINK:
+                handleLinkAction(ad);
                 break;
 
             case AdAction.NULLACTION:
-                Log.d(TAG, "Handling NULL Ad Action");
                 break;
 
             case AdAction.POPUP:
-                Log.d(TAG, "Handling POPUP Ad Action");
                 handlePopupAction(ad);
                 break;
         }
@@ -48,8 +51,16 @@ public class AdActionHandler {
         AdAdapted.getInstance().publishContent(ad.getAd().getZoneId(), payload);
     }
 
+    private void handleDelegateAction(ViewAd ad) {
+
+    }
+
+    private void handleLinkAction(ViewAd ad) {
+
+    }
+
     private void handlePopupAction(ViewAd ad) {
-        Intent intent = WebViewPopupActivity.createActivity(context, ad);
+        Intent intent = AaWebViewPopupActivity.createActivity(context, ad);
         context.startActivity(intent);
     }
 }
