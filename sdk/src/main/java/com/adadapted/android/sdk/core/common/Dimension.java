@@ -22,12 +22,4 @@ public class Dimension {
     public void setWidth(int width) {
         this.width = width;
     }
-
-    @Override
-    public String toString() {
-        return "ZoneDimension{" +
-                "height=" + height +
-                ", width=" + width +
-                '}';
-    }
 }
