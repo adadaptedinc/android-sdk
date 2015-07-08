@@ -8,7 +8,6 @@ import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptAdapter;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptBuilder;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptRequestBuilder;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptManager;
-import com.adadapted.android.sdk.core.keywordintercept.model.KeywordIntercept;
 import com.adadapted.android.sdk.ext.http.HttpKeywordInterceptAdapter;
 import com.adadapted.android.sdk.ext.json.JsonKeywordInterceptBuilder;
 import com.adadapted.android.sdk.ext.json.JsonKeywordInterceptRequestBuilder;
