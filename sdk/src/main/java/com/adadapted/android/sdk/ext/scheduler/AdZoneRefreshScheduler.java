@@ -11,7 +11,7 @@ import java.util.TimerTask;
 public class AdZoneRefreshScheduler extends Timer {
     private static final String TAG = AdZoneRefreshScheduler.class.getName();
 
-    private Listener listener;
+    private final Listener listener;
 
     public interface Listener {
         void onAdZoneRefreshTimer();
