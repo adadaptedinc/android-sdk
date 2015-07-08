@@ -80,18 +80,4 @@ public class PopupAdAction extends AdAction {
     public void setHideBrowserNavigation(boolean hideBrowserNavigation) {
         this.hideBrowserNavigation = hideBrowserNavigation;
     }
-
-    @Override
-    public String toString() {
-        return "AdPopup{" +
-                "hideBanner=" + hideBanner +
-                ", title='" + title + '\'' +
-                ", backgroundColor='" + backgroundColor + '\'' +
-                ", textColor='" + textColor + '\'' +
-                ", altCloseButton='" + altCloseButton + '\'' +
-                ", type='" + type + '\'' +
-                ", hideCloseButton=" + hideCloseButton +
-                ", hideBrowserNavigation=" + hideBrowserNavigation +
-                '}';
-    }
 }

@@ -26,11 +26,4 @@ public class AdImage implements Serializable {
     public String getOrientation(String orientation) {
         return orientations.get(orientation);
     }
-
-    @Override
-    public String toString() {
-        return "AdImage{" +
-                "orientations=" + orientations +
-                '}';
-    }
 }
