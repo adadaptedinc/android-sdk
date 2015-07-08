@@ -16,35 +16,35 @@ import com.adadapted.android.sdk.R;
 /**
  * Created by chrisweeden on 3/30/15.
  */
-public class AAZoneView extends RelativeLayout implements AAZoneViewController.Listener {
-    private static final String TAG = AAZoneView.class.getName();
+public class AaZoneView extends RelativeLayout implements AdInteractionListener, AaZoneViewController.Listener {
+    private static final String TAG = AaZoneView.class.getName();
 
     private final Context context;
 
     private String zoneId;
     private int layoutResourceId;
 
-    private AAZoneViewController viewController;
+    private AaZoneViewController viewController;
     private boolean visible = true;
 
-    public AAZoneView(Context context) {
+    public AaZoneView(Context context) {
         super(context);
         this.context = context;
     }
 
-    public AAZoneView(Context context, AttributeSet attrs) {
+    public AaZoneView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public AAZoneView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public AaZoneView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public AAZoneView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public AaZoneView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         this.context = context;
     }
@@ -69,6 +69,8 @@ public class AAZoneView extends RelativeLayout implements AAZoneViewController.L
     }
 
     private void displayAdView(final View view) {
+        ((AdView)view).setAdInteractionListener(this);
+
         this.post(new Runnable() {
             @Override
             public void run() {
@@ -77,8 +79,8 @@ public class AAZoneView extends RelativeLayout implements AAZoneViewController.L
                     parent.removeView(view);
                 }
 
-                AAZoneView.this.removeAllViews();
-                AAZoneView.this.addView(view);
+                AaZoneView.this.removeAllViews();
+                AaZoneView.this.addView(view);
             }
         });
     }
@@ -96,13 +98,13 @@ public class AAZoneView extends RelativeLayout implements AAZoneViewController.L
         this.post(new Runnable() {
             @Override
             public void run() {
-                AAZoneView.this.removeAllViews();
+                AaZoneView.this.removeAllViews();
             }
         });
     }
 
     public void onStart() {
-        viewController = AAZoneViewControllerFactory.getInstance(context).getController(zoneId, layoutResourceId);
+        viewController = AaZoneViewControllerFactory.getInstance(context).getController(zoneId, layoutResourceId);
         viewController.setListener(this);
     }
 
@@ -128,5 +130,10 @@ public class AAZoneView extends RelativeLayout implements AAZoneViewController.L
                 visible = true;
                 break;
         }
+    }
+
+    @Override
+    public void onClick() {
+        viewController.handleAdAction();
     }
 }

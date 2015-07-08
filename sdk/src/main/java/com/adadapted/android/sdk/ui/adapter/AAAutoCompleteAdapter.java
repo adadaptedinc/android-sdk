@@ -12,16 +12,16 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 6/18/15.
  */
-public class AAAutoCompleteAdapter extends ArrayAdapter<String> {
-    private static final String TAG = AAAutoCompleteAdapter.class.getName();
+public class AaAutoCompleteAdapter extends ArrayAdapter<String> {
+    private static final String TAG = AaAutoCompleteAdapter.class.getName();
 
-    private final AAKeyworkInterceptMatcher matcher;
+    private final AaKeyworkInterceptMatcher matcher;
     private final List<String> allItems;
 
-    public AAAutoCompleteAdapter(Context context, int resource, List items) {
+    public AaAutoCompleteAdapter(Context context, int resource, List<String> items) {
         super(context, resource, items);
 
-        this.matcher = new AAKeyworkInterceptMatcher(context);
+        this.matcher = new AaKeyworkInterceptMatcher(context);
         this.allItems = new ArrayList<>(items);
     }
 

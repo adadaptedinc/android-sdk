@@ -17,8 +17,8 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 6/25/15.
  */
-public class AAKeyworkInterceptMatcher implements SessionManager.Listener, KeywordInterceptManager.Listener {
-    private static final String TAG = AAKeyworkInterceptMatcher.class.getName();
+public class AaKeyworkInterceptMatcher implements SessionManager.Listener, KeywordInterceptManager.Listener {
+    private static final String TAG = AaKeyworkInterceptMatcher.class.getName();
 
     private final KeywordInterceptManager manager;
     
@@ -26,7 +26,7 @@ public class AAKeyworkInterceptMatcher implements SessionManager.Listener, Keywo
     private boolean loaded = false;
     private Session session;
 
-    public AAKeyworkInterceptMatcher(Context context) {
+    public AaKeyworkInterceptMatcher(Context context) {
         manager = KeywordInterceptManagerFactory.getInstance(context).createKeywordInterceptManager();
         manager.setListener(this);
 

@@ -5,25 +5,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.adadapted.android.sdk.ui.view.AAZoneView;
+import com.adadapted.android.sdk.ui.view.AaZoneView;
 
 /**
  * Created by chrisweeden on 5/27/15.
  */
-public class AAFeedAdapter extends BaseAdapter {
-    private static final String TAG = AAFeedAdapter.class.getName();
+public class AaFeedAdapter extends BaseAdapter {
+    private static final String TAG = AaFeedAdapter.class.getName();
 
     private final BaseAdapter adapter;
-    private final AAFeedAdPlacement placement;
+    private final AaFeedAdPlacement placement;
 
-    private AAZoneView currentZoneView;
+    private AaZoneView currentZoneView;
 
-    public AAFeedAdapter(Context context, BaseAdapter adapter, String zoneId, int placement, int height, int padding) {
+    public AaFeedAdapter(Context context, BaseAdapter adapter, String zoneId, int placement, int height, int padding) {
         this.adapter = adapter;
-        this.placement = new AAFeedAdPlacement(context, zoneId, placement, height, padding);
+        this.placement = new AaFeedAdPlacement(context, zoneId, placement, height, padding);
     }
 
-    public AAFeedAdapter(Context context, BaseAdapter adapter, String zoneId, int placement, int height) {
+    public AaFeedAdapter(Context context, BaseAdapter adapter, String zoneId, int placement, int height) {
         this(context, adapter, zoneId, placement, height, 0);
     }
 
@@ -39,7 +39,7 @@ public class AAFeedAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        AAFeedItem feedItem = placement.getItem(position);
+        AaFeedItem feedItem = placement.getItem(position);
 
         if(feedItem == null) {
             return placement.getModifiedItemId(position);
@@ -50,7 +50,7 @@ public class AAFeedAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        AAZoneView view = placement.getView(position);
+        AaZoneView view = placement.getView(position);
 
         if(view == null) {
             int modPos = placement.getModifiedPosition(position);
@@ -69,7 +69,7 @@ public class AAFeedAdapter extends BaseAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        AAFeedItem feedItem = placement.getItem(position);
+        AaFeedItem feedItem = placement.getItem(position);
         if(feedItem == null) {
             return adapter.getViewTypeCount();
         }
@@ -93,7 +93,7 @@ public class AAFeedAdapter extends BaseAdapter {
 
     @Override
     public String toString() {
-        return "AAFeedAdapter{" +
+        return "AaFeedAdapter{" +
                 "adapter=" + adapter +
                 ", placement=" + placement +
                 '}';

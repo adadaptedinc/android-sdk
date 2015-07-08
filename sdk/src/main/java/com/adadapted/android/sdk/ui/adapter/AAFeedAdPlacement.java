@@ -3,13 +3,13 @@ package com.adadapted.android.sdk.ui.adapter;
 import android.content.Context;
 import android.widget.AbsListView;
 
-import com.adadapted.android.sdk.ui.view.AAZoneView;
+import com.adadapted.android.sdk.ui.view.AaZoneView;
 
 /**
  * Created by chrisweeden on 5/28/15.
  */
-public class AAFeedAdPlacement {
-    private static final String TAG = AAFeedAdPlacement.class.getName();
+public class AaFeedAdPlacement {
+    private static final String TAG = AaFeedAdPlacement.class.getName();
 
     private final Context context;
     private final String zoneId;
@@ -18,7 +18,7 @@ public class AAFeedAdPlacement {
     private final int height;
     private final int padding;
 
-    public AAFeedAdPlacement(Context context, String zoneId, int placement, int height, int padding) {
+    public AaFeedAdPlacement(Context context, String zoneId, int placement, int height, int padding) {
         this.context = context;
         this.zoneId = zoneId;
         this.placement = (placement <= 0) ? 0 : placement-1;
@@ -28,7 +28,7 @@ public class AAFeedAdPlacement {
         this.padding = padding < 1 ? convertToDp(0) : convertToDp(padding);
     }
 
-    public AAFeedAdPlacement(Context context, String zoneId, int placement, int height) {
+    public AaFeedAdPlacement(Context context, String zoneId, int placement, int height) {
         this(context, zoneId, placement, height, 0);
     }
 
@@ -37,15 +37,19 @@ public class AAFeedAdPlacement {
         return (int) (value * scale + 0.5f);
     }
 
-    public AAFeedItem getItem(int position) {
+    public AaFeedItem getItem(int position) {
         if(position == placement) {
-            return new AAFeedItem();
+            return new AaFeedItem();
         }
 
         return null;
     }
 
     public int getModifiedCount(int count) {
+        if(count < placement) {
+            return count;
+        }
+
         return count + 1;
     }
 
@@ -61,9 +65,9 @@ public class AAFeedAdPlacement {
         return count + 1;
     }
 
-    public AAZoneView getView(int position) {
+    public AaZoneView getView(int position) {
         if(position == placement) {
-            AAZoneView view = new AAZoneView(context);
+            AaZoneView view = new AaZoneView(context);
             view.setLayoutParams(new AbsListView.LayoutParams(width, height));
             view.setPadding(padding, padding, padding, padding);
             view.init(zoneId);
@@ -76,7 +80,7 @@ public class AAFeedAdPlacement {
 
     @Override
     public String toString() {
-        return "AAFeedAdPlacement{" +
+        return "AaFeedAdPlacement{" +
                 "zoneId='" + zoneId + '\'' +
                 ", placement=" + placement +
                 '}';
