@@ -39,7 +39,7 @@ public class Session {
     }
 
     public boolean hasExpired() {
-        return expiresAt.getTime() <= (new Date().getTime());
+        return expiresAt != null && (expiresAt.getTime() <= (new Date().getTime()));
     }
 
     public Date getExpiresAt() {
