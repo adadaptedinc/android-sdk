@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -15,7 +16,7 @@ import com.adadapted.android.sdk.R;
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.PopupAdAction;
 import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
-import com.adadapted.android.sdk.ui.model.ViewAd;
+import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
 public class AaWebViewPopupActivity extends AppCompatActivity {
     private static final String TAG = AaWebViewPopupActivity.class.getName();
@@ -23,7 +24,7 @@ public class AaWebViewPopupActivity extends AppCompatActivity {
     public static final String EXTRA_POPUP_AD = AaWebViewPopupActivity.class.getName() + ".EXTRA_POPUP_AD";
     public static final String EXTRA_SESSSION_ID = AaWebViewPopupActivity.class.getName() + ".EXTRA_SESSSION_ID";
 
-    public static Intent createActivity(Context context, ViewAd ad) {
+    public static Intent createActivity(Context context, ViewAdWrapper ad) {
         Intent intent = new Intent(context, AaWebViewPopupActivity.class);
         intent.putExtra(AaWebViewPopupActivity.EXTRA_POPUP_AD, ad.getAd());
         intent.putExtra(AaWebViewPopupActivity.EXTRA_SESSSION_ID, ad.getSessionId());
@@ -61,6 +62,7 @@ public class AaWebViewPopupActivity extends AppCompatActivity {
         EventTrackerFactory.getInstance(this).createEventTracker().trackPopupEndEvent(sessionId, ad);
     }
 
+    @SuppressLint({"AddJavascriptInterface", "SetJavaScriptEnabled"})
     private void loadPopup(String url) {
         WebView webView = (WebView)findViewById(R.id.activity_web_view_popup_webView);
         webView.getSettings().setJavaScriptEnabled(true);
@@ -81,13 +83,15 @@ public class AaWebViewPopupActivity extends AppCompatActivity {
         try {
             setTitleColor(Color.parseColor(action.getTextColor()));
         } catch (Exception ex) {
-            Log.d(TAG, "Problem setting text color " + action.getTextColor(), ex);
+            Log.w(TAG, "Problem setting text color " + action.getTextColor());
         }
 
         try {
-            bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(action.getBackgroundColor())));
+            if(bar != null) {
+                bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(action.getBackgroundColor())));
+            }
         } catch (Exception ex) {
-            Log.d(TAG, "Problem setting background color " + action.getBackgroundColor(), ex);
+            Log.w(TAG, "Problem setting background color " + action.getBackgroundColor());
         }
     }
 }
