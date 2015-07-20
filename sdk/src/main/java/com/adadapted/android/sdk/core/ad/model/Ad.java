@@ -6,10 +6,11 @@ import java.io.Serializable;
  * Created by chrisweeden on 3/23/15.
  */
 public class Ad implements Serializable {
-    static final long serialVersionUID = 42L;
+    private static final long serialVersionUID = 42L;
 
     private String adId = "";
     private String zoneId = "";
+    private String baseImpressionId = "";
     private String impressionId = "";
     private boolean hideAfterInteraction = false;
     private int refreshTime = 0;
@@ -44,6 +45,11 @@ public class Ad implements Serializable {
 
     public void setImpressionId(String impressionId) {
         this.impressionId = impressionId;
+        this.baseImpressionId = impressionId;
+    }
+
+    public void setImpressionViews(int impressionViews) {
+        impressionId = baseImpressionId + ":" + impressionViews;
     }
 
     public int getRefreshTime() {
