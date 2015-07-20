@@ -45,7 +45,7 @@ public class EventTracker implements EventAdapter.Listener {
             Log.d(TAG, "No items queued to publish.");
         }
         else {
-            Set<JSONObject> currentEvents = new HashSet<>(queuedEvents);
+            Set<JSONObject> currentEvents = new HashSet<>(getQueuedEvents());
             queuedEvents.clear();
 
             JSONArray eventsArray = new JSONArray(currentEvents);
