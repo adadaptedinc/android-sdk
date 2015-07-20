@@ -1,11 +1,13 @@
 package com.adadapted.android.sdk.core.session;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.ext.scheduler.AdRefreshScheduler;
+import com.adadapted.android.sdk.ext.scheduler.EventFlushScheduler;
 
 import org.json.JSONObject;
 
@@ -38,9 +40,8 @@ public class SessionManager implements SessionAdapter.Listener {
                           SessionAdapter httpSessionAdapter,
                           SessionRequestBuilder requestBuilder,
                           SessionBuilder sessionBuilder) {
-        this.listeners = new HashSet<>();
-
         this.context = context;
+        this.listeners = new HashSet<>();
 
         this.httpSessionAdapter = httpSessionAdapter;
         this.httpSessionAdapter.addListener(this);
@@ -48,6 +49,10 @@ public class SessionManager implements SessionAdapter.Listener {
         this.requestBuilder = requestBuilder;
 
         this.sessionBuilder = sessionBuilder;
+    }
+
+    public Session getCurrentSession() {
+        return currentSession;
     }
 
     public void initialize(DeviceInfo deviceInfo) {
@@ -58,13 +63,6 @@ public class SessionManager implements SessionAdapter.Listener {
     public void reinitialize(DeviceInfo deviceInfo, Session session) {
         JSONObject request = requestBuilder.buildSessionReinitRequest(deviceInfo, session);
         httpSessionAdapter.sendReinit(request);
-    }
-
-    private void scheduleAdRefreshTimer() {
-        new AdRefreshScheduler(context).schedule(
-                currentSession.getPollingInterval(),
-                currentSession,
-                AdAdapted.getInstance().getDeviceInfo());
     }
 
     public void addListener(Listener listener) {
@@ -99,9 +97,14 @@ public class SessionManager implements SessionAdapter.Listener {
 
     @Override
     public void onSessionInitRequestCompleted(JSONObject response) {
+        Log.d(TAG, "onSessionInitRequestCompleted() Called");
+
         currentSession = sessionBuilder.buildSession(response);
         sessionLoaded = true;
-        scheduleAdRefreshTimer();
+
+        new AdRefreshScheduler(context).schedule(getCurrentSession(), AdAdapted.getInstance().getDeviceInfo());
+        new EventFlushScheduler(context).start();
+
         notifySessionInitialized();
     }
 
