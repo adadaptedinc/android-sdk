@@ -49,6 +49,7 @@ public class JsonKeywordInterceptRequestBuilder implements KeywordInterceptReque
                 json.put(JsonFields.SESSIONID, event.getSessionId());
                 json.put(JsonFields.APPID, event.getAppId());
                 json.put(JsonFields.UDID, event.getUdid());
+                json.put(JsonFields.SEARCHID, event.getSearchId());
                 json.put(JsonFields.DATETIME, event.getDatetime().getTime());
                 json.put(JsonFields.TERM, event.getTerm());
                 json.put(JsonFields.USERINPUT, event.getUserInput());
