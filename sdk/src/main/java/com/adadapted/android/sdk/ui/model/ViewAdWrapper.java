@@ -10,8 +10,8 @@ import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
 /**
  * Created by chrisweeden on 5/26/15.
  */
-public class ViewAd {
-    private static final String TAG = ViewAd.class.getName();
+public class ViewAdWrapper {
+    private static final String TAG = ViewAdWrapper.class.getName();
 
     private final EventTracker eventTracker;
     private final String sessionId;
@@ -19,19 +19,27 @@ public class ViewAd {
 
     private boolean trackingHasStarted = false;
 
-    public ViewAd(Context context, String sessionId, Ad ad) {
+    public ViewAdWrapper(Context context, String sessionId, Ad ad) {
         eventTracker = EventTrackerFactory.getInstance(context).createEventTracker();
 
         this.sessionId = sessionId;
         this.ad = ad;
     }
 
-    public static ViewAd createEmptyCurrentAd(Context context, String sessionId) {
-        return new ViewAd(context, sessionId, null);
+    public static ViewAdWrapper createEmptyCurrentAd(Context context, String sessionId) {
+        return new ViewAdWrapper(context, sessionId, null);
     }
 
     public Ad getAd() {
         return ad;
+    }
+
+    public String getAdId() {
+        if(hasAd()) {
+            return getAd().getAdId();
+        }
+
+        return null;
     }
 
     public boolean hasAd() {
@@ -66,6 +74,8 @@ public class ViewAd {
             eventTracker.trackImpressionEndEvent(sessionId, getAd());
             trackingHasStarted = false;
         }
+
+        flush();
     }
 
     public void trackInteraction() {
@@ -76,6 +86,8 @@ public class ViewAd {
                 ad.hideAd();
             }
         }
+
+        flush();
     }
 
     public void trackPayloadDelivered() {
@@ -84,7 +96,7 @@ public class ViewAd {
         }
     }
 
-    public void flush() {
+    private void flush() {
         eventTracker.publishEvents();
     }
 }

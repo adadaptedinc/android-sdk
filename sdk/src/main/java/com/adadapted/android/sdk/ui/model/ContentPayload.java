@@ -1,4 +1,4 @@
-package com.adadapted.android.sdk.core.content;
+package com.adadapted.android.sdk.ui.model;
 
 import android.util.Log;
 
