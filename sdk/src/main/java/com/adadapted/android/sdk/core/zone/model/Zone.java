@@ -76,7 +76,7 @@ public class Zone {
     }
 
     public boolean hasVisibleAds() {
-        boolean result = true;
+        boolean result = false;
 
         for(Ad ad : getAds()) {
             result |= ad.isNotHidden();
