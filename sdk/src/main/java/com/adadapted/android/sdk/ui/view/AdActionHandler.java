@@ -5,9 +5,9 @@ import android.content.Intent;
 
 import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.ad.model.AdAction;
-import com.adadapted.android.sdk.core.content.ContentPayload;
 import com.adadapted.android.sdk.ui.activity.AaWebViewPopupActivity;
-import com.adadapted.android.sdk.ui.model.ViewAd;
+import com.adadapted.android.sdk.ui.model.ContentPayload;
+import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
 /**
  * Created by chrisweeden on 7/1/15.
@@ -21,7 +21,7 @@ class AdActionHandler {
         this.context = context;
     }
 
-    public void handleAction(ViewAd ad) {
+    public void handleAction(ViewAdWrapper ad) {
         if(!ad.hasAd()) { return; }
 
         switch(ad.getAd().getAdAction().getActionType()) {
@@ -46,20 +46,20 @@ class AdActionHandler {
         }
     }
 
-    private void handleContentAction(ViewAd ad) {
+    private void handleContentAction(ViewAdWrapper ad) {
         ContentPayload payload = ContentPayload.createAddToListContent(ad);
         AdAdapted.getInstance().publishContent(ad.getAd().getZoneId(), payload);
     }
 
-    private void handleDelegateAction(ViewAd ad) {
+    private void handleDelegateAction(ViewAdWrapper ad) {
 
     }
 
-    private void handleLinkAction(ViewAd ad) {
+    private void handleLinkAction(ViewAdWrapper ad) {
 
     }
 
-    private void handlePopupAction(ViewAd ad) {
+    private void handlePopupAction(ViewAdWrapper ad) {
         Intent intent = AaWebViewPopupActivity.createActivity(context, ad);
         context.startActivity(intent);
     }
