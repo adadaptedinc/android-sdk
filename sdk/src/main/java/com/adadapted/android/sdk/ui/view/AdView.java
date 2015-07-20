@@ -1,5 +1,7 @@
 package com.adadapted.android.sdk.ui.view;
 
+import android.view.View;
+
 import com.adadapted.android.sdk.core.ad.model.Ad;
 
 /**
@@ -7,6 +9,5 @@ import com.adadapted.android.sdk.core.ad.model.Ad;
  */
 interface AdView {
     void buildView(Ad ad);
-    void setAdInteractionListener(AdInteractionListener listener);
-    void removeAdInteractionListener();
+    View getView();
 }
