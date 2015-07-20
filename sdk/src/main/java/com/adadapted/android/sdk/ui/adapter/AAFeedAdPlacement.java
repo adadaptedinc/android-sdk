@@ -1,7 +1,7 @@
 package com.adadapted.android.sdk.ui.adapter;
 
 import android.content.Context;
-import android.widget.AbsListView;
+import android.view.ViewGroup;
 
 import com.adadapted.android.sdk.ui.view.AaZoneView;
 
@@ -14,27 +14,37 @@ public class AaFeedAdPlacement {
     private final Context context;
     private final String zoneId;
     private final int placement;
-    private final int width;
-    private final int height;
-    private final int padding;
 
-    public AaFeedAdPlacement(Context context, String zoneId, int placement, int height, int padding) {
+    private ViewGroup.LayoutParams layoutParams;
+    private int resourceId;
+
+    public AaFeedAdPlacement(Context context, String zoneId, int placement) {
         this.context = context;
         this.zoneId = zoneId;
         this.placement = (placement <= 0) ? 0 : placement-1;
-
-        this.width = AbsListView.LayoutParams.MATCH_PARENT;
-        this.height = height < 1 ? convertToDp(120) : convertToDp(height);
-        this.padding = padding < 1 ? convertToDp(0) : convertToDp(padding);
+        this.layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
-    public AaFeedAdPlacement(Context context, String zoneId, int placement, int height) {
-        this(context, zoneId, placement, height, 0);
+    public AaFeedAdPlacement(Context context, String zoneId, int placement, int resourceId) {
+        this(context, zoneId, placement);
+        this.resourceId = resourceId;
     }
 
-    private int convertToDp(int value) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (value * scale + 0.5f);
+    public AaFeedAdPlacement(Context context, String zoneId, int placement,
+                             ViewGroup.LayoutParams layoutParams) {
+        this(context, zoneId, placement);
+        this.layoutParams = layoutParams;
+    }
+
+    public AaFeedAdPlacement(Context context, String zoneId, int placement,
+                             ViewGroup.LayoutParams layoutParams, int resourceId) {
+        this(context, zoneId, placement, layoutParams);
+        this.resourceId = resourceId;
+    }
+
+    public void setLayoutParams(ViewGroup.LayoutParams layoutParams) {
+        this.layoutParams = layoutParams;
     }
 
     public AaFeedItem getItem(int position) {
@@ -68,9 +78,8 @@ public class AaFeedAdPlacement {
     public AaZoneView getView(int position) {
         if(position == placement) {
             AaZoneView view = new AaZoneView(context);
-            view.setLayoutParams(new AbsListView.LayoutParams(width, height));
-            view.setPadding(padding, padding, padding, padding);
-            view.init(zoneId);
+            view.setLayoutParams(layoutParams);
+            view.init(zoneId, resourceId);
 
             return view;
         }

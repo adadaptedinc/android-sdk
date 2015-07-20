@@ -1,12 +1,13 @@
 package com.adadapted.android.sdk.ui.view;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -16,7 +17,8 @@ import com.adadapted.android.sdk.R;
 /**
  * Created by chrisweeden on 3/30/15.
  */
-public class AaZoneView extends RelativeLayout implements AdInteractionListener, AaZoneViewController.Listener {
+public class AaZoneView extends RelativeLayout
+        implements AdInteractionListener, AaZoneViewController.Listener {
     private static final String TAG = AaZoneView.class.getName();
 
     private final Context context;
@@ -50,7 +52,7 @@ public class AaZoneView extends RelativeLayout implements AdInteractionListener,
     }
 
     public void init(String zoneId) {
-        init(zoneId, R.layout.default_json_ad_zone);
+        init(zoneId, R.layout.aa_default_json_ad_zone);
     }
 
     public void init(String zoneId, int layoutResourceId) {
@@ -69,13 +71,12 @@ public class AaZoneView extends RelativeLayout implements AdInteractionListener,
     }
 
     private void displayAdView(final View view) {
-        ((AdView)view).setAdInteractionListener(this);
-
-        this.post(new Runnable() {
+        Activity activity = (Activity)context;
+        activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ViewGroup parent = ((ViewGroup)view.getParent());
-                if(parent != null) {
+                ViewGroup parent = ((ViewGroup) view.getParent());
+                if (parent != null) {
                     parent.removeView(view);
                 }
 
@@ -87,6 +88,19 @@ public class AaZoneView extends RelativeLayout implements AdInteractionListener,
 
     @Override
     public void onViewReadyForDisplay(final View view) {
+        view.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        onClick();
+                        break;
+                }
+
+                return true;
+            }
+        });
+
         if(visible) {
             displayAdView(view);
             viewController.acknowledgeDisplay();
@@ -109,7 +123,7 @@ public class AaZoneView extends RelativeLayout implements AdInteractionListener,
     }
 
     public void onStop() {
-        viewController.removeListener(this);
+        viewController.removeListener();
     }
 
     @Override
@@ -119,13 +133,11 @@ public class AaZoneView extends RelativeLayout implements AdInteractionListener,
         switch(visibility) {
             case View.GONE:
             case View.INVISIBLE:
-                Log.d(TAG, "No Longer Visible");
                 visible = false;
                 onStop();
                 break;
 
             case View.VISIBLE:
-                Log.d(TAG, "Is Visible");
                 onStart();
                 visible = true;
                 break;
@@ -135,5 +147,12 @@ public class AaZoneView extends RelativeLayout implements AdInteractionListener,
     @Override
     public void onClick() {
         viewController.handleAdAction();
+    }
+
+    @Override
+    public String toString() {
+        return "AaZoneView{" +
+                "zoneId='" + zoneId + '\'' +
+                '}';
     }
 }

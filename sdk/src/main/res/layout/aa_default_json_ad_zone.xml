@@ -1,8 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/default_json_ad_zones_layout"
-    android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/aa_default_json_ad_zone_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="90dp"
+    android:padding="8dp">
 
-</LinearLayout>
+    <ImageView android:id="@+id/aa_ad_campaign_image"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:scaleType="fitXY"
+        android:padding="4dp"
+        android:contentDescription="" />
+
+    <TextView android:id="@+id/aa_ad_tag_line"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/aa_ad_campaign_image"
+        android:layout_toEndOf="@id/aa_ad_campaign_image"
+        android:padding="4dp" />
+
+    <ImageView android:id="@+id/aa_ad_sponsor_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/aa_ad_campaign_image"
+        android:layout_toEndOf="@id/aa_ad_campaign_image"
+        android:layout_below="@id/aa_ad_tag_line"
+        android:scaleType="fitXY"
+        android:padding="4dp"
+        android:contentDescription="" />
+
+    <TextView android:id="@+id/aa_ad_cta_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/aa_ad_sponsor_logo"
+        android:layout_toEndOf="@id/aa_ad_sponsor_logo"
+        android:layout_below="@id/aa_ad_tag_line"
+        android:padding="4dp"/>
+
+</RelativeLayout>

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 
+import com.adadapted.android.sdk.ui.model.SuggestionPayload;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 6/18/15.
  */
+@SuppressWarnings("ALL")
 public class AaAutoCompleteAdapter extends ArrayAdapter<String> {
     private static final String TAG = AaAutoCompleteAdapter.class.getName();
 
@@ -21,8 +24,8 @@ public class AaAutoCompleteAdapter extends ArrayAdapter<String> {
     public AaAutoCompleteAdapter(Context context, int resource, List<String> items) {
         super(context, resource, items);
 
-        this.matcher = new AaKeyworkInterceptMatcher(context);
-        this.allItems = new ArrayList<>(items);
+        matcher = new AaKeyworkInterceptMatcher(context);
+        allItems = new ArrayList<>(items);
     }
 
     @Override
@@ -37,10 +40,12 @@ public class AaAutoCompleteAdapter extends ArrayAdapter<String> {
             Set<String> suggestions = new HashSet<>();
 
             if(constraint != null) {
-                suggestions.addAll(matcher.match(constraint));
+                SuggestionPayload suggestionPayload = matcher.match(constraint);
+                suggestions.addAll(suggestionPayload.getSuggestions());
 
                 for(String item : allItems) {
                     if (item.toLowerCase().contains(constraint.toString().toLowerCase())) {
+                        suggestionPayload.presented(item);
                         suggestions.add(item);
                     }
                 }

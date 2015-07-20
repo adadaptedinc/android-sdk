@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.ui.view;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 
 import com.adadapted.android.sdk.core.ad.AdFetcher;
@@ -11,9 +10,11 @@ import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.core.zone.model.Zone;
 import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
 import com.adadapted.android.sdk.ext.scheduler.AdZoneRefreshScheduler;
-import com.adadapted.android.sdk.ui.model.ViewAd;
+import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by chrisweeden on 7/1/15.
@@ -38,8 +39,8 @@ class AaZoneViewController implements SessionManager.Listener, AdFetcher.Listene
 
     private String sessionId = "";
     private Zone zone;
-    private ViewAd currentAd;
-    private boolean timerRunning = false;
+    private ViewAdWrapper currentAd;
+    private Set<String> timerRunning;
 
     public AaZoneViewController(final Context context, final String zoneId, final int resourceId) {
         this.context = context;
@@ -52,66 +53,54 @@ class AaZoneViewController implements SessionManager.Listener, AdFetcher.Listene
         adActionHandler = new AdActionHandler(context);
 
         this.zone = Zone.createEmptyZone(zoneId);
-        this.currentAd = ViewAd.createEmptyCurrentAd(context, sessionId);
-
-        SessionManagerFactory.getInstance(context).createSessionManager().addListener(this);
+        this.currentAd = ViewAdWrapper.createEmptyCurrentAd(context, sessionId);
+        this.timerRunning = new HashSet<>();
     }
 
     private void setNextAd() {
-        Log.d(TAG, zoneId + ": setNextAd() Called.");
-        currentAd.flush();
+        completeCurrentAd();
 
         Ad ad = zone.getNextAd();
         if(ad != null) {
-            currentAd = new ViewAd(context, sessionId, ad);
+            currentAd = new ViewAdWrapper(context, sessionId, ad);
         }
         else {
-            currentAd = ViewAd.createEmptyCurrentAd(context, sessionId);
+            currentAd = ViewAdWrapper.createEmptyCurrentAd(context, sessionId);
         }
 
         displayAd();
     }
 
     private void completeCurrentAd() {
-        Log.d(TAG, zoneId + ": completeAd() Called.");
+        if(currentAd.hasAd()) {
+            currentAd.completeAdTracking();
+        }
 
-        currentAd.completeAdTracking();
         notifyResetDisplayView();
     }
 
     private void displayAd() {
-        Log.d(TAG, zoneId + ": displayAd() Called.");
-
         if(currentAd.hasAd()) {
-            buildAdView();
+            adViewBuilder.buildView(currentAd, resourceId);
+        }
+        else {
+            // TODO: Probably should close the zone.
         }
     }
 
-    private void buildAdView() {
-        Log.d(TAG, zoneId + ": buildAdView() Called.");
-
-        adViewBuilder.buildView(currentAd, resourceId);
-    }
-
     public void setTimer() {
-        Log.d(TAG, zoneId + ": setTimer() Called.");
-
         new AdZoneRefreshScheduler(this).schedule(currentAd.getAd());
-        timerRunning = true;
+        timerRunning.add(currentAd.getAdId());
     }
 
     public void acknowledgeDisplay() {
-        Log.d(TAG, zoneId + ": acknowledgeDisplay() Called.");
-
-        if(!timerRunning) {
+        if(!timerRunning.contains(currentAd.getAdId())) {
             currentAd.beginAdTracking();
             setTimer();
         }
     }
 
     public void handleAdAction() {
-        Log.d(TAG, zoneId + ": handleAdAction() Called.");
-
         currentAd.trackInteraction();
         adActionHandler.handleAction(currentAd);
 
@@ -121,32 +110,22 @@ class AaZoneViewController implements SessionManager.Listener, AdFetcher.Listene
     }
 
     public void setListener(Listener listener) {
-        Log.d(TAG, zoneId + ": setListener() Called.");
-
         this.listener = listener;
-        displayAd();
+        SessionManagerFactory.getInstance(context).createSessionManager().addListener(this);
     }
 
-    public void removeListener(Listener listener) {
-        Log.d(TAG, zoneId + ": removeListener() Called.");
-
-        if(this.listener != null && this.listener.equals(listener)) {
-            this.listener = null;
-            notifyResetDisplayView();
-        }
+    public void removeListener() {
+        this.listener = null;
+        SessionManagerFactory.getInstance(context).createSessionManager().removeListener(this);
     }
 
     private void notifyViewReadyForDisplay(final View v) {
-        Log.d(TAG, zoneId + ": notifyViewReadyForDisplay() Called.");
-
         if(listener != null) {
             listener.onViewReadyForDisplay(v);
         }
     }
 
     private void notifyResetDisplayView() {
-        Log.d(TAG, zoneId + ": notifyResetDisplayView() Called.");
-
         if(listener != null) {
             listener.onResetDisplayView();
         }
@@ -154,16 +133,15 @@ class AaZoneViewController implements SessionManager.Listener, AdFetcher.Listene
 
     @Override
     public void onSessionInitialized(final Session session) {
-        Log.d(TAG, zoneId + ": onSessionInitialized() Called.");
-
         sessionId = session.getSessionId();
         zone = session.getZone(zoneId);
 
-        if(!timerRunning) {
+        if(timerRunning.size() == 0) {
             setNextAd();
         }
-
-        displayAd();
+        else {
+            displayAd();
+        }
     }
 
     @Override
@@ -174,20 +152,20 @@ class AaZoneViewController implements SessionManager.Listener, AdFetcher.Listene
 
     @Override
     public void onAdsRefreshed(Map<String, Zone> zones) {
-        //zone.setAds(zones.get(zoneId).getAds());
+        zone.setAds(zones.get(zoneId).getAds());
     }
 
     @Override
     public void onAdsNotRefreshed() {}
 
     @Override
-    public void onAdZoneRefreshTimer() {
-        Log.d(TAG, zoneId + ": onAdZoneRefreshTimer() Called.");
+    public void onAdZoneRefreshTimer(Ad ad) {
+        if(ad.getAdId().equals(currentAd.getAdId())) {
+            timerRunning.remove(ad.getAdId());
 
-        timerRunning = false;
-
-        completeCurrentAd();
-        setNextAd();
+            completeCurrentAd();
+            setNextAd();
+        }
     }
 
     @Override
