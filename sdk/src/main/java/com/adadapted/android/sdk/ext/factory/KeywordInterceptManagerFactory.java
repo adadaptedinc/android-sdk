@@ -48,17 +48,17 @@ public class KeywordInterceptManagerFactory {
 
     private String determineInitEndpoint() {
         if(AdAdapted.getInstance().isProd()) {
-            return context.getString(R.string.prod_autofill_init_object_url);
+            return context.getString(R.string.prod_ki_init_object_url);
         }
 
-        return context.getString(R.string.sandbox_autofill_init_object_url);
+        return context.getString(R.string.sandbox_ki_init_object_url);
     }
 
     private String determineTrackEndpoint() {
         if(AdAdapted.getInstance().isProd()) {
-            return context.getString(R.string.prod_autofill_track_object_url);
+            return context.getString(R.string.prod_ki_track_object_url);
         }
 
-        return context.getString(R.string.sandbox_autofill_track_object_url);
+        return context.getString(R.string.sandbox_ki_track_object_url);
     }
 }
