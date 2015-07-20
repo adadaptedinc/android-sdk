@@ -1,22 +1,21 @@
 package com.adadapted.android.sdk.core.ad.model;
 
-import org.json.JSONObject;
-
 /**
  * Created by chrisweeden on 4/15/15.
  */
 public class JsonAdType extends AdType {
-    private JSONObject json;
+    private AdComponent components;
 
     public JsonAdType() {
         setType(AdTypes.JSON);
+        components = new AdComponent();
     }
 
-    public JSONObject getJson() {
-        return json;
+    public AdComponent getComponents() {
+        return components;
     }
 
-    public void setJson(JSONObject json) {
-        this.json = json;
+    public void setComponents(AdComponent components) {
+        this.components = components;
     }
 }
