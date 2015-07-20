@@ -35,25 +35,23 @@ public class AdRefreshScheduler extends Timer {
         adFetcher = AdFetcherFactory.getInstance(context).createAdFetcher();
     }
 
-    public void schedule(long interval, final Session session, final DeviceInfo deviceInfo) {
-        Log.d(TAG, "Scheduling next Ad refresh.");
+    public void schedule(final Session session, final DeviceInfo deviceInfo) {
+        Log.i(TAG, "Scheduling next Ad refresh.");
+        long interval = session.getPollingInterval();
         if(interval <= 0L) { return; }
 
         this.schedule(new TimerTask() {
 
             @Override
             public void run() {
-                Log.d(TAG, "AdRefreshScheduler fired.");
-
                 eventTracker.publishEvents();
                 keywordInterceptManager.publishEvents();
 
                 if(session.hasExpired()) {
-                    Log.d(TAG, "Session has expired.");
+                    Log.i(TAG, "Session has expired.");
                     sessionManager.reinitialize(deviceInfo, session);
                 }
                 else {
-                    Log.d(TAG, "Session has NOT expired.");
                     adFetcher.fetchAdsFor(deviceInfo, session);
                 }
             }

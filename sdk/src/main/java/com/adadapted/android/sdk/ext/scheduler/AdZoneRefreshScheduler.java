@@ -1,5 +1,7 @@
 package com.adadapted.android.sdk.ext.scheduler;
 
+import android.util.Log;
+
 import com.adadapted.android.sdk.core.ad.model.Ad;
 
 import java.util.Timer;
@@ -14,14 +16,16 @@ public class AdZoneRefreshScheduler extends Timer {
     private final Listener listener;
 
     public interface Listener {
-        void onAdZoneRefreshTimer();
+        void onAdZoneRefreshTimer(Ad ad);
     }
 
     public AdZoneRefreshScheduler(Listener listener) {
         this.listener = listener;
     }
 
-    public void schedule(Ad ad) {
+    public void schedule(final Ad ad) {
+        Log.d(TAG, "Scheduling Refresh For Ad " + ad.getAdId());
+
         long interval = ad.getRefreshTimeInMs();
         if(interval <= 0) { return; }
 
@@ -29,13 +33,13 @@ public class AdZoneRefreshScheduler extends Timer {
 
             @Override
             public void run() {
-                notifyAdZoneRefreshTimer();
+                notifyAdZoneRefreshTimer(ad);
             }
 
         }, interval);
     }
 
-    private void notifyAdZoneRefreshTimer() {
-        listener.onAdZoneRefreshTimer();
+    private void notifyAdZoneRefreshTimer(Ad ad) {
+        listener.onAdZoneRefreshTimer(ad);
     }
 }
