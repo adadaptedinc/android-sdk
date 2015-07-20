@@ -31,13 +31,12 @@ public class HttpEventAdapter implements EventAdapter {
 
     @Override
     public void sendBatch(final JSONArray json) {
-        Log.i(TAG, "event/batch JSON: " + json);
         JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST,
                 batchUrl, json, new Response.Listener<JSONArray>(){
 
             @Override
             public void onResponse(JSONArray response) {
-                Log.d(TAG, "Event Batch Request Succeeded.");
+                Log.i(TAG, "Event Batch Request Succeeded.");
                 notifyEventsPublished();
             }
 
@@ -45,7 +44,7 @@ public class HttpEventAdapter implements EventAdapter {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, "Event Batch Request Failed.", error);
+                Log.i(TAG, "Event Batch Request Failed.", error);
                 notifyEventsFailed(json);
             }
 
