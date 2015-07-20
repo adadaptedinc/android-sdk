@@ -1,9 +1,10 @@
 package com.adadapted.android.sdk.ui.view;
 
 import android.content.Context;
+import android.os.Handler;
 import android.view.View;
 
-import com.adadapted.android.sdk.ui.model.ViewAd;
+import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
 /**
  * Created by chrisweeden on 7/1/15.
@@ -18,6 +19,7 @@ class AdViewBuilder implements HtmlAdView.Listener, ImageAdView.Listener, JsonAd
     private final Context context;
 
     private Listener listener;
+    private Handler handler = new Handler();
 
     private ImageAdView adImageView;
     private HtmlAdView adWebView;
@@ -25,11 +27,13 @@ class AdViewBuilder implements HtmlAdView.Listener, ImageAdView.Listener, JsonAd
 
     public AdViewBuilder(Context context) {
         this.context = context;
+
+        // For whatever reason the WebView has to be created ahead of time.
+        // The App will likely crash if it is constructed on-demand.
+        adWebView = new HtmlAdView(context, this);
     }
 
-    public void buildView(ViewAd currentAd, int resourceId) {
-        resetListeners();
-
+    public void buildView(ViewAdWrapper currentAd, int resourceId) {
         switch(currentAd.getAdType()) {
             case HTML:
                 loadHtmlView(currentAd);
@@ -48,42 +52,34 @@ class AdViewBuilder implements HtmlAdView.Listener, ImageAdView.Listener, JsonAd
         }
     }
 
-    private void resetListeners() {
-        if(adImageView != null) {
-            adImageView.removeAdInteractionListener();
-        }
-
-        if(adWebView != null) {
-            adWebView.removeAdInteractionListener();
-        }
-
-        if(adJsonView != null) {
-            adJsonView.removeAdInteractionListener();
-        }
-    }
-
-    private void loadHtmlView(ViewAd currentAd) {
+    private void loadHtmlView(final ViewAdWrapper currentAd) {
         if(adWebView == null) {
             adWebView = new HtmlAdView(context, this);
         }
 
-        adWebView.buildView(currentAd.getAd());
+        loadView(adWebView, currentAd);
     }
 
-    private void loadImageView(ViewAd currentAd) {
+    private void loadImageView(final ViewAdWrapper currentAd) {
         if(adImageView == null) {
             adImageView = new ImageAdView(context, this);
         }
 
-        adImageView.buildView(currentAd.getAd());
+        loadView(adImageView, currentAd);
     }
 
-    private void loadJsonView(ViewAd currentAd, int resourceId) {
-        if(adJsonView == null) {
-            adJsonView = new JsonAdView(context, this, resourceId);
-        }
+    private void loadJsonView(final ViewAdWrapper currentAd, int resourceId) {
+        adJsonView = new JsonAdView(context, this, resourceId);
+        loadView(adJsonView, currentAd);
+    }
 
-        adJsonView.buildView(currentAd.getAd());
+    private void loadView(final AdView view, final ViewAdWrapper currentAd) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                view.buildView(currentAd.getAd());
+            }
+        });
     }
 
     public void setListener(Listener listener) {
@@ -103,14 +99,14 @@ class AdViewBuilder implements HtmlAdView.Listener, ImageAdView.Listener, JsonAd
     }
 
     public void onHtmlViewLoaded() {
-        notifyViewLoaded(adWebView);
+        notifyViewLoaded(adWebView.getView());
     }
 
     public void onImageViewLoaded() {
-        notifyViewLoaded(adImageView);
+        notifyViewLoaded(adImageView.getView());
     }
 
     public void onJsonViewLoaded() {
-        notifyViewLoaded(adJsonView);
+        notifyViewLoaded(adJsonView.getView());
     }
 }
