@@ -32,13 +32,12 @@ public class HttpSessionAdapter implements SessionAdapter {
     }
 
     public void sendInit(JSONObject json) {
-        Log.i(TAG, "session/init JSON: " + json);
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
                 initUrl, json, new Response.Listener<JSONObject>(){
 
             @Override
             public void onResponse(JSONObject response) {
-                Log.d(TAG, "Session Init Request Succeeded.");
+                Log.i(TAG, "Session Init Request Succeeded.");
                 notifySessionRequestCompleted(response);
             }
 
@@ -46,7 +45,7 @@ public class HttpSessionAdapter implements SessionAdapter {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, "Session Init Request Failed.", error);
+                Log.i(TAG, "Session Init Request Failed.", error);
                 notifySessionRequestFailed();
             }
 
@@ -57,13 +56,12 @@ public class HttpSessionAdapter implements SessionAdapter {
 
     @Override
     public void sendReinit(JSONObject json) {
-        Log.i(TAG, "session/reinit JSON: " + json);
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
                 reinitUrl, json, new Response.Listener<JSONObject>(){
 
             @Override
             public void onResponse(JSONObject response) {
-                Log.d(TAG, "Session Reinit Request Succeeded.");
+                Log.i(TAG, "Session Reinit Request Succeeded.");
                 if(response.length() > 0) {
                     notifySessionRequestCompleted(response);
                 }
@@ -76,7 +74,7 @@ public class HttpSessionAdapter implements SessionAdapter {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, "Session Reinit Request Failed.", error);
+                Log.i(TAG, "Session Reinit Request Failed.", error);
                 notifySessionReinitRequestFailed();
             }
 
@@ -115,13 +113,5 @@ public class HttpSessionAdapter implements SessionAdapter {
         for(Listener listener : listeners) {
             listener.onSessionReinitRequestFailed();
         }
-    }
-
-    @Override
-    public String toString() {
-        return "HttpSessionAdapter{" +
-                "initUrl='" + initUrl + '\'' +
-                ", reinitUrl='" + reinitUrl + '\'' +
-                '}';
     }
 }
