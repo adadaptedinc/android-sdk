@@ -5,6 +5,7 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.ad.AdBuilder;
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.AdAction;
+import com.adadapted.android.sdk.core.ad.model.AdComponent;
 import com.adadapted.android.sdk.core.ad.model.AdImage;
 import com.adadapted.android.sdk.core.ad.model.AdType;
 import com.adadapted.android.sdk.core.ad.model.ContentAdAction;
@@ -77,34 +78,43 @@ public class JsonAdBuilder implements AdBuilder {
         return ads;
     }
 
-    public Ad buildAd(JSONObject jsonAd) {
+    public Ad buildAd(JSONObject jsonAd) throws JSONException {
         Ad ad = new Ad();
 
-        try {
+        if(jsonAd.has(FIELD_AD_ID)) {
             ad.setAdId(jsonAd.getString(FIELD_AD_ID));
+        }
+
+        if(jsonAd.has(FIELD_ZONE)) {
             ad.setZoneId(jsonAd.getString(FIELD_ZONE));
+        }
+
+        if(jsonAd.has(FIELD_IMPRESSION_ID)) {
             ad.setImpressionId(jsonAd.getString(FIELD_IMPRESSION_ID));
+        }
 
-            try {
-                ad.setRefreshTime(Integer.parseInt(jsonAd.getString(FIELD_REFRESH_TIME)));
-            }
-            catch(NumberFormatException ex) {
-                Log.w(TAG, "Ad " + ad.getAdId() + " has an improperly set refresh_time.");
-                ad.setRefreshTime(DEFAULT_REFRESH_TIME);
-            }
+        try {
+            ad.setRefreshTime(Integer.parseInt(jsonAd.getString(FIELD_REFRESH_TIME)));
+        }
+        catch(NumberFormatException ex) {
+            Log.w(TAG, "Ad " + ad.getAdId() + " has an improperly set refresh_time.");
+            ad.setRefreshTime(DEFAULT_REFRESH_TIME);
+        }
 
+        if(jsonAd.has(FIELD_AD_TYPE)) {
             String adTypeCode = jsonAd.getString(FIELD_AD_TYPE);
             AdType adType = parseAdType(adTypeCode, jsonAd);
             ad.setAdType(adType);
+        }
 
+        if(jsonAd.has(FIELD_ACTION_TYPE)) {
             String actionTypeCode = jsonAd.getString(FIELD_ACTION_TYPE);
             AdAction adAction = parseAdAction(actionTypeCode, jsonAd);
             ad.setAdAction(adAction);
-
-            ad.setHideAfterInteraction(jsonAd.getString(FIELD_HIDE_AFTER_INTERACTION).equals("1"));
         }
-        catch(JSONException ex) {
-            Log.w(TAG, "Problem converting to JSON.", ex);
+
+        if(jsonAd.has(FIELD_HIDE_AFTER_INTERACTION)) {
+            ad.setHideAfterInteraction(jsonAd.getString(FIELD_HIDE_AFTER_INTERACTION).equals("1"));
         }
 
         return ad;
@@ -178,14 +188,37 @@ public class JsonAdBuilder implements AdBuilder {
         popup.setActionPath(actionPath);
 
         try {
-            popup.setHideBanner(Boolean.parseBoolean(popupJson.getString("hide_banner")));
-            popup.setTitle(popupJson.getString("title_text"));
-            popup.setBackgroundColor(popupJson.getString("background_color"));
-            popup.setTextColor(popupJson.getString("text_color"));
-            popup.setAltCloseButton(popupJson.getString("alt_close_btn"));
-            popup.setType(popupJson.getString("type"));
-            popup.setHideCloseButton(Boolean.parseBoolean(popupJson.getString("hide_close_btn")));
-            popup.setHideBrowserNavigation(Boolean.parseBoolean(popupJson.getString("hide_browser_nav")));
+            if(popupJson.has("hide_banner")) {
+                popup.setHideBanner(Boolean.parseBoolean(popupJson.getString("hide_banner")));
+            }
+
+            if(popupJson.has("title_text")) {
+                popup.setTitle(popupJson.getString("title_text"));
+            }
+
+            if(popupJson.has("background_color")) {
+                popup.setBackgroundColor(popupJson.getString("background_color"));
+            }
+
+            if(popupJson.has("text_color")) {
+                popup.setTextColor(popupJson.getString("text_color"));
+            }
+
+            if(popupJson.has("alt_close_btn")) {
+                popup.setAltCloseButton(popupJson.getString("alt_close_btn"));
+            }
+
+            if(popupJson.has("type")) {
+                popup.setType(popupJson.getString("type"));
+            }
+
+            if(popupJson.has("hide_close_btn")) {
+                popup.setHideCloseButton(Boolean.parseBoolean(popupJson.getString("hide_close_btn")));
+            }
+
+            if(popupJson.has("hide_browser_nav")) {
+                popup.setHideBrowserNavigation(Boolean.parseBoolean(popupJson.getString("hide_browser_nav")));
+            }
         }
         catch(JSONException ex) {
             Log.w(TAG, "Problem converting to JSON.", ex);
@@ -212,7 +245,9 @@ public class JsonAdBuilder implements AdBuilder {
         HtmlAdType adType = new HtmlAdType();
 
         try {
-            adType.setAdUrl(jsonAd.getString(FIELD_AD_URL));
+            if(jsonAd.has(FIELD_AD_URL)) {
+                adType.setAdUrl(jsonAd.getString(FIELD_AD_URL));
+            }
         }
         catch(JSONException ex) {
             Log.w(TAG, "Problem converting to JSON.", ex);
@@ -238,13 +273,66 @@ public class JsonAdBuilder implements AdBuilder {
         JsonAdType adType = new JsonAdType();
 
         try {
-            adType.setJson(jsonAd.getJSONObject(FIELD_JSON));
+            JSONObject jsonComponents = jsonAd.getJSONObject(FIELD_JSON);
+
+            AdComponent adComponents = parseJsonAdComponents(jsonComponents);
+            adType.setComponents(adComponents);
         }
         catch(JSONException ex) {
             Log.w(TAG, "Problem converting to JSON.", ex);
         }
 
         return adType;
+    }
+
+    private AdComponent parseJsonAdComponents(JSONObject json) throws JSONException {
+        AdComponent adComponents = new AdComponent();
+
+        if(json.has("ad_cta_1")) {
+            adComponents.setCta1(json.getString("ad_cta_1"));
+        }
+
+        if(json.has("ad_cta_2")) {
+            adComponents.setCta2(json.getString("ad_cta_2"));
+        }
+
+        if(json.has("ad_campaign_img")) {
+            adComponents.setCampaignImage(json.getString("ad_campaign_img"));
+        }
+
+        if(json.has("ad_sponsor_logo")) {
+            adComponents.setSponsorLogo(json.getString("ad_sponsor_logo"));
+        }
+
+        if(json.has("ad_sponsor_name")) {
+            adComponents.setSponsorName(json.getString("ad_sponsor_name"));
+        }
+
+        if(json.has("ad_title")) {
+            adComponents.setTitle(json.getString("ad_title"));
+        }
+
+        if(json.has("ad_tagline")) {
+            adComponents.setTagLine(json.getString("ad_tagline"));
+        }
+
+        if(json.has("ad_text_long")) {
+            adComponents.setLongText(json.getString("ad_text_long"));
+        }
+
+        if(json.has("ad_sponsor_text")) {
+            adComponents.setSponsorText(json.getString("ad_sponsor_text"));
+        }
+
+        if(json.has("ad_app_icon_1")) {
+            adComponents.setAppIcon1(json.getString("ad_app_icon_1"));
+        }
+
+        if(json.has("ad_app_icon_2")) {
+            adComponents.setAppIcon2(json.getString("ad_app_icon_2"));
+        }
+
+        return adComponents;
     }
 
     private Map<String, AdImage> parseImages(JSONObject jsonImages) {
@@ -271,10 +359,5 @@ public class JsonAdBuilder implements AdBuilder {
         }
 
         return images;
-    }
-
-    @Override
-    public String toString() {
-        return "AdBuilder{}";
     }
 }
