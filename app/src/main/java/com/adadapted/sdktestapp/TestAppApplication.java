@@ -4,7 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import com.adadapted.android.sdk.AdAdapted;
-import com.adadapted.android.sdk.core.content.ContentPayload;
+import com.adadapted.android.sdk.ui.model.ContentPayload;
 import com.newrelic.agent.android.NewRelic;
 
 /**

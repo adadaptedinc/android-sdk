@@ -7,18 +7,22 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ListView;
 
 import com.adadapted.android.sdk.AdAdapted;
-import com.adadapted.android.sdk.core.content.ContentPayload;
-import com.adadapted.android.sdk.ui.view.AaZoneView;
+import com.adadapted.android.sdk.ui.adapter.AaFeedAdapter;
+import com.adadapted.android.sdk.ui.model.ContentPayload;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.todo.TodoList;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;
+import com.adadapted.sdktestapp.util.DimConverter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,8 +46,8 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
     private TodoList list;
 
     private TodoListItemAdapter adapter;
-    private AaZoneView aaZoneView;
-    //private AaFeedAdapter feedAdapter;
+    //private AaZoneView aaZoneView;
+    private AaFeedAdapter feedAdapter;
     private DialogFragment dialog;
 
     private OnFragmentInteractionListener mListener;
@@ -81,24 +85,31 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
 
         list = TodoListManager.getInstance(getActivity()).getList(listId);
 
+        //aaZoneView = new AaZoneView(getActivity());
+        //aaZoneView.init("100682");
+        //aaZoneView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, 90));
+
         getActivity().setTitle(list.getName());
 
         dialog = new NewListItemDialogFragment();
     }
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView() called.");
+
+        View view = inflater.inflate(R.layout.fragment_todo_list_detail, container, false);
+
+        ListView listView = (ListView)view.findViewById(android.R.id.list);
+        //listView.addFooterView(aaZoneView);
 
         adapter = new TodoListItemAdapter(getActivity(), list.getItems());
-        //feedAdapter = new AaFeedAdapter(getActivity(), adapter, "100682", 3, 90, 8);
-        //setListAdapter(feedAdapter);
-        setListAdapter(adapter);
+        feedAdapter = new AaFeedAdapter(getActivity(), adapter, "100682", 3,
+                new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,
+                        DimConverter.convertDpToPx(getActivity(), 90)));
+        setListAdapter(feedAdapter);
+        //setListAdapter(adapter);
 
-        aaZoneView = new AaZoneView(getActivity());
-        aaZoneView.init("100682");
-        ListView listView = getListView();
-        listView.addFooterView(aaZoneView);
+        return view;
     }
 
     @Override
@@ -108,8 +119,8 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
         Log.w(TAG, "onResume() called.");
 
         AdAdapted.getInstance().addListener(this);
-        //feedAdapter.onStart();
-        aaZoneView.onStart();
+        feedAdapter.onStart();
+        //aaZoneView.onStart();
     }
 
     @Override
@@ -119,8 +130,8 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
         super.onPause();
 
         AdAdapted.getInstance().removeListener(this);
-        //feedAdapter.onStop();
-        aaZoneView.onStop();
+        feedAdapter.onStop();
+        //aaZoneView.onStop();
     }
 
     @Override
@@ -145,8 +156,8 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
-        //Object item = feedAdapter.getItem(position);
-        Object item = adapter.getItem(position);
+        Object item = feedAdapter.getItem(position);
+        //Object item = adapter.getItem(position);
 
         Log.d(TAG, "Feed Item Clicked: " + item);
     }
