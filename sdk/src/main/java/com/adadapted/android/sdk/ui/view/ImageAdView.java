@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Handler;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -20,20 +18,21 @@ import com.adadapted.android.sdk.ext.http.HttpAdImageLoader;
 /**
  * Created by chrisweeden on 5/20/15.
  */
-class ImageAdView extends ImageView implements AdView, HttpAdImageLoader.Listener {
+class ImageAdView implements AdView {
     private static final String TAG = ImageAdView.class.getName();
 
     private final HttpAdImageLoader imageLoader;
+
+    private final Context context;
+    private final ImageView view;
 
     private Bitmap adImage;
 
     private final Runnable buildAdRunnable = new Runnable() {
         public void run() {
-            Log.d(TAG, "Setting image view bitmap.");
-            setImageBitmap(adImage);
+            view.setImageBitmap(adImage);
         }
     };
-
     private final Handler buildAdHandler = new Handler();
 
     public interface Listener {
@@ -41,43 +40,33 @@ class ImageAdView extends ImageView implements AdView, HttpAdImageLoader.Listene
     }
 
     private final Listener listener;
-    private AdInteractionListener adInteractionListener;
 
     public ImageAdView(final Context context, final Listener listener) {
-        super(context);
-
+        this.context = context;
         this.listener = listener;
 
         imageLoader = new HttpAdImageLoader();
-        imageLoader.addListener(this);
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
-        setLayoutParams(layoutParams);
 
-        setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        notifyOnClick();
-                        break;
-                }
-
-                return true;
-            }
-        });
+        view = new ImageView(context);
+        view.setLayoutParams(layoutParams);
     }
 
     private String getPresentOrientation() {
-        int orientation = getContext().getResources().getConfiguration().orientation;
+        int orientation = context.getResources().getConfiguration().orientation;
 
         if(orientation == Configuration.ORIENTATION_LANDSCAPE) {
             return AdImage.LANDSCAPE;
         }
 
         return AdImage.PORTRAIT;
+    }
+
+    public View getView() {
+        return view;
     }
 
     @Override
@@ -87,37 +76,17 @@ class ImageAdView extends ImageView implements AdView, HttpAdImageLoader.Listene
         String imageResolution = AdAdapted.getInstance().getDeviceInfo().chooseImageSize();
 
         String imageUrl = adType.getImageUrlFor(imageResolution, getPresentOrientation());
-        imageLoader.getImage(imageUrl);
-    }
+        imageLoader.getImage(imageUrl, new HttpAdImageLoader.Listener() {
+            @Override
+            public void onAdImageLoaded(Bitmap bitmap) {
+                adImage = bitmap;
+                buildAdHandler.post(buildAdRunnable);
 
-    @Override
-    public void setAdInteractionListener(AdInteractionListener listener) {
-        this.adInteractionListener = listener;
-    }
+                listener.onImageViewLoaded();
+            }
 
-    @Override
-    public void removeAdInteractionListener() {
-        adInteractionListener = null;
-    }
-
-    private void notifyOnClick() {
-        if(adInteractionListener != null) {
-            adInteractionListener.onClick();
-        }
-    }
-
-    @Override
-    public void onAdImageLoaded(Bitmap bitmap) {
-        Log.d(TAG, "Calling onAdImageLoaded()");
-
-        adImage = bitmap;
-        buildAdHandler.post(buildAdRunnable);
-
-        listener.onImageViewLoaded();
-    }
-
-    @Override
-    public void onAdImageLoadFailed() {
-        Log.d(TAG, "Calling onAdImageLoadFailed()");
+            @Override
+            public void onAdImageLoadFailed() {}
+        });
     }
 }
