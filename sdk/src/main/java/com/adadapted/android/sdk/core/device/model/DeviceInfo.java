@@ -13,7 +13,6 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.TimeZone;
 
