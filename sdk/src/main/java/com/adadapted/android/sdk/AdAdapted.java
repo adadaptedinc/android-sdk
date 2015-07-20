@@ -3,13 +3,13 @@ package com.adadapted.android.sdk;
 import android.content.Context;
 import android.util.Log;
 
-import com.adadapted.android.sdk.core.content.ContentPayload;
 import com.adadapted.android.sdk.core.device.BuildDeviceInfoParam;
 import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.device.DeviceInfoBuilder;
 import com.adadapted.android.sdk.core.session.SessionManager;
 import com.adadapted.android.sdk.ext.cache.ImageCache;
 import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
+import com.adadapted.android.sdk.ui.model.ContentPayload;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -41,10 +41,9 @@ public class AdAdapted implements DeviceInfoBuilder.Listener {
     private final Set<DelegateListener> delegateListeners;
 
     private final Context context;
+    private final boolean isProdMode;
 
     private DeviceInfo deviceInfo;
-
-    private final boolean isProdMode;
 
     private AdAdapted(Context context, String appId, String[] zones, boolean isProdMode) {
         this.adEventListeners = new HashSet<>();
