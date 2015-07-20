@@ -59,27 +59,27 @@ public class KeywordInterceptManager implements KeywordInterceptAdapter.Listener
         adapter.init(request);
     }
 
+    public void trackMatched(Session session, String term, String userInput) {
+        trackEvent(session, term, userInput, KeywordInterceptEvent.MATCHED);
+    }
+
     public void trackPresented(Session session, String term, String userInput) {
-        KeywordInterceptEvent event = new KeywordInterceptEvent(
-                session.getSessionId(),
-                deviceInfo.getAppId(),
-                deviceInfo.getUdid(),
-                KeywordInterceptEvent.PRESENTED,
-                userInput,
-                term,
-                deviceInfo.getSdkVersion());
-        fileEvent(event);
+        trackEvent(session, term, userInput, KeywordInterceptEvent.PRESENTED);
     }
 
     public void trackSelected(Session session, String term, String userInput) {
-        KeywordInterceptEvent event = new KeywordInterceptEvent(
-                session.getSessionId(),
-                deviceInfo.getAppId(),
-                deviceInfo.getUdid(),
-                KeywordInterceptEvent.SELECTED,
-                userInput,
-                term,
-                deviceInfo.getSdkVersion());
+        trackEvent(session, term, userInput, KeywordInterceptEvent.SELECTED);
+    }
+
+    private void trackEvent(Session session, String term, String userInput, String eventType) {
+        String appId = deviceInfo.getAppId();
+        String sessionId = session != null ? session.getSessionId() : "";
+        String udid = deviceInfo.getUdid();
+        String searchId = keywordIntercept.getSearchId();
+        String sdkVersion = deviceInfo.getSdkVersion();
+
+        KeywordInterceptEvent event = new KeywordInterceptEvent(appId, sessionId, udid, searchId,
+                eventType, userInput, term, sdkVersion);
         fileEvent(event);
     }
 
@@ -110,7 +110,6 @@ public class KeywordInterceptManager implements KeywordInterceptAdapter.Listener
 
         for(KeywordInterceptEvent e : keywordInterceptEvents) {
             if(event.supercedes(e)) {
-                Log.d(TAG, "Superceded: " + e);
                 events.remove(e);
             }
         }
@@ -153,10 +152,13 @@ public class KeywordInterceptManager implements KeywordInterceptAdapter.Listener
     public void onInitFailed() {}
 
     @Override
-    public void onTrackSuccess() {}
+    public void onTrackSuccess() {
+        failedRetries = 0;
+    }
 
     @Override
     public void onTrackFailed(JSONArray json) {
+        failedRetries++;
         sendBatchRetry(json);
     }
 }
