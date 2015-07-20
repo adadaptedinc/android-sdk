@@ -3,14 +3,16 @@ package com.adadapted.android.sdk.ext.http;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptAdapter;
-import com.adadapted.android.sdk.core.keywordintercept.model.KeywordIntercept;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -34,44 +36,45 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
     @Override
     public void init(JSONObject json) {
         Log.i(TAG, "ki/init JSON: " + json);
-        //JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
-        //        initUrl, json, new Response.Listener<JSONObject>(){
-        //    @Override
-        //    public void onResponse(JSONObject jsonObject) {
-        //        Log.d(TAG, "KI Init Request Succeeded.");
-        //        notifyInitSuccess(jsonObject);
-        //    }
-        //}, new Response.ErrorListener() {
-        //    @Override
-        //    public void onErrorResponse(VolleyError volleyError) {
-        //        Log.d(TAG, "KI Init Request Failed.");
-        //        notifyInitFailed();
-        //    }
-        //});
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
+                initUrl, json, new Response.Listener<JSONObject>(){
+            @Override
+            public void onResponse(JSONObject jsonObject) {
+                Log.d(TAG, "KI Init Request Succeeded.");
+                notifyInitSuccess(jsonObject);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Log.d(TAG, "KI Init Request Failed.");
+                notifyInitFailed();
+            }
+        });
 
-        //HttpRequestManager.getQueue().add(jsonRequest);
+        HttpRequestManager.getQueue().add(jsonRequest);
 
         notifyInitSuccess(new JSONObject());
     }
 
     @Override
-    public void track(JSONArray json) {
+    public void track(final JSONArray json) {
         Log.i(TAG, "ki/track JSON: " + json);
-        //JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
-        //        trackUrl, json, new Response.Listener<JSONObject>(){
-        //    @Override
-        //    public void onResponse(JSONObject jsonObject) {
-        //        Log.d(TAG, "KI Track Request Succeeded.");
-        //    }
-        //}, new Response.ErrorListener() {
-        //    @Override
-        //    public void onErrorResponse(VolleyError volleyError) {
-        //        Log.d(TAG, "KI Track Request Failed.");
-        //            notifyTrackFailed(json);
-        //    }
-        //});
+        JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST,
+                trackUrl, json, new Response.Listener<JSONArray>(){
+            @Override
+            public void onResponse(JSONArray jsonObject) {
+                Log.d(TAG, "KI Track Request Succeeded.");
+                notifyTrackSuccess();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Log.d(TAG, "KI Track Request Failed.");
+                notifyTrackFailed(json);
+            }
+        });
 
-        //HttpRequestManager.getQueue().add(jsonRequest);
+        HttpRequestManager.getQueue().add(jsonRequest);
     }
 
     public void addListener(Listener listener) {
