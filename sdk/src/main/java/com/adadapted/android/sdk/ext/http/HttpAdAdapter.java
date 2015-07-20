@@ -28,20 +28,19 @@ public class HttpAdAdapter implements AdAdapter {
 
     @Override
     public void getAds(JSONObject json) {
-        Log.i(TAG, "ad/get JSON: " + json);
         JsonObjectRequest request = new JsonObjectRequest(adGetUrl, json,
             new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject jsonObject) {
                     notifyAdGetRequestCompleted(jsonObject);
-                    Log.d(TAG, "Ad Get Request Succeeded.");
+                    Log.i(TAG, "Ad Get Request Succeeded.");
                 }
             },
             new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError volleyError) {
                     notifyAdGetRequestFailed();
-                    Log.d(TAG, "Ad Get Request Failed.");
+                    Log.i(TAG, "Ad Get Request Failed.");
                 }
             }
         );
