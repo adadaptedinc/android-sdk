@@ -1,7 +1,5 @@
 package com.adadapted.android.sdk.core.keywordintercept.model;
 
-import com.adadapted.android.sdk.core.ad.model.Ad;
-
 import java.util.Map;
 
 /**
@@ -10,15 +8,12 @@ import java.util.Map;
 public class KeywordIntercept {
     private final String searchId;
     private final long refreshTime;
-    private final Map<String, String> autofill;
-    private final Map<String, Ad> trigger;
+    private final Map<String, AutoFill> autofill;
 
-    public KeywordIntercept(String searchId, long refreshTime,
-                            Map<String, String> autofill, Map<String, Ad> trigger) {
+    public KeywordIntercept(String searchId, long refreshTime, Map<String, AutoFill> autofill) {
         this.searchId = searchId;
         this.refreshTime = refreshTime;
         this.autofill = autofill;
-        this.trigger = trigger;
     }
 
     public String getSearchId() {
@@ -29,11 +24,7 @@ public class KeywordIntercept {
         return refreshTime;
     }
 
-    public Map<String, String> getAutofill() {
+    public Map<String, AutoFill> getAutofill() {
         return autofill;
-    }
-
-    public Map<String, Ad> getTrigger() {
-        return trigger;
     }
 }
