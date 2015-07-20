@@ -11,5 +11,4 @@ import java.util.Map;
  */
 public interface ZoneBuilder {
     Map<String, Zone> buildZones(JSONObject jsonZones);
-    Zone buildZone(String zoneId, JSONObject jsonZone);
 }
