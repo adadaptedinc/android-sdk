@@ -28,16 +28,29 @@ public class JsonSessionBuilder implements SessionBuilder {
         Session session = new Session();
 
         try {
-            session.setSessionId(response.getString("session_id"));
-            session.setActiveCampaigns(response.getBoolean("active_campaigns"));
-            session.setExpiresAt(response.getLong("session_expires_at"));
-            session.setPollingInterval(response.getLong("polling_interval_ms"));
+            if(response.has("session_id")) {
+                session.setSessionId(response.getString("session_id"));
+            }
+
+            if(response.has("active_campaigns")) {
+                session.setActiveCampaigns(response.getBoolean("active_campaigns"));
+            }
+
+            if(response.has("session_expires_at")) {
+                session.setExpiresAt(response.getLong("session_expires_at"));
+            }
+
+            if(response.has("polling_interval_ms")) {
+                session.setPollingInterval(response.getLong("polling_interval_ms"));
+            }
 
             if(session.hasActiveCampaigns()) {
-                JSONObject jsonZones = response.getJSONObject("zones");
-                Map<String, Zone> zones = zoneBuilder.buildZones(jsonZones);
+                if(response.has("zones")) {
+                    JSONObject jsonZones = response.getJSONObject("zones");
+                    Map<String, Zone> zones = zoneBuilder.buildZones(jsonZones);
 
-                session.updateZones(zones);
+                    session.updateZones(zones);
+                }
             }
         }
         catch(JSONException ex) {
