@@ -6,7 +6,7 @@ import java.io.Serializable;
  * Created by chrisweeden on 4/9/15.
  */
 public abstract class AdAction implements Serializable {
-    static final long serialVersionUID = 42L;
+    private static final long serialVersionUID = 42L;
 
     public static final String CONTENT = "content";
     public static final String DELEGATE = "delegate";
