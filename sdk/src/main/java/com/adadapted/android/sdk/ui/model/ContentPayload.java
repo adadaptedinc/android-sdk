@@ -3,7 +3,6 @@ package com.adadapted.android.sdk.ui.model;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.model.ContentAdAction;
-import com.adadapted.android.sdk.ui.model.ViewAd;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,17 +21,17 @@ public class ContentPayload {
 
     public static final String FIELD_ADD_TO_LIST_ITEMS = "add_to_list_items";
 
-    private final ViewAd ad;
+    private final ViewAdWrapper ad;
     private final int type;
     private final JSONObject payload;
 
-    private ContentPayload(ViewAd ad, int type, JSONObject payload) {
+    private ContentPayload(ViewAdWrapper ad, int type, JSONObject payload) {
         this.ad = ad;
         this.type = type;
         this.payload = payload;
     }
 
-    public static ContentPayload createAddToListContent(ViewAd ad) {
+    public static ContentPayload createAddToListContent(ViewAdWrapper ad) {
         List items = ((ContentAdAction)ad.getAd().getAdAction()).getItems();
         JSONObject json = new JSONObject();
 
@@ -46,7 +45,7 @@ public class ContentPayload {
         return new ContentPayload(ad, ADD_TO_LIST, json);
     }
 
-    public static ContentPayload createRecipeFavoriteContent(ViewAd ad) {
+    public static ContentPayload createRecipeFavoriteContent(ViewAdWrapper ad) {
         return new ContentPayload(ad, RECIPE_FAVORITE, new JSONObject());
     }
 
