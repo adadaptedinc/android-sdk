@@ -9,56 +9,44 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Created by chrisweeden on 3/30/15.
  */
 public class HttpAdImageLoader implements AdImageLoader {
     private static final String TAG = HttpAdImageLoader.class.getName();
 
-    private final Set<Listener> listeners;
-
     public HttpAdImageLoader() {
-        listeners = new HashSet<>();
+
     }
 
-    public void getImage(String url) {
+    public void getImage(final String url, final Listener listener) {
         if(url == null) {
             Log.w(TAG, "No URL has been provided.");
-            notifyAdImageLoadFailed();
+            notifyAdImageLoadFailed(listener);
             return;
         }
 
-        Log.d(TAG, "Grabbing image: " + url);
-
         Bitmap bitmap = ImageCache.getInstance().getImage(url);
 
-        if(bitmap == null)
-        {
-            Log.d(TAG, "Image Cache Miss.");
-            loadRemoteImage(url);
+        if(bitmap == null) {
+            loadRemoteImage(url, listener);
         }
-        else
-        {
-            Log.d(TAG, "Image Cache Hit.");
-            notifyAdImageLoaded(bitmap);
+        else {
+            notifyAdImageLoaded(listener, bitmap);
         }
     }
 
-    private void loadRemoteImage(final String url) {
+    private void loadRemoteImage(final String url, final Listener listener) {
         ImageRequest imageRequest = new ImageRequest(url,
             new Response.Listener<Bitmap>() {
 
                 @Override
                 public void onResponse(Bitmap response) {
                     if(null == ImageCache.getInstance().getImage(url)) {
-                        Log.d(TAG, "Loaded image " + url);
                         ImageCache.getInstance().putImage(url, response);
                     }
 
-                    notifyAdImageLoaded(response);
+                    notifyAdImageLoaded(listener, response);
                 }
 
             }, 0, 0, Bitmap.Config.ARGB_8888,
@@ -67,8 +55,7 @@ public class HttpAdImageLoader implements AdImageLoader {
 
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.d(TAG, "Problem retrieving Ad Image.", error);
-                    notifyAdImageLoadFailed();
+                    notifyAdImageLoadFailed(listener);
                 }
             }
         );
@@ -76,27 +63,17 @@ public class HttpAdImageLoader implements AdImageLoader {
         HttpRequestManager.getQueue().add(imageRequest);
     }
 
-    public void addListener(HttpAdImageLoader.Listener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeListener(HttpAdImageLoader.Listener listener) {
-        listeners.remove(listener);
-    }
-
-    private void notifyAdImageLoaded(Bitmap bitmap) {
-        if(bitmap != null) {
-            for(HttpAdImageLoader.Listener listener : listeners) {
-                listener.onAdImageLoaded(bitmap);
-            }
+    private void notifyAdImageLoaded(Listener listener, Bitmap bitmap) {
+        if(listener != null & bitmap != null) {
+            listener.onAdImageLoaded(bitmap);
         }
         else {
             Log.w(TAG, "No Bitmap to return.");
         }
     }
 
-    private void notifyAdImageLoadFailed() {
-        for(HttpAdImageLoader.Listener listener : listeners) {
+    private void notifyAdImageLoadFailed(Listener listener) {
+        if(listener != null) {
             listener.onAdImageLoadFailed();
         }
     }
