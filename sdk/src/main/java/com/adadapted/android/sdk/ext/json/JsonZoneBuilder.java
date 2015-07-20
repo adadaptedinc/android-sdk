@@ -31,8 +31,7 @@ public class JsonZoneBuilder implements ZoneBuilder {
         Map<String, Zone> zones = new HashMap<>();
 
         try {
-            for(Iterator<String> z = jsonZones.keys(); z.hasNext();)
-            {
+            for(Iterator<String> z = jsonZones.keys(); z.hasNext();) {
                 String zoneId = z.next();
                 JSONObject jsonZone = jsonZones.getJSONObject(zoneId);
                 Zone zone = buildZone(zoneId, jsonZone);
