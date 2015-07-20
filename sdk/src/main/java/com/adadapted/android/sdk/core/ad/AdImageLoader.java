@@ -11,5 +11,5 @@ public interface AdImageLoader {
         void onAdImageLoadFailed();
     }
 
-    void getImage(String url);
+    void getImage(String url, Listener listener);
 }
