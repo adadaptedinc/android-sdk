@@ -18,13 +18,13 @@ import java.util.Set;
 public class AaAutoCompleteAdapter extends ArrayAdapter<String> {
     private static final String TAG = AaAutoCompleteAdapter.class.getName();
 
-    private final AaKeyworkInterceptMatcher matcher;
+    private final AaKeywordInterceptMatcher matcher;
     private final List<String> allItems;
 
     public AaAutoCompleteAdapter(Context context, int resource, List<String> items) {
         super(context, resource, items);
 
-        matcher = new AaKeyworkInterceptMatcher(context);
+        matcher = new AaKeywordInterceptMatcher(context);
         allItems = new ArrayList<>(items);
     }
 

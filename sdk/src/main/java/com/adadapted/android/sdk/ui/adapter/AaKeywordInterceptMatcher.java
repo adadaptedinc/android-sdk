@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.ui.adapter;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptManager;
@@ -19,8 +18,8 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 6/25/15.
  */
-public class AaKeyworkInterceptMatcher implements SessionManager.Listener, KeywordInterceptManager.Listener {
-    private static final String TAG = AaKeyworkInterceptMatcher.class.getName();
+public class AaKeywordInterceptMatcher implements SessionManager.Listener, KeywordInterceptManager.Listener {
+    private static final String TAG = AaKeywordInterceptMatcher.class.getName();
 
     private final KeywordInterceptManager manager;
     private final AaSuggestionTracker suggestionTracker;
@@ -29,7 +28,7 @@ public class AaKeyworkInterceptMatcher implements SessionManager.Listener, Keywo
     private boolean loaded = false;
     private Session session;
 
-    public AaKeyworkInterceptMatcher(Context context) {
+    public AaKeywordInterceptMatcher(Context context) {
         manager = KeywordInterceptManagerFactory.getInstance(context).createKeywordInterceptManager();
         manager.setListener(this);
 
