@@ -4,26 +4,30 @@ import android.content.Context;
 import android.util.Log;
 
 import com.adadapted.android.sdk.AdAdapted;
+import com.adadapted.android.sdk.core.ad.AdFetcher;
 import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.session.model.Session;
+import com.adadapted.android.sdk.core.zone.model.Zone;
 import com.adadapted.android.sdk.ext.scheduler.AdRefreshScheduler;
 import com.adadapted.android.sdk.ext.scheduler.EventFlushScheduler;
 
 import org.json.JSONObject;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * Created by chrisweeden on 3/23/15.
  */
-public class SessionManager implements SessionAdapter.Listener {
+public class SessionManager implements SessionAdapter.Listener, AdFetcher.Listener {
     private static final String TAG = SessionManager.class.getName();
 
     public interface Listener {
         void onSessionInitialized(Session session);
         void onSessionInitFailed();
         void onSessionNotReinitialized();
+        void onNewAdsAvailable(Session session);
     }
 
     private final Set<Listener> listeners;
@@ -65,6 +69,11 @@ public class SessionManager implements SessionAdapter.Listener {
         httpSessionAdapter.sendReinit(request);
     }
 
+    public void scheduleAdRefresh() {
+        new AdRefreshScheduler(context).schedule(getCurrentSession(),
+                AdAdapted.getInstance().getDeviceInfo());
+    }
+
     public void addListener(Listener listener) {
         if(sessionLoaded) {
             listener.onSessionInitialized(currentSession);
@@ -95,6 +104,12 @@ public class SessionManager implements SessionAdapter.Listener {
         }
     }
 
+    private void notifyNewAdsAvailable() {
+        for(Listener listener: listeners) {
+            listener.onNewAdsAvailable(currentSession);
+        }
+    }
+
     @Override
     public void onSessionInitRequestCompleted(JSONObject response) {
         Log.d(TAG, "onSessionInitRequestCompleted() Called");
@@ -102,8 +117,8 @@ public class SessionManager implements SessionAdapter.Listener {
         currentSession = sessionBuilder.buildSession(response);
         sessionLoaded = true;
 
-        new AdRefreshScheduler(context).schedule(getCurrentSession(), AdAdapted.getInstance().getDeviceInfo());
-        new EventFlushScheduler(context).start();
+        scheduleAdRefresh();
+        new EventFlushScheduler(context).start(20000L);
 
         notifySessionInitialized();
     }
@@ -124,10 +139,12 @@ public class SessionManager implements SessionAdapter.Listener {
     }
 
     @Override
-    public String toString() {
-        return "SessionManager{" +
-                "listeners=" + listeners +
-                ", httpSessionAdapter=" + httpSessionAdapter +
-                '}';
+    public void onAdsRefreshed(Map<String, Zone> zones) {
+        currentSession.updateZones(zones);
+        scheduleAdRefresh();
+        notifyNewAdsAvailable();
     }
+
+    @Override
+    public void onAdsNotRefreshed() {}
 }

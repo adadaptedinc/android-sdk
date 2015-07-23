@@ -16,7 +16,7 @@ public class Session {
     private boolean activeCampaigns = false;
     private Date expiresAt;
     private long pollingInterval = 300000;
-    private final Map<String, Zone> zones;
+    private Map<String, Zone> zones;
 
     public Session() {
         this.zones = new HashMap<>();
@@ -78,18 +78,11 @@ public class Session {
     }
 
     public void updateZones(Map<String, Zone> zones) {
-        this.zones.clear();
-        this.zones.putAll(zones);
+        this.zones = new HashMap<>(zones);
     }
 
     @Override
     public String toString() {
-        return "Session{" +
-                "sessionId='" + sessionId + '\'' +
-                ", activeCampaigns=" + activeCampaigns +
-                ", expiresAt=" + expiresAt +
-                ", pollingInterval=" + pollingInterval +
-                ", zones=" + zones +
-                '}';
+        return "Session{}";
     }
 }
