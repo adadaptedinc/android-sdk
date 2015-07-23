@@ -1,4 +1,4 @@
-package com.adadapted.sdktestapp.ui.recipe;
+package com.adadapted.sdktestapp.ui.recipe.fragment;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;

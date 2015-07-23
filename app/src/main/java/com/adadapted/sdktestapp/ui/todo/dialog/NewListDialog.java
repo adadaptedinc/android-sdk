@@ -1,4 +1,4 @@
-package com.adadapted.sdktestapp.ui.todo;
+package com.adadapted.sdktestapp.ui.todo.dialog;
 
 import android.app.DialogFragment;
 import android.os.Bundle;

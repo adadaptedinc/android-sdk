@@ -1,4 +1,4 @@
-package com.adadapted.sdktestapp.ui.recipe;
+package com.adadapted.sdktestapp.ui.recipe.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,7 +9,6 @@ import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -17,6 +16,7 @@ import com.adadapted.android.sdk.ui.view.AaZoneView;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.recipe.Recipe;
 import com.adadapted.sdktestapp.core.recipe.RecipeManager;
+import com.adadapted.sdktestapp.ui.recipe.activity.RecipeDetailActivity;
 
 import java.util.List;
 
@@ -74,7 +74,6 @@ public class RecipesFragment extends ListFragment implements RecipeManager.Liste
         }
 
         aaZoneView = new AaZoneView(getActivity());
-        aaZoneView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, 320));
         aaZoneView.init("100680");
     }
 
@@ -163,7 +162,7 @@ public class RecipesFragment extends ListFragment implements RecipeManager.Liste
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction(Uri uri);
     }
 
 }

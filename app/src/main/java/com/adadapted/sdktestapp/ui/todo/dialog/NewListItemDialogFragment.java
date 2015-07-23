@@ -1,4 +1,4 @@
-package com.adadapted.sdktestapp.ui.todo;
+package com.adadapted.sdktestapp.ui.todo.dialog;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -57,7 +57,7 @@ public class NewListItemDialogFragment extends DialogFragment {
                 Log.d(TAG, "onClick() Save Called.");
                 String userEntry = actv.getText().toString();
 
-                //adapter.getTracker().suggestionSelected(userEntry);
+                adapter.suggestionSelected(userEntry);
 
                 mListener.onDialogPositiveClick(userEntry);
             }

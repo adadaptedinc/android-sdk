@@ -1,4 +1,4 @@
-package com.adadapted.sdktestapp.ui.todo;
+package com.adadapted.sdktestapp.ui.todo.activity;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -10,6 +10,8 @@ import android.view.MenuItem;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;
 import com.adadapted.sdktestapp.ui.SingleFragmentActivity;
+import com.adadapted.sdktestapp.ui.todo.dialog.NewListItemDialogFragment;
+import com.adadapted.sdktestapp.ui.todo.fragment.TodoListDetailFragment;
 
 import java.util.UUID;
 

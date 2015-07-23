@@ -1,4 +1,4 @@
-package com.adadapted.sdktestapp.ui.todo;
+package com.adadapted.sdktestapp.ui.todo.fragment;
 
 import android.app.Activity;
 import android.net.Uri;
@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.adadapted.android.sdk.ui.view.AaZoneView;
@@ -91,7 +90,6 @@ public class ItemDetailFragment extends Fragment {
         nameTextView.setText(item.getName());
 
         aaZoneView = (AaZoneView)view.findViewById(R.id.fragment_item_detail_aa_zone);
-        aaZoneView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, 120));
         aaZoneView.init("10");
 
         return view;

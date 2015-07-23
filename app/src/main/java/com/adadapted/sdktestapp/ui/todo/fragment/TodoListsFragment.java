@@ -1,4 +1,4 @@
-package com.adadapted.sdktestapp.ui.todo;
+package com.adadapted.sdktestapp.ui.todo.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,7 +9,7 @@ import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -17,6 +17,7 @@ import com.adadapted.android.sdk.ui.view.AaZoneView;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.todo.TodoList;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;
+import com.adadapted.sdktestapp.ui.todo.activity.TodoListDetailActivity;
 
 import java.util.List;
 
@@ -55,8 +56,10 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        lists = TodoListManager.getInstance(getActivity()).getLists();
+        adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, lists);
+
         aaZoneView = new AaZoneView(getActivity());
-        aaZoneView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, 320));
         aaZoneView.init("100680");
     }
 
@@ -65,10 +68,6 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
 
         ListView listView = (ListView)view.findViewById(android.R.id.list);
         listView.addFooterView(aaZoneView);
-
-        lists = TodoListManager.getInstance(getActivity()).getLists();
-
-        adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, lists);
         listView.setAdapter(adapter);
 
         return view;
@@ -79,7 +78,6 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
         super.onResume();
 
         TodoListManager.getInstance(getActivity()).addListener(this);
-
         aaZoneView.onStart();
     }
 
@@ -88,15 +86,19 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
         super.onPause();
 
         TodoListManager.getInstance(getActivity()).removeListener(this);
-
         aaZoneView.onStop();
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+        TodoList list = lists.get(position);
+
+        Intent intent = new Intent(getActivity(), TodoListDetailActivity.class);
+        intent.putExtra(TodoListDetailActivity.TODO_LIST_ID, list.getId());
+
+        startActivity(intent);
     }
 
     @Override
@@ -117,19 +119,8 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
     }
 
     @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-
-        TodoList list = lists.get(position);
-
-        Intent intent = new Intent(getActivity(), TodoListDetailActivity.class);
-        intent.putExtra(TodoListDetailActivity.TODO_LIST_ID, list.getId());
-
-        startActivity(intent);
-    }
-
-    @Override
     public void onTodoListsAvailable() {
+        lists = TodoListManager.getInstance(getActivity()).getLists();
         adapter.notifyDataSetChanged();
     }
 
@@ -144,6 +135,6 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        public void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction(Uri uri);
     }
 }

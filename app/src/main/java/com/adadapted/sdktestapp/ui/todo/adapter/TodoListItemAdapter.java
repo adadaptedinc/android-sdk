@@ -1,4 +1,4 @@
-package com.adadapted.sdktestapp.ui.todo;
+package com.adadapted.sdktestapp.ui.todo.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;

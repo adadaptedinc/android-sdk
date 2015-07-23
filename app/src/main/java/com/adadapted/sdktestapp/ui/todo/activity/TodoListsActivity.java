@@ -1,4 +1,4 @@
-package com.adadapted.sdktestapp.ui.todo;
+package com.adadapted.sdktestapp.ui.todo.activity;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -9,7 +9,8 @@ import android.view.MenuItem;
 
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.ui.SpinnerActionBarActivity;
-import com.adadapted.sdktestapp.ui.recipe.RecipesActivity;
+import com.adadapted.sdktestapp.ui.recipe.activity.RecipesActivity;
+import com.adadapted.sdktestapp.ui.todo.fragment.TodoListsFragment;
 
 public class TodoListsActivity extends SpinnerActionBarActivity
         implements TodoListsFragment.OnFragmentInteractionListener {

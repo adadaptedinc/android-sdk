@@ -1,4 +1,4 @@
-package com.adadapted.sdktestapp.ui.todo;
+package com.adadapted.sdktestapp.ui.todo.fragment;
 
 import android.app.Activity;
 import android.app.DialogFragment;
@@ -13,7 +13,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.ListView;
 
 import com.adadapted.android.sdk.AdAdapted;
@@ -22,7 +21,8 @@ import com.adadapted.android.sdk.ui.model.ContentPayload;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.todo.TodoList;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;
-import com.adadapted.sdktestapp.util.DimConverter;
+import com.adadapted.sdktestapp.ui.todo.adapter.TodoListItemAdapter;
+import com.adadapted.sdktestapp.ui.todo.dialog.NewListItemDialogFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,7 +46,6 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
     private TodoList list;
 
     private TodoListItemAdapter adapter;
-    //private AaZoneView aaZoneView;
     private AaFeedAdapter feedAdapter;
     private DialogFragment dialog;
 
@@ -85,10 +84,6 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
 
         list = TodoListManager.getInstance(getActivity()).getList(listId);
 
-        //aaZoneView = new AaZoneView(getActivity());
-        //aaZoneView.init("100682");
-        //aaZoneView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, 90));
-
         getActivity().setTitle(list.getName());
 
         dialog = new NewListItemDialogFragment();
@@ -100,14 +95,10 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
         View view = inflater.inflate(R.layout.fragment_todo_list_detail, container, false);
 
         ListView listView = (ListView)view.findViewById(android.R.id.list);
-        //listView.addFooterView(aaZoneView);
 
         adapter = new TodoListItemAdapter(getActivity(), list.getItems());
-        feedAdapter = new AaFeedAdapter(getActivity(), adapter, "100682", 3,
-                new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,
-                        DimConverter.convertDpToPx(getActivity(), 90)));
+        feedAdapter = new AaFeedAdapter(getActivity(), adapter, "100682", 3);
         setListAdapter(feedAdapter);
-        //setListAdapter(adapter);
 
         return view;
     }
@@ -120,7 +111,6 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
 
         AdAdapted.getInstance().addListener(this);
         feedAdapter.onStart();
-        //aaZoneView.onStart();
     }
 
     @Override
@@ -131,7 +121,6 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
 
         AdAdapted.getInstance().removeListener(this);
         feedAdapter.onStop();
-        //aaZoneView.onStop();
     }
 
     @Override
@@ -157,8 +146,6 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
         super.onListItemClick(l, v, position, id);
 
         Object item = feedAdapter.getItem(position);
-        //Object item = adapter.getItem(position);
-
         Log.d(TAG, "Feed Item Clicked: " + item);
     }
 
@@ -194,7 +181,6 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
                 String item = array.getString(i);
                 TodoListManager.getInstance(getActivity()).addItemToList(listId, item);
 
-                //feedAdapter.notifyDataSetChanged();
                 adapter.notifyDataSetChanged();
             }
 

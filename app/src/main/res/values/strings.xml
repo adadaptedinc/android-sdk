@@ -9,15 +9,6 @@
         <item>Recipes</item>
     </string-array>
 
-    <!--<string name="adadapted_api_key">NTU1YJG3ZMNKYZQ0</string>
-    <bool name="adadapted_prod">false</bool>
-    <string-array name="adadapted_zones">
-        <item>100668</item>
-        <item>100669</item>
-        <item>100670</item>
-        <item>100671</item>
-    </string-array>-->
-
     <string name="adadapted_api_key">NTU3NZQ2ZTG2YTBK</string>
     <bool name="adadapted_prod">false</bool>
     <string-array name="adadapted_zones">
