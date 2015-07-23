@@ -17,6 +17,8 @@ public class EventFlushScheduler {
     private final Handler handler;
     private final Runnable runnable;
 
+    private long pollingInterval;
+
     public EventFlushScheduler(Context context) {
         eventTracker = EventTrackerFactory.getInstance(context).createEventTracker();
         keywordInterceptManager = KeywordInterceptManagerFactory.getInstance(context).createKeywordInterceptManager();
@@ -27,12 +29,15 @@ public class EventFlushScheduler {
             public void run() {
                 eventTracker.publishEvents();
                 keywordInterceptManager.publishEvents();
-                handler.postDelayed(this, 20000);
+                handler.postDelayed(this, pollingInterval);
             }
+
+
         };
     }
 
-    public void start() {
+    public void start(long pollingInterval) {
+        this.pollingInterval = pollingInterval <= 0L ? 20000L : pollingInterval;
         runnable.run();
     }
 

@@ -36,7 +36,6 @@ public class AdRefreshScheduler extends Timer {
     }
 
     public void schedule(final Session session, final DeviceInfo deviceInfo) {
-        Log.i(TAG, "Scheduling next Ad refresh.");
         long interval = session.getPollingInterval();
         if(interval <= 0L) { return; }
 
