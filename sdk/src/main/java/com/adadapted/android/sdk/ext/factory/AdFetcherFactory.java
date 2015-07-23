@@ -37,7 +37,7 @@ public class AdFetcherFactory {
         if(adFetcher == null) {
             adFetcher = new AdFetcher(new HttpAdAdapter(determineEndpoint()),
                     new JsonAdRequestBuilder(),
-                    new AdRefreshBuilder(new JsonZoneBuilder()));
+                    new AdRefreshBuilder(new JsonZoneBuilder(context)));
         }
 
         return adFetcher;

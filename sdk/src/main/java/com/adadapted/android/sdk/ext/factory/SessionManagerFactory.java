@@ -37,9 +37,11 @@ public class SessionManagerFactory {
             HttpSessionAdapter adapter = new HttpSessionAdapter(determineInitEndpoint(),
                     determineReinitEndpoint());
             SessionRequestBuilder requestBuilder = new JsonSessionRequestBuilder();
-            SessionBuilder sessionBuilder = new JsonSessionBuilder();
+            SessionBuilder sessionBuilder = new JsonSessionBuilder(context);
 
             sessionManager = new SessionManager(context, adapter, requestBuilder, sessionBuilder);
+
+            AdFetcherFactory.getInstance(context).createAdFetcher().addListener(sessionManager);
         }
 
         return sessionManager;
