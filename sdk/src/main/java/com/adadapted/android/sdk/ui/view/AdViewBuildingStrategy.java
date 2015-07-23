@@ -8,6 +8,10 @@ import com.adadapted.android.sdk.core.ad.model.Ad;
  * Created by chrisweeden on 7/7/15.
  */
 interface AdViewBuildingStrategy {
-    void buildView(Ad ad);
+    interface Listener {
+        void onStrategyViewLoaded();
+    }
+
+    void buildView(Ad ad, int width, int height);
     View getView();
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.adadapted.android.sdk.R;
@@ -19,10 +20,6 @@ import com.adadapted.android.sdk.ext.http.HttpAdImageLoader;
 class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
     private static final String TAG = HtmlAdViewBuildingStrategy.class.getName();
 
-    public interface Listener {
-        void onJsonViewLoaded();
-    }
-
     private final Listener listener;
     private final View view;
 
@@ -36,7 +33,9 @@ class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
     }
 
     @Override
-    public void buildView(Ad ad) {
+    public void buildView(Ad ad, int width, int height) {
+        view.setLayoutParams(new RelativeLayout.LayoutParams(width, height));
+
         AdComponent adComponents = ((JsonAdType)ad.getAdType()).getComponents();
 
         TextView cta1 = (TextView)view.findViewById(R.id.aa_ad_cta_1);
@@ -94,7 +93,7 @@ class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
             loadImageViewFromUrl(appIcon2, adComponents.getAppIcon2());
         }
 
-        listener.onJsonViewLoaded();
+        listener.onStrategyViewLoaded();
     }
 
     @Override

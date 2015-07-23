@@ -1,10 +1,12 @@
 package com.adadapted.android.sdk.ui.view;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.view.View;
 
-import com.adadapted.android.sdk.core.ad.AdFetcher;
 import com.adadapted.android.sdk.core.ad.model.Ad;
+import com.adadapted.android.sdk.core.ad.model.AdImage;
+import com.adadapted.android.sdk.core.common.Dimension;
 import com.adadapted.android.sdk.core.session.SessionManager;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.core.zone.model.Zone;
@@ -13,14 +15,13 @@ import com.adadapted.android.sdk.ext.scheduler.AdZoneRefreshScheduler;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
  * Created by chrisweeden on 7/1/15.
  */
-class AaZoneViewController implements SessionManager.Listener, AdFetcher.Listener,
-        AdZoneRefreshScheduler.Listener, AdViewBuilder.Listener {
+class AaZoneViewController implements SessionManager.Listener, AdZoneRefreshScheduler.Listener,
+        AdViewBuilder.Listener {
     private static final String TAG = AaZoneViewController.class.getName();
 
     public interface Listener {
@@ -81,10 +82,7 @@ class AaZoneViewController implements SessionManager.Listener, AdFetcher.Listene
 
     private void displayAd() {
         if(currentAd.hasAd()) {
-            adViewBuilder.buildView(currentAd, resourceId);
-        }
-        else {
-            // TODO: Probably should close the zone.
+            adViewBuilder.buildView(currentAd, resourceId, getZoneWidth(), getZoneHeight());
         }
     }
 
@@ -109,12 +107,44 @@ class AaZoneViewController implements SessionManager.Listener, AdFetcher.Listene
         }
     }
 
+    public int getZoneWidth() {
+        Dimension dim = zone.getDimension(getPresentOrientation());
+        if(dim != null) {
+            return dim.getWidth();
+        }
+
+        return -2;
+    }
+
+    public int getZoneHeight() {
+        Dimension dim = zone.getDimension(getPresentOrientation());
+        if(dim != null) {
+            return dim.getHeight();
+        }
+
+        return -2;
+    }
+
+    private String getPresentOrientation() {
+        int orientation = context.getResources().getConfiguration().orientation;
+
+        if(orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            return AdImage.LANDSCAPE;
+        }
+
+        return AdImage.PORTRAIT;
+    }
+
     public void setListener(Listener listener) {
         this.listener = listener;
         SessionManagerFactory.getInstance(context).createSessionManager().addListener(this);
+
+        currentAd.beginAdTracking();
     }
 
     public void removeListener() {
+        currentAd.completeAdTracking();
+
         this.listener = null;
         SessionManagerFactory.getInstance(context).createSessionManager().removeListener(this);
     }
@@ -151,12 +181,9 @@ class AaZoneViewController implements SessionManager.Listener, AdFetcher.Listene
     public void onSessionNotReinitialized() {}
 
     @Override
-    public void onAdsRefreshed(Map<String, Zone> zones) {
-        zone.setAds(zones.get(zoneId).getAds());
+    public void onNewAdsAvailable(final Session session) {
+        zone = session.getZone(zoneId);
     }
-
-    @Override
-    public void onAdsNotRefreshed() {}
 
     @Override
     public void onAdZoneRefreshTimer(Ad ad) {

@@ -10,6 +10,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.RelativeLayout;
 
 import com.adadapted.android.sdk.R;
@@ -60,17 +61,9 @@ public class AaZoneView extends RelativeLayout
         this.layoutResourceId = layoutResourceId;
 
         setGravity(Gravity.CENTER);
-        setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (viewController != null) {
-                    viewController.handleAdAction();
-                }
-            }
-        });
     }
 
-    private void displayAdView(final View view) {
+    protected void displayAdView(final View view) {
         Activity activity = (Activity)context;
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -88,18 +81,28 @@ public class AaZoneView extends RelativeLayout
 
     @Override
     public void onViewReadyForDisplay(final View view) {
-        view.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        onClick();
-                        break;
-                }
+        if(view instanceof WebView) {
+            view.setOnTouchListener(new OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            AaZoneView.this.onAdInteraction();
+                            return true;
+                    }
 
-                return true;
-            }
-        });
+                    return false;
+                }
+            });
+        }
+        else {
+            setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AaZoneView.this.onAdInteraction();
+                }
+            });
+        }
 
         if(visible) {
             displayAdView(view);
@@ -145,14 +148,9 @@ public class AaZoneView extends RelativeLayout
     }
 
     @Override
-    public void onClick() {
-        viewController.handleAdAction();
-    }
-
-    @Override
-    public String toString() {
-        return "AaZoneView{" +
-                "zoneId='" + zoneId + '\'' +
-                '}';
+    public void onAdInteraction() {
+        if (viewController != null) {
+            viewController.handleAdAction();
+        }
     }
 }

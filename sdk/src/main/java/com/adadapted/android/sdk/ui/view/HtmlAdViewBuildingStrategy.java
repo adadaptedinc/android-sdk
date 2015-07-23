@@ -1,9 +1,11 @@
 package com.adadapted.android.sdk.ui.view;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.RelativeLayout;
 
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.HtmlAdType;
@@ -14,22 +16,13 @@ import com.adadapted.android.sdk.core.ad.model.HtmlAdType;
 class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
     private static final String TAG = HtmlAdViewBuildingStrategy.class.getName();
 
-    public interface Listener {
-        void onHtmlViewLoaded();
-    }
-
     private final Listener listener;
     private final WebView view;
 
     public HtmlAdViewBuildingStrategy(final Context context, final Listener listener) {
         this.listener = listener;
 
-        //LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-        //        ViewGroup.LayoutParams.MATCH_PARENT,
-        //        ViewGroup.LayoutParams.MATCH_PARENT);
-
         view = new WebView(context);
-        //view.setLayoutParams(layoutParams);
         view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         view.setWebViewClient(new WebViewClient() {
             @Override
@@ -43,11 +36,14 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
     }
 
     @Override
-    public void buildView(Ad ad) {
+    public void buildView(Ad ad, int width, int height) {
         final HtmlAdType adType = (HtmlAdType) ad.getAdType();
 
+        Log.i(TAG, "Setting WebView to " + width + " x " + height);
+        view.setLayoutParams(new RelativeLayout.LayoutParams(width, height));
         view.loadUrl(adType.getAdUrl());
-        listener.onHtmlViewLoaded();
+
+        listener.onStrategyViewLoaded();
     }
 
     @Override

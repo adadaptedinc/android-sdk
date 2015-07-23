@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.ui.view;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
@@ -9,7 +10,7 @@ import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 /**
  * Created by chrisweeden on 7/1/15.
  */
-class AdViewBuilder implements HtmlAdView.Listener, ImageAdView.Listener, JsonAdView.Listener {
+class AdViewBuilder implements AdViewBuildingStrategy.Listener {
     private static final String TAG = AdViewBuilder.class.getName();
 
     public interface Listener {
@@ -19,65 +20,65 @@ class AdViewBuilder implements HtmlAdView.Listener, ImageAdView.Listener, JsonAd
     private final Context context;
 
     private Listener listener;
-    private Handler handler = new Handler();
+    private Handler handler = new Handler(Looper.getMainLooper());
 
-    private ImageAdView adImageView;
-    private HtmlAdView adWebView;
-    private JsonAdView adJsonView;
+    private HtmlAdViewBuildingStrategy adWebView;
+    private AdViewBuildingStrategy strategy;
 
     public AdViewBuilder(Context context) {
         this.context = context;
 
         // For whatever reason the WebView has to be created ahead of time.
         // The App will likely crash if it is constructed on-demand.
-        adWebView = new HtmlAdView(context, this);
+        adWebView = new HtmlAdViewBuildingStrategy(context, this);
     }
 
-    public void buildView(ViewAdWrapper currentAd, int resourceId) {
+    public void buildView(ViewAdWrapper currentAd, int resourceId, int width, int height) {
+        strategy = null;
         switch(currentAd.getAdType()) {
             case HTML:
-                loadHtmlView(currentAd);
+                strategy = getHtmlViewStrategy();
                 break;
 
             case IMAGE:
-                loadImageView(currentAd);
+                strategy = getImageViewStrategy();
                 break;
 
             case JSON:
-                loadJsonView(currentAd, resourceId);
+                strategy = getJsonViewStrategy(resourceId);
                 break;
 
             default:
-                notifyViewLoaded(new View(context));
-        }
-    }
-
-    private void loadHtmlView(final ViewAdWrapper currentAd) {
-        if(adWebView == null) {
-            adWebView = new HtmlAdView(context, this);
+                strategy = getEmptyViewStrategy();
         }
 
-        loadView(adWebView, currentAd);
+        loadView(strategy, currentAd, width, height);
     }
 
-    private void loadImageView(final ViewAdWrapper currentAd) {
-        if(adImageView == null) {
-            adImageView = new ImageAdView(context, this);
-        }
-
-        loadView(adImageView, currentAd);
+    private AdViewBuildingStrategy getHtmlViewStrategy() {
+        return adWebView;
     }
 
-    private void loadJsonView(final ViewAdWrapper currentAd, int resourceId) {
-        adJsonView = new JsonAdView(context, this, resourceId);
-        loadView(adJsonView, currentAd);
+    private AdViewBuildingStrategy getImageViewStrategy() {
+        return new ImageAdViewBuildingStrategy(context, this);
     }
 
-    private void loadView(final AdView view, final ViewAdWrapper currentAd) {
+    private AdViewBuildingStrategy getJsonViewStrategy(int resourceId) {
+        return new JsonAdViewBuildingStrategy(context, this, resourceId);
+    }
+
+    private AdViewBuildingStrategy getEmptyViewStrategy() {
+        return new EmptyAdViewStrategy(context, this);
+    }
+
+    private void loadView(final AdViewBuildingStrategy strategy,
+                          final ViewAdWrapper currentAd,
+                          final int width,
+                          final int height) {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                view.buildView(currentAd.getAd());
+                strategy.buildView(currentAd.getAd(), width, height);
             }
         });
     }
@@ -98,15 +99,7 @@ class AdViewBuilder implements HtmlAdView.Listener, ImageAdView.Listener, JsonAd
         }
     }
 
-    public void onHtmlViewLoaded() {
-        notifyViewLoaded(adWebView.getView());
-    }
-
-    public void onImageViewLoaded() {
-        notifyViewLoaded(adImageView.getView());
-    }
-
-    public void onJsonViewLoaded() {
-        notifyViewLoaded(adJsonView.getView());
+    public void onStrategyViewLoaded() {
+        notifyViewLoaded(strategy.getView());
     }
 }

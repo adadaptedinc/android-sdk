@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.ad.model.Ad;
@@ -31,11 +33,7 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
             view.setImageBitmap(adImage);
         }
     };
-    private final Handler buildAdHandler = new Handler();
-
-    public interface Listener {
-        void onImageViewLoaded();
-    }
+    private final Handler buildAdHandler = new Handler(Looper.getMainLooper());
 
     private final Listener listener;
 
@@ -44,13 +42,7 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
         this.listener = listener;
 
         imageLoader = new HttpAdImageLoader();
-
-        //LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-        //        ViewGroup.LayoutParams.MATCH_PARENT,
-        //        ViewGroup.LayoutParams.MATCH_PARENT);
-
         view = new ImageView(context);
-        //view.setLayoutParams(layoutParams);
     }
 
     private String getPresentOrientation() {
@@ -68,7 +60,9 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
     }
 
     @Override
-    public void buildView(Ad ad) {
+    public void buildView(Ad ad, int width, int height) {
+        view.setLayoutParams(new RelativeLayout.LayoutParams(width, height));
+
         ImageAdType adType = (ImageAdType) ad.getAdType();
 
         String imageResolution = AdAdapted.getInstance().getDeviceInfo().chooseImageSize();
@@ -80,7 +74,7 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
                 adImage = bitmap;
                 buildAdHandler.post(buildAdRunnable);
 
-                listener.onImageViewLoaded();
+                listener.onStrategyViewLoaded();
             }
 
             @Override
