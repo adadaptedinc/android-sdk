@@ -41,10 +41,7 @@ public class EventTracker implements EventAdapter.Listener {
     }
 
     public void publishEvents() {
-        if(queuedEvents.isEmpty()) {
-            Log.d(TAG, "No items queued to publish.");
-        }
-        else {
+        if(!queuedEvents.isEmpty()) {
             Set<JSONObject> currentEvents = new HashSet<>(getQueuedEvents());
             queuedEvents.clear();
 
@@ -58,11 +55,12 @@ public class EventTracker implements EventAdapter.Listener {
             eventAdapter.sendBatch(json);
         }
         else {
-            Log.d(TAG, "Maximum failed retries. No longer sending batch retries.");
+            Log.w(TAG, "Maximum failed retries. No longer sending batch retries.");
         }
     }
 
     public void trackImpressionBeginEvent(String sessionId, Ad ad) {
+        ad.incrementImpressionViews();
         trackEvent(sessionId, ad, EventTypes.IMPRESSION, "");
     }
 
@@ -88,8 +86,6 @@ public class EventTracker implements EventAdapter.Listener {
     }
 
     private void trackEvent(String sessionId, Ad ad, EventTypes eventType, String eventName) {
-        Log.d(TAG, "Queueing " + eventType + " for " + ad.getAdId());
-
         DeviceInfo deviceInfo = AdAdapted.getInstance().getDeviceInfo();
         queuedEvents.add(builder.build(deviceInfo, sessionId, ad, eventType, eventName));
 
