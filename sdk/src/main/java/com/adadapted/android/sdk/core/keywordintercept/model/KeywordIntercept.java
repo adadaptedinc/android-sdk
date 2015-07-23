@@ -8,11 +8,16 @@ import java.util.Map;
 public class KeywordIntercept {
     private final String searchId;
     private final long refreshTime;
+    private final int minMatchLength;
     private final Map<String, AutoFill> autofill;
 
-    public KeywordIntercept(String searchId, long refreshTime, Map<String, AutoFill> autofill) {
+    public KeywordIntercept(String searchId,
+                            long refreshTime,
+                            int minMatchLength,
+                            Map<String, AutoFill> autofill) {
         this.searchId = searchId;
         this.refreshTime = refreshTime;
+        this.minMatchLength = minMatchLength;
         this.autofill = autofill;
     }
 
@@ -22,6 +27,10 @@ public class KeywordIntercept {
 
     public long getRefreshTime() {
         return refreshTime;
+    }
+
+    public int getMinMatchLength() {
+        return minMatchLength;
     }
 
     public Map<String, AutoFill> getAutofill() {
