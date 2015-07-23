@@ -28,6 +28,10 @@ public class AaAutoCompleteAdapter extends ArrayAdapter<String> {
         allItems = new ArrayList<>(items);
     }
 
+    public boolean suggestionSelected(String suggestion) {
+        return matcher.suggestionSelected(suggestion);
+    }
+
     @Override
     public Filter getFilter() {
         return filter;

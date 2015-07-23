@@ -1,8 +1,9 @@
 package com.adadapted.android.sdk.ui.adapter;
 
 import android.content.Context;
-import android.view.ViewGroup;
+import android.widget.AbsListView;
 
+import com.adadapted.android.sdk.R;
 import com.adadapted.android.sdk.ui.view.AaZoneView;
 
 /**
@@ -15,15 +16,14 @@ public class AaFeedAdPlacement {
     private final String zoneId;
     private final int placement;
 
-    private ViewGroup.LayoutParams layoutParams;
+    private AbsListView.LayoutParams layoutParams;
     private int resourceId;
 
     public AaFeedAdPlacement(Context context, String zoneId, int placement) {
         this.context = context;
         this.zoneId = zoneId;
         this.placement = (placement <= 0) ? 0 : placement-1;
-        this.layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
+        this.resourceId = R.layout.aa_default_json_ad_zone;
     }
 
     public AaFeedAdPlacement(Context context, String zoneId, int placement, int resourceId) {
@@ -31,19 +31,7 @@ public class AaFeedAdPlacement {
         this.resourceId = resourceId;
     }
 
-    public AaFeedAdPlacement(Context context, String zoneId, int placement,
-                             ViewGroup.LayoutParams layoutParams) {
-        this(context, zoneId, placement);
-        this.layoutParams = layoutParams;
-    }
-
-    public AaFeedAdPlacement(Context context, String zoneId, int placement,
-                             ViewGroup.LayoutParams layoutParams, int resourceId) {
-        this(context, zoneId, placement, layoutParams);
-        this.resourceId = resourceId;
-    }
-
-    public void setLayoutParams(ViewGroup.LayoutParams layoutParams) {
+    public void setLayoutParams(AbsListView.LayoutParams layoutParams) {
         this.layoutParams = layoutParams;
     }
 
@@ -78,7 +66,6 @@ public class AaFeedAdPlacement {
     public AaZoneView getView(int position) {
         if(position == placement) {
             AaZoneView view = new AaZoneView(context);
-            view.setLayoutParams(layoutParams);
             view.init(zoneId, resourceId);
 
             return view;

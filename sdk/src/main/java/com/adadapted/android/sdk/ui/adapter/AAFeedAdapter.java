@@ -29,18 +29,6 @@ public class AaFeedAdapter extends BaseAdapter {
         this.placement = new AaFeedAdPlacement(context, zoneId, placement, resourceId);
     }
 
-    public AaFeedAdapter(Context context, BaseAdapter adapter, String zoneId, int placement,
-                         ViewGroup.LayoutParams layoutParams) {
-        this.adapter = adapter;
-        this.placement = new AaFeedAdPlacement(context, zoneId, placement, layoutParams);
-    }
-
-    public AaFeedAdapter(Context context, BaseAdapter adapter, String zoneId, int placement,
-                         ViewGroup.LayoutParams layoutParams, int resourceId) {
-        this.adapter = adapter;
-        this.placement = new AaFeedAdPlacement(context, zoneId, placement, layoutParams, resourceId);
-    }
-
     @Override
     public int getCount() {
         return placement.getModifiedCount(adapter.getCount());

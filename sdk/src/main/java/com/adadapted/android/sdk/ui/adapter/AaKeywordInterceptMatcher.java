@@ -22,8 +22,8 @@ public class AaKeywordInterceptMatcher implements SessionManager.Listener, Keywo
     private static final String TAG = AaKeywordInterceptMatcher.class.getName();
 
     private final KeywordInterceptManager manager;
-    private final AaSuggestionTracker suggestionTracker;
-    
+    private AaSuggestionTracker suggestionTracker;
+
     private KeywordIntercept keywordIntercept;
     private boolean loaded = false;
     private Session session;
@@ -40,7 +40,7 @@ public class AaKeywordInterceptMatcher implements SessionManager.Listener, Keywo
     public SuggestionPayload match(CharSequence constraint) {
         Set<String> suggestions = new HashSet<>();
 
-        if((constraint != null && constraint.length() >= 3) && isLoaded()) {
+        if((isLoaded() && constraint != null && constraint.length() >= keywordIntercept.getMinMatchLength())) {
             for (String item : keywordIntercept.getAutofill().keySet()) {
                 if (item.toLowerCase().contains(constraint.toString().toLowerCase())) {
                     AutoFill autofill = keywordIntercept.getAutofill().get(item);
@@ -52,6 +52,10 @@ public class AaKeywordInterceptMatcher implements SessionManager.Listener, Keywo
         }
 
         return new SuggestionPayload(suggestionTracker, suggestions);
+    }
+
+    public boolean suggestionSelected(String suggestion) {
+        return suggestionTracker.suggestionSelected(suggestion);
     }
 
     private boolean isLoaded() {
@@ -75,4 +79,7 @@ public class AaKeywordInterceptMatcher implements SessionManager.Listener, Keywo
 
     @Override
     public void onSessionNotReinitialized() {}
+
+    @Override
+    public void onNewAdsAvailable(Session session) {}
 }

@@ -16,8 +16,8 @@ import com.adadapted.android.sdk.ext.http.HttpAdImageLoader;
 /**
  * Created by chrisweeden on 5/26/15.
  */
-class JsonAdView implements AdView {
-    private static final String TAG = HtmlAdView.class.getName();
+class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
+    private static final String TAG = HtmlAdViewBuildingStrategy.class.getName();
 
     public interface Listener {
         void onJsonViewLoaded();
@@ -28,7 +28,7 @@ class JsonAdView implements AdView {
 
     private final AdImageLoader imageLoader;
 
-    public JsonAdView(final Context context, final Listener listener, int resourceId) {
+    public JsonAdViewBuildingStrategy(final Context context, final Listener listener, int resourceId) {
         this.listener = listener;
         this.imageLoader = new HttpAdImageLoader();
 

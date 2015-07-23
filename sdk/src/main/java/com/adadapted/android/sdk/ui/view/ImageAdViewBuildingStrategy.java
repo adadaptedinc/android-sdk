@@ -5,9 +5,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.ad.model.Ad;
@@ -18,8 +16,8 @@ import com.adadapted.android.sdk.ext.http.HttpAdImageLoader;
 /**
  * Created by chrisweeden on 5/20/15.
  */
-class ImageAdView implements AdView {
-    private static final String TAG = ImageAdView.class.getName();
+class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
+    private static final String TAG = ImageAdViewBuildingStrategy.class.getName();
 
     private final HttpAdImageLoader imageLoader;
 
@@ -41,18 +39,18 @@ class ImageAdView implements AdView {
 
     private final Listener listener;
 
-    public ImageAdView(final Context context, final Listener listener) {
+    public ImageAdViewBuildingStrategy(final Context context, final Listener listener) {
         this.context = context;
         this.listener = listener;
 
         imageLoader = new HttpAdImageLoader();
 
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
+        //LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+        //        ViewGroup.LayoutParams.MATCH_PARENT,
+        //        ViewGroup.LayoutParams.MATCH_PARENT);
 
         view = new ImageView(context);
-        view.setLayoutParams(layoutParams);
+        //view.setLayoutParams(layoutParams);
     }
 
     private String getPresentOrientation() {

@@ -14,7 +14,10 @@ public class AaSuggestionTracker {
 
     private final KeywordInterceptManager manager;
 
+    // Here the key is the Term Text
     private Map<String, String> items = new HashMap<>();
+
+    // Here the key is the Replacement Text
     private Map<String, String> replacements = new HashMap<>();
 
     private Session session;
@@ -38,15 +41,24 @@ public class AaSuggestionTracker {
 
     public void suggestionPresented(String term) {
         term = term.toLowerCase();
+
         if(items.containsKey(term)) {
             manager.trackPresented(session, term, items.get(term));
         }
     }
 
-    public void suggestionSelected(String replacement) {
-        if(items.containsKey(replacement)) {
+    public boolean suggestionSelected(String replacement) {
+        replacement = replacement.toLowerCase();
+
+        if(replacements.containsKey(replacement)) {
             String term = replacements.get(replacement);
-            manager.trackSelected(session, term, replacement);
+            String userInput = items.get(term);
+
+            manager.trackSelected(session, term, userInput);
+
+            return true;
         }
+
+        return false;
     }
 }

@@ -2,10 +2,8 @@ package com.adadapted.android.sdk.ui.view;
 
 import android.content.Context;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.LinearLayout;
 
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.HtmlAdType;
@@ -13,8 +11,8 @@ import com.adadapted.android.sdk.core.ad.model.HtmlAdType;
 /**
  * Created by chrisweeden on 5/20/15.
  */
-class HtmlAdView implements AdView {
-    private static final String TAG = HtmlAdView.class.getName();
+class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
+    private static final String TAG = HtmlAdViewBuildingStrategy.class.getName();
 
     public interface Listener {
         void onHtmlViewLoaded();
@@ -23,20 +21,20 @@ class HtmlAdView implements AdView {
     private final Listener listener;
     private final WebView view;
 
-    public HtmlAdView(final Context context, final Listener listener) {
+    public HtmlAdViewBuildingStrategy(final Context context, final Listener listener) {
         this.listener = listener;
 
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
+        //LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+        //        ViewGroup.LayoutParams.MATCH_PARENT,
+        //        ViewGroup.LayoutParams.MATCH_PARENT);
 
         view = new WebView(context);
-        view.setLayoutParams(layoutParams);
+        //view.setLayoutParams(layoutParams);
         view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         view.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                return false;
+                return true;
             }
         });
 

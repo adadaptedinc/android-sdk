@@ -7,7 +7,7 @@ import com.adadapted.android.sdk.core.ad.model.Ad;
 /**
  * Created by chrisweeden on 7/7/15.
  */
-interface AdView {
+interface AdViewBuildingStrategy {
     void buildView(Ad ad);
     View getView();
 }
