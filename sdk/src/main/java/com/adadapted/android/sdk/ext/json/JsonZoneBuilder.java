@@ -1,9 +1,11 @@
 package com.adadapted.android.sdk.ext.json;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.AdBuilder;
 import com.adadapted.android.sdk.core.common.Dimension;
+import com.adadapted.android.sdk.core.common.DimensionConverter;
 import com.adadapted.android.sdk.core.zone.ZoneBuilder;
 import com.adadapted.android.sdk.core.zone.model.Zone;
 
@@ -22,9 +24,11 @@ public class JsonZoneBuilder implements ZoneBuilder {
     private static final String TAG = JsonZoneBuilder.class.getName();
 
     private final AdBuilder adBuilder;
+    private final Context context;
 
-    public JsonZoneBuilder() {
-        this.adBuilder = new JsonAdBuilder();
+    public JsonZoneBuilder(Context context) {
+        this.context = context;
+        this.adBuilder = new JsonAdBuilder(context);
     }
 
     public Map<String, Zone> buildZones(JSONObject jsonZones) {
@@ -53,8 +57,19 @@ public class JsonZoneBuilder implements ZoneBuilder {
             if(jsonZone.has("port_zone_height") && jsonZone.has("port_zone_width")) {
                 Dimension portDimension = new Dimension();
 
-                portDimension.setHeight(Integer.parseInt(jsonZone.getString("port_zone_height")));
-                portDimension.setWidth(Integer.parseInt(jsonZone.getString("port_zone_width")));
+                if(jsonZone.has("port_zone_height")) {
+                    portDimension.setHeight(calculateDimensionValue(jsonZone.getString("port_zone_height")));
+                }
+                else {
+                    portDimension.setHeight(-2);
+                }
+
+                if(jsonZone.has("port_zone_width")) {
+                    portDimension.setWidth(calculateDimensionValue(jsonZone.getString("port_zone_width")));
+                }
+                else {
+                    portDimension.setWidth(-2);
+                }
 
                 zone.getDimensions().put("port", portDimension);
             }
@@ -62,8 +77,19 @@ public class JsonZoneBuilder implements ZoneBuilder {
             if(jsonZone.has("land_zone_height") && jsonZone.has("land_zone_width")) {
                 Dimension landDimension = new Dimension();
 
-                landDimension.setHeight(Integer.parseInt(jsonZone.getString("land_zone_height")));
-                landDimension.setWidth(Integer.parseInt(jsonZone.getString("land_zone_width")));
+                if(jsonZone.has("land_zone_height")) {
+                    landDimension.setHeight(calculateDimensionValue(jsonZone.getString("land_zone_height")));
+                }
+                else {
+                    landDimension.setHeight(-2);
+                }
+
+                if(jsonZone.has("land_zone_width")) {
+                    landDimension.setWidth(calculateDimensionValue(jsonZone.getString("land_zone_width")));
+                }
+                else {
+                    landDimension.setWidth(-2);
+                }
 
                 zone.getDimensions().put("land", landDimension);
             }
@@ -76,5 +102,9 @@ public class JsonZoneBuilder implements ZoneBuilder {
         }
 
         return zone;
+    }
+
+    public int calculateDimensionValue(String value) {
+        return DimensionConverter.convertDpToPx(context, Integer.parseInt(value));
     }
 }

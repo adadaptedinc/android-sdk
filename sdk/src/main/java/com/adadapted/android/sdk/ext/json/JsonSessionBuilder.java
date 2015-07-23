@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.ext.json;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.session.SessionBuilder;
@@ -20,8 +21,8 @@ public class JsonSessionBuilder implements SessionBuilder {
 
     private final ZoneBuilder zoneBuilder;
 
-    public JsonSessionBuilder() {
-        this.zoneBuilder = new JsonZoneBuilder();
+    public JsonSessionBuilder(Context context) {
+        this.zoneBuilder = new JsonZoneBuilder(context);
     }
 
     public Session buildSession(JSONObject response) {

@@ -23,6 +23,7 @@ public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
 
         String searchId = "";
         long refreshTime = 0L;
+        int minMatchLength = 2;
 
         try {
             if (json.has("search_id")) {
@@ -32,6 +33,10 @@ public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
             if (json.has("refresh_time")) {
                 refreshTime = Long.parseLong(json.getString("refresh_time"));
             }
+
+            if (json.has("min_match_len")) {
+                minMatchLength = Integer.parseInt(json.getString("min_match_len"));
+            }
         }
         catch(JSONException ex) {
             Log.w(TAG, "Problem parsing JSON", ex);
@@ -39,7 +44,7 @@ public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
 
         Map<String, AutoFill> interceptMap = parseAutofill(json);
 
-        return new KeywordIntercept(searchId, refreshTime, interceptMap);
+        return new KeywordIntercept(searchId, refreshTime, minMatchLength, interceptMap);
     }
 
     private Map<String, AutoFill> parseAutofill(JSONObject json) {

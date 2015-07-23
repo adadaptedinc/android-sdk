@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.ext.json;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.AdBuilder;
@@ -60,6 +61,9 @@ public class JsonAdBuilder implements AdBuilder {
 
     private static final String FIELD_IMAGE_ORIENTATION = "orientation";
     private static final String FIELD_IMAGE_URL = "url";
+
+    public JsonAdBuilder(Context context) {
+    }
 
     public List<Ad> buildAds(JSONArray jsonAds) {
         List<Ad> ads = new ArrayList<>();
