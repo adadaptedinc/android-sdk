@@ -84,10 +84,7 @@ public class KeywordInterceptManager implements KeywordInterceptAdapter.Listener
     }
 
     public void publishEvents() {
-        if(!isInitialized() || keywordInterceptEvents.isEmpty()) {
-            Log.d(TAG, "No items queued to publish.");
-        }
-        else {
+        if(isInitialized() && !keywordInterceptEvents.isEmpty()) {
             Set<KeywordInterceptEvent> events = new HashSet<>(keywordInterceptEvents);
             keywordInterceptEvents.clear();
 
@@ -101,7 +98,7 @@ public class KeywordInterceptManager implements KeywordInterceptAdapter.Listener
             adapter.track(json);
         }
         else {
-            Log.d(TAG, "Maximum failed retries. No longer sending batch retries.");
+            Log.w(TAG, "Maximum failed retries. No longer sending batch retries.");
         }
     }
 
