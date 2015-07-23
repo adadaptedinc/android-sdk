@@ -22,15 +22,15 @@ public class KeywordInterceptEvent {
 
     public KeywordInterceptEvent(String appId, String sessionId, String udid, String searchId,
                                  String event, String userInput, String term, String sdkVersion) {
-        this.appId = appId;
-        this.sessionId = sessionId;
-        this.udid = udid;
-        this.searchId = searchId;
+        this.appId = (appId == null) ? "" : appId;
+        this.sessionId =  (sessionId == null) ? "" : sessionId;
+        this.udid = (udid == null) ? "" : udid;
+        this.searchId = (searchId == null) ? "" : searchId;
         this.datetime = new Date();
-        this.event = event;
-        this.userInput = userInput;
-        this.term = term;
-        this.sdkVersion = sdkVersion;
+        this.event = (event == null) ? "" : event;
+        this.userInput = (userInput == null) ? "" : userInput;
+        this.term = (term == null) ? "" : term;
+        this.sdkVersion = (sdkVersion == null) ? "" : sdkVersion;
     }
 
     public String getAppId() {
@@ -79,9 +79,15 @@ public class KeywordInterceptEvent {
     @Override
     public String toString() {
         return "KeywordInterceptEvent{" +
+                "appId='" + appId + '\'' +
+                ", sessionId='" + sessionId + '\'' +
+                ", udid='" + udid + '\'' +
+                ", searchId='" + searchId + '\'' +
+                ", datetime=" + datetime +
                 ", event='" + event + '\'' +
                 ", userInput='" + userInput + '\'' +
                 ", term='" + term + '\'' +
+                ", sdkVersion='" + sdkVersion + '\'' +
                 '}';
     }
 }
