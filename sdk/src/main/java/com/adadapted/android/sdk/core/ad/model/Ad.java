@@ -11,16 +11,17 @@ public class Ad implements Serializable {
     private String adId = "";
     private String zoneId = "";
     private String baseImpressionId = "";
-    private String impressionId = "";
     private boolean hideAfterInteraction = false;
     private int refreshTime = 0;
     private AdType adType = new NullAdType();
     private AdAction adAction = new NullAdAction();
 
     private boolean isHidden;
+    private int impressionViews;
 
     public Ad() {
         isHidden = false;
+        impressionViews = 0;
     }
 
     public String getAdId() {
@@ -40,16 +41,15 @@ public class Ad implements Serializable {
     }
 
     public String getImpressionId() {
-        return impressionId;
+        return baseImpressionId + ":" + impressionViews;
     }
 
     public void setImpressionId(String impressionId) {
-        this.impressionId = impressionId;
         this.baseImpressionId = impressionId;
     }
 
-    public void setImpressionViews(int impressionViews) {
-        impressionId = baseImpressionId + ":" + impressionViews;
+    public void incrementImpressionViews() {
+        impressionViews++;
     }
 
     public int getRefreshTime() {
