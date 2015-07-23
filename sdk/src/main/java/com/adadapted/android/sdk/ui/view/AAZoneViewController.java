@@ -113,7 +113,7 @@ class AaZoneViewController implements SessionManager.Listener, AdZoneRefreshSche
             return dim.getWidth();
         }
 
-        return -2;
+        return -1;
     }
 
     public int getZoneHeight() {

@@ -3,9 +3,9 @@ package com.adadapted.android.sdk.ui.view;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.RelativeLayout;
 
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.HtmlAdType;
@@ -40,7 +40,7 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
         final HtmlAdType adType = (HtmlAdType) ad.getAdType();
 
         Log.i(TAG, "Setting WebView to " + width + " x " + height);
-        view.setLayoutParams(new RelativeLayout.LayoutParams(width, height));
+        view.setLayoutParams(new ViewGroup.LayoutParams(width, height));
         view.loadUrl(adType.getAdUrl());
 
         listener.onStrategyViewLoaded();
