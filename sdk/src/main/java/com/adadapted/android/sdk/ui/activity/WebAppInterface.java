@@ -3,7 +3,6 @@ package com.adadapted.android.sdk.ui.activity;
 import android.content.Context;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
-import android.widget.Toast;
 
 /**
  * Created by chrisweeden on 6/29/15.
@@ -18,10 +17,8 @@ class WebAppInterface {
         mContext = c;
     }
 
-    /** Show a toast from the web page */
-    @JavascriptInterface
-    public void showToast(String toast) {
-        Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show();
+    public void registerImpression(String zoneId, String adId) {
+
     }
 
     @JavascriptInterface
