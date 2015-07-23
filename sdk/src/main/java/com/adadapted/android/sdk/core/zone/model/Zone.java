@@ -15,7 +15,7 @@ public class Zone {
     private static final String TAG = Zone.class.getName();
 
     private final String zoneId;
-    private final List<Ad> ads;
+    private List<Ad> ads;
 
     private Map<String, Dimension> dimensions;
     private int zoneViews = 0;
@@ -40,8 +40,12 @@ public class Zone {
         return dimensions;
     }
 
+    public Dimension getDimension(String orientation) {
+        return getDimensions().get(orientation);
+    }
+
     public void setDimensions(Map<String, Dimension> dimensions) {
-        this.dimensions = dimensions;
+        this.dimensions = new HashMap<>(dimensions);
     }
 
     public List<Ad> getAds() {
@@ -49,8 +53,7 @@ public class Zone {
     }
 
     public void setAds(List<Ad> ads) {
-        this.ads.clear();
-        this.ads.addAll(ads);
+        this.ads = new ArrayList<>(ads);
 
         zoneViews = 0;
         adIndex = 0;
@@ -83,9 +86,5 @@ public class Zone {
         }
 
         return result;
-    }
-
-    public Ad getCurrentAd() {
-        return ads.get(adIndex);
     }
 }
