@@ -36,7 +36,6 @@ public class HttpEventAdapter implements EventAdapter {
 
             @Override
             public void onResponse(JSONArray response) {
-                Log.i(TAG, "Event Batch Request Succeeded.");
                 notifyEventsPublished();
             }
 

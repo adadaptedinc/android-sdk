@@ -35,12 +35,10 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
 
     @Override
     public void init(JSONObject json) {
-        Log.i(TAG, "ki/init JSON: " + json);
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
                 initUrl, json, new Response.Listener<JSONObject>(){
             @Override
             public void onResponse(JSONObject jsonObject) {
-                Log.d(TAG, "KI Init Request Succeeded.");
                 notifyInitSuccess(jsonObject);
             }
         }, new Response.ErrorListener() {
@@ -58,12 +56,10 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
 
     @Override
     public void track(final JSONArray json) {
-        Log.i(TAG, "ki/track JSON: " + json);
         JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST,
                 trackUrl, json, new Response.Listener<JSONArray>(){
             @Override
             public void onResponse(JSONArray jsonObject) {
-                Log.d(TAG, "KI Track Request Succeeded.");
                 notifyTrackSuccess();
             }
         }, new Response.ErrorListener() {

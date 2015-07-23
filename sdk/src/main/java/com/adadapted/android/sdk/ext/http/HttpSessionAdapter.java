@@ -37,7 +37,6 @@ public class HttpSessionAdapter implements SessionAdapter {
 
             @Override
             public void onResponse(JSONObject response) {
-                Log.i(TAG, "Session Init Request Succeeded.");
                 notifySessionRequestCompleted(response);
             }
 
@@ -61,7 +60,6 @@ public class HttpSessionAdapter implements SessionAdapter {
 
             @Override
             public void onResponse(JSONObject response) {
-                Log.i(TAG, "Session Reinit Request Succeeded.");
                 if(response.length() > 0) {
                     notifySessionRequestCompleted(response);
                 }

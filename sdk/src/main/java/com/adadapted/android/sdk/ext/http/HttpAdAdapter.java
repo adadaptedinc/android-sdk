@@ -33,7 +33,6 @@ public class HttpAdAdapter implements AdAdapter {
                 @Override
                 public void onResponse(JSONObject jsonObject) {
                     notifyAdGetRequestCompleted(jsonObject);
-                    Log.i(TAG, "Ad Get Request Succeeded.");
                 }
             },
             new Response.ErrorListener() {
