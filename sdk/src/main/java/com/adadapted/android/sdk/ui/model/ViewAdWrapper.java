@@ -63,7 +63,7 @@ public class ViewAdWrapper {
     }
 
     public void beginAdTracking() {
-        if(hasAd()) {
+        if(hasAd() && !trackingHasStarted) {
             eventTracker.trackImpressionBeginEvent(sessionId, getAd());
             trackingHasStarted = true;
         }
@@ -74,8 +74,6 @@ public class ViewAdWrapper {
             eventTracker.trackImpressionEndEvent(sessionId, getAd());
             trackingHasStarted = false;
         }
-
-        flush();
     }
 
     public void trackInteraction() {
@@ -86,17 +84,11 @@ public class ViewAdWrapper {
                 ad.hideAd();
             }
         }
-
-        flush();
     }
 
     public void trackPayloadDelivered() {
         if(hasAd() && trackingHasStarted) {
             eventTracker.trackCustomEvent(sessionId, getAd(), "payload_delivered");
         }
-    }
-
-    private void flush() {
-        eventTracker.publishEvents();
     }
 }
