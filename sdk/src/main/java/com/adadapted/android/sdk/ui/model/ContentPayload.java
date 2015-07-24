@@ -54,6 +54,10 @@ public class ContentPayload {
         ad.trackPayloadDelivered();
     }
 
+    public String getZoneId() {
+        return ad.getAd().getZoneId();
+    }
+
     public int getType() {
         return type;
     }
