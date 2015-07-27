@@ -4,14 +4,16 @@ import android.app.Application;
 import android.util.Log;
 
 import com.adadapted.android.sdk.AdAdapted;
+import com.adadapted.android.sdk.ui.listener.AaAdEventListener;
+import com.adadapted.android.sdk.ui.listener.AaContentListener;
+import com.adadapted.android.sdk.ui.listener.AaDelegateListener;
 import com.adadapted.android.sdk.ui.model.ContentPayload;
 import com.newrelic.agent.android.NewRelic;
 
 /**
  * Created by chrisweeden on 3/16/15.
  */
-public class TestAppApplication extends Application implements AdAdapted.AdEventListener,
-        AdAdapted.ContentListener, AdAdapted.DelegateListener {
+public class TestAppApplication extends Application {
     private static final String TAG = TestAppApplication.class.getName();
 
     public TestAppApplication() {
@@ -26,29 +28,16 @@ public class TestAppApplication extends Application implements AdAdapted.AdEvent
         String[] zones = getResources().getStringArray(R.array.adadapted_zones);
         boolean isProd = getResources().getBoolean(R.bool.adadapted_prod);
 
-        AdAdapted.init(this, apiKey, zones, isProd);
-        AdAdapted.addAdListener(this);
-        AdAdapted.addContentListener(this);
-        AdAdapted.addDelegateListener(this);
-    }
+        AdAdapted.init(this, apiKey, zones, isProd, new AaAdEventListener() {
+            @Override
+            public void onAdImpression(String zoneId) {
+                Log.i(TAG, "Ad Impression for Zone " + zoneId);
+            }
 
-    @Override
-    public void onAdImpression(String zoneId) {
-        Log.i(TAG, "Ad Impression registered for Zone " + zoneId);
-    }
-
-    @Override
-    public void onAdClick(String zoneId) {
-        Log.i(TAG, "Ad Click registered for Zone " + zoneId);
-    }
-
-    @Override
-    public void onContentAvailable(String zoneId, ContentPayload contentPayload) {
-
-    }
-
-    @Override
-    public void onDelegateAvailable(String zoneId, String delegate) {
-
+            @Override
+            public void onAdClick(String zoneId) {
+                Log.i(TAG, "Ad Interaction for Zone " + zoneId);
+            }
+        });
     }
 }

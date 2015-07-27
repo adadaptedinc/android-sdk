@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/aa_default_json_ad_zone_layout"
     android:layout_width="match_parent"
+    android:orientation="vertical"
     android:layout_height="90dp"
     android:padding="8dp">
 
@@ -37,4 +38,4 @@
         android:layout_below="@id/aa_ad_tag_line"
         android:padding="4dp"/>
 
-</RelativeLayout>
+</LinearLayout>

@@ -9,7 +9,6 @@ import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -60,7 +59,7 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
         adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, lists);
 
         aaZoneView = new AaZoneView(getActivity());
-        aaZoneView.init("100680");
+        aaZoneView.init("100680", R.layout.aa_default_json_ad_zone);
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

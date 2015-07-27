@@ -15,8 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.ui.adapter.AaFeedAdapter;
+import com.adadapted.android.sdk.ui.listener.AaContentListener;
 import com.adadapted.android.sdk.ui.model.ContentPayload;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.todo.TodoList;
@@ -37,7 +37,7 @@ import java.util.UUID;
  * Use the {@link TodoListDetailFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TodoListDetailFragment extends ListFragment implements AdAdapted.ContentListener {
+public class TodoListDetailFragment extends ListFragment implements AaContentListener {
     private static final String TAG = TodoListDetailFragment.class.getName();
 
     private static final String ARG_LIST_ID = "listId";
@@ -94,10 +94,10 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
 
         View view = inflater.inflate(R.layout.fragment_todo_list_detail, container, false);
 
-        ListView listView = (ListView)view.findViewById(android.R.id.list);
+        //ListView listView = (ListView)view.findViewById(android.R.id.list);
 
         adapter = new TodoListItemAdapter(getActivity(), list.getItems());
-        feedAdapter = new AaFeedAdapter(getActivity(), adapter, "100682", 3);
+        feedAdapter = new AaFeedAdapter(getActivity(), adapter, "100682", 3, R.layout.aa_default_json_ad_zone);
         setListAdapter(feedAdapter);
 
         return view;
@@ -107,20 +107,14 @@ public class TodoListDetailFragment extends ListFragment implements AdAdapted.Co
     public void onResume() {
         super.onResume();
 
-        Log.w(TAG, "onResume() called.");
-
-        AdAdapted.getInstance().addListener(this);
-        feedAdapter.onStart();
+        feedAdapter.onStart(this);
     }
 
     @Override
     public void onPause() {
-        Log.w(TAG, "onPause() called.");
-
         super.onPause();
 
-        AdAdapted.getInstance().removeListener(this);
-        feedAdapter.onStop();
+        feedAdapter.onStop(this);
     }
 
     @Override
