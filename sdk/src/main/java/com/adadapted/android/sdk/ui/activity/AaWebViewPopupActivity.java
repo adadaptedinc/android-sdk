@@ -11,8 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.RelativeLayout;
 
-import com.adadapted.android.sdk.R;
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.PopupAdAction;
 import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
@@ -32,13 +32,27 @@ public class AaWebViewPopupActivity extends AppCompatActivity {
         return intent;
     }
 
+    private WebView popupWebView;
     private Ad ad;
     private String sessionId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_web_view_popup);
+
+        setTitle("Web View Popup Activity");
+
+        RelativeLayout.LayoutParams webViewLayout = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.MATCH_PARENT);
+
+        popupWebView = new WebView(this);
+        popupWebView.setLayoutParams(webViewLayout);
+
+        RelativeLayout popupLayout = new RelativeLayout(this);
+        popupLayout.addView(popupWebView);
+
+        setContentView(popupLayout);
 
         Intent intent = getIntent();
         ad = (Ad)intent.getSerializableExtra(EXTRA_POPUP_AD);
@@ -54,26 +68,25 @@ public class AaWebViewPopupActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
 
-        EventTrackerFactory.getInstance(this).createEventTracker().trackPopupBeginEvent(sessionId, ad);
+        EventTrackerFactory.getInstance().createEventTracker(this).trackPopupBeginEvent(sessionId, ad);
     }
 
     public void onPause() {
         super.onPause();
-        EventTrackerFactory.getInstance(this).createEventTracker().trackPopupEndEvent(sessionId, ad);
+        EventTrackerFactory.getInstance().createEventTracker(this).trackPopupEndEvent(sessionId, ad);
     }
 
     @SuppressLint({"AddJavascriptInterface", "SetJavaScriptEnabled"})
     private void loadPopup(String url) {
-        WebView webView = (WebView)findViewById(R.id.activity_web_view_popup_webView);
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.addJavascriptInterface(new WebAppInterface(this), "AdAdapted");
-        webView.setWebViewClient(new WebViewClient() {
+        popupWebView.getSettings().setJavaScriptEnabled(true);
+        popupWebView.addJavascriptInterface(new WebAppInterface(this), "AdAdapted");
+        popupWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 return false;
             }
         });
-        webView.loadUrl(url);
+        popupWebView.loadUrl(url);
     }
 
     private void styleActivity(PopupAdAction action) {
