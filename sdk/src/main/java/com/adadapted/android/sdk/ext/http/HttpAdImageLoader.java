@@ -20,7 +20,7 @@ public class HttpAdImageLoader implements AdImageLoader {
     }
 
     public void getImage(final String url, final Listener listener) {
-        if(url == null) {
+        if(url == null || !url.toLowerCase().startsWith("http")) {
             Log.w(TAG, "No URL has been provided.");
             notifyAdImageLoadFailed(listener);
             return;
