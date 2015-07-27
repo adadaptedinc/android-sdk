@@ -3,6 +3,7 @@ package com.adadapted.android.sdk;
 import android.content.Context;
 import android.util.Log;
 
+import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.device.BuildDeviceInfoParam;
 import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.device.DeviceInfoBuilder;
@@ -11,7 +12,6 @@ import com.adadapted.android.sdk.ext.cache.ImageCache;
 import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
 import com.adadapted.android.sdk.ui.listener.AaAdEventListener;
 import com.adadapted.android.sdk.ui.listener.AaContentListener;
-import com.adadapted.android.sdk.ui.listener.AaDelegateListener;
 import com.adadapted.android.sdk.ui.model.ContentPayload;
 
 import java.util.Arrays;
@@ -28,7 +28,6 @@ public class AdAdapted implements DeviceInfoBuilder.Listener {
 
     private final Set<AaAdEventListener> adEventListeners;
     private final Set<AaContentListener> contentListeners;
-    private final Set<AaDelegateListener> delegateListeners;
 
     private final Context context;
     private final boolean isProdMode;
@@ -38,18 +37,16 @@ public class AdAdapted implements DeviceInfoBuilder.Listener {
     private AdAdapted(Context context, String appId, String[] zones, boolean isProdMode) {
         this.adEventListeners = new HashSet<>();
         this.contentListeners = new HashSet<>();
-        this.delegateListeners = new HashSet<>();
 
         this.context = context;
 
         this.isProdMode = isProdMode;
-        String sdkVersion = context.getString(R.string.sdk_version);
 
         ImageCache.getInstance().purgeCache();
 
         DeviceInfoBuilder builder = new DeviceInfoBuilder();
         builder.addListener(this);
-        builder.execute(new BuildDeviceInfoParam(context, appId, zones, sdkVersion));
+        builder.execute(new BuildDeviceInfoParam(context, appId, zones, Config.SDK_VERSION));
     }
 
     public static synchronized AdAdapted getInstance() {
@@ -73,30 +70,6 @@ public class AdAdapted implements DeviceInfoBuilder.Listener {
         }
     }
 
-    public static synchronized void addAdListener(AaAdEventListener listener) {
-        getInstance().addListener(listener);
-    }
-
-    public static synchronized void removeAdListener(AaAdEventListener listener) {
-        getInstance().removeListener(listener);
-    }
-
-    public static synchronized void addContentListener(AaContentListener listener) {
-        getInstance().addListener(listener);
-    }
-
-    public static synchronized void removeContentListener(AaContentListener listener) {
-        getInstance().removeListener(listener);
-    }
-
-    public static synchronized void addDelegateListener(AaDelegateListener listener) {
-        getInstance().addListener(listener);
-    }
-
-    public static synchronized void removeDelegateListener(AaDelegateListener listener) {
-        getInstance().removeListener(listener);
-    }
-
     public Context getContext() {
         return context;
     }
@@ -110,7 +83,7 @@ public class AdAdapted implements DeviceInfoBuilder.Listener {
     }
 
     private SessionManager getSessionManager() {
-        return SessionManagerFactory.getInstance(context).createSessionManager();
+        return SessionManagerFactory.getInstance().createSessionManager(context);
     }
 
     public void addListener(AaAdEventListener listener) {
@@ -121,20 +94,12 @@ public class AdAdapted implements DeviceInfoBuilder.Listener {
         contentListeners.add(listener);
     }
 
-    public void addListener(AaDelegateListener listener) {
-        delegateListeners.add(listener);
-    }
-
     public void removeListener(AaAdEventListener listener) {
         adEventListeners.remove(listener);
     }
 
     public void removeListener(AaContentListener listener) {
         contentListeners.remove(listener);
-    }
-
-    public void removeListener(AaDelegateListener listener) {
-        delegateListeners.remove(listener);
     }
 
     public void publishAdImpression(String zoneId) {
@@ -152,12 +117,6 @@ public class AdAdapted implements DeviceInfoBuilder.Listener {
     public void publishContent(String zoneId, ContentPayload payload) {
         for(AaContentListener listener : contentListeners) {
             listener.onContentAvailable(zoneId, payload);
-        }
-    }
-
-    public void publishDelegate(String zoneId, String delegate) {
-        for(AaDelegateListener listener : delegateListeners) {
-            listener.onDelegateAvailable(zoneId, delegate);
         }
     }
 
