@@ -3,7 +3,7 @@ package com.adadapted.android.sdk.ext.factory;
 import android.content.Context;
 
 import com.adadapted.android.sdk.AdAdapted;
-import com.adadapted.android.sdk.R;
+import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.ad.AdFetcher;
 import com.adadapted.android.sdk.core.ad.AdRefreshBuilder;
 import com.adadapted.android.sdk.ext.http.HttpAdAdapter;
@@ -18,22 +18,19 @@ public class AdFetcherFactory {
 
     private static AdFetcherFactory instance;
 
-    public static synchronized AdFetcherFactory getInstance(Context context) {
+    public static synchronized AdFetcherFactory getInstance() {
         if(instance == null) {
-            instance = new AdFetcherFactory(context);
+            instance = new AdFetcherFactory();
         }
 
         return instance;
     }
 
-    private final Context context;
     private AdFetcher adFetcher;
 
-    private AdFetcherFactory(Context context) {
-        this.context = context;
-    }
+    private AdFetcherFactory() {}
 
-    public AdFetcher createAdFetcher() {
+    public AdFetcher createAdFetcher(Context context) {
         if(adFetcher == null) {
             adFetcher = new AdFetcher(new HttpAdAdapter(determineEndpoint()),
                     new JsonAdRequestBuilder(),
@@ -45,9 +42,9 @@ public class AdFetcherFactory {
 
     private String determineEndpoint() {
         if(AdAdapted.getInstance().isProd()) {
-            return context.getString(R.string.prod_ad_get_object_url);
+            return Config.Prod.URL_AD_GET;
         }
 
-        return context.getString(R.string.sandbox_ad_get_object_url);
+        return Config.Sand.URL_AD_GET;
     }
 }

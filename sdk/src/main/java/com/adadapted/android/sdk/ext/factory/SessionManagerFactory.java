@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.R;
+import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.session.SessionBuilder;
 import com.adadapted.android.sdk.core.session.SessionManager;
 import com.adadapted.android.sdk.core.session.SessionRequestBuilder;
@@ -17,22 +18,19 @@ import com.adadapted.android.sdk.ext.json.JsonSessionRequestBuilder;
 public class SessionManagerFactory {
     private static SessionManagerFactory instance;
 
-    public static synchronized SessionManagerFactory getInstance(Context context) {
+    public static synchronized SessionManagerFactory getInstance() {
         if(instance == null) {
-            instance = new SessionManagerFactory(context);
+            instance = new SessionManagerFactory();
         }
 
         return instance;
     }
 
-    private final Context context;
     private SessionManager sessionManager;
 
-    private SessionManagerFactory(Context context) {
-        this.context = context;
-    }
+    private SessionManagerFactory() {}
 
-    public SessionManager createSessionManager() {
+    public SessionManager createSessionManager(Context context) {
         if(sessionManager == null) {
             HttpSessionAdapter adapter = new HttpSessionAdapter(determineInitEndpoint(),
                     determineReinitEndpoint());
@@ -41,7 +39,7 @@ public class SessionManagerFactory {
 
             sessionManager = new SessionManager(context, adapter, requestBuilder, sessionBuilder);
 
-            AdFetcherFactory.getInstance(context).createAdFetcher().addListener(sessionManager);
+            AdFetcherFactory.getInstance().createAdFetcher(context).addListener(sessionManager);
         }
 
         return sessionManager;
@@ -49,17 +47,17 @@ public class SessionManagerFactory {
 
     private String determineInitEndpoint() {
         if(AdAdapted.getInstance().isProd()) {
-            return context.getString(R.string.prod_session_init_object_url);
+            return Config.Prod.URL_SESSION_INIT;
         }
 
-        return context.getString(R.string.sandbox_session_init_object_url);
+        return Config.Sand.URL_SESSION_INIT;
     }
 
     private String determineReinitEndpoint() {
         if(AdAdapted.getInstance().isProd()) {
-            return context.getString(R.string.prod_session_reinit_object_url);
+            return Config.Prod.URL_SESSION_REINIT;
         }
 
-        return context.getString(R.string.sandbox_session_reinit_object_url);
+        return Config.Sand.URL_SESSION_REINIT;
     }
 }

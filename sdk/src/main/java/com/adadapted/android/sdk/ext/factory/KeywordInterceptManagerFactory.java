@@ -3,7 +3,7 @@ package com.adadapted.android.sdk.ext.factory;
 import android.content.Context;
 
 import com.adadapted.android.sdk.AdAdapted;
-import com.adadapted.android.sdk.R;
+import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptAdapter;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptBuilder;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptRequestBuilder;
@@ -18,22 +18,19 @@ import com.adadapted.android.sdk.ext.json.JsonKeywordInterceptRequestBuilder;
 public class KeywordInterceptManagerFactory {
     private static KeywordInterceptManagerFactory instance;
 
-    public static synchronized KeywordInterceptManagerFactory getInstance(Context context) {
+    public static synchronized KeywordInterceptManagerFactory getInstance() {
         if(instance == null) {
-            instance = new KeywordInterceptManagerFactory(context);
+            instance = new KeywordInterceptManagerFactory();
         }
 
         return instance;
     }
 
-    private final Context context;
     private KeywordInterceptManager interceptManager;
 
-    private KeywordInterceptManagerFactory(Context context) {
-        this.context = context;
-    }
+    private KeywordInterceptManagerFactory() {}
 
-    public KeywordInterceptManager createKeywordInterceptManager() {
+    public KeywordInterceptManager createKeywordInterceptManager(Context context) {
         if(interceptManager == null) {
             KeywordInterceptAdapter adapter = new HttpKeywordInterceptAdapter(determineInitEndpoint(),
                     determineTrackEndpoint());
@@ -48,17 +45,17 @@ public class KeywordInterceptManagerFactory {
 
     private String determineInitEndpoint() {
         if(AdAdapted.getInstance().isProd()) {
-            return context.getString(R.string.prod_ki_init_object_url);
+            return Config.Prod.URL_KI_INIT;
         }
 
-        return context.getString(R.string.sandbox_ki_init_object_url);
+        return Config.Sand.URL_KI_INIT;
     }
 
     private String determineTrackEndpoint() {
         if(AdAdapted.getInstance().isProd()) {
-            return context.getString(R.string.prod_ki_track_object_url);
+            return Config.Prod.URL_KI_TRACK;
         }
 
-        return context.getString(R.string.sandbox_ki_track_object_url);
+        return Config.Sand.URL_KI_TRACK;
     }
 }

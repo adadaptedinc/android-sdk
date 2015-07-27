@@ -3,7 +3,7 @@ package com.adadapted.android.sdk.ext.factory;
 import android.content.Context;
 
 import com.adadapted.android.sdk.AdAdapted;
-import com.adadapted.android.sdk.R;
+import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.event.EventTracker;
 import com.adadapted.android.sdk.ext.http.HttpEventAdapter;
 import com.adadapted.android.sdk.ext.json.JsonEventRequestBuilder;
@@ -14,22 +14,19 @@ import com.adadapted.android.sdk.ext.json.JsonEventRequestBuilder;
 public class EventTrackerFactory {
     private static EventTrackerFactory instance;
 
-    public static synchronized EventTrackerFactory getInstance(Context context) {
+    public static synchronized EventTrackerFactory getInstance() {
         if(instance == null) {
-            instance = new EventTrackerFactory(context);
+            instance = new EventTrackerFactory();
         }
 
         return instance;
     }
 
-    private final Context context;
     private EventTracker eventTracker;
 
-    private EventTrackerFactory(Context context) {
-        this.context = context;
-    }
+    private EventTrackerFactory() {}
 
-    public EventTracker createEventTracker() {
+    public EventTracker createEventTracker(Context context) {
         if(eventTracker == null) {
             eventTracker = new EventTracker(new HttpEventAdapter(determineEndpoint()),
                     new JsonEventRequestBuilder());
@@ -40,9 +37,9 @@ public class EventTrackerFactory {
 
     private String determineEndpoint() {
         if(AdAdapted.getInstance().isProd()) {
-            return context.getString(R.string.prod_event_batch_object_url);
+            return Config.Prod.URL_EVENT_BATCH;
         }
 
-        return context.getString(R.string.sandbox_event_batch_object_url);
+        return Config.Sand.URL_EVENT_BATCH;
     }
 }
