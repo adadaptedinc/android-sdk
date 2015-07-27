@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/aa_default_json_ad_zone_layout"
-    android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:layout_height="90dp"
+    android:layout_width="fill_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
     android:padding="8dp">
 
     <ImageView android:id="@+id/aa_ad_campaign_image"
@@ -11,31 +10,47 @@
         android:layout_height="75dp"
         android:scaleType="fitXY"
         android:padding="4dp"
-        android:contentDescription="" />
+        android:contentDescription=""/>
+
+    <TextView android:id="@+id/aa_ad_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/aa_ad_campaign_image"
+        android:layout_toEndOf="@id/aa_ad_campaign_image"
+        android:padding="4dp"
+        android:text="aa_ad_tag_title" />
 
     <TextView android:id="@+id/aa_ad_tag_line"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/aa_ad_campaign_image"
-        android:layout_toEndOf="@id/aa_ad_campaign_image"
-        android:padding="4dp" />
+        android:layout_below="@id/aa_ad_title"
+        android:padding="4dp"
+        android:text="aa_ad_tag_line" />
 
-    <ImageView android:id="@+id/aa_ad_sponsor_logo"
+    <TextView android:id="@+id/aa_ad_sponsor_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/aa_ad_campaign_image"
-        android:layout_toEndOf="@id/aa_ad_campaign_image"
         android:layout_below="@id/aa_ad_tag_line"
-        android:scaleType="fitXY"
+        android:layout_toRightOf="@id/aa_ad_campaign_image"
         android:padding="4dp"
-        android:contentDescription="" />
+        android:text="aa_ad_sponsor_text"/>
+
+    <TextView android:id="@+id/aa_ad_sponsor_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/aa_ad_tag_line"
+        android:layout_toRightOf="@id/aa_ad_sponsor_text"
+        android:padding="4dp"
+        android:text="aa_ad_sponsor_name"/>
 
     <TextView android:id="@+id/aa_ad_cta_1"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/aa_ad_sponsor_logo"
-        android:layout_toEndOf="@id/aa_ad_sponsor_logo"
+        android:gravity="right"
         android:layout_below="@id/aa_ad_tag_line"
-        android:padding="4dp"/>
+        android:layout_toRightOf="@id/aa_ad_sponsor_name"
+        android:padding="4dp"
+        android:text="aa_ad_cta_1"/>
 
-</LinearLayout>
+</RelativeLayout>
