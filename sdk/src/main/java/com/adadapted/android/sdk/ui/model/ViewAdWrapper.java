@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.ui.model;
 
 import android.content.Context;
 
+import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.AdTypes;
 import com.adadapted.android.sdk.core.event.EventTracker;
@@ -20,7 +21,7 @@ public class ViewAdWrapper {
     private boolean trackingHasStarted = false;
 
     public ViewAdWrapper(Context context, String sessionId, Ad ad) {
-        eventTracker = EventTrackerFactory.getInstance(context).createEventTracker();
+        eventTracker = EventTrackerFactory.getInstance().createEventTracker(context);
 
         this.sessionId = sessionId;
         this.ad = ad;
@@ -65,6 +66,7 @@ public class ViewAdWrapper {
     public void beginAdTracking() {
         if(hasAd() && !trackingHasStarted) {
             eventTracker.trackImpressionBeginEvent(sessionId, getAd());
+            AdAdapted.getInstance().publishAdImpression(getAd().getZoneId());
             trackingHasStarted = true;
         }
     }
@@ -79,6 +81,7 @@ public class ViewAdWrapper {
     public void trackInteraction() {
         if(hasAd() && trackingHasStarted) {
             eventTracker.trackInteractionEvent(sessionId, getAd());
+            AdAdapted.getInstance().publishAdClick(getAd().getZoneId());
 
             if(ad.isHiddenAfterInteraction()) {
                 ad.hideAd();
