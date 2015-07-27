@@ -3,6 +3,7 @@ package com.adadapted.android.sdk.ext.scheduler;
 import android.content.Context;
 import android.os.Handler;
 
+import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.event.EventTracker;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptManager;
 import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
@@ -20,8 +21,8 @@ public class EventFlushScheduler {
     private long pollingInterval;
 
     public EventFlushScheduler(Context context) {
-        eventTracker = EventTrackerFactory.getInstance(context).createEventTracker();
-        keywordInterceptManager = KeywordInterceptManagerFactory.getInstance(context).createKeywordInterceptManager();
+        eventTracker = EventTrackerFactory.getInstance().createEventTracker(context);
+        keywordInterceptManager = KeywordInterceptManagerFactory.getInstance().createKeywordInterceptManager(context);
 
         handler = new Handler();
         runnable = new Runnable() {
@@ -37,7 +38,7 @@ public class EventFlushScheduler {
     }
 
     public void start(long pollingInterval) {
-        this.pollingInterval = pollingInterval <= 0L ? 20000L : pollingInterval;
+        this.pollingInterval = pollingInterval <= 0L ? Config.DEFAULT_EVENT_POLLING : pollingInterval;
         runnable.run();
     }
 

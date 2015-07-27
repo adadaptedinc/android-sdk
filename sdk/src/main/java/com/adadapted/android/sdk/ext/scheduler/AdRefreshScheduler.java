@@ -29,10 +29,10 @@ public class AdRefreshScheduler extends Timer {
     private final AdFetcher adFetcher;
 
     public AdRefreshScheduler(Context context) {
-        sessionManager = SessionManagerFactory.getInstance(context).createSessionManager();
-        keywordInterceptManager = KeywordInterceptManagerFactory.getInstance(context).createKeywordInterceptManager();
-        eventTracker = EventTrackerFactory.getInstance(context).createEventTracker();
-        adFetcher = AdFetcherFactory.getInstance(context).createAdFetcher();
+        sessionManager = SessionManagerFactory.getInstance().createSessionManager(context);
+        keywordInterceptManager = KeywordInterceptManagerFactory.getInstance().createKeywordInterceptManager(context);
+        eventTracker = EventTrackerFactory.getInstance().createEventTracker(context);
+        adFetcher = AdFetcherFactory.getInstance().createAdFetcher(context);
     }
 
     public void schedule(final Session session, final DeviceInfo deviceInfo) {

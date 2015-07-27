@@ -68,7 +68,7 @@ public class JsonZoneBuilder implements ZoneBuilder {
                     portDimension.setWidth(calculateDimensionValue(jsonZone.getString("port_zone_width")));
                 }
                 else {
-                    portDimension.setWidth(-2);
+                    portDimension.setWidth(-1);
                 }
 
                 zone.getDimensions().put("port", portDimension);
@@ -88,7 +88,7 @@ public class JsonZoneBuilder implements ZoneBuilder {
                     landDimension.setWidth(calculateDimensionValue(jsonZone.getString("land_zone_width")));
                 }
                 else {
-                    landDimension.setWidth(-2);
+                    landDimension.setWidth(-1);
                 }
 
                 zone.getDimensions().put("land", landDimension);

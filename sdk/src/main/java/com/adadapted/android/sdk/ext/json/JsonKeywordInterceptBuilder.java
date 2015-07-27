@@ -20,7 +20,6 @@ public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
     private static final String TAG = JsonKeywordInterceptBuilder.class.getName();
 
     public KeywordIntercept build(JSONObject json) {
-
         String searchId = "";
         long refreshTime = 0L;
         int minMatchLength = 2;
@@ -34,8 +33,8 @@ public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
                 refreshTime = Long.parseLong(json.getString("refresh_time"));
             }
 
-            if (json.has("min_match_len")) {
-                minMatchLength = Integer.parseInt(json.getString("min_match_len"));
+            if (json.has("min_match_length")) {
+                minMatchLength = Integer.parseInt(json.getString("min_match_length"));
             }
         }
         catch(JSONException ex) {
