@@ -5,6 +5,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import com.adadapted.android.sdk.AdAdapted;
+import com.adadapted.android.sdk.ui.listener.AaContentListener;
 import com.adadapted.android.sdk.ui.view.AaZoneView;
 
 /**
@@ -87,9 +89,25 @@ public class AaFeedAdapter extends BaseAdapter {
         }
     }
 
+    public void onStart(AaContentListener listener) {
+        if(currentZoneView != null) {
+            currentZoneView.onStart();
+        }
+
+        AdAdapted.getInstance().addListener(listener);
+    }
+
     public void onStop() {
         if(currentZoneView != null) {
             currentZoneView.onStop();
         }
+    }
+
+    public void onStop(AaContentListener listener) {
+        if(currentZoneView != null) {
+            currentZoneView.onStop();
+        }
+
+        AdAdapted.getInstance().removeListener(listener);
     }
 }

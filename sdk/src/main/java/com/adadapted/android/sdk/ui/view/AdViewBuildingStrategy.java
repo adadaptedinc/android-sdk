@@ -13,5 +13,6 @@ interface AdViewBuildingStrategy {
     }
 
     void buildView(Ad ad, int width, int height);
+    void buildView(Ad ad, int width, int height, int resourceId);
     View getView();
 }

@@ -45,14 +45,14 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
                 break;
 
             case JSON:
-                strategy = getJsonViewStrategy(resourceId);
+                strategy = getJsonViewStrategy();
                 break;
 
             default:
                 strategy = getEmptyViewStrategy();
         }
 
-        loadView(strategy, currentAd, width, height);
+        loadView(strategy, currentAd, width, height, resourceId);
     }
 
     private AdViewBuildingStrategy getHtmlViewStrategy() {
@@ -63,8 +63,8 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
         return new ImageAdViewBuildingStrategy(context, this);
     }
 
-    private AdViewBuildingStrategy getJsonViewStrategy(int resourceId) {
-        return new JsonAdViewBuildingStrategy(context, this, resourceId);
+    private AdViewBuildingStrategy getJsonViewStrategy() {
+        return new JsonAdViewBuildingStrategy(context, this);
     }
 
     private AdViewBuildingStrategy getEmptyViewStrategy() {
@@ -74,11 +74,12 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
     private void loadView(final AdViewBuildingStrategy strategy,
                           final ViewAdWrapper currentAd,
                           final int width,
-                          final int height) {
+                          final int height,
+                          final int resourceId) {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                strategy.buildView(currentAd.getAd(), width, height);
+                strategy.buildView(currentAd.getAd(), width, height, resourceId);
             }
         });
     }

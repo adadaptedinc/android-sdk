@@ -36,6 +36,11 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
     }
 
     @Override
+    public View getView() {
+        return view;
+    }
+
+    @Override
     public void buildView(Ad ad, int width, int height) {
         final HtmlAdType adType = (HtmlAdType) ad.getAdType();
 
@@ -47,7 +52,12 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
     }
 
     @Override
-    public View getView() {
-        return view;
+    public void buildView(Ad ad, int width, int height, int resourceId) {
+        buildView(ad, width, height);
+    }
+
+    @Override
+    public String toString() {
+        return "HtmlAdViewBuildingStrategy{}";
     }
 }

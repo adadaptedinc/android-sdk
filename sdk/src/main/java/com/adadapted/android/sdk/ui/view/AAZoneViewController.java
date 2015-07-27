@@ -99,11 +99,12 @@ class AaZoneViewController implements SessionManager.Listener, AdZoneRefreshSche
     }
 
     public void handleAdAction() {
-        currentAd.trackInteraction();
-        adActionHandler.handleAction(currentAd);
+        if(adActionHandler.handleAction(currentAd)){
+            currentAd.trackInteraction();
 
-        if(currentAd.isHiddenOnInteraction()) {
-            setNextAd();
+            if (currentAd.isHiddenOnInteraction()) {
+                setNextAd();
+            }
         }
     }
 
@@ -137,7 +138,7 @@ class AaZoneViewController implements SessionManager.Listener, AdZoneRefreshSche
 
     public void setListener(Listener listener) {
         this.listener = listener;
-        SessionManagerFactory.getInstance(context).createSessionManager().addListener(this);
+        SessionManagerFactory.getInstance().createSessionManager(context).addListener(this);
 
         currentAd.beginAdTracking();
     }
@@ -146,7 +147,7 @@ class AaZoneViewController implements SessionManager.Listener, AdZoneRefreshSche
         currentAd.completeAdTracking();
 
         this.listener = null;
-        SessionManagerFactory.getInstance(context).createSessionManager().removeListener(this);
+        SessionManagerFactory.getInstance().createSessionManager(context).removeListener(this);
     }
 
     private void notifyViewReadyForDisplay(final View v) {

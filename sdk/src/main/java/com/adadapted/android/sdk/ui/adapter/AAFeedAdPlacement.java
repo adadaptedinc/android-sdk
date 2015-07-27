@@ -3,7 +3,6 @@ package com.adadapted.android.sdk.ui.adapter;
 import android.content.Context;
 import android.widget.AbsListView;
 
-import com.adadapted.android.sdk.R;
 import com.adadapted.android.sdk.ui.view.AaZoneView;
 
 /**
@@ -23,7 +22,7 @@ public class AaFeedAdPlacement {
         this.context = context;
         this.zoneId = zoneId;
         this.placement = (placement <= 0) ? 0 : placement-1;
-        this.resourceId = R.layout.aa_default_json_ad_zone;
+        this.resourceId = 0;
     }
 
     public AaFeedAdPlacement(Context context, String zoneId, int placement, int resourceId) {

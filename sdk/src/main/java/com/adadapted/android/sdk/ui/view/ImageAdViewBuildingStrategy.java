@@ -81,4 +81,14 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
             public void onAdImageLoadFailed() {}
         });
     }
+
+    @Override
+    public void buildView(Ad ad, int width, int height, int resourceId) {
+        buildView(ad, width, height);
+    }
+
+    @Override
+    public String toString() {
+        return "ImageAdViewBuildingStrategy{}";
+    }
 }

@@ -29,12 +29,12 @@ public class AaKeywordInterceptMatcher implements SessionManager.Listener, Keywo
     private Session session;
 
     public AaKeywordInterceptMatcher(Context context) {
-        manager = KeywordInterceptManagerFactory.getInstance(context).createKeywordInterceptManager();
+        manager = KeywordInterceptManagerFactory.getInstance().createKeywordInterceptManager(context);
         manager.setListener(this);
 
         suggestionTracker = new AaSuggestionTracker(manager);
 
-        SessionManagerFactory.getInstance(context).createSessionManager().addListener(this);
+        SessionManagerFactory.getInstance().createSessionManager(context).addListener(this);
     }
 
     public SuggestionPayload match(CharSequence constraint) {

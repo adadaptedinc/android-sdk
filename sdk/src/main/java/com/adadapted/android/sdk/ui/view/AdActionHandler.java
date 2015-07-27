@@ -21,9 +21,15 @@ class AdActionHandler {
         this.context = context;
     }
 
-    public void handleAction(ViewAdWrapper ad) {
-        if(!ad.hasAd()) { return; }
+    /**
+     *
+     * @param ad
+     * @return Whether the Ad Interaction should be tracked or not.
+     */
+    public boolean handleAction(ViewAdWrapper ad) {
+        if(!ad.hasAd()) { return false; }
 
+        boolean result = true;
         switch(ad.getAd().getAdAction().getActionType()) {
             case AdAction.CONTENT:
                 handleContentAction(ad);
@@ -38,12 +44,15 @@ class AdActionHandler {
                 break;
 
             case AdAction.NULLACTION:
+                result = false;
                 break;
 
             case AdAction.POPUP:
                 handlePopupAction(ad);
                 break;
         }
+
+        return result;
     }
 
     private void handleContentAction(ViewAdWrapper ad) {

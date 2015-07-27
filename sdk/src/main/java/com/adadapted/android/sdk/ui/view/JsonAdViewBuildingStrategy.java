@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.ui.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -21,19 +22,37 @@ class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
     private static final String TAG = HtmlAdViewBuildingStrategy.class.getName();
 
     private final Listener listener;
-    private final View view;
+    private final Context context;
+
+    private View view;
 
     private final AdImageLoader imageLoader;
 
-    public JsonAdViewBuildingStrategy(final Context context, final Listener listener, int resourceId) {
+    public JsonAdViewBuildingStrategy(final Context context, final Listener listener) {
+        this.context = context;
         this.listener = listener;
         this.imageLoader = new HttpAdImageLoader();
 
-        view = View.inflate(context, resourceId, null);
+        view = new View(context);
     }
 
     @Override
-    public void buildView(Ad ad, int width, int height) {
+    public View getView() {
+        return view;
+    }
+
+    @Override
+    public void buildView(Ad ad, int width, int height) {}
+
+    @Override
+    public void buildView(Ad ad, int width, int height, int resourceId) {
+        if(resourceId == 0) {
+            Log.w(TAG, "No Resource File passed in for JSON Ad in Zone " + ad.getZoneId());
+            listener.onStrategyViewLoaded();
+            return;
+        }
+
+        view = View.inflate(context, resourceId, null);
         view.setLayoutParams(new ViewGroup.LayoutParams(width, height));
 
         AdComponent adComponents = ((JsonAdType)ad.getAdType()).getComponents();
@@ -96,11 +115,6 @@ class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
         listener.onStrategyViewLoaded();
     }
 
-    @Override
-    public View getView() {
-        return view;
-    }
-
     private void loadImageViewFromUrl(final ImageView imageView, final String url) {
         imageLoader.getImage(url, new AdImageLoader.Listener() {
             @Override
@@ -111,5 +125,10 @@ class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
             @Override
             public void onAdImageLoadFailed() {}
         });
+    }
+
+    @Override
+    public String toString() {
+        return "JsonAdViewBuildingStrategy{}";
     }
 }

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,7 +14,8 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.RelativeLayout;
 
-import com.adadapted.android.sdk.R;
+import com.adadapted.android.sdk.AdAdapted;
+import com.adadapted.android.sdk.ui.listener.AaContentListener;
 
 /**
  * Created by chrisweeden on 3/30/15.
@@ -53,7 +55,7 @@ public class AaZoneView extends RelativeLayout
     }
 
     public void init(String zoneId) {
-        init(zoneId, R.layout.aa_default_json_ad_zone);
+        init(zoneId, 0);
     }
 
     public void init(String zoneId, int layoutResourceId) {
@@ -64,6 +66,8 @@ public class AaZoneView extends RelativeLayout
     }
 
     protected void displayAdView(final View view) {
+        if(view == null) { return; }
+
         Activity activity = (Activity)context;
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -125,8 +129,20 @@ public class AaZoneView extends RelativeLayout
         viewController.setListener(this);
     }
 
+    public void onStart(AaContentListener listener) {
+        onStart();
+
+        AdAdapted.getInstance().addListener(listener);
+    }
+
     public void onStop() {
         viewController.removeListener();
+    }
+
+    public void onStop(AaContentListener listener) {
+        AdAdapted.getInstance().removeListener(listener);
+
+        onStop();
     }
 
     @Override

@@ -18,12 +18,22 @@ class EmptyAdViewStrategy implements AdViewBuildingStrategy {
     }
 
     @Override
+    public View getView() {
+        return view;
+    }
+
+    @Override
     public void buildView(Ad ad, int width, int height) {
         listener.onStrategyViewLoaded();
     }
 
     @Override
-    public View getView() {
-        return view;
+    public void buildView(Ad ad, int width, int height, int resourceId) {
+        buildView(ad, width, height);
+    }
+
+    @Override
+    public String toString() {
+        return "EmptyAdViewStrategy{}";
     }
 }
