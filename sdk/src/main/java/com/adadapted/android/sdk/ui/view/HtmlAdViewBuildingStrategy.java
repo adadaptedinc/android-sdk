@@ -44,11 +44,15 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
     public void buildView(Ad ad, int width, int height) {
         final HtmlAdType adType = (HtmlAdType) ad.getAdType();
 
-        Log.i(TAG, "Setting WebView to " + width + " x " + height);
-        view.setLayoutParams(new ViewGroup.LayoutParams(width, height));
-        view.loadUrl(adType.getAdUrl());
+        if(adType.getAdUrl().toLowerCase().startsWith("http")) {
+            view.setLayoutParams(new ViewGroup.LayoutParams(width, height));
+            view.loadUrl(adType.getAdUrl());
 
-        listener.onStrategyViewLoaded();
+            listener.onStrategyViewLoaded();
+        }
+        else {
+            listener.onStrategyViewLoadFailed();
+        }
     }
 
     @Override

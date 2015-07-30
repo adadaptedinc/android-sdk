@@ -10,6 +10,7 @@ import com.adadapted.android.sdk.core.ad.model.Ad;
 interface AdViewBuildingStrategy {
     interface Listener {
         void onStrategyViewLoaded();
+        void onStrategyViewLoadFailed();
     }
 
     void buildView(Ad ad, int width, int height);

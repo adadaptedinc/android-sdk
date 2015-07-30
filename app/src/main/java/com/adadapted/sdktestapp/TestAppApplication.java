@@ -5,9 +5,7 @@ import android.util.Log;
 
 import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.ui.listener.AaAdEventListener;
-import com.adadapted.android.sdk.ui.listener.AaContentListener;
-import com.adadapted.android.sdk.ui.listener.AaDelegateListener;
-import com.adadapted.android.sdk.ui.model.ContentPayload;
+import com.facebook.stetho.Stetho;
 import com.newrelic.agent.android.NewRelic;
 
 /**
@@ -22,6 +20,21 @@ public class TestAppApplication extends Application {
 
     @Override
     public void onCreate() {
+        // Create an InitializerBuilder
+        Stetho.InitializerBuilder initializerBuilder = Stetho.newInitializerBuilder(this);
+
+        // Enable Chrome DevTools
+        initializerBuilder.enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this));
+
+        // Enable command line interface
+        initializerBuilder.enableDumpapp(Stetho.defaultDumperPluginsProvider(this));
+
+        // Use the InitializerBuilder to generate an Initializer
+        Stetho.Initializer initializer = initializerBuilder.build();
+
+        // Initialize Stetho with the Initializer
+        Stetho.initialize(initializer);
+
         NewRelic.withApplicationToken("AAabde692c32523732801586d2c793895d9dae5e0d").start(this);
 
         String apiKey = getResources().getString(R.string.adadapted_api_key);

@@ -24,7 +24,7 @@ class EmptyAdViewStrategy implements AdViewBuildingStrategy {
 
     @Override
     public void buildView(Ad ad, int width, int height) {
-        listener.onStrategyViewLoaded();
+        listener.onStrategyViewLoadFailed();
     }
 
     @Override

@@ -48,7 +48,7 @@ class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
     public void buildView(Ad ad, int width, int height, int resourceId) {
         if(resourceId == 0) {
             Log.w(TAG, "No Resource File passed in for JSON Ad in Zone " + ad.getZoneId());
-            listener.onStrategyViewLoaded();
+            listener.onStrategyViewLoadFailed();
             return;
         }
 

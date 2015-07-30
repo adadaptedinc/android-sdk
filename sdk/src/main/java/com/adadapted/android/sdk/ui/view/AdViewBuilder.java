@@ -15,6 +15,7 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
 
     public interface Listener {
         void onViewLoaded(View v);
+        void onViewLoadFailed();
     }
 
     private final Context context;
@@ -100,7 +101,18 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
         }
     }
 
+    public void notifyViewLoadFailed() {
+        if(listener != null) {
+            listener.onViewLoadFailed();
+        }
+    }
+
     public void onStrategyViewLoaded() {
         notifyViewLoaded(strategy.getView());
+    }
+
+    @Override
+    public void onStrategyViewLoadFailed() {
+        notifyViewLoadFailed();
     }
 }

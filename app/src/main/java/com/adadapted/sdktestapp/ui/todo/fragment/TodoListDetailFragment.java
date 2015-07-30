@@ -94,10 +94,8 @@ public class TodoListDetailFragment extends ListFragment implements AaContentLis
 
         View view = inflater.inflate(R.layout.fragment_todo_list_detail, container, false);
 
-        //ListView listView = (ListView)view.findViewById(android.R.id.list);
-
         adapter = new TodoListItemAdapter(getActivity(), list.getItems());
-        feedAdapter = new AaFeedAdapter(getActivity(), adapter, "100682", 3, R.layout.aa_default_json_ad_zone);
+        feedAdapter = new AaFeedAdapter(getActivity(), adapter, "100682", 3);
         setListAdapter(feedAdapter);
 
         return view;

@@ -200,4 +200,10 @@ class AaZoneViewController implements SessionManager.Listener, AdZoneRefreshSche
     public void onViewLoaded(View v) {
         notifyViewReadyForDisplay(v);
     }
+
+    @Override
+    public void onViewLoadFailed() {
+        currentAd.getAd().hideAd();
+        setNextAd();
+    }
 }

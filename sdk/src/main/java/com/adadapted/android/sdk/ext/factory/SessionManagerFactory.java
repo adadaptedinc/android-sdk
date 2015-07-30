@@ -3,7 +3,6 @@ package com.adadapted.android.sdk.ext.factory;
 import android.content.Context;
 
 import com.adadapted.android.sdk.AdAdapted;
-import com.adadapted.android.sdk.R;
 import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.session.SessionBuilder;
 import com.adadapted.android.sdk.core.session.SessionManager;

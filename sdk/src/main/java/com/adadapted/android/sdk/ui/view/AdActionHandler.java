@@ -23,7 +23,7 @@ class AdActionHandler {
 
     /**
      *
-     * @param ad
+     * @param ad The Ad to handle the action for
      * @return Whether the Ad Interaction should be tracked or not.
      */
     public boolean handleAction(ViewAdWrapper ad) {

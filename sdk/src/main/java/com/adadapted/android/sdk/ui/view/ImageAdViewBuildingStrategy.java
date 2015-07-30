@@ -78,7 +78,9 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
             }
 
             @Override
-            public void onAdImageLoadFailed() {}
+            public void onAdImageLoadFailed() {
+                listener.onStrategyViewLoadFailed();
+            }
         });
     }
 
