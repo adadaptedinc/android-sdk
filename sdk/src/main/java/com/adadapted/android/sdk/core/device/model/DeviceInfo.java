@@ -20,12 +20,13 @@ import java.util.TimeZone;
  * Created by chrisweeden on 3/23/15.
  */
 public class DeviceInfo {
-    private static final String TAG = DeviceInfo.class.getName();
+    private static final String LOGTAG = DeviceInfo.class.getName();
 
     private static final String UNKNOWN_VALUE = "Unknown";
 
     private String appId;
-    private String[] zones;
+    private boolean isProd;
+    private float scale;
     private String bundleId;
     private String udid;
     private String device;
@@ -41,11 +42,15 @@ public class DeviceInfo {
 
     public DeviceInfo() {}
 
-    public static DeviceInfo captureDeviceInfo(Context context, String appId, String[] zones, String sdkVersion) {
+    public static DeviceInfo captureDeviceInfo(final Context context,
+                                               final String appId,
+                                               final boolean isProd,
+                                               final String sdkVersion) {
         DeviceInfo deviceInfo = new DeviceInfo();
 
         deviceInfo.setAppId(appId);
-        deviceInfo.setZones(zones);
+        deviceInfo.setIsProd(isProd);
+        deviceInfo.setScale(context.getResources().getDisplayMetrics().density);
 
         deviceInfo.setUdid(deviceInfo.captureAdvertisingId(context));
 
@@ -77,22 +82,24 @@ public class DeviceInfo {
             return AdvertisingIdClient.getAdvertisingIdInfo(context).getId();
         }
         catch (GooglePlayServicesNotAvailableException ex) {
-            Log.w(TAG, "Problem retrieving Google Play AdvertiserId", ex);
+            Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId", ex);
         }
         catch (GooglePlayServicesRepairableException ex) {
-            Log.w(TAG, "Problem retrieving Google Play AdvertiserId", ex);
+            Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId", ex);
         }
         catch (IOException ex) {
-            Log.w(TAG, "Problem retrieving Google Play AdvertiserId", ex);
+            Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId", ex);
         }
 
         return captureAndroidId(context);
     }
 
-    private String captureAndroidId(Context context) {
-        return Settings.Secure.getString(
+    private String captureAndroidId(final Context context) {
+        String androidId = Settings.Secure.getString(
                 context.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
+
+        return androidId == null ? "" : androidId;
     }
 
     private ScreenDensity determineScreenDensity(final Context context) {
@@ -134,12 +141,20 @@ public class DeviceInfo {
         this.appId = appId;
     }
 
-    public String[] getZones() {
-        return zones;
+    public boolean isProd() {
+        return isProd;
     }
 
-    public void setZones(String[] zones) {
-        this.zones = zones;
+    public void setIsProd(boolean isProd) {
+        this.isProd = isProd;
+    }
+
+    public float getScale() {
+        return scale;
+    }
+
+    public void setScale(float scale) {
+        this.scale = scale;
     }
 
     public String getBundleId() {

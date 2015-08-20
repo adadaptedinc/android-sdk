@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 6/23/15.
  */
-public class KeywordInterceptManager implements KeywordInterceptAdapter.Listener {
+public class KeywordInterceptManager {
     private static final String TAG = KeywordInterceptManager.class.getName();
 
     private static final int MAX_QUEUE_SIZE = 10;
@@ -39,11 +39,23 @@ public class KeywordInterceptManager implements KeywordInterceptAdapter.Listener
     private boolean initialized = false;
     private int failedRetries;
 
+    KeywordInterceptTrackListener keywordInterceptTrackListener = new KeywordInterceptTrackListener() {
+        @Override
+        public void onSuccess() {
+            failedRetries = 0;
+        }
+
+        @Override
+        public void onFailure(JSONArray json) {
+            failedRetries++;
+            sendBatchRetry(json);
+        }
+    };
+
     public KeywordInterceptManager(KeywordInterceptAdapter adapter,
                                    KeywordInterceptBuilder builder,
                                    KeywordInterceptRequestBuilder requestBuilder) {
         this.adapter = adapter;
-        this.adapter.addListener(this);
 
         this.builder = builder;
         this.requestBuilder = requestBuilder;
@@ -52,11 +64,22 @@ public class KeywordInterceptManager implements KeywordInterceptAdapter.Listener
         this.failedRetries = 0;
     }
 
-    public void init(Session session, DeviceInfo deviceInfo) {
-        this.deviceInfo = deviceInfo;
+    public void init(Session session) {
+        this.deviceInfo = session.getDeviceInfo();
 
-        JSONObject request = requestBuilder.buildInitRequest(session, deviceInfo);
-        adapter.init(request);
+        JSONObject request = requestBuilder.buildInitRequest(session);
+        adapter.init(request, new KeywordInterceptInitListener() {
+            @Override
+            public void onSuccess(JSONObject json) {
+                keywordIntercept = builder.build(json);
+                initialized = true;
+
+                notifyInitSuccess();
+            }
+
+            @Override
+            public void onFailure() {}
+        });
     }
 
     public void trackMatched(Session session, String term, String userInput) {
@@ -89,13 +112,13 @@ public class KeywordInterceptManager implements KeywordInterceptAdapter.Listener
             keywordInterceptEvents.clear();
 
             JSONArray json = requestBuilder.buildTrackRequest(events);
-            adapter.track(json);
+            adapter.track(json, keywordInterceptTrackListener);
         }
     }
 
     private void sendBatchRetry(JSONArray json) {
         if(failedRetries <= MAX_FAILED_RETRIES) {
-            adapter.track(json);
+            adapter.track(json, keywordInterceptTrackListener);
         }
         else {
             Log.w(TAG, "Maximum failed retries. No longer sending batch retries.");
@@ -135,27 +158,5 @@ public class KeywordInterceptManager implements KeywordInterceptAdapter.Listener
 
     private void notifyInitSuccess() {
        listener.onKeywordInterceptInitSuccess(keywordIntercept);
-    }
-
-    @Override
-    public void onInitSuccess(JSONObject json) {
-        keywordIntercept = builder.build(json);
-        initialized = true;
-
-        notifyInitSuccess();
-    }
-
-    @Override
-    public void onInitFailed() {}
-
-    @Override
-    public void onTrackSuccess() {
-        failedRetries = 0;
-    }
-
-    @Override
-    public void onTrackFailed(JSONArray json) {
-        failedRetries++;
-        sendBatchRetry(json);
     }
 }

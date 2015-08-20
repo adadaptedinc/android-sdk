@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.core.session.model;
 
+import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.zone.model.Zone;
 
 import java.util.Date;
@@ -12,14 +13,26 @@ import java.util.Map;
 public class Session {
     private static final String TAG = Session.class.getName();
 
-    private String sessionId = "";
-    private boolean activeCampaigns = false;
+    private DeviceInfo deviceInfo;
+    private String sessionId;
+    private boolean activeCampaigns;
     private Date expiresAt;
-    private long pollingInterval = 300000;
+    private long pollingInterval;
     private Map<String, Zone> zones;
 
     public Session() {
-        this.zones = new HashMap<>();
+        sessionId = "";
+        activeCampaigns = false;
+        pollingInterval = 300000;
+        zones = new HashMap<>();
+    }
+
+    public DeviceInfo getDeviceInfo() {
+        return deviceInfo;
+    }
+
+    public void setDeviceInfo(DeviceInfo deviceInfo) {
+        this.deviceInfo = deviceInfo;
     }
 
     public String getSessionId() {

@@ -7,16 +7,6 @@ import org.json.JSONObject;
  * Created by chrisweeden on 6/23/15.
  */
 public interface KeywordInterceptAdapter {
-    interface Listener {
-        void onInitSuccess(JSONObject response);
-        void onInitFailed();
-        void onTrackSuccess();
-        void onTrackFailed(JSONArray json);
-    }
-
-    void init(JSONObject request);
-    void track(JSONArray request);
-
-    void addListener(Listener listener);
-    void removeListener(Listener listener);
+    void init(JSONObject request, KeywordInterceptInitListener listener);
+    void track(JSONArray request, KeywordInterceptTrackListener listener);
 }

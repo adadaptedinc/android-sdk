@@ -4,130 +4,89 @@ import android.content.Context;
 import android.util.Log;
 
 import com.adadapted.android.sdk.config.Config;
-import com.adadapted.android.sdk.core.device.BuildDeviceInfoParam;
-import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.device.DeviceInfoBuilder;
+import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.session.SessionManager;
 import com.adadapted.android.sdk.ext.cache.ImageCache;
+import com.adadapted.android.sdk.ext.factory.DeviceInfoFactory;
 import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
-import com.adadapted.android.sdk.ui.listener.AaAdEventListener;
-import com.adadapted.android.sdk.ui.listener.AaContentListener;
-import com.adadapted.android.sdk.ui.model.ContentPayload;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener;
+import com.adadapted.android.sdk.ui.messaging.SdkEventPublisher;
+import com.adadapted.android.sdk.ui.messaging.SdkEventPublisherFactory;
 
 /**
- * Created by chrisweeden on 3/16/15.
+ * Created by chrisweeden on 8/18/15.
  */
-public class AdAdapted implements DeviceInfoBuilder.Listener {
-    private static final String TAG = AdAdapted.class.getName();
+public class AdAdapted {
+    private static final String LOGTAG = AdAdapted.class.getName();
 
-    private static AdAdapted instance;
+    public static class Env {
+        public static final boolean PROD = true;
+        public static final boolean DEV = false;
+    }
 
-    private final Set<AaAdEventListener> adEventListeners;
-    private final Set<AaContentListener> contentListeners;
+    private static AdAdapted sInstance;
 
-    private final Context context;
-    private final boolean isProdMode;
+    private String mAppId;
+    private boolean mIsProd;
 
-    private DeviceInfo deviceInfo;
+    private boolean mSdkLoaded = false;
 
-    private AdAdapted(Context context, String appId, String[] zones, boolean isProdMode) {
-        this.adEventListeners = new HashSet<>();
-        this.contentListeners = new HashSet<>();
+    private Context mContext;
 
-        this.context = context;
-
-        this.isProdMode = isProdMode;
+    private AdAdapted(Context context) {
+        mContext = context;
 
         ImageCache.getInstance().purgeCache();
-
-        DeviceInfoBuilder builder = new DeviceInfoBuilder();
-        builder.addListener(this);
-        builder.execute(new BuildDeviceInfoParam(context, appId, zones, Config.SDK_VERSION));
     }
 
-    public static synchronized AdAdapted getInstance() {
-        return instance;
-    }
-
-    public static synchronized void init(Context context, String appId, String[] zones,
-                                         boolean prodMode) {
-        if(instance == null) {
-            Log.d(TAG, "init() called for appId: " + appId + " and zones: " + Arrays.toString(zones));
-            instance = new AdAdapted(context, appId, zones, prodMode);
+    public static AdAdapted init(Context context) {
+        if(sInstance == null) {
+            sInstance = new AdAdapted(context);
         }
+
+        return sInstance;
     }
 
-    public static synchronized void init(Context context, String appId, String[] zones,
-                                         boolean prodMode, AaAdEventListener listenter) {
-        if(instance == null) {
-            Log.d(TAG, "init() called for appId: " + appId + " and zones: " + Arrays.toString(zones));
-            instance = new AdAdapted(context, appId, zones, prodMode);
-            instance.addListener(listenter);
+    public AdAdapted withAppId(String appId) {
+        mAppId = appId;
+
+        return this;
+    }
+
+    public AdAdapted inEnv(boolean environment) {
+        mIsProd = environment;
+
+        return this;
+    }
+
+    public AdAdapted setSdkEventListener(AaSdkEventListener listener) {
+        getSdkEventPublisher().setListener(listener);
+
+        return this;
+    }
+
+    public void start() {
+        if(!mSdkLoaded) {
+            DeviceInfoFactory.createDeviceInfo(mContext, mAppId, Config.SDK_VERSION,
+                    mIsProd, new DeviceInfoBuilder.Listener() {
+                @Override
+                public void onDeviceInfoCollected(DeviceInfo deviceInfo) {
+                    getSessionManager().initialize(deviceInfo);
+                    mSdkLoaded = true;
+                }
+            });
         }
-    }
-
-    public Context getContext() {
-        return context;
-    }
-
-    public DeviceInfo getDeviceInfo() {
-        return deviceInfo;
-    }
-
-    public boolean isProd() {
-        return isProdMode;
+        else {
+            Log.w(LOGTAG, "AdAdapted SDK has already been loaded with App Id: " + mAppId + ".");
+        }
     }
 
     private SessionManager getSessionManager() {
-        return SessionManagerFactory.getInstance().createSessionManager(context);
+        return SessionManagerFactory.createSessionManager(mContext);
     }
 
-    public void addListener(AaAdEventListener listener) {
-        adEventListeners.add(listener);
-    }
-
-    public void addListener(AaContentListener listener) {
-        contentListeners.add(listener);
-    }
-
-    public void removeListener(AaAdEventListener listener) {
-        adEventListeners.remove(listener);
-    }
-
-    public void removeListener(AaContentListener listener) {
-        contentListeners.remove(listener);
-    }
-
-    public void publishAdImpression(String zoneId) {
-        for(AaAdEventListener listener : adEventListeners) {
-            listener.onAdImpression(zoneId);
-        }
-    }
-
-    public void publishAdClick(String zoneId) {
-        for(AaAdEventListener listener : adEventListeners) {
-            listener.onAdClick(zoneId);
-        }
-    }
-
-    public void publishContent(String zoneId, ContentPayload payload) {
-        for(AaContentListener listener : contentListeners) {
-            listener.onContentAvailable(zoneId, payload);
-        }
-    }
-
-    @Override
-    public void onDeviceInfoCollected(DeviceInfo deviceInfo) {
-        this.deviceInfo = deviceInfo;
-        getSessionManager().initialize(deviceInfo);
-    }
-
-    @Override
-    public String toString() {
-        return "AdAdapted{}";
+    private SdkEventPublisher getSdkEventPublisher() {
+        return SdkEventPublisherFactory.getSdkEventPublisher();
     }
 }

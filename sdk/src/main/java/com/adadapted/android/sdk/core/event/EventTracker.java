@@ -2,10 +2,9 @@ package com.adadapted.android.sdk.core.event;
 
 import android.util.Log;
 
-import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.ad.model.Ad;
-import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.event.model.EventTypes;
+import com.adadapted.android.sdk.core.session.model.Session;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -16,101 +15,106 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 3/23/15.
  */
-public class EventTracker implements EventAdapter.Listener {
-    private static final String TAG = EventTracker.class.getName();
+public class EventTracker {
+    private static final String LOGTAG = EventTracker.class.getName();
 
     private static final int MAX_QUEUE_SIZE = 10;
     private static final int MAX_FAILED_RETRIES = 2;
 
-    private final EventAdapter eventAdapter;
-    private final EventRequestBuilder builder;
+    private final EventAdapter mEventAdapter;
+    private final EventRequestBuilder mBuilder;
+    private final Set<JSONObject> mQueuedEvents;
 
-    private final Set<JSONObject> queuedEvents;
-    private int failedRetries;
+    private int mFailedRetries;
 
-    public EventTracker(EventAdapter eventAdapter, EventRequestBuilder builder) {
-        this.eventAdapter = eventAdapter;
-        this.builder = builder;
+    private final EventAdapterListener mEventAdapterListener = new EventAdapterListener() {
+        @Override
+        public void onSuccess() {
+            mFailedRetries = 0;
+        }
 
-        this.queuedEvents = new HashSet<>();
-        failedRetries = 0;
+        @Override
+        public void onFailure(final JSONArray json) {
+            mFailedRetries++;
+            sendBatchRetry(json);
+        }
+    };
+
+    public EventTracker(final EventAdapter eventAdapter, final EventRequestBuilder builder) {
+        mEventAdapter = eventAdapter;
+        mBuilder = builder;
+
+        mQueuedEvents = new HashSet<>();
+
+        mFailedRetries = 0;
     }
 
     public Set<JSONObject> getQueuedEvents() {
-        return queuedEvents;
+        return mQueuedEvents;
     }
 
     public void publishEvents() {
-        if(!queuedEvents.isEmpty()) {
+        if(!mQueuedEvents.isEmpty()) {
             Set<JSONObject> currentEvents = new HashSet<>(getQueuedEvents());
-            queuedEvents.clear();
+            mQueuedEvents.clear();
 
             JSONArray eventsArray = new JSONArray(currentEvents);
-            eventAdapter.sendBatch(eventsArray);
+            mEventAdapter.sendBatch(eventsArray, mEventAdapterListener);
         }
     }
 
-    private void sendBatchRetry(JSONArray json) {
-        if(failedRetries <= MAX_FAILED_RETRIES) {
-            eventAdapter.sendBatch(json);
+    private void sendBatchRetry(final JSONArray json) {
+        if(mFailedRetries <= MAX_FAILED_RETRIES) {
+            mEventAdapter.sendBatch(json, mEventAdapterListener);
         }
         else {
-            Log.w(TAG, "Maximum failed retries. No longer sending batch retries.");
+            Log.w(LOGTAG, "Maximum failed retries. No longer sending batch retries.");
         }
     }
 
-    public void trackImpressionBeginEvent(String sessionId, Ad ad) {
+    public void trackImpressionBeginEvent(final Session session, final Ad ad) {
         ad.incrementImpressionViews();
-        trackEvent(sessionId, ad, EventTypes.IMPRESSION, "");
+        trackEvent(session, ad, EventTypes.IMPRESSION, "");
     }
 
-    public void trackImpressionEndEvent(String sessionId, Ad ad) {
-        trackEvent(sessionId, ad, EventTypes.IMPRESSION_END, "");
+    public void trackImpressionEndEvent(final Session session, final Ad ad) {
+        trackEvent(session, ad, EventTypes.IMPRESSION_END, "");
     }
 
 
-    public void trackInteractionEvent(String sessionId, Ad ad) {
-        trackEvent(sessionId, ad, EventTypes.INTERACTION, "");
+    public void trackInteractionEvent(final Session session, final Ad ad) {
+        trackEvent(session, ad, EventTypes.INTERACTION, "");
     }
 
-    public void trackPopupBeginEvent(String sessionId, Ad ad) {
-        trackEvent(sessionId, ad, EventTypes.POPUP_BEGIN, "");
+    public void trackPopupBeginEvent(final Session session, final Ad ad) {
+        trackEvent(session, ad, EventTypes.POPUP_BEGIN, "");
     }
 
-    public void trackPopupEndEvent(String sessionId, Ad ad) {
-        trackEvent(sessionId, ad, EventTypes.POPUP_END, "");
+    public void trackPopupEndEvent(final Session session, final Ad ad) {
+        trackEvent(session, ad, EventTypes.POPUP_END, "");
     }
 
-    public void trackCustomEvent(String sessionId, Ad ad, String eventName) {
-        trackEvent(sessionId, ad, EventTypes.CUSTOM, eventName);
+    public void trackCustomEvent(final Session session, final Ad ad, final String eventName) {
+        trackEvent(session, ad, EventTypes.CUSTOM, eventName);
     }
 
-    private void trackEvent(String sessionId, Ad ad, EventTypes eventType, String eventName) {
-        DeviceInfo deviceInfo = AdAdapted.getInstance().getDeviceInfo();
-        queuedEvents.add(builder.build(deviceInfo, sessionId, ad, eventType, eventName));
+    private void trackEvent(final Session session,
+                            final Ad ad,
+                            final EventTypes eventType,
+                            final String eventName) {
+        mQueuedEvents.add(mBuilder.build(session, ad, eventType, eventName));
 
-        if(queuedEvents.size() >= MAX_QUEUE_SIZE) {
+        if(mQueuedEvents.size() >= MAX_QUEUE_SIZE) {
             publishEvents();
         }
     }
 
     @Override
-    public void onEventsPublished() {
-        failedRetries = 0;
-    }
-
-    @Override
-    public void onEventsPublishFailed(JSONArray json) {
-        failedRetries++;
-        sendBatchRetry(json);
-    }
-
-    @Override
     public String toString() {
         return "EventTracker{" +
-                "eventAdapter=" + eventAdapter +
-                ", builder=" + builder +
-                ", queuedEvents=" + queuedEvents +
+                "eventAdapter=" + mEventAdapter +
+                ", builder=" + mBuilder +
+                ", queuedEvents=" + mQueuedEvents +
                 '}';
     }
 }

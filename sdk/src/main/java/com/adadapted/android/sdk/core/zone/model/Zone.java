@@ -16,16 +16,18 @@ public class Zone {
 
     private final String zoneId;
     private List<Ad> ads;
-
     private Map<String, Dimension> dimensions;
-    private int zoneViews = 0;
-    private int adIndex = 0;
+
+    private int zoneViews;
+    private int adIndex;
 
     public Zone(String zoneId) {
         this.zoneId = (zoneId == null) ? "" : zoneId;
-
-        this.dimensions = new HashMap<>();
         this.ads = new ArrayList<>();
+        this.dimensions = new HashMap<>();
+
+        zoneViews = 0;
+        adIndex = 0;
     }
 
     public static Zone createEmptyZone(String zoneId) {

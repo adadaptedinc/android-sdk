@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.ui.view;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
@@ -14,17 +13,17 @@ import com.adadapted.android.sdk.core.ad.model.HtmlAdType;
  * Created by chrisweeden on 5/20/15.
  */
 class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
-    private static final String TAG = HtmlAdViewBuildingStrategy.class.getName();
+    private static final String LOGTAG = HtmlAdViewBuildingStrategy.class.getName();
 
-    private final Listener listener;
-    private final WebView view;
+    private final Listener mListener;
+    private final WebView mWebView;
 
     public HtmlAdViewBuildingStrategy(final Context context, final Listener listener) {
-        this.listener = listener;
+        mListener = listener;
 
-        view = new WebView(context);
-        view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        view.setWebViewClient(new WebViewClient() {
+        mWebView = new WebView(context);
+        mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 return true;
@@ -32,12 +31,12 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
         });
 
         String dummyDocument = "<html><head><meta name=\"viewport\" content=\"width=device-width, user-scalable=no\" /><style>body{width:100px;height100px;}</style></head><body></body></html>";
-        view.loadData(dummyDocument, "text/html", null);
+        mWebView.loadData(dummyDocument, "text/html", null);
     }
 
     @Override
     public View getView() {
-        return view;
+        return mWebView;
     }
 
     @Override
@@ -45,13 +44,13 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
         final HtmlAdType adType = (HtmlAdType) ad.getAdType();
 
         if(adType.getAdUrl().toLowerCase().startsWith("http")) {
-            view.setLayoutParams(new ViewGroup.LayoutParams(width, height));
-            view.loadUrl(adType.getAdUrl());
+            mWebView.setLayoutParams(new ViewGroup.LayoutParams(width, height));
+            mWebView.loadUrl(adType.getAdUrl());
 
-            listener.onStrategyViewLoaded();
+            mListener.onStrategyViewLoaded();
         }
         else {
-            listener.onStrategyViewLoadFailed();
+            mListener.onStrategyViewLoadFailed();
         }
     }
 

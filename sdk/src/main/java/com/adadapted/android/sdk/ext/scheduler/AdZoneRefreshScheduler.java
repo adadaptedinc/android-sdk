@@ -9,16 +9,16 @@ import java.util.TimerTask;
  * Created by chrisweeden on 3/23/15.
  */
 public class AdZoneRefreshScheduler extends Timer {
-    private static final String TAG = AdZoneRefreshScheduler.class.getName();
+    private static final String LOGTAG = AdZoneRefreshScheduler.class.getName();
 
-    private final Listener listener;
+    private final Listener mListener;
 
     public interface Listener {
         void onAdZoneRefreshTimer(Ad ad);
     }
 
     public AdZoneRefreshScheduler(Listener listener) {
-        this.listener = listener;
+        mListener = listener;
     }
 
     public void schedule(final Ad ad) {
@@ -36,6 +36,6 @@ public class AdZoneRefreshScheduler extends Timer {
     }
 
     private void notifyAdZoneRefreshTimer(Ad ad) {
-        listener.onAdZoneRefreshTimer(ad);
+        mListener.onAdZoneRefreshTimer(ad);
     }
 }

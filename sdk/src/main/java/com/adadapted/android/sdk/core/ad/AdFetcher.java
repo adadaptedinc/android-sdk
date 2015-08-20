@@ -1,6 +1,5 @@
 package com.adadapted.android.sdk.core.ad;
 
-import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.core.zone.model.Zone;
 
@@ -13,65 +12,59 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 4/1/15.
  */
-public class AdFetcher implements AdAdapter.Listener {
-    private static final String TAG = AdFetcher.class.getName();
+public class AdFetcher {
+    private static final String LOGTAG = AdFetcher.class.getName();
 
-    private final Set<Listener> listeners;
-
-    public interface Listener {
-        void onAdsRefreshed(Map<String, Zone> zones);
-        void onAdsNotRefreshed();
-    }
+    private final Set<AdFetcherListener> listeners;
 
     private final AdAdapter adAdapter;
     private final AdRequestBuilder requestBuilder;
     private final AdRefreshBuilder refreshBuilder;
 
-    public AdFetcher(AdAdapter adAdapter,
-                     AdRequestBuilder requestBuilder,
-                     AdRefreshBuilder refreshBuilder) {
+    public AdFetcher(final AdAdapter adAdapter,
+                     final AdRequestBuilder requestBuilder,
+                     final AdRefreshBuilder refreshBuilder) {
         this.listeners = new HashSet<>();
 
         this.adAdapter = adAdapter;
-        this.adAdapter.addListener(this);
 
         this.requestBuilder = requestBuilder;
         this.refreshBuilder = refreshBuilder;
     }
 
-    public void fetchAdsFor(DeviceInfo deviceInfo, Session session) {
-        JSONObject json = requestBuilder.buildAdRequest(deviceInfo, session);
-        adAdapter.getAds(json);
+    public void fetchAdsFor(final Session session) {
+        JSONObject json = requestBuilder.buildAdRequest(session);
+        adAdapter.getAds(json, new AdAdapterListener() {
+            @Override
+            public void onSuccess(final JSONObject adJson) {
+                Map<String, Zone> zones = refreshBuilder.buildRefreshedAds(adJson);
+                notifyOnAdsRefreshed(zones);
+            }
+
+            @Override
+            public void onFailure() {
+                notifyOnAdsNotRefreshed();
+            }
+        });
     }
 
-    @Override
-    public void onAdGetRequestCompleted(JSONObject adJson) {
-        Map<String, Zone> zones = refreshBuilder.buildRefreshedAds(adJson);
-        notifyOnAdsRefreshed(zones);
-    }
-
-    @Override
-    public void onAdGetRequestFailed() {
-        notifyOnAdsNotRefreshed();
-    }
-
-    public void addListener(Listener listener) {
+    public void addListener(final AdFetcherListener listener) {
         listeners.add(listener);
     }
 
-    public void removeListener(Listener listener) {
+    public void removeListener(final AdFetcherListener listener) {
         listeners.remove(listener);
     }
 
-    private void notifyOnAdsRefreshed(Map<String, Zone> zones) {
-        for(Listener listener : listeners) {
-            listener.onAdsRefreshed(zones);
+    private void notifyOnAdsRefreshed(final Map<String, Zone> zones) {
+        for(AdFetcherListener listener : listeners) {
+            listener.onSuccess(zones);
         }
     }
 
     private void notifyOnAdsNotRefreshed() {
-        for(Listener listener : listeners) {
-            listener.onAdsNotRefreshed();
+        for(AdFetcherListener listener : listeners) {
+            listener.onFailure();
         }
     }
 }

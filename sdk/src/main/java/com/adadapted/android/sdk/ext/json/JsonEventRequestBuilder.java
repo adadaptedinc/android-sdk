@@ -6,6 +6,7 @@ import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.event.EventRequestBuilder;
 import com.adadapted.android.sdk.core.event.model.EventTypes;
+import com.adadapted.android.sdk.core.session.model.Session;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,28 +17,30 @@ import java.util.Date;
  * Created by chrisweeden on 4/28/15.
  */
 public class JsonEventRequestBuilder implements EventRequestBuilder {
-    private static final String TAG = JsonEventRequestBuilder.class.getName();
+    private static final String LOGTAG = JsonEventRequestBuilder.class.getName();
 
-    public JSONObject build(DeviceInfo deviceInfo,
-                            String sessionId,
-                            Ad ad,
-                            EventTypes eventType,
-                            String eventName) {
+    public JSONObject build(final Session session,
+                            final Ad ad,
+                            final EventTypes eventType,
+                            final String eventName) {
         JSONObject json = new JSONObject();
 
+        DeviceInfo deviceInfo = session.getDeviceInfo();
+        String sessionId = session.getSessionId();
+
         try {
-            json.put("app_id", deviceInfo.getAppId());
-            json.put("session_id", sessionId);
-            json.put("udid", deviceInfo.getUdid());
-            json.put("ad_id", ad.getAdId());
-            json.put("impression_id", ad.getImpressionId());
-            json.put("event_type", eventType.toString());
-            json.put("event_name", eventName);
-            json.put("datetime", new Date().getTime());
-            json.put("sdk_version", deviceInfo.getSdkVersion());
+            json.put(JsonFields.APPID, deviceInfo.getAppId());
+            json.put(JsonFields.SESSIONID, sessionId);
+            json.put(JsonFields.UDID, deviceInfo.getUdid());
+            json.put(JsonFields.ADID, ad.getAdId());
+            json.put(JsonFields.IMPRESSIONID, ad.getImpressionId());
+            json.put(JsonFields.EVENTTYPE, eventType.toString());
+            json.put(JsonFields.EVENTNAME, eventName);
+            json.put(JsonFields.DATETIME, new Date().getTime());
+            json.put(JsonFields.SDKVERSION, deviceInfo.getSdkVersion());
         }
         catch(JSONException ex) {
-            Log.d(TAG, "Problem converting to JSON.", ex);
+            Log.d(LOGTAG, "Problem converting to JSON.", ex);
         }
 
         return json;

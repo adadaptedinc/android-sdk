@@ -15,26 +15,26 @@ import android.widget.RelativeLayout;
 
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.PopupAdAction;
+import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
+import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
 public class AaWebViewPopupActivity extends AppCompatActivity {
-    private static final String TAG = AaWebViewPopupActivity.class.getName();
+    private static final String LOGTAG = AaWebViewPopupActivity.class.getName();
 
     public static final String EXTRA_POPUP_AD = AaWebViewPopupActivity.class.getName() + ".EXTRA_POPUP_AD";
-    public static final String EXTRA_SESSSION_ID = AaWebViewPopupActivity.class.getName() + ".EXTRA_SESSSION_ID";
 
     public static Intent createActivity(Context context, ViewAdWrapper ad) {
         Intent intent = new Intent(context, AaWebViewPopupActivity.class);
         intent.putExtra(AaWebViewPopupActivity.EXTRA_POPUP_AD, ad.getAd());
-        intent.putExtra(AaWebViewPopupActivity.EXTRA_SESSSION_ID, ad.getSessionId());
 
         return intent;
     }
 
     private WebView popupWebView;
     private Ad ad;
-    private String sessionId;
+    private Session mSession;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +56,8 @@ public class AaWebViewPopupActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         ad = (Ad)intent.getSerializableExtra(EXTRA_POPUP_AD);
-        sessionId = intent.getStringExtra(EXTRA_SESSSION_ID);
+
+        mSession = SessionManagerFactory.getSessionManager().getCurrentSession();
 
         PopupAdAction action = (PopupAdAction)ad.getAdAction();
 
@@ -68,18 +69,18 @@ public class AaWebViewPopupActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
 
-        EventTrackerFactory.getInstance().createEventTracker(this).trackPopupBeginEvent(sessionId, ad);
+        EventTrackerFactory.getEventTracker().trackPopupBeginEvent(mSession, ad);
     }
 
     public void onPause() {
         super.onPause();
-        EventTrackerFactory.getInstance().createEventTracker(this).trackPopupEndEvent(sessionId, ad);
+        EventTrackerFactory.getEventTracker().trackPopupEndEvent(mSession, ad);
     }
 
     @SuppressLint({"AddJavascriptInterface", "SetJavaScriptEnabled"})
     private void loadPopup(String url) {
         popupWebView.getSettings().setJavaScriptEnabled(true);
-        popupWebView.addJavascriptInterface(new WebAppInterface(this), "AdAdapted");
+        popupWebView.addJavascriptInterface(new WebAppInterface(this), "OldAdAdapted");
         popupWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -96,7 +97,7 @@ public class AaWebViewPopupActivity extends AppCompatActivity {
         try {
             setTitleColor(Color.parseColor(action.getTextColor()));
         } catch (Exception ex) {
-            Log.w(TAG, "Problem setting text color " + action.getTextColor());
+            Log.w(LOGTAG, "Problem setting text color " + action.getTextColor());
         }
 
         try {
@@ -104,7 +105,7 @@ public class AaWebViewPopupActivity extends AppCompatActivity {
                 bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(action.getBackgroundColor())));
             }
         } catch (Exception ex) {
-            Log.w(TAG, "Problem setting background color " + action.getBackgroundColor());
+            Log.w(LOGTAG, "Problem setting background color " + action.getBackgroundColor());
         }
     }
 }

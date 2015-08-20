@@ -21,21 +21,23 @@ import java.util.TimerTask;
  * Created by chrisweeden on 4/15/15.
  */
 public class AdRefreshScheduler extends Timer {
-    private static final String TAG = AdRefreshScheduler.class.getName();
+    private static final String LOGTAG = AdRefreshScheduler.class.getName();
 
-    private final SessionManager sessionManager;
-    private final KeywordInterceptManager keywordInterceptManager;
-    private final EventTracker eventTracker;
-    private final AdFetcher adFetcher;
+    private final SessionManager mSessionManager;
+    private final KeywordInterceptManager mKiManager;
+    private final EventTracker mEventTracker;
+    private final AdFetcher mAdFetcher;
 
-    public AdRefreshScheduler(Context context) {
-        sessionManager = SessionManagerFactory.getInstance().createSessionManager(context);
-        keywordInterceptManager = KeywordInterceptManagerFactory.getInstance().createKeywordInterceptManager(context);
-        eventTracker = EventTrackerFactory.getInstance().createEventTracker(context);
-        adFetcher = AdFetcherFactory.getInstance().createAdFetcher(context);
+    public AdRefreshScheduler(Context context, Session session) {
+        DeviceInfo deviceInfo = session.getDeviceInfo();
+
+        mSessionManager = SessionManagerFactory.createSessionManager(context);
+        mKiManager = KeywordInterceptManagerFactory.createKeywordInterceptManager(deviceInfo);
+        mEventTracker = EventTrackerFactory.createEventTracker(deviceInfo);
+        mAdFetcher = AdFetcherFactory.createAdFetcher(deviceInfo);
     }
 
-    public void schedule(final Session session, final DeviceInfo deviceInfo) {
+    public void schedule(final Session session) {
         long interval = session.getPollingInterval();
         if(interval <= 0L) { return; }
 
@@ -43,15 +45,15 @@ public class AdRefreshScheduler extends Timer {
 
             @Override
             public void run() {
-                eventTracker.publishEvents();
-                keywordInterceptManager.publishEvents();
+                mEventTracker.publishEvents();
+                mKiManager.publishEvents();
 
                 if(session.hasExpired()) {
-                    Log.i(TAG, "Session has expired.");
-                    sessionManager.reinitialize(deviceInfo, session);
+                    Log.i(LOGTAG, "Session has expired.");
+                    mSessionManager.initialize(session.getDeviceInfo());
                 }
                 else {
-                    adFetcher.fetchAdsFor(deviceInfo, session);
+                    mAdFetcher.fetchAdsFor(session);
                 }
             }
 

@@ -1,13 +1,12 @@
 package com.adadapted.android.sdk.ui.adapter;
 
-import android.content.Context;
-
-import com.adadapted.android.sdk.AdAdapted;
+import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptManager;
 import com.adadapted.android.sdk.core.keywordintercept.model.AutoFill;
 import com.adadapted.android.sdk.core.keywordintercept.model.KeywordIntercept;
-import com.adadapted.android.sdk.core.session.SessionManager;
+import com.adadapted.android.sdk.core.session.SessionListener;
 import com.adadapted.android.sdk.core.session.model.Session;
+import com.adadapted.android.sdk.ext.factory.DeviceInfoFactory;
 import com.adadapted.android.sdk.ext.factory.KeywordInterceptManagerFactory;
 import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
 import com.adadapted.android.sdk.ui.model.SuggestionPayload;
@@ -18,67 +17,66 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 6/25/15.
  */
-public class AaKeywordInterceptMatcher implements SessionManager.Listener, KeywordInterceptManager.Listener {
-    private static final String TAG = AaKeywordInterceptMatcher.class.getName();
+public class AaKeywordInterceptMatcher implements SessionListener, KeywordInterceptManager.Listener {
+    private static final String LOGTAG = AaKeywordInterceptMatcher.class.getName();
 
-    private final KeywordInterceptManager manager;
-    private AaSuggestionTracker suggestionTracker;
+    private final KeywordInterceptManager mManager;
+    private AaSuggestionTracker mSuggestionTracker;
 
-    private KeywordIntercept keywordIntercept;
-    private boolean loaded = false;
-    private Session session;
+    private KeywordIntercept mKeywordIntercept;
+    private boolean mLoaded = false;
+    private Session mSession;
 
-    public AaKeywordInterceptMatcher(Context context) {
-        manager = KeywordInterceptManagerFactory.getInstance().createKeywordInterceptManager(context);
-        manager.setListener(this);
+    public AaKeywordInterceptMatcher() {
+        DeviceInfo deviceInfo = DeviceInfoFactory.getsDeviceInfo();
 
-        suggestionTracker = new AaSuggestionTracker(manager);
+        mManager = KeywordInterceptManagerFactory.createKeywordInterceptManager(deviceInfo);
+        mManager.setListener(this);
 
-        SessionManagerFactory.getInstance().createSessionManager(context).addListener(this);
+        mSuggestionTracker = new AaSuggestionTracker(mManager);
+
+        SessionManagerFactory.addListener(this);
     }
 
     public SuggestionPayload match(CharSequence constraint) {
         Set<String> suggestions = new HashSet<>();
 
-        if((isLoaded() && constraint != null && constraint.length() >= keywordIntercept.getMinMatchLength())) {
-            for (String item : keywordIntercept.getAutofill().keySet()) {
+        if((isLoaded() && constraint != null && constraint.length() >= mKeywordIntercept.getMinMatchLength())) {
+            for (String item : mKeywordIntercept.getAutoFill().keySet()) {
                 if (item.toLowerCase().contains(constraint.toString().toLowerCase())) {
-                    AutoFill autofill = keywordIntercept.getAutofill().get(item);
+                    AutoFill autofill = mKeywordIntercept.getAutoFill().get(item);
                     suggestions.add(autofill.getReplacement());
 
-                    suggestionTracker.suggestionMatched(session, item, autofill.getReplacement(), constraint.toString());
+                    mSuggestionTracker.suggestionMatched(mSession, item, autofill.getReplacement(), constraint.toString());
                 }
             }
         }
 
-        return new SuggestionPayload(suggestionTracker, suggestions);
+        return new SuggestionPayload(mSuggestionTracker, suggestions);
     }
 
     public boolean suggestionSelected(String suggestion) {
-        return suggestionTracker.suggestionSelected(suggestion);
+        return mSuggestionTracker.suggestionSelected(suggestion);
     }
 
     private boolean isLoaded() {
-        return loaded;
+        return mLoaded;
     }
 
     @Override
     public void onKeywordInterceptInitSuccess(KeywordIntercept keywordIntercept) {
-        this.keywordIntercept = keywordIntercept;
-        this.loaded = true;
+        mKeywordIntercept = keywordIntercept;
+        mLoaded = true;
     }
 
     @Override
     public void onSessionInitialized(Session session) {
-        this.session = session;
-        manager.init(session, AdAdapted.getInstance().getDeviceInfo());
+        mSession = session;
+        mManager.init(session);
     }
 
     @Override
     public void onSessionInitFailed() {}
-
-    @Override
-    public void onSessionNotReinitialized() {}
 
     @Override
     public void onNewAdsAvailable(Session session) {}

@@ -3,9 +3,9 @@ package com.adadapted.android.sdk.ui.view;
 import android.content.Context;
 import android.content.Intent;
 
-import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.ad.model.AdAction;
 import com.adadapted.android.sdk.ui.activity.AaWebViewPopupActivity;
+import com.adadapted.android.sdk.ui.messaging.SdkContentPublisherFactory;
 import com.adadapted.android.sdk.ui.model.ContentPayload;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
@@ -13,12 +13,12 @@ import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
  * Created by chrisweeden on 7/1/15.
  */
 class AdActionHandler {
-    private static final String TAG = AdActionHandler.class.getName();
+    private static final String LOGTAG = AdActionHandler.class.getName();
 
-    private final Context context;
+    private final Context mContext;
 
     public AdActionHandler(Context context) {
-        this.context = context;
+        mContext = context;
     }
 
     /**
@@ -50,14 +50,19 @@ class AdActionHandler {
             case AdAction.POPUP:
                 handlePopupAction(ad);
                 break;
+
+            default:
+                result = false;
         }
 
         return result;
     }
 
     private void handleContentAction(ViewAdWrapper ad) {
+        String zoneId = ad.getAd().getZoneId();
+
         ContentPayload payload = ContentPayload.createAddToListContent(ad);
-        AdAdapted.getInstance().publishContent(ad.getAd().getZoneId(), payload);
+        SdkContentPublisherFactory.getContentPublisher().publishContent(zoneId, payload);
     }
 
     private void handleDelegateAction(ViewAdWrapper ad) {
@@ -69,7 +74,7 @@ class AdActionHandler {
     }
 
     private void handlePopupAction(ViewAdWrapper ad) {
-        Intent intent = AaWebViewPopupActivity.createActivity(context, ad);
-        context.startActivity(intent);
+        Intent intent = AaWebViewPopupActivity.createActivity(mContext, ad);
+        mContext.startActivity(intent);
     }
 }

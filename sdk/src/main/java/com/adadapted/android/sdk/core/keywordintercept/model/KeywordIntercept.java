@@ -9,16 +9,16 @@ public class KeywordIntercept {
     private final String searchId;
     private final long refreshTime;
     private final int minMatchLength;
-    private final Map<String, AutoFill> autofill;
+    private final Map<String, AutoFill> autoFill;
 
     public KeywordIntercept(String searchId,
                             long refreshTime,
                             int minMatchLength,
-                            Map<String, AutoFill> autofill) {
+                            Map<String, AutoFill> autoFill) {
         this.searchId = searchId;
         this.refreshTime = refreshTime;
         this.minMatchLength = minMatchLength;
-        this.autofill = autofill;
+        this.autoFill = autoFill;
     }
 
     public String getSearchId() {
@@ -33,7 +33,7 @@ public class KeywordIntercept {
         return minMatchLength;
     }
 
-    public Map<String, AutoFill> getAutofill() {
-        return autofill;
+    public Map<String, AutoFill> getAutoFill() {
+        return autoFill;
     }
 }

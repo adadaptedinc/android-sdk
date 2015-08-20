@@ -4,7 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import com.adadapted.android.sdk.AdAdapted;
-import com.adadapted.android.sdk.ui.listener.AaAdEventListener;
+import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener;
 import com.facebook.stetho.Stetho;
 import com.newrelic.agent.android.NewRelic;
 
@@ -38,19 +38,21 @@ public class TestAppApplication extends Application {
         NewRelic.withApplicationToken("AAabde692c32523732801586d2c793895d9dae5e0d").start(this);
 
         String apiKey = getResources().getString(R.string.adadapted_api_key);
-        String[] zones = getResources().getStringArray(R.array.adadapted_zones);
-        boolean isProd = getResources().getBoolean(R.bool.adadapted_prod);
 
-        AdAdapted.init(this, apiKey, zones, isProd, new AaAdEventListener() {
-            @Override
-            public void onAdImpression(String zoneId) {
-                Log.i(TAG, "Ad Impression for Zone " + zoneId);
-            }
+        AdAdapted.init(this)
+            .withAppId(apiKey)
+            .inEnv(AdAdapted.Env.DEV)
+            .setSdkEventListener(new AaSdkEventListener() {
+                @Override
+                public void onHasAdsToServe(boolean enabled) {
+                    Log.i(TAG, "OldAdAdapted has Campaign: " + enabled);
+                }
 
-            @Override
-            public void onAdClick(String zoneId) {
-                Log.i(TAG, "Ad Interaction for Zone " + zoneId);
-            }
-        });
+                @Override
+                public void onNextAdEvent(String zoneId, String eventType) {
+                    Log.i(TAG, "Ad " + eventType + " for Zone " + zoneId);
+                }
+            })
+            .start();
     }
 }

@@ -9,33 +9,26 @@ import com.adadapted.android.sdk.ui.view.AaZoneView;
  * Created by chrisweeden on 5/28/15.
  */
 public class AaFeedAdPlacement {
-    private static final String TAG = AaFeedAdPlacement.class.getName();
+    private static final String LOGTAG = AaFeedAdPlacement.class.getName();
 
-    private final Context context;
-    private final String zoneId;
-    private final int placement;
-
-    private AbsListView.LayoutParams layoutParams;
-    private int resourceId;
+    private final Context mContext;
+    private final String mZoneId;
+    private final int mPlacement;
+    private final int mResourceId;
 
     public AaFeedAdPlacement(Context context, String zoneId, int placement) {
-        this.context = context;
-        this.zoneId = zoneId;
-        this.placement = (placement <= 0) ? 0 : placement-1;
-        this.resourceId = 0;
+        this(context, zoneId, placement, 0);
     }
 
     public AaFeedAdPlacement(Context context, String zoneId, int placement, int resourceId) {
-        this(context, zoneId, placement);
-        this.resourceId = resourceId;
-    }
-
-    public void setLayoutParams(AbsListView.LayoutParams layoutParams) {
-        this.layoutParams = layoutParams;
+        mContext = context;
+        mZoneId = zoneId;
+        mPlacement = (placement <= 0) ? 0 : placement-1;
+        mResourceId = resourceId;
     }
 
     public AaFeedItem getItem(int position) {
-        if(position == placement) {
+        if(position == mPlacement) {
             return new AaFeedItem();
         }
 
@@ -43,7 +36,7 @@ public class AaFeedAdPlacement {
     }
 
     public int getModifiedCount(int count) {
-        if(count < placement) {
+        if(count < mPlacement) {
             return count;
         }
 
@@ -51,11 +44,11 @@ public class AaFeedAdPlacement {
     }
 
     public int getModifiedPosition(int position) {
-        return (position >= placement) ? position - 1 : position ;
+        return (position >= mPlacement) ? position - 1 : position ;
     }
 
     public long getModifiedItemId(int position) {
-        return (position >= placement) ? position - 1 : position;
+        return (position >= mPlacement) ? position - 1 : position;
     }
 
     public int getModifiedViewTypeCount(int count) {
@@ -63,9 +56,9 @@ public class AaFeedAdPlacement {
     }
 
     public AaZoneView getView(int position) {
-        if(position == placement) {
-            AaZoneView view = new AaZoneView(context);
-            view.init(zoneId, resourceId);
+        if(position == mPlacement) {
+            AaZoneView view = new AaZoneView(mContext);
+            view.init(mZoneId, mResourceId);
 
             return view;
         }
@@ -76,8 +69,8 @@ public class AaFeedAdPlacement {
     @Override
     public String toString() {
         return "AaFeedAdPlacement{" +
-                "zoneId='" + zoneId + '\'' +
-                ", placement=" + placement +
+                "zoneId='" + mZoneId + '\'' +
+                ", placement=" + mPlacement +
                 '}';
     }
 }

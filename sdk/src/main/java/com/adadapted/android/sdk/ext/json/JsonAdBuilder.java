@@ -1,6 +1,5 @@
 package com.adadapted.android.sdk.ext.json;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.AdBuilder;
@@ -32,7 +31,7 @@ import java.util.Map;
  * Created by chrisweeden on 6/29/15.
  */
 public class JsonAdBuilder implements AdBuilder {
-    private static final String TAG = JsonAdBuilder.class.getName();
+    private static final String LOGTAG = JsonAdBuilder.class.getName();
 
     private static final int DEFAULT_REFRESH_TIME = 90;
 
@@ -62,9 +61,7 @@ public class JsonAdBuilder implements AdBuilder {
     private static final String FIELD_IMAGE_ORIENTATION = "orientation";
     private static final String FIELD_IMAGE_URL = "url";
 
-    public JsonAdBuilder(Context context) {}
-
-    public List<Ad> buildAds(JSONArray jsonAds) {
+    public List<Ad> buildAds(final JSONArray jsonAds) {
         List<Ad> ads = new ArrayList<>();
 
         try {
@@ -75,13 +72,13 @@ public class JsonAdBuilder implements AdBuilder {
             }
         }
         catch(JSONException ex) {
-            Log.w(TAG, "Problem converting to JSON.", ex);
+            Log.w(LOGTAG, "Problem converting to JSON.", ex);
         }
 
         return ads;
     }
 
-    public Ad buildAd(JSONObject jsonAd) throws JSONException {
+    public Ad buildAd(final JSONObject jsonAd) throws JSONException {
         Ad ad = new Ad();
 
         if(jsonAd.has(FIELD_AD_ID)) {
@@ -100,7 +97,7 @@ public class JsonAdBuilder implements AdBuilder {
             ad.setRefreshTime(Integer.parseInt(jsonAd.getString(FIELD_REFRESH_TIME)));
         }
         catch(NumberFormatException ex) {
-            Log.w(TAG, "Ad " + ad.getAdId() + " has an improperly set refresh_time.");
+            Log.w(LOGTAG, "Ad " + ad.getAdId() + " has an improperly set refresh_time.");
             ad.setRefreshTime(DEFAULT_REFRESH_TIME);
         }
 
@@ -123,7 +120,7 @@ public class JsonAdBuilder implements AdBuilder {
         return ad;
     }
 
-    private AdAction parseAdAction(String actionTypeCode, JSONObject jsonAd) {
+    private AdAction parseAdAction(final String actionTypeCode, final JSONObject jsonAd) {
         if(actionTypeCode.equalsIgnoreCase(ACTION_TYPE_POPUP)) {
             try {
                 JSONObject popupObject = jsonAd.getJSONObject(FIELD_POPUP);
@@ -131,7 +128,7 @@ public class JsonAdBuilder implements AdBuilder {
                 return parseAdPopup(popupObject, actionPath);
             }
             catch(JSONException ex) {
-                Log.w(TAG, "Problem converting to JSON.", ex);
+                Log.w(LOGTAG, "Problem converting to JSON.", ex);
             }
         }
         else if(actionTypeCode.equalsIgnoreCase(ACTION_TYPE_DELEGATE)) {
@@ -140,7 +137,7 @@ public class JsonAdBuilder implements AdBuilder {
                 return parseAdDelegate(actionPath);
             }
             catch(JSONException ex) {
-                Log.w(TAG, "Problem converting to JSON.", ex);
+                Log.w(LOGTAG, "Problem converting to JSON.", ex);
             }
         }
         else if(actionTypeCode.equalsIgnoreCase(ACTION_TYPE_CONTENT)) {
@@ -150,14 +147,14 @@ public class JsonAdBuilder implements AdBuilder {
                 return parseAdContent(payloadObject, actionPath);
             }
             catch(JSONException ex) {
-                Log.w(TAG, "Problem converting to JSON.", ex);
+                Log.w(LOGTAG, "Problem converting to JSON.", ex);
             }
         }
 
         return new NullAdAction();
     }
 
-    private ContentAdAction parseAdContent(JSONObject payloadObject, String actionPath) {
+    private ContentAdAction parseAdContent(final JSONObject payloadObject, final String actionPath) {
         ContentAdAction content = new ContentAdAction();
         content.setActionPath(actionPath);
 
@@ -171,7 +168,7 @@ public class JsonAdBuilder implements AdBuilder {
             }
         }
         catch(JSONException ex) {
-            Log.w(TAG, "Problem converting to JSON.", ex);
+            Log.w(LOGTAG, "Problem converting to JSON.", ex);
         }
 
         content.setItems(listItems);
@@ -179,14 +176,14 @@ public class JsonAdBuilder implements AdBuilder {
         return content;
     }
 
-    private DelegateAdAction parseAdDelegate(String actionPath) {
+    private DelegateAdAction parseAdDelegate(final String actionPath) {
         DelegateAdAction delegate = new DelegateAdAction();
         delegate.setActionPath(actionPath);
 
         return delegate;
     }
 
-    private PopupAdAction parseAdPopup(JSONObject popupJson, String actionPath) {
+    private PopupAdAction parseAdPopup(final JSONObject popupJson, final String actionPath) {
         PopupAdAction popup = new PopupAdAction();
         popup.setActionPath(actionPath);
 
@@ -224,13 +221,13 @@ public class JsonAdBuilder implements AdBuilder {
             }
         }
         catch(JSONException ex) {
-            Log.w(TAG, "Problem converting to JSON.", ex);
+            Log.w(LOGTAG, "Problem converting to JSON.", ex);
         }
 
         return popup;
     }
 
-    private AdType parseAdType(String adTypeCode, JSONObject jsonAd) {
+    private AdType parseAdType(final String adTypeCode, final JSONObject jsonAd) {
         if(adTypeCode.equalsIgnoreCase(AD_TYPE_HTML)) {
             return parseHtmlAd(jsonAd);
         }
@@ -244,7 +241,7 @@ public class JsonAdBuilder implements AdBuilder {
         return new NullAdType();
     }
 
-    private HtmlAdType parseHtmlAd(JSONObject jsonAd) {
+    private HtmlAdType parseHtmlAd(final JSONObject jsonAd) {
         HtmlAdType adType = new HtmlAdType();
 
         try {
@@ -253,20 +250,20 @@ public class JsonAdBuilder implements AdBuilder {
             }
         }
         catch(JSONException ex) {
-            Log.w(TAG, "Problem converting to JSON.", ex);
+            Log.w(LOGTAG, "Problem converting to JSON.", ex);
         }
 
         return adType;
     }
 
-    private ImageAdType parseImageAd(JSONObject jsonAd) {
+    private ImageAdType parseImageAd(final JSONObject jsonAd) {
         ImageAdType adType = new ImageAdType();
         try {
             Map<String, AdImage> images = parseImages(jsonAd.getJSONObject(FIELD_IMAGES));
             adType.setImages(images);
         }
         catch(JSONException ex) {
-            Log.w(TAG, "Problem converting to JSON.", ex);
+            Log.w(LOGTAG, "Problem converting to JSON.", ex);
         }
 
         return adType;
@@ -282,13 +279,13 @@ public class JsonAdBuilder implements AdBuilder {
             adType.setComponents(adComponents);
         }
         catch(JSONException ex) {
-            Log.w(TAG, "Problem converting to JSON.", ex);
+            Log.w(LOGTAG, "Problem converting to JSON.", ex);
         }
 
         return adType;
     }
 
-    private AdComponent parseJsonAdComponents(JSONObject json) throws JSONException {
+    private AdComponent parseJsonAdComponents(final JSONObject json) throws JSONException {
         AdComponent adComponents = new AdComponent();
 
         if(json.has("ad_cta_1")) {
@@ -338,7 +335,7 @@ public class JsonAdBuilder implements AdBuilder {
         return adComponents;
     }
 
-    private Map<String, AdImage> parseImages(JSONObject jsonImages) {
+    private Map<String, AdImage> parseImages(final JSONObject jsonImages) {
         Map<String, AdImage> images = new HashMap<>();
 
         try {
@@ -358,7 +355,7 @@ public class JsonAdBuilder implements AdBuilder {
             }
         }
         catch(JSONException ex) {
-            Log.w(TAG, "Problem converting to JSON.", ex);
+            Log.w(LOGTAG, "Problem converting to JSON.", ex);
         }
 
         return images;

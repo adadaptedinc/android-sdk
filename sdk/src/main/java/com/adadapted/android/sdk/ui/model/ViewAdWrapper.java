@@ -1,38 +1,43 @@
 package com.adadapted.android.sdk.ui.model;
 
-import android.content.Context;
-
-import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.AdTypes;
+import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.event.EventTracker;
+import com.adadapted.android.sdk.core.event.model.AdEvent;
+import com.adadapted.android.sdk.core.session.model.Session;
+import com.adadapted.android.sdk.ext.factory.DeviceInfoFactory;
 import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
+import com.adadapted.android.sdk.ui.messaging.SdkEventPublisherFactory;
 
 /**
  * Created by chrisweeden on 5/26/15.
  */
 public class ViewAdWrapper {
-    private static final String TAG = ViewAdWrapper.class.getName();
+    private static final String LOGTAG = ViewAdWrapper.class.getName();
 
-    private final EventTracker eventTracker;
-    private final String sessionId;
-    private final Ad ad;
+    private EventTracker mEventTracker;
+    private final Session mSession;
+    private final Ad mAd;
 
     private boolean trackingHasStarted = false;
 
-    public ViewAdWrapper(Context context, String sessionId, Ad ad) {
-        eventTracker = EventTrackerFactory.getInstance().createEventTracker(context);
+    public ViewAdWrapper(Session session, Ad ad) {
+        if(ad != null) {
+            DeviceInfo deviceInfo = DeviceInfoFactory.getsDeviceInfo();
+            mEventTracker = EventTrackerFactory.createEventTracker(deviceInfo);
+        }
 
-        this.sessionId = sessionId;
-        this.ad = ad;
+        mSession = session;
+        mAd = ad;
     }
 
-    public static ViewAdWrapper createEmptyCurrentAd(Context context, String sessionId) {
-        return new ViewAdWrapper(context, sessionId, null);
+    public static ViewAdWrapper createEmptyCurrentAd(Session session) {
+        return new ViewAdWrapper(session, null);
     }
 
     public Ad getAd() {
-        return ad;
+        return mAd;
     }
 
     public String getAdId() {
@@ -44,54 +49,63 @@ public class ViewAdWrapper {
     }
 
     public boolean hasAd() {
-        return (ad != null);
+        return (mAd != null);
     }
 
     public AdTypes getAdType() {
         if(hasAd()) {
-            return ad.getAdType().getType();
+            return mAd.getAdType().getType();
         }
 
         return AdTypes.NULL;
     }
 
-    public boolean isHiddenOnInteraction() {
-        return hasAd() && ad.isHiddenAfterInteraction();
+    public void markAdAsHidden() {
+        mAd.hideAd();
     }
 
-    public String getSessionId() {
-        return sessionId;
+    public boolean isHiddenOnInteraction() {
+        return hasAd() && mAd.isHiddenAfterInteraction();
+    }
+
+    public Session getSession() {
+        return mSession;
     }
 
     public void beginAdTracking() {
         if(hasAd() && !trackingHasStarted) {
-            eventTracker.trackImpressionBeginEvent(sessionId, getAd());
-            AdAdapted.getInstance().publishAdImpression(getAd().getZoneId());
+            mEventTracker.trackImpressionBeginEvent(mSession, getAd());
+
+            AdEvent adEvent = new AdEvent(AdEvent.Types.IMPRESSION, getAd().getZoneId());
+            SdkEventPublisherFactory.getSdkEventPublisher().publishAdEvent(adEvent);
+
             trackingHasStarted = true;
         }
     }
 
     public void completeAdTracking() {
         if(hasAd() && trackingHasStarted) {
-            eventTracker.trackImpressionEndEvent(sessionId, getAd());
+            mEventTracker.trackImpressionEndEvent(mSession, getAd());
             trackingHasStarted = false;
         }
     }
 
     public void trackInteraction() {
         if(hasAd() && trackingHasStarted) {
-            eventTracker.trackInteractionEvent(sessionId, getAd());
-            AdAdapted.getInstance().publishAdClick(getAd().getZoneId());
+            mEventTracker.trackInteractionEvent(mSession, getAd());
 
-            if(ad.isHiddenAfterInteraction()) {
-                ad.hideAd();
+            AdEvent adEvent = new AdEvent(AdEvent.Types.INTERACTION, getAd().getZoneId());
+            SdkEventPublisherFactory.getSdkEventPublisher().publishAdEvent(adEvent);
+
+            if(mAd.isHiddenAfterInteraction()) {
+                markAdAsHidden();
             }
         }
     }
 
     public void trackPayloadDelivered() {
         if(hasAd() && trackingHasStarted) {
-            eventTracker.trackCustomEvent(sessionId, getAd(), "payload_delivered");
+            mEventTracker.trackCustomEvent(mSession, getAd(), "payload_delivered");
         }
     }
 }

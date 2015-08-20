@@ -1,11 +1,12 @@
 package com.adadapted.android.sdk.ext.scheduler;
 
-import android.content.Context;
 import android.os.Handler;
 
 import com.adadapted.android.sdk.config.Config;
+import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.event.EventTracker;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptManager;
+import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
 import com.adadapted.android.sdk.ext.factory.KeywordInterceptManagerFactory;
 
@@ -13,24 +14,26 @@ import com.adadapted.android.sdk.ext.factory.KeywordInterceptManagerFactory;
  * Created by chrisweeden on 7/16/15.
  */
 public class EventFlushScheduler {
-    private final EventTracker eventTracker;
-    private final KeywordInterceptManager keywordInterceptManager;
-    private final Handler handler;
-    private final Runnable runnable;
+    private final EventTracker mEventTracker;
+    private final KeywordInterceptManager mKiManager;
+    private final Handler mHandler;
+    private final Runnable mRunnable;
 
     private long pollingInterval;
 
-    public EventFlushScheduler(Context context) {
-        eventTracker = EventTrackerFactory.getInstance().createEventTracker(context);
-        keywordInterceptManager = KeywordInterceptManagerFactory.getInstance().createKeywordInterceptManager(context);
+    public EventFlushScheduler(Session session) {
+        DeviceInfo deviceInfo = session.getDeviceInfo();
 
-        handler = new Handler();
-        runnable = new Runnable() {
+        mEventTracker = EventTrackerFactory.createEventTracker(deviceInfo);
+        mKiManager = KeywordInterceptManagerFactory.createKeywordInterceptManager(deviceInfo);
+
+        mHandler = new Handler();
+        mRunnable = new Runnable() {
             @Override
             public void run() {
-                eventTracker.publishEvents();
-                keywordInterceptManager.publishEvents();
-                handler.postDelayed(this, pollingInterval);
+                mEventTracker.publishEvents();
+                mKiManager.publishEvents();
+                mHandler.postDelayed(this, pollingInterval);
             }
 
 
@@ -39,10 +42,10 @@ public class EventFlushScheduler {
 
     public void start(long pollingInterval) {
         this.pollingInterval = pollingInterval <= 0L ? Config.DEFAULT_EVENT_POLLING : pollingInterval;
-        runnable.run();
+        mRunnable.run();
     }
 
     public void stop() {
-        handler.removeCallbacks(runnable);
+        mHandler.removeCallbacks(mRunnable);
     }
 }

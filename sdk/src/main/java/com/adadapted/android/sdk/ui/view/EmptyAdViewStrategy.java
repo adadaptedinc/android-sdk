@@ -9,22 +9,22 @@ import com.adadapted.android.sdk.core.ad.model.Ad;
  * Created by chrisweeden on 7/22/15.
  */
 class EmptyAdViewStrategy implements AdViewBuildingStrategy {
-    private Listener listener;
-    private View view;
+    private Listener mListener;
+    private View mView;
 
     EmptyAdViewStrategy(Context context, Listener listener) {
-        this.listener = listener;
-        view = new View(context);
+        mListener = listener;
+        mView = new View(context);
     }
 
     @Override
     public View getView() {
-        return view;
+        return mView;
     }
 
     @Override
     public void buildView(Ad ad, int width, int height) {
-        listener.onStrategyViewLoadFailed();
+        mListener.onStrategyViewLoadFailed();
     }
 
     @Override

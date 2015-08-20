@@ -21,8 +21,9 @@ public class JsonKeywordInterceptRequestBuilder implements KeywordInterceptReque
     private static final String TAG = JsonKeywordInterceptRequestBuilder.class.getName();
 
     @Override
-    public JSONObject buildInitRequest(Session session, DeviceInfo deviceInfo) {
+    public JSONObject buildInitRequest(Session session) {
         JSONObject json = new JSONObject();
+        DeviceInfo deviceInfo = session.getDeviceInfo();
 
         try {
             json.put(JsonFields.SESSIONID, session.getSessionId());

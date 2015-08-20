@@ -1,6 +1,5 @@
 package com.adadapted.android.sdk.ext.json;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.AdBuilder;
@@ -21,17 +20,17 @@ import java.util.Map;
  * Created by chrisweeden on 6/29/15.
  */
 public class JsonZoneBuilder implements ZoneBuilder {
-    private static final String TAG = JsonZoneBuilder.class.getName();
+    private static final String LOGTAG = JsonZoneBuilder.class.getName();
 
-    private final AdBuilder adBuilder;
-    private final Context context;
+    private final AdBuilder mAdBuilder;
+    private final DimensionConverter mDimensionConverter;
 
-    public JsonZoneBuilder(Context context) {
-        this.context = context;
-        this.adBuilder = new JsonAdBuilder(context);
+    public JsonZoneBuilder(final float deviceScale) {
+        mDimensionConverter = new DimensionConverter(deviceScale);
+        mAdBuilder = new JsonAdBuilder();
     }
 
-    public Map<String, Zone> buildZones(JSONObject jsonZones) {
+    public Map<String, Zone> buildZones(final JSONObject jsonZones) {
         Map<String, Zone> zones = new HashMap<>();
 
         try {
@@ -44,67 +43,67 @@ public class JsonZoneBuilder implements ZoneBuilder {
             }
         }
         catch(JSONException ex) {
-            Log.w(TAG, "Problem converting to JSON.", ex);
+            Log.w(LOGTAG, "Problem converting to JSON.", ex);
         }
 
         return zones;
     }
 
-    public Zone buildZone(String zoneId, JSONObject jsonZone) {
+    public Zone buildZone(final String zoneId, final JSONObject jsonZone) {
         Zone zone = new Zone(zoneId);
 
         try {
-            if(jsonZone.has("port_zone_height") && jsonZone.has("port_zone_width")) {
+            if(jsonZone.has(JsonFields.PORTZONEHEIGHT) && jsonZone.has(JsonFields.PORTZONEWIDTH)) {
                 Dimension portDimension = new Dimension();
 
-                if(jsonZone.has("port_zone_height")) {
-                    portDimension.setHeight(calculateDimensionValue(jsonZone.getString("port_zone_height")));
+                if(jsonZone.has(JsonFields.PORTZONEHEIGHT)) {
+                    portDimension.setHeight(calculateDimensionValue(jsonZone.getString(JsonFields.PORTZONEHEIGHT)));
                 }
                 else {
-                    portDimension.setHeight(-2);
+                    portDimension.setHeight(Dimension.WRAP_CONTENT);
                 }
 
-                if(jsonZone.has("port_zone_width")) {
-                    portDimension.setWidth(calculateDimensionValue(jsonZone.getString("port_zone_width")));
+                if(jsonZone.has(JsonFields.PORTZONEWIDTH)) {
+                    portDimension.setWidth(calculateDimensionValue(jsonZone.getString(JsonFields.PORTZONEWIDTH)));
                 }
                 else {
-                    portDimension.setWidth(-1);
+                    portDimension.setWidth(Dimension.MATCH_PARENT);
                 }
 
-                zone.getDimensions().put("port", portDimension);
+                zone.getDimensions().put(Dimension.ORIEN.PORT, portDimension);
             }
 
-            if(jsonZone.has("land_zone_height") && jsonZone.has("land_zone_width")) {
+            if(jsonZone.has(JsonFields.LANDZONEHEIGHT) && jsonZone.has(JsonFields.LANDZONEWIDTH)) {
                 Dimension landDimension = new Dimension();
 
-                if(jsonZone.has("land_zone_height")) {
-                    landDimension.setHeight(calculateDimensionValue(jsonZone.getString("land_zone_height")));
+                if(jsonZone.has(JsonFields.LANDZONEHEIGHT)) {
+                    landDimension.setHeight(calculateDimensionValue(jsonZone.getString(JsonFields.LANDZONEHEIGHT)));
                 }
                 else {
-                    landDimension.setHeight(-2);
+                    landDimension.setHeight(Dimension.WRAP_CONTENT);
                 }
 
-                if(jsonZone.has("land_zone_width")) {
-                    landDimension.setWidth(calculateDimensionValue(jsonZone.getString("land_zone_width")));
+                if(jsonZone.has(JsonFields.LANDZONEWIDTH)) {
+                    landDimension.setWidth(calculateDimensionValue(jsonZone.getString(JsonFields.LANDZONEWIDTH)));
                 }
                 else {
-                    landDimension.setWidth(-1);
+                    landDimension.setWidth(Dimension.MATCH_PARENT);
                 }
 
-                zone.getDimensions().put("land", landDimension);
+                zone.getDimensions().put(Dimension.ORIEN.LAND, landDimension);
             }
 
-            JSONArray jsonAds = jsonZone.getJSONArray("ads");
-            zone.setAds(adBuilder.buildAds(jsonAds));
+            JSONArray jsonAds = jsonZone.getJSONArray(JsonFields.ADS);
+            zone.setAds(mAdBuilder.buildAds(jsonAds));
         }
         catch(JSONException ex) {
-            Log.w(TAG, "Problem converting to JSON.", ex);
+            Log.w(LOGTAG, "Problem converting to JSON.", ex);
         }
 
         return zone;
     }
 
-    public int calculateDimensionValue(String value) {
-        return DimensionConverter.convertDpToPx(context, Integer.parseInt(value));
+    public int calculateDimensionValue(final String value) {
+        return mDimensionConverter.convertDpToPx(Integer.parseInt(value));
     }
 }

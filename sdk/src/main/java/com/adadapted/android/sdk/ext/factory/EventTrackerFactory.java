@@ -1,9 +1,7 @@
 package com.adadapted.android.sdk.ext.factory;
 
-import android.content.Context;
-
-import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.config.Config;
+import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.event.EventTracker;
 import com.adadapted.android.sdk.ext.http.HttpEventAdapter;
 import com.adadapted.android.sdk.ext.json.JsonEventRequestBuilder;
@@ -12,31 +10,31 @@ import com.adadapted.android.sdk.ext.json.JsonEventRequestBuilder;
  * Created by chrisweeden on 5/26/15.
  */
 public class EventTrackerFactory {
-    private static EventTrackerFactory instance;
+    private static final String LOGTAG = EventTrackerFactory.class.getName();
 
-    public static synchronized EventTrackerFactory getInstance() {
-        if(instance == null) {
-            instance = new EventTrackerFactory();
-        }
+    private static EventTrackerFactory sInstance;
 
-        return instance;
+    private EventTracker mEventTracker;
+
+    private EventTrackerFactory(DeviceInfo deviceInfo) {
+        mEventTracker = new EventTracker(new HttpEventAdapter(determineEndpoint(deviceInfo)),
+                new JsonEventRequestBuilder());
     }
 
-    private EventTracker eventTracker;
-
-    private EventTrackerFactory() {}
-
-    public EventTracker createEventTracker(Context context) {
-        if(eventTracker == null) {
-            eventTracker = new EventTracker(new HttpEventAdapter(determineEndpoint()),
-                    new JsonEventRequestBuilder());
+    public static synchronized EventTracker createEventTracker(DeviceInfo deviceInfo) {
+        if(sInstance == null) {
+            sInstance = new EventTrackerFactory(deviceInfo);
         }
 
-        return eventTracker;
+        return sInstance.mEventTracker;
     }
 
-    private String determineEndpoint() {
-        if(AdAdapted.getInstance().isProd()) {
+    public static synchronized EventTracker getEventTracker() {
+        return sInstance.mEventTracker;
+    }
+
+    private String determineEndpoint(DeviceInfo deviceInfo) {
+        if(deviceInfo.isProd()) {
             return Config.Prod.URL_EVENT_BATCH;
         }
 

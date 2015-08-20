@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.AdImageLoader;
+import com.adadapted.android.sdk.core.ad.AdImageLoaderListener;
 import com.adadapted.android.sdk.ext.cache.ImageCache;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -13,16 +14,14 @@ import com.android.volley.toolbox.ImageRequest;
  * Created by chrisweeden on 3/30/15.
  */
 public class HttpAdImageLoader implements AdImageLoader {
-    private static final String TAG = HttpAdImageLoader.class.getName();
+    private static final String LOGTAG = HttpAdImageLoader.class.getName();
 
-    public HttpAdImageLoader() {
+    public HttpAdImageLoader() {}
 
-    }
-
-    public void getImage(final String url, final Listener listener) {
+    public void getImage(final String url, final AdImageLoaderListener listener) {
         if(url == null || !url.toLowerCase().startsWith("http")) {
-            Log.w(TAG, "No URL has been provided.");
-            notifyAdImageLoadFailed(listener);
+            Log.w(LOGTAG, "No URL has been provided.");
+            listener.onFailure();
             return;
         }
 
@@ -32,49 +31,35 @@ public class HttpAdImageLoader implements AdImageLoader {
             loadRemoteImage(url, listener);
         }
         else {
-            notifyAdImageLoaded(listener, bitmap);
+            listener.onSuccess(bitmap);
         }
     }
 
-    private void loadRemoteImage(final String url, final Listener listener) {
+    private void loadRemoteImage(final String url, final AdImageLoaderListener listener) {
         ImageRequest imageRequest = new ImageRequest(url,
-            new Response.Listener<Bitmap>() {
+                new Response.Listener<Bitmap>() {
 
-                @Override
-                public void onResponse(Bitmap response) {
-                    if(null == ImageCache.getInstance().getImage(url)) {
-                        ImageCache.getInstance().putImage(url, response);
+                    @Override
+                    public void onResponse(Bitmap bitmap) {
+                        if (null == ImageCache.getInstance().getImage(url)) {
+                            ImageCache.getInstance().putImage(url, bitmap);
+                        }
+
+                        listener.onSuccess(bitmap);
                     }
 
-                    notifyAdImageLoaded(listener, response);
+                }, 0, 0, Bitmap.Config.ARGB_8888,
+
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.w(LOGTAG, "Problem loading image URL: " + url);
+                        listener.onFailure();
+                    }
                 }
-
-            }, 0, 0, Bitmap.Config.ARGB_8888,
-
-            new Response.ErrorListener() {
-
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    notifyAdImageLoadFailed(listener);
-                }
-            }
         );
 
         HttpRequestManager.getQueue().add(imageRequest);
-    }
-
-    private void notifyAdImageLoaded(Listener listener, Bitmap bitmap) {
-        if(listener != null & bitmap != null) {
-            listener.onAdImageLoaded(bitmap);
-        }
-        else {
-            Log.w(TAG, "No Bitmap to return.");
-        }
-    }
-
-    private void notifyAdImageLoadFailed(Listener listener) {
-        if(listener != null) {
-            listener.onAdImageLoadFailed();
-        }
     }
 }

@@ -6,12 +6,12 @@ package com.adadapted.android.sdk.core.keywordintercept.model;
 public class AutoFill {
     private final String replacement;
     private final String icon;
-    private final String tagline;
+    private final String tagLine;
 
-    public AutoFill(String replacement, String icon, String tagline) {
+    public AutoFill(String replacement, String icon, String tagLine) {
         this.replacement = replacement;
         this.icon = icon;
-        this.tagline = tagline;
+        this.tagLine = tagLine;
     }
 
     public String getReplacement() {
@@ -22,8 +22,8 @@ public class AutoFill {
         return icon;
     }
 
-    public String getTagline() {
-        return tagline;
+    public String getTagLine() {
+        return tagLine;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class AutoFill {
         return "AutoFill{" +
                 "replacement='" + replacement + '\'' +
                 ", icon='" + icon + '\'' +
-                ", tagline='" + tagline + '\'' +
+                ", tagLine='" + tagLine + '\'' +
                 '}';
     }
 }

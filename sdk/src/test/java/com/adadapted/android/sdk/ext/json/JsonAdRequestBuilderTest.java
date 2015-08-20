@@ -16,7 +16,6 @@ import java.util.Date;
  */
 public class JsonAdRequestBuilderTest {
     private static final String APPID = "TESTAPPLICATION";
-    private static final String[] ZONES = new String[]{"10", "11"};
     private static final String UDID = "TESTUDID";
     private static final String BUNDLEID = "com.adadapted.android.sdk";
     private static final String DEVICE = "Test Device";
@@ -31,7 +30,6 @@ public class JsonAdRequestBuilderTest {
     public void testBuildAdRequestJson_ReturnsJson() throws Exception {
         DeviceInfo deviceInfo = new DeviceInfo();
         deviceInfo.setAppId(APPID);
-        deviceInfo.setZones(ZONES);
         deviceInfo.setUdid(UDID);
         deviceInfo.setBundleId(BUNDLEID);
         deviceInfo.setDevice(DEVICE);

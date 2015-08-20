@@ -9,7 +9,6 @@ public class Config {
 
     public static class Prod {
         public static final String URL_SESSION_INIT = "https://ads.adadapted.com/v/0.9.3/android/session/init";
-        public static final String URL_SESSION_REINIT = "https://ads.adadapted.com/v/0.9.3/android/session/reinit";
         public static final String URL_EVENT_BATCH = "https://ads.adadapted.com/v/0.9.3/android/event/batch";
         public static final String URL_AD_GET = "https://ads.adadapted.com/v/0.9.3/android/ad/get";
         public static final String URL_KI_INIT = "https://ads.adadapted.com/v/0.9.3/android/ki/init";
@@ -19,7 +18,6 @@ public class Config {
 
     public static class Sand {
         public static final String URL_SESSION_INIT = "http://sandbox.adadapted.com/v/0.9.3/android/session/init";
-        public static final String URL_SESSION_REINIT = "http://sandbox.adadapted.com/v/0.9.3/android/session/reinit";
         public static final String URL_EVENT_BATCH = "http://sandbox.adadapted.com/v/0.9.3/android/event/batch";
         public static final String URL_AD_GET = "http://sandbox.adadapted.com/v/0.9.3/android/ad/get";
         public static final String URL_KI_INIT = "http://sandbox.adadapted.com/v/0.9.3/android/ki/init";

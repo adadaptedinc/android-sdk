@@ -1,9 +1,7 @@
 package com.adadapted.android.sdk.ext.factory;
 
-import android.content.Context;
-
-import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.config.Config;
+import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptAdapter;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptBuilder;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptRequestBuilder;
@@ -16,43 +14,40 @@ import com.adadapted.android.sdk.ext.json.JsonKeywordInterceptRequestBuilder;
  * Created by chrisweeden on 6/23/15.
  */
 public class KeywordInterceptManagerFactory {
-    private static KeywordInterceptManagerFactory instance;
+    private static KeywordInterceptManagerFactory sInstance;
 
-    public static synchronized KeywordInterceptManagerFactory getInstance() {
-        if(instance == null) {
-            instance = new KeywordInterceptManagerFactory();
-        }
+    private KeywordInterceptManager mInterceptManager;
 
-        return instance;
+    private KeywordInterceptManagerFactory(DeviceInfo deviceInfo) {
+        KeywordInterceptAdapter adapter = new HttpKeywordInterceptAdapter(
+                determineInitEndpoint(deviceInfo),
+                determineTrackEndpoint(deviceInfo)
+        );
+
+        KeywordInterceptBuilder builder = new JsonKeywordInterceptBuilder();
+        KeywordInterceptRequestBuilder requestBuilder = new JsonKeywordInterceptRequestBuilder();
+
+        mInterceptManager = new KeywordInterceptManager(adapter, builder, requestBuilder);
     }
 
-    private KeywordInterceptManager interceptManager;
-
-    private KeywordInterceptManagerFactory() {}
-
-    public KeywordInterceptManager createKeywordInterceptManager(Context context) {
-        if(interceptManager == null) {
-            KeywordInterceptAdapter adapter = new HttpKeywordInterceptAdapter(determineInitEndpoint(),
-                    determineTrackEndpoint());
-            KeywordInterceptBuilder builder = new JsonKeywordInterceptBuilder();
-            KeywordInterceptRequestBuilder requestBuilder = new JsonKeywordInterceptRequestBuilder();
-
-            interceptManager = new KeywordInterceptManager(adapter, builder, requestBuilder);
+    public static KeywordInterceptManager createKeywordInterceptManager(DeviceInfo deviceInfo) {
+        if(sInstance == null) {
+            sInstance = new KeywordInterceptManagerFactory(deviceInfo);
         }
 
-        return interceptManager;
+        return sInstance.mInterceptManager;
     }
 
-    private String determineInitEndpoint() {
-        if(AdAdapted.getInstance().isProd()) {
+    private String determineInitEndpoint(DeviceInfo deviceInfo) {
+        if(deviceInfo.isProd()) {
             return Config.Prod.URL_KI_INIT;
         }
 
         return Config.Sand.URL_KI_INIT;
     }
 
-    private String determineTrackEndpoint() {
-        if(AdAdapted.getInstance().isProd()) {
+    private String determineTrackEndpoint(DeviceInfo deviceInfo) {
+        if(deviceInfo.isProd()) {
             return Config.Prod.URL_KI_TRACK;
         }
 

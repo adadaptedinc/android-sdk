@@ -5,71 +5,73 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
 
+import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
 /**
  * Created by chrisweeden on 7/1/15.
  */
 class AdViewBuilder implements AdViewBuildingStrategy.Listener {
-    private static final String TAG = AdViewBuilder.class.getName();
+    private static final String LOGTAG = AdViewBuilder.class.getName();
 
     public interface Listener {
         void onViewLoaded(View v);
         void onViewLoadFailed();
     }
 
-    private final Context context;
+    private final Context mContext;
 
-    private Listener listener;
-    private Handler handler = new Handler(Looper.getMainLooper());
+    private Listener mListener;
+    private Handler mHandler = new Handler(Looper.getMainLooper());
 
-    private HtmlAdViewBuildingStrategy adWebView;
-    private AdViewBuildingStrategy strategy;
+    private HtmlAdViewBuildingStrategy mAdWebView;
+    private AdViewBuildingStrategy mStrategy;
 
     public AdViewBuilder(Context context) {
-        this.context = context;
+        mContext = context;
 
         // For whatever reason the WebView has to be created ahead of time.
         // The App will likely crash if it is constructed on-demand.
-        adWebView = new HtmlAdViewBuildingStrategy(context, this);
+        mAdWebView = new HtmlAdViewBuildingStrategy(context, this);
     }
 
     public void buildView(ViewAdWrapper currentAd, int resourceId, int width, int height) {
-        strategy = null;
+        mStrategy = null;
         switch(currentAd.getAdType()) {
             case HTML:
-                strategy = getHtmlViewStrategy();
+                mStrategy = getHtmlViewStrategy();
                 break;
 
             case IMAGE:
-                strategy = getImageViewStrategy();
+                mStrategy = getImageViewStrategy(currentAd);
                 break;
 
             case JSON:
-                strategy = getJsonViewStrategy();
+                mStrategy = getJsonViewStrategy();
                 break;
 
             default:
-                strategy = getEmptyViewStrategy();
+                mStrategy = getEmptyViewStrategy();
         }
 
-        loadView(strategy, currentAd, width, height, resourceId);
+        loadView(mStrategy, currentAd, width, height, resourceId);
     }
 
     private AdViewBuildingStrategy getHtmlViewStrategy() {
-        return adWebView;
+        return mAdWebView;
     }
 
-    private AdViewBuildingStrategy getImageViewStrategy() {
-        return new ImageAdViewBuildingStrategy(context, this);
+    private AdViewBuildingStrategy getImageViewStrategy(ViewAdWrapper currentAd) {
+        DeviceInfo deviceInfo = currentAd.getSession().getDeviceInfo();
+        return new ImageAdViewBuildingStrategy(mContext, deviceInfo, this);
     }
 
     private AdViewBuildingStrategy getJsonViewStrategy() {
-        return new JsonAdViewBuildingStrategy(context, this);
+        return new JsonAdViewBuildingStrategy(mContext, this);
     }
 
     private AdViewBuildingStrategy getEmptyViewStrategy() {
-        return new EmptyAdViewStrategy(context, this);
+        return new EmptyAdViewStrategy(mContext, this);
     }
 
     private void loadView(final AdViewBuildingStrategy strategy,
@@ -77,7 +79,7 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
                           final int width,
                           final int height,
                           final int resourceId) {
-        handler.post(new Runnable() {
+        mHandler.post(new Runnable() {
             @Override
             public void run() {
                 strategy.buildView(currentAd.getAd(), width, height, resourceId);
@@ -86,29 +88,29 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
     }
 
     public void setListener(Listener listener) {
-        this.listener = listener;
+        mListener = listener;
     }
 
     public void removeListener(Listener listener) {
-        if(this.listener != null && this.listener.equals(listener)) {
-            this.listener = null;
+        if(mListener != null && mListener.equals(listener)) {
+            mListener = null;
         }
     }
 
     public void notifyViewLoaded(View v) {
-        if(listener != null) {
-            listener.onViewLoaded(v);
+        if(mListener != null) {
+            mListener.onViewLoaded(v);
         }
     }
 
     public void notifyViewLoadFailed() {
-        if(listener != null) {
-            listener.onViewLoadFailed();
+        if(mListener != null) {
+            mListener.onViewLoadFailed();
         }
     }
 
     public void onStrategyViewLoaded() {
-        notifyViewLoaded(strategy.getView());
+        notifyViewLoaded(mStrategy.getView());
     }
 
     @Override

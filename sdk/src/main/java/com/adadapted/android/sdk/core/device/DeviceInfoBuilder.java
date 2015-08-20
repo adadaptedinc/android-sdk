@@ -25,29 +25,32 @@ public class DeviceInfoBuilder extends AsyncTask<BuildDeviceInfoParam, Void, Dev
     }
 
     @Override
-    protected DeviceInfo doInBackground(BuildDeviceInfoParam... params) {
+    protected DeviceInfo doInBackground(final BuildDeviceInfoParam... params) {
         if(params.length == 1) {
-            return DeviceInfo.captureDeviceInfo(params[0].getContext(),
-                    params[0].getAppId(), params[0].getZones(), params[0].getSdkVersion());
+            return DeviceInfo.captureDeviceInfo(
+                    params[0].getContext(),
+                    params[0].getAppId(),
+                    params[0].isProd(),
+                    params[0].getSdkVersion());
         }
 
         Log.e(TAG, "Only expects a single parameter.");
         return null;
     }
 
-    protected void onPostExecute(DeviceInfo deviceInfo) {
+    protected void onPostExecute(final DeviceInfo deviceInfo) {
         notifyDeviceInfoCollected(deviceInfo);
     }
 
-    public void addListener(Listener listener) {
+    public void addListener(final Listener listener) {
         listeners.add(listener);
     }
 
-    public void removeListener(Listener listener) {
+    public void removeListener(final Listener listener) {
         listeners.remove(listener);
     }
 
-    private void notifyDeviceInfoCollected(DeviceInfo deviceInfo) {
+    private void notifyDeviceInfoCollected(final DeviceInfo deviceInfo) {
         for(Listener listener : listeners) {
             listener.onDeviceInfoCollected(deviceInfo);
         }

@@ -9,44 +9,50 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.adadapted.android.sdk.AdAdapted;
+import com.adadapted.android.sdk.core.ad.AdImageLoaderListener;
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.AdImage;
 import com.adadapted.android.sdk.core.ad.model.ImageAdType;
+import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.ext.http.HttpAdImageLoader;
 
 /**
  * Created by chrisweeden on 5/20/15.
  */
 class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
-    private static final String TAG = ImageAdViewBuildingStrategy.class.getName();
+    private static final String LOGTAG = ImageAdViewBuildingStrategy.class.getName();
 
-    private final HttpAdImageLoader imageLoader;
+    private final HttpAdImageLoader mImageLoader;
 
-    private final Context context;
-    private final ImageView view;
+    private final Context mContext;
+    private final DeviceInfo mDeviceInfo;
+    private final ImageView mView;
 
-    private Bitmap adImage;
+    private Bitmap mAdImage;
 
     private final Runnable buildAdRunnable = new Runnable() {
         public void run() {
-            view.setImageBitmap(adImage);
+            mView.setImageBitmap(mAdImage);
         }
     };
+
     private final Handler buildAdHandler = new Handler(Looper.getMainLooper());
 
-    private final Listener listener;
+    private final Listener mListener;
 
-    public ImageAdViewBuildingStrategy(final Context context, final Listener listener) {
-        this.context = context;
-        this.listener = listener;
+    public ImageAdViewBuildingStrategy(final Context context,
+                                       final DeviceInfo deviceInfo,
+                                       final Listener listener) {
+        mContext = context;
+        mDeviceInfo = deviceInfo;
+        mListener = listener;
 
-        imageLoader = new HttpAdImageLoader();
-        view = new ImageView(context);
+        mImageLoader = new HttpAdImageLoader();
+        mView = new ImageView(context);
     }
 
     private String getPresentOrientation() {
-        int orientation = context.getResources().getConfiguration().orientation;
+        int orientation = mContext.getResources().getConfiguration().orientation;
 
         if(orientation == Configuration.ORIENTATION_LANDSCAPE) {
             return AdImage.LANDSCAPE;
@@ -56,30 +62,30 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
     }
 
     public View getView() {
-        return view;
+        return mView;
     }
 
     @Override
     public void buildView(Ad ad, int width, int height) {
-        view.setLayoutParams(new ViewGroup.LayoutParams(width, height));
+        mView.setLayoutParams(new ViewGroup.LayoutParams(width, height));
 
         ImageAdType adType = (ImageAdType) ad.getAdType();
 
-        String imageResolution = AdAdapted.getInstance().getDeviceInfo().chooseImageSize();
+        String imageResolution = mDeviceInfo.chooseImageSize();
 
         String imageUrl = adType.getImageUrlFor(imageResolution, getPresentOrientation());
-        imageLoader.getImage(imageUrl, new HttpAdImageLoader.Listener() {
+        mImageLoader.getImage(imageUrl, new AdImageLoaderListener() {
             @Override
-            public void onAdImageLoaded(Bitmap bitmap) {
-                adImage = bitmap;
+            public void onSuccess(final Bitmap bitmap) {
+                mAdImage = bitmap;
                 buildAdHandler.post(buildAdRunnable);
 
-                listener.onStrategyViewLoaded();
+                mListener.onStrategyViewLoaded();
             }
 
             @Override
-            public void onAdImageLoadFailed() {
-                listener.onStrategyViewLoadFailed();
+            public void onFailure() {
+                mListener.onStrategyViewLoadFailed();
             }
         });
     }

@@ -10,51 +10,51 @@ import java.util.Map;
  * Created by chrisweeden on 7/16/15.
  */
 public class AaSuggestionTracker {
-    private static final String TAG = AaSuggestionTracker.class.getName();
+    private static final String LOGTAG = AaSuggestionTracker.class.getName();
 
-    private final KeywordInterceptManager manager;
+    private final KeywordInterceptManager mManager;
 
     // Here the key is the Term Text
-    private Map<String, String> items = new HashMap<>();
+    private Map<String, String> mItems = new HashMap<>();
 
     // Here the key is the Replacement Text
-    private Map<String, String> replacements = new HashMap<>();
+    private Map<String, String> mReplacements = new HashMap<>();
 
-    private Session session;
+    private Session mSession;
 
     AaSuggestionTracker(KeywordInterceptManager manager) {
-        this.manager = manager;
+        mManager = manager;
     }
 
     void suggestionMatched(Session session, String term, String replacement, String userInput) {
-        this.session = session;
+        mSession = session;
 
         term = term.toLowerCase();
         userInput = userInput.toLowerCase();
         replacement = replacement.toLowerCase();
 
-        items.put(term, userInput);
-        replacements.put(replacement, term);
+        mItems.put(term, userInput);
+        mReplacements.put(replacement, term);
 
-        manager.trackMatched(session, term, userInput);
+        mManager.trackMatched(session, term, userInput);
     }
 
     public void suggestionPresented(String term) {
         term = term.toLowerCase();
 
-        if(items.containsKey(term)) {
-            manager.trackPresented(session, term, items.get(term));
+        if(mItems.containsKey(term)) {
+            mManager.trackPresented(mSession, term, mItems.get(term));
         }
     }
 
     public boolean suggestionSelected(String replacement) {
         replacement = replacement.toLowerCase();
 
-        if(replacements.containsKey(replacement)) {
-            String term = replacements.get(replacement);
-            String userInput = items.get(term);
+        if(mReplacements.containsKey(replacement)) {
+            String term = mReplacements.get(replacement);
+            String userInput = mItems.get(term);
 
-            manager.trackSelected(session, term, userInput);
+            mManager.trackSelected(mSession, term, userInput);
 
             return true;
         }
