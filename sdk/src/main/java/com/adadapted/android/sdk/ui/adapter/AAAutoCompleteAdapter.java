@@ -14,40 +14,39 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 6/18/15.
  */
-@SuppressWarnings("ALL")
 public class AaAutoCompleteAdapter extends ArrayAdapter<String> {
-    private static final String TAG = AaAutoCompleteAdapter.class.getName();
+    private static final String LOGTAG = AaAutoCompleteAdapter.class.getName();
 
-    private final AaKeywordInterceptMatcher matcher;
-    private final List<String> allItems;
+    private final AaKeywordInterceptMatcher mMatcher;
+    private final List<String> mAllItems;
 
     public AaAutoCompleteAdapter(Context context, int resource, List<String> items) {
         super(context, resource, items);
 
-        matcher = new AaKeywordInterceptMatcher(context);
-        allItems = new ArrayList<>(items);
+        mMatcher = new AaKeywordInterceptMatcher();
+        mAllItems = new ArrayList<>(items);
     }
 
     public boolean suggestionSelected(String suggestion) {
-        return matcher.suggestionSelected(suggestion);
+        return mMatcher.suggestionSelected(suggestion);
     }
 
     @Override
     public Filter getFilter() {
-        return filter;
+        return mFilter;
     }
 
-    private final Filter filter = new Filter() {
+    private final Filter mFilter = new Filter() {
         @Override
         protected Filter.FilterResults performFiltering(CharSequence constraint) {
             FilterResults filterResults = new FilterResults();
             Set<String> suggestions = new HashSet<>();
 
             if(constraint != null) {
-                SuggestionPayload suggestionPayload = matcher.match(constraint);
+                SuggestionPayload suggestionPayload = mMatcher.match(constraint);
                 suggestions.addAll(suggestionPayload.getSuggestions());
 
-                for(String item : allItems) {
+                for(String item : mAllItems) {
                     if (item.toLowerCase().contains(constraint.toString().toLowerCase())) {
                         suggestionPayload.presented(item);
                         suggestions.add(item);
@@ -66,7 +65,7 @@ public class AaAutoCompleteAdapter extends ArrayAdapter<String> {
             List<String> filteredList = (ArrayList<String>) results.values;
             clear();
 
-            if(results.count > 0) {
+            if (results.count > 0) {
                 for (String s : filteredList) {
                     add(s);
                 }

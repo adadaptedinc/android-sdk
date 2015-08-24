@@ -5,35 +5,34 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.adadapted.android.sdk.AdAdapted;
-import com.adadapted.android.sdk.ui.listener.AaContentListener;
+import com.adadapted.android.sdk.ui.messaging.AaSdkContentListener;
+import com.adadapted.android.sdk.ui.messaging.SdkContentPublisherFactory;
 import com.adadapted.android.sdk.ui.view.AaZoneView;
 
 /**
  * Created by chrisweeden on 5/27/15.
  */
 public class AaFeedAdapter extends BaseAdapter {
-    private static final String TAG = AaFeedAdapter.class.getName();
+    private static final String LOGTAG = AaFeedAdapter.class.getName();
 
-    private final BaseAdapter adapter;
-    private final AaFeedAdPlacement placement;
+    private final BaseAdapter mAdapter;
+    private final AaFeedAdPlacement mPlacement;
 
     private AaZoneView currentZoneView;
 
     public AaFeedAdapter(Context context, BaseAdapter adapter, String zoneId, int placement) {
-        this.adapter = adapter;
-        this.placement = new AaFeedAdPlacement(context, zoneId, placement);
+        this(context, adapter, zoneId, placement, 0);
     }
 
     public AaFeedAdapter(Context context, BaseAdapter adapter, String zoneId, int placement,
                          int resourceId) {
-        this.adapter = adapter;
-        this.placement = new AaFeedAdPlacement(context, zoneId, placement, resourceId);
+        mAdapter = adapter;
+        mPlacement = new AaFeedAdPlacement(context, zoneId, placement, resourceId);
     }
 
     @Override
     public int getCount() {
-        return placement.getModifiedCount(adapter.getCount());
+        return mPlacement.getModifiedCount(mAdapter.getCount());
     }
 
     @Override
@@ -43,10 +42,10 @@ public class AaFeedAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        AaFeedItem feedItem = placement.getItem(position);
+        AaFeedItem feedItem = mPlacement.getItem(position);
 
         if(feedItem == null) {
-            return placement.getModifiedItemId(position);
+            return mPlacement.getModifiedItemId(position);
         }
 
         return position;
@@ -54,11 +53,11 @@ public class AaFeedAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        AaZoneView view = placement.getView(position);
+        AaZoneView view = mPlacement.getView(position);
 
         if(view == null) {
-            int modPos = placement.getModifiedPosition(position);
-            return adapter.getView(modPos, convertView, parent);
+            int modPos = mPlacement.getModifiedPosition(position);
+            return mAdapter.getView(modPos, convertView, parent);
         }
 
         currentZoneView = view;
@@ -68,18 +67,18 @@ public class AaFeedAdapter extends BaseAdapter {
 
     @Override
     public int getViewTypeCount() {
-        return placement.getModifiedViewTypeCount(adapter.getViewTypeCount());
+        return mPlacement.getModifiedViewTypeCount(mAdapter.getViewTypeCount());
     }
 
     @Override
     public int getItemViewType(int position) {
-        AaFeedItem feedItem = placement.getItem(position);
+        AaFeedItem feedItem = mPlacement.getItem(position);
         if(feedItem == null) {
-            return adapter.getViewTypeCount();
+            return mAdapter.getViewTypeCount();
         }
         else {
-            int modPos = placement.getModifiedPosition(position);
-            return adapter.getItemViewType(modPos);
+            int modPos = mPlacement.getModifiedPosition(position);
+            return mAdapter.getItemViewType(modPos);
         }
     }
 
@@ -89,12 +88,12 @@ public class AaFeedAdapter extends BaseAdapter {
         }
     }
 
-    public void onStart(AaContentListener listener) {
+    public void onStart(AaSdkContentListener listener) {
         if(currentZoneView != null) {
             currentZoneView.onStart();
         }
 
-        AdAdapted.getInstance().addListener(listener);
+        SdkContentPublisherFactory.getContentPublisher().addListener(listener);
     }
 
     public void onStop() {
@@ -103,11 +102,11 @@ public class AaFeedAdapter extends BaseAdapter {
         }
     }
 
-    public void onStop(AaContentListener listener) {
+    public void onStop(AaSdkContentListener listener) {
         if(currentZoneView != null) {
             currentZoneView.onStop();
         }
 
-        AdAdapted.getInstance().removeListener(listener);
+        SdkContentPublisherFactory.getContentPublisher().removeListener(listener);
     }
 }

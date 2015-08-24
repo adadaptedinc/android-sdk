@@ -9,31 +9,26 @@ import java.util.Map;
  * Created by chrisweeden on 6/25/15.
  */
 class AaZoneViewControllerFactory {
-    private static AaZoneViewControllerFactory instance;
+    private static AaZoneViewControllerFactory sInstance;
 
-    public static synchronized AaZoneViewControllerFactory getInstance(final Context context) {
-        if(instance == null) {
-            instance = new AaZoneViewControllerFactory(context);
+    private final Map<String, AaZoneViewController> mZoneControllers;
+
+    public AaZoneViewControllerFactory() {
+        mZoneControllers = new HashMap<>();
+    }
+
+    public static AaZoneViewController getController(final Context context,
+                                                     final String zoneId,
+                                                     final int resourceId) {
+        if(sInstance == null) {
+            sInstance = new AaZoneViewControllerFactory();
         }
 
-        return instance;
-    }
-
-    private final Context context;
-    private final Map<String, AaZoneViewController> zoneControllers;
-
-    public AaZoneViewControllerFactory(final Context context) {
-        this.context = context;
-        this.zoneControllers = new HashMap<>();
-    }
-
-    public AaZoneViewController getController(final String zoneId,
-                                              final int resourceId) {
-        if(!zoneControllers.containsKey(zoneId)) {
+        if(!sInstance.mZoneControllers.containsKey(zoneId)) {
             AaZoneViewController controller = new AaZoneViewController(context, zoneId, resourceId);
-            zoneControllers.put(zoneId, controller);
+            sInstance.mZoneControllers.put(zoneId, controller);
         }
 
-        return zoneControllers.get(zoneId);
+        return sInstance.mZoneControllers.get(zoneId);
     }
 }

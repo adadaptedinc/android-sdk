@@ -6,7 +6,6 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,44 +13,44 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.RelativeLayout;
 
-import com.adadapted.android.sdk.AdAdapted;
-import com.adadapted.android.sdk.ui.listener.AaContentListener;
+import com.adadapted.android.sdk.ui.messaging.AaSdkContentListener;
+import com.adadapted.android.sdk.ui.messaging.SdkContentPublisherFactory;
 
 /**
  * Created by chrisweeden on 3/30/15.
  */
 public class AaZoneView extends RelativeLayout
-        implements AdInteractionListener, AaZoneViewController.Listener {
-    private static final String TAG = AaZoneView.class.getName();
+        implements AdInteractionListener, AaZoneViewControllerListener {
+    private static final String LOGTAG = AaZoneView.class.getName();
 
-    private final Context context;
+    private final Context mContext;
 
-    private String zoneId;
-    private int layoutResourceId;
+    private String mZoneId;
+    private int mLayoutResourceId;
 
-    private AaZoneViewController viewController;
-    private boolean visible = true;
+    private AaZoneViewController mViewController;
+    private boolean mVisible = true;
 
     public AaZoneView(Context context) {
         super(context);
-        this.context = context;
+        mContext = context;
     }
 
     public AaZoneView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.context = context;
+        mContext = context;
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public AaZoneView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        this.context = context;
+        mContext = context;
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public AaZoneView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        this.context = context;
+        mContext = context;
     }
 
     public void init(String zoneId) {
@@ -59,8 +58,8 @@ public class AaZoneView extends RelativeLayout
     }
 
     public void init(String zoneId, int layoutResourceId) {
-        this.zoneId = zoneId;
-        this.layoutResourceId = layoutResourceId;
+        mZoneId = zoneId;
+        mLayoutResourceId = layoutResourceId;
 
         setGravity(Gravity.CENTER);
     }
@@ -68,7 +67,7 @@ public class AaZoneView extends RelativeLayout
     protected void displayAdView(final View view) {
         if(view == null) { return; }
 
-        Activity activity = (Activity)context;
+        Activity activity = (Activity)mContext;
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -100,17 +99,17 @@ public class AaZoneView extends RelativeLayout
             });
         }
         else {
-            setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    AaZoneView.this.onAdInteraction();
-                }
-            });
+          setOnClickListener(new OnClickListener() {
+              @Override
+              public void onClick(View v) {
+                  AaZoneView.this.onAdInteraction();
+              }
+          });
         }
 
-        if(visible) {
+        if(mVisible) {
             displayAdView(view);
-            viewController.acknowledgeDisplay();
+            mViewController.acknowledgeDisplay();
         }
     }
 
@@ -125,22 +124,22 @@ public class AaZoneView extends RelativeLayout
     }
 
     public void onStart() {
-        viewController = AaZoneViewControllerFactory.getInstance(context).getController(zoneId, layoutResourceId);
-        viewController.setListener(this);
+        mViewController = AaZoneViewControllerFactory.getController(mContext, mZoneId, mLayoutResourceId);
+        mViewController.setListener(this);
     }
 
-    public void onStart(AaContentListener listener) {
+    public void onStart(AaSdkContentListener listener) {
         onStart();
 
-        AdAdapted.getInstance().addListener(listener);
+        SdkContentPublisherFactory.getContentPublisher().addListener(listener);
     }
 
     public void onStop() {
-        viewController.removeListener();
+        mViewController.removeListener();
     }
 
-    public void onStop(AaContentListener listener) {
-        AdAdapted.getInstance().removeListener(listener);
+    public void onStop(AaSdkContentListener listener) {
+        SdkContentPublisherFactory.getContentPublisher().removeListener(listener);
 
         onStop();
     }
@@ -152,21 +151,21 @@ public class AaZoneView extends RelativeLayout
         switch(visibility) {
             case View.GONE:
             case View.INVISIBLE:
-                visible = false;
+                mVisible = false;
                 onStop();
                 break;
 
             case View.VISIBLE:
                 onStart();
-                visible = true;
+                mVisible = true;
                 break;
         }
     }
 
     @Override
     public void onAdInteraction() {
-        if (viewController != null) {
-            viewController.handleAdAction();
+        if (mViewController != null) {
+            mViewController.handleAdAction();
         }
     }
 }

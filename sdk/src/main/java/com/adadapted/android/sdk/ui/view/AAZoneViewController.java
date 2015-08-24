@@ -7,7 +7,7 @@ import android.view.View;
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.AdImage;
 import com.adadapted.android.sdk.core.common.Dimension;
-import com.adadapted.android.sdk.core.session.SessionManager;
+import com.adadapted.android.sdk.core.session.SessionListener;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.core.zone.model.Zone;
 import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
@@ -20,96 +20,91 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 7/1/15.
  */
-class AaZoneViewController implements SessionManager.Listener, AdZoneRefreshScheduler.Listener,
+class AaZoneViewController implements SessionListener, AdZoneRefreshScheduler.Listener,
         AdViewBuilder.Listener {
-    private static final String TAG = AaZoneViewController.class.getName();
+    private static final String LOGTAG = AaZoneViewController.class.getName();
 
-    public interface Listener {
-        void onViewReadyForDisplay(View v);
-        void onResetDisplayView();
-    }
+    private final Context mContext;
+    private final String mZoneId;
+    private final int mResourceId;
 
-    private final Context context;
-    private final String zoneId;
-    private final int resourceId;
+    private final AdViewBuilder mAdViewBuilder;
+    private final AdActionHandler mAdActionHandler;
 
-    private final AdViewBuilder adViewBuilder;
-    private final AdActionHandler adActionHandler;
+    private AaZoneViewControllerListener mListener;
 
-    private Listener listener;
-
-    private String sessionId = "";
-    private Zone zone;
-    private ViewAdWrapper currentAd;
-    private Set<String> timerRunning;
+    private Session mSession;
+    private Zone mZone;
+    private ViewAdWrapper mCurrentAd;
+    private Set<String> mTimerRunning;
 
     public AaZoneViewController(final Context context, final String zoneId, final int resourceId) {
-        this.context = context;
-        this.zoneId = zoneId;
-        this.resourceId = resourceId;
+        mContext = context;
+        mZoneId = zoneId;
+        mResourceId = resourceId;
 
-        adViewBuilder = new AdViewBuilder(context);
-        adViewBuilder.setListener(this);
+        mAdViewBuilder = new AdViewBuilder(context);
+        mAdViewBuilder.setListener(this);
 
-        adActionHandler = new AdActionHandler(context);
+        mAdActionHandler = new AdActionHandler(context);
 
-        this.zone = Zone.createEmptyZone(zoneId);
-        this.currentAd = ViewAdWrapper.createEmptyCurrentAd(context, sessionId);
-        this.timerRunning = new HashSet<>();
+        mZone = Zone.createEmptyZone(zoneId);
+        mCurrentAd = ViewAdWrapper.createEmptyCurrentAd(mSession);
+        mTimerRunning = new HashSet<>();
     }
 
     private void setNextAd() {
         completeCurrentAd();
 
-        Ad ad = zone.getNextAd();
+        Ad ad = mZone.getNextAd();
         if(ad != null) {
-            currentAd = new ViewAdWrapper(context, sessionId, ad);
+            mCurrentAd = new ViewAdWrapper(mSession, ad);
         }
         else {
-            currentAd = ViewAdWrapper.createEmptyCurrentAd(context, sessionId);
+            mCurrentAd = ViewAdWrapper.createEmptyCurrentAd(mSession);
         }
 
         displayAd();
     }
 
     private void completeCurrentAd() {
-        if(currentAd.hasAd()) {
-            currentAd.completeAdTracking();
+        if(mCurrentAd.hasAd()) {
+            mCurrentAd.completeAdTracking();
         }
 
         notifyResetDisplayView();
     }
 
     private void displayAd() {
-        if(currentAd.hasAd()) {
-            adViewBuilder.buildView(currentAd, resourceId, getZoneWidth(), getZoneHeight());
+        if(mCurrentAd.hasAd()) {
+            mAdViewBuilder.buildView(mCurrentAd, mResourceId, getZoneWidth(), getZoneHeight());
         }
     }
 
     public void setTimer() {
-        new AdZoneRefreshScheduler(this).schedule(currentAd.getAd());
-        timerRunning.add(currentAd.getAdId());
+        new AdZoneRefreshScheduler(this).schedule(mCurrentAd.getAd());
+        mTimerRunning.add(mCurrentAd.getAdId());
     }
 
     public void acknowledgeDisplay() {
-        if(!timerRunning.contains(currentAd.getAdId())) {
-            currentAd.beginAdTracking();
+        if(!mTimerRunning.contains(mCurrentAd.getAdId())) {
+            mCurrentAd.beginAdTracking();
             setTimer();
         }
     }
 
     public void handleAdAction() {
-        if(adActionHandler.handleAction(currentAd)){
-            currentAd.trackInteraction();
+        if(mAdActionHandler.handleAction(mCurrentAd)){
+            mCurrentAd.trackInteraction();
 
-            if (currentAd.isHiddenOnInteraction()) {
+            if (mCurrentAd.isHiddenOnInteraction()) {
                 setNextAd();
             }
         }
     }
 
     public int getZoneWidth() {
-        Dimension dim = zone.getDimension(getPresentOrientation());
+        Dimension dim = mZone.getDimension(getPresentOrientation());
         if(dim != null) {
             return dim.getWidth();
         }
@@ -118,7 +113,7 @@ class AaZoneViewController implements SessionManager.Listener, AdZoneRefreshSche
     }
 
     public int getZoneHeight() {
-        Dimension dim = zone.getDimension(getPresentOrientation());
+        Dimension dim = mZone.getDimension(getPresentOrientation());
         if(dim != null) {
             return dim.getHeight();
         }
@@ -127,7 +122,7 @@ class AaZoneViewController implements SessionManager.Listener, AdZoneRefreshSche
     }
 
     private String getPresentOrientation() {
-        int orientation = context.getResources().getConfiguration().orientation;
+        int orientation = mContext.getResources().getConfiguration().orientation;
 
         if(orientation == Configuration.ORIENTATION_LANDSCAPE) {
             return AdImage.LANDSCAPE;
@@ -136,38 +131,38 @@ class AaZoneViewController implements SessionManager.Listener, AdZoneRefreshSche
         return AdImage.PORTRAIT;
     }
 
-    public void setListener(Listener listener) {
-        this.listener = listener;
-        SessionManagerFactory.getInstance().createSessionManager(context).addListener(this);
+    public void setListener(AaZoneViewControllerListener listener) {
+        mListener = listener;
+        SessionManagerFactory.addListener(this);
 
-        currentAd.beginAdTracking();
+        mCurrentAd.beginAdTracking();
     }
 
     public void removeListener() {
-        currentAd.completeAdTracking();
+        mCurrentAd.completeAdTracking();
 
-        this.listener = null;
-        SessionManagerFactory.getInstance().createSessionManager(context).removeListener(this);
+        mListener = null;
+        SessionManagerFactory.removeListener(this);
     }
 
     private void notifyViewReadyForDisplay(final View v) {
-        if(listener != null) {
-            listener.onViewReadyForDisplay(v);
+        if(mListener != null) {
+            mListener.onViewReadyForDisplay(v);
         }
     }
 
     private void notifyResetDisplayView() {
-        if(listener != null) {
-            listener.onResetDisplayView();
+        if(mListener != null) {
+            mListener.onResetDisplayView();
         }
     }
 
     @Override
     public void onSessionInitialized(final Session session) {
-        sessionId = session.getSessionId();
-        zone = session.getZone(zoneId);
+        mSession = session;
+        mZone = session.getZone(mZoneId);
 
-        if(timerRunning.size() == 0) {
+        if(mTimerRunning.size() == 0) {
             setNextAd();
         }
         else {
@@ -179,17 +174,14 @@ class AaZoneViewController implements SessionManager.Listener, AdZoneRefreshSche
     public void onSessionInitFailed() {}
 
     @Override
-    public void onSessionNotReinitialized() {}
-
-    @Override
     public void onNewAdsAvailable(final Session session) {
-        zone = session.getZone(zoneId);
+        mZone = session.getZone(mZoneId);
     }
 
     @Override
     public void onAdZoneRefreshTimer(Ad ad) {
-        if(ad.getAdId().equals(currentAd.getAdId())) {
-            timerRunning.remove(ad.getAdId());
+        if(ad.getAdId().equals(mCurrentAd.getAdId())) {
+            mTimerRunning.remove(ad.getAdId());
 
             completeCurrentAd();
             setNextAd();
@@ -199,5 +191,11 @@ class AaZoneViewController implements SessionManager.Listener, AdZoneRefreshSche
     @Override
     public void onViewLoaded(View v) {
         notifyViewReadyForDisplay(v);
+    }
+
+    @Override
+    public void onViewLoadFailed() {
+        mCurrentAd.markAdAsHidden();
+        setNextAd();
     }
 }
