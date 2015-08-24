@@ -20,7 +20,7 @@ import java.util.Set;
  */
 public class SessionManagerFactory {
     private static SessionManagerFactory sInstance;
-    private static Set<SessionListener> listeners = new HashSet<>();
+    private static Set<SessionListener> sListeners = new HashSet<>();
 
     private final SessionManager mSessionManager;
 
@@ -30,9 +30,10 @@ public class SessionManagerFactory {
         SessionBuilder sessionBuilder = new JsonSessionBuilder(deviceInfo.getScale());
 
         mSessionManager = new SessionManager(context, adapter, requestBuilder, sessionBuilder);
-        for(SessionListener listener : listeners) {
+        for(SessionListener listener : sListeners) {
             mSessionManager.addListener(listener);
         }
+        sListeners.clear();
 
         AdFetcherFactory.createAdFetcher(deviceInfo).addListener(mSessionManager.getAdFetcherListener());
     }
@@ -40,10 +41,16 @@ public class SessionManagerFactory {
     public static synchronized SessionManager createSessionManager(final Context context) {
         if(sInstance == null) {
             DeviceInfo deviceInfo = DeviceInfoFactory.getsDeviceInfo();
-            sInstance = new SessionManagerFactory(context, deviceInfo);
+            if(deviceInfo != null) {
+                sInstance = new SessionManagerFactory(context, deviceInfo);
+            }
         }
 
-        return sInstance.mSessionManager;
+        if(sInstance != null) {
+            return sInstance.mSessionManager;
+        }
+
+        return null;
     }
 
     public static SessionManager getSessionManager() {
@@ -60,7 +67,7 @@ public class SessionManagerFactory {
             manager.addListener(listener);
         }
         else {
-            listeners.add(listener);
+            sListeners.add(listener);
         }
     }
 
@@ -70,7 +77,7 @@ public class SessionManagerFactory {
             manager.removeListener(listener);
         }
         else {
-            listeners.remove(listener);
+            sListeners.remove(listener);
         }
     }
 

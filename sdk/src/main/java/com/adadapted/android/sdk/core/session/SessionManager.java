@@ -22,7 +22,7 @@ import java.util.Set;
 public class SessionManager {
     private static final String LOGTAG = SessionManager.class.getName();
 
-    private final Set<SessionListener> listeners;
+    private final Set<SessionListener> mListeners;
 
     private final Context mContext;
     private final SessionAdapter mHttpSessionAdapter;
@@ -49,12 +49,14 @@ public class SessionManager {
                           SessionAdapter httpSessionAdapter,
                           SessionRequestBuilder requestBuilder,
                           SessionBuilder sessionBuilder) {
-        this.listeners = new HashSet<>();
+        mListeners = new HashSet<>();
 
         mContext = context;
         mHttpSessionAdapter = httpSessionAdapter;
         mRequestBuilder = requestBuilder;
         mSessionBuilder = sessionBuilder;
+
+        mCurrentSession = new Session();
     }
 
     public Session getCurrentSession() {
@@ -98,27 +100,27 @@ public class SessionManager {
             listener.onSessionInitialized(mCurrentSession);
         }
 
-        listeners.add(listener);
+        mListeners.add(listener);
     }
 
     public void removeListener(SessionListener listener) {
-        listeners.remove(listener);
+        mListeners.remove(listener);
     }
 
     private void notifySessionInitialized() {
-        for(SessionListener listener: listeners) {
+        for(SessionListener listener: mListeners) {
            listener.onSessionInitialized(mCurrentSession);
         }
     }
 
     private void notifySessionInitFailed() {
-        for(SessionListener listener: listeners) {
+        for(SessionListener listener: mListeners) {
             listener.onSessionInitFailed();
         }
     }
 
     private void notifyNewAdsAvailable() {
-        for(SessionListener listener: listeners) {
+        for(SessionListener listener: mListeners) {
             listener.onNewAdsAvailable(mCurrentSession);
         }
     }

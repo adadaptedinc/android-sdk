@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.ui.adapter;
 
 import android.content.Context;
-import android.widget.AbsListView;
 
 import com.adadapted.android.sdk.ui.view.AaZoneView;
 

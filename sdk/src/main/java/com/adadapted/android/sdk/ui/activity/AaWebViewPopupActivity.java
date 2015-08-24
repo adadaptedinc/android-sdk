@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.PopupAdAction;
+import com.adadapted.android.sdk.core.session.SessionManager;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
 import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
@@ -57,7 +58,11 @@ public class AaWebViewPopupActivity extends AppCompatActivity {
         Intent intent = getIntent();
         ad = (Ad)intent.getSerializableExtra(EXTRA_POPUP_AD);
 
-        mSession = SessionManagerFactory.getSessionManager().getCurrentSession();
+        mSession = new Session();
+        SessionManager sessionManager = SessionManagerFactory.getSessionManager();
+        if(sessionManager != null) {
+            mSession = sessionManager.getCurrentSession();
+        }
 
         PopupAdAction action = (PopupAdAction)ad.getAdAction();
 
