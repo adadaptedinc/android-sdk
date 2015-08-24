@@ -20,6 +20,8 @@ public class TestAppApplication extends Application {
 
     @Override
     public void onCreate() {
+        super.onCreate();
+
         // Create an InitializerBuilder
         Stetho.InitializerBuilder initializerBuilder = Stetho.newInitializerBuilder(this);
 
@@ -45,7 +47,7 @@ public class TestAppApplication extends Application {
             .setSdkEventListener(new AaSdkEventListener() {
                 @Override
                 public void onHasAdsToServe(boolean enabled) {
-                    Log.i(TAG, "OldAdAdapted has Campaign: " + enabled);
+                    Log.i(TAG, "AdAdapted has Campaign: " + enabled);
                 }
 
                 @Override
