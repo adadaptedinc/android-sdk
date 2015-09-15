@@ -33,6 +33,10 @@ public class SdkEventPublisher {
     }
 
     public void publishAdEvent(final AdEvent event) {
+        if(mListener == null) {
+            return;
+        }
+
         if(event.getEventType().equals(AdEvent.Types.IMPRESSION)) {
             mListener.onNextAdEvent(event.getZoneId(), EventTypes.IMPRESSION);
         }
