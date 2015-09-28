@@ -17,7 +17,7 @@ import com.adadapted.android.sdk.core.ad.model.JsonAdType;
 import com.adadapted.android.sdk.ext.http.HttpAdImageLoader;
 
 /**
- * Created by chrisweeden on 5/26/15.
+ * Created by chrisweeden on 5/26/15
  */
 class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
     private static final String TAG = HtmlAdViewBuildingStrategy.class.getName();

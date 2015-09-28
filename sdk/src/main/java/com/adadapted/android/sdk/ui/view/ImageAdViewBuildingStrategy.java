@@ -17,7 +17,7 @@ import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.ext.http.HttpAdImageLoader;
 
 /**
- * Created by chrisweeden on 5/20/15.
+ * Created by chrisweeden on 5/20/15
  */
 class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
     private static final String LOGTAG = ImageAdViewBuildingStrategy.class.getName();

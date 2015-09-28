@@ -10,7 +10,7 @@ import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.HtmlAdType;
 
 /**
- * Created by chrisweeden on 5/20/15.
+ * Created by chrisweeden on 5/20/15
  */
 class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
     private static final String LOGTAG = HtmlAdViewBuildingStrategy.class.getName();
