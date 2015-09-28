@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by chrisweeden on 7/16/15.
+ * Created by chrisweeden on 7/16/15
  */
 public class AaSuggestionTracker {
     private static final String LOGTAG = AaSuggestionTracker.class.getName();

@@ -17,7 +17,7 @@ import com.adadapted.android.sdk.ui.messaging.AaSdkContentListener;
 import com.adadapted.android.sdk.ui.messaging.SdkContentPublisherFactory;
 
 /**
- * Created by chrisweeden on 3/30/15.
+ * Created by chrisweeden on 3/30/15
  */
 public class AaZoneView extends RelativeLayout
         implements AdInteractionListener, AaZoneViewControllerListener {

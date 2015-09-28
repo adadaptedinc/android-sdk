@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by chrisweeden on 6/25/15.
+ * Created by chrisweeden on 6/25/15
  */
 public class AaKeywordInterceptMatcher implements SessionListener, KeywordInterceptManager.Listener {
     private static final String LOGTAG = AaKeywordInterceptMatcher.class.getName();

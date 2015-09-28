@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by chrisweeden on 7/1/15.
+ * Created by chrisweeden on 7/1/15
  */
 class AaZoneViewController implements SessionListener, AdZoneRefreshScheduler.Listener,
         AdViewBuilder.Listener {

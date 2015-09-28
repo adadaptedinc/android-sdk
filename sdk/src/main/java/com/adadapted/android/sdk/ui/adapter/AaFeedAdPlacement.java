@@ -5,7 +5,7 @@ import android.content.Context;
 import com.adadapted.android.sdk.ui.view.AaZoneView;
 
 /**
- * Created by chrisweeden on 5/28/15.
+ * Created by chrisweeden on 5/28/15
  */
 public class AaFeedAdPlacement {
     private static final String LOGTAG = AaFeedAdPlacement.class.getName();

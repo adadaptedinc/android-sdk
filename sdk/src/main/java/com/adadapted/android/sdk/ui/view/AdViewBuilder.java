@@ -9,7 +9,7 @@ import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
 /**
- * Created by chrisweeden on 7/1/15.
+ * Created by chrisweeden on 7/1/15
  */
 class AdViewBuilder implements AdViewBuildingStrategy.Listener {
     private static final String LOGTAG = AdViewBuilder.class.getName();

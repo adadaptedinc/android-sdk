@@ -10,7 +10,7 @@ import com.adadapted.android.sdk.ui.model.ContentPayload;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
 /**
- * Created by chrisweeden on 7/1/15.
+ * Created by chrisweeden on 7/1/15
  */
 class AdActionHandler {
     private static final String LOGTAG = AdActionHandler.class.getName();
