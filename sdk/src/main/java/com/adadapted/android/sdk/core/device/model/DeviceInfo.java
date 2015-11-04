@@ -82,13 +82,13 @@ public class DeviceInfo {
             return AdvertisingIdClient.getAdvertisingIdInfo(context).getId();
         }
         catch (GooglePlayServicesNotAvailableException ex) {
-            Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId", ex);
+            Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId");
         }
         catch (GooglePlayServicesRepairableException ex) {
-            Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId", ex);
+            Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId");
         }
         catch (IOException ex) {
-            Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId", ex);
+            Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId");
         }
 
         return captureAndroidId(context);
