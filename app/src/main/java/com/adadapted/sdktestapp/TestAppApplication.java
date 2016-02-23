@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener;
+import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener;
 import com.facebook.stetho.Stetho;
 import com.newrelic.agent.android.NewRelic;
 
@@ -44,12 +45,13 @@ public class TestAppApplication extends Application {
         AdAdapted.init(this)
             .withAppId(apiKey)
             .inEnv(AdAdapted.Env.DEV)
-            .setSdkEventListener(new AaSdkEventListener() {
+            .setSdkSessionListener(new AaSdkSessionListener() {
                 @Override
-                public void onHasAdsToServe(boolean enabled) {
-                    Log.i(TAG, "AdAdapted has Campaign: " + enabled);
+                public void onHasAdsToServe(boolean hasAds) {
+                    Log.i(TAG, "Has Ads To Serve: " + hasAds);
                 }
-
+            })
+            .setSdkEventListener(new AaSdkEventListener() {
                 @Override
                 public void onNextAdEvent(String zoneId, String eventType) {
                     Log.i(TAG, "Ad " + eventType + " for Zone " + zoneId);
