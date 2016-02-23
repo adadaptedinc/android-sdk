@@ -25,7 +25,7 @@ public class SessionManager {
     private final Set<SessionListener> mListeners;
 
     private final Context mContext;
-    private final SessionAdapter mHttpSessionAdapter;
+    private final SessionAdapter mSessionAdapter;
     private final SessionRequestBuilder mRequestBuilder;
     private final SessionBuilder mSessionBuilder;
 
@@ -46,13 +46,13 @@ public class SessionManager {
     };
 
     public SessionManager(Context context,
-                          SessionAdapter httpSessionAdapter,
+                          SessionAdapter sessionAdapter,
                           SessionRequestBuilder requestBuilder,
                           SessionBuilder sessionBuilder) {
         mListeners = new HashSet<>();
 
         mContext = context;
-        mHttpSessionAdapter = httpSessionAdapter;
+        mSessionAdapter = sessionAdapter;
         mRequestBuilder = requestBuilder;
         mSessionBuilder = sessionBuilder;
 
@@ -69,7 +69,7 @@ public class SessionManager {
 
     public void initialize(final DeviceInfo deviceInfo) {
         JSONObject request = mRequestBuilder.buildSessionInitRequest(deviceInfo);
-        mHttpSessionAdapter.sendInit(request, new SessionAdapterListener() {
+        mSessionAdapter.sendInit(request, new SessionAdapterListener() {
             @Override
             public void onSuccess(JSONObject json) {
                 mCurrentSession = mSessionBuilder.buildSession(deviceInfo, json);
