@@ -1,14 +1,11 @@
 package com.adadapted.android.sdk.ui.activity;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
@@ -21,7 +18,7 @@ import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
 import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
-public class AaWebViewPopupActivity extends AppCompatActivity {
+public class AaWebViewPopupActivity extends Activity {
     private static final String LOGTAG = AaWebViewPopupActivity.class.getName();
 
     public static final String EXTRA_POPUP_AD = AaWebViewPopupActivity.class.getName() + ".EXTRA_POPUP_AD";
@@ -40,8 +37,6 @@ public class AaWebViewPopupActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setTitle("Web View Popup Activity");
 
         RelativeLayout.LayoutParams webViewLayout = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
@@ -67,7 +62,7 @@ public class AaWebViewPopupActivity extends AppCompatActivity {
         PopupAdAction action = (PopupAdAction)ad.getAdAction();
 
         loadPopup(action.getActionPath());
-        styleActivity(action);
+        setTitle(action.getTitle());
     }
 
     @Override
@@ -82,10 +77,19 @@ public class AaWebViewPopupActivity extends AppCompatActivity {
         EventTrackerFactory.getEventTracker().trackPopupEndEvent(mSession, ad);
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK) && popupWebView.canGoBack()) {
+            popupWebView.goBack();
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
     @SuppressLint({"AddJavascriptInterface", "SetJavaScriptEnabled"})
     private void loadPopup(String url) {
         popupWebView.getSettings().setJavaScriptEnabled(true);
-        popupWebView.addJavascriptInterface(new WebAppInterface(this), "OldAdAdapted");
         popupWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -95,22 +99,22 @@ public class AaWebViewPopupActivity extends AppCompatActivity {
         popupWebView.loadUrl(url);
     }
 
-    private void styleActivity(PopupAdAction action) {
-        setTitle(action.getTitle());
+    //private void styleActivity(PopupAdAction action) {
+    //
 
-        ActionBar bar = getSupportActionBar();
-        try {
-            setTitleColor(Color.parseColor(action.getTextColor()));
-        } catch (Exception ex) {
-            Log.w(LOGTAG, "Problem setting text color " + action.getTextColor());
-        }
+    //    ActionBar bar = getActionBar();
+    //    try {
+    //        setTitleColor(Color.parseColor(action.getTextColor()));
+    //    } catch (Exception ex) {
+    //        Log.w(LOGTAG, "Problem setting text color " + action.getTextColor());
+    //    }
 
-        try {
-            if(bar != null) {
-                bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(action.getBackgroundColor())));
-            }
-        } catch (Exception ex) {
-            Log.w(LOGTAG, "Problem setting background color " + action.getBackgroundColor());
-        }
-    }
+    //    try {
+    //        if(bar != null) {
+    //            bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(action.getBackgroundColor())));
+    //        }
+    //    } catch (Exception ex) {
+    //        Log.w(LOGTAG, "Problem setting background color " + action.getBackgroundColor());
+    //    }
+    //}
 }
