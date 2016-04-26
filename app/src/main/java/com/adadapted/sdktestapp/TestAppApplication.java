@@ -6,9 +6,6 @@ import android.util.Log;
 import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener;
-import com.adadapted.sdk.sdk_migration.R;
-import com.facebook.stetho.Stetho;
-import com.newrelic.agent.android.NewRelic;
 
 /**
  * Created by chrisweeden on 3/16/15.

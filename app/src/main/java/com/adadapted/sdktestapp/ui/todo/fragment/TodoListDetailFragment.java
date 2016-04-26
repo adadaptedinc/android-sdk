@@ -1,11 +1,10 @@
 package com.adadapted.sdktestapp.ui.todo.fragment;
 
 import android.app.Activity;
-import android.app.DialogFragment;
-import android.support.v4.app.ListFragment;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -123,7 +122,7 @@ public class TodoListDetailFragment extends ListFragment implements AaSdkContent
     public boolean onOptionsItemSelected (MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_new_list_item:
-                dialog.show(getActivity().getFragmentManager(), "NewListItemDialogFragment");
+                dialog.show(getActivity().getSupportFragmentManager(), "NewListItemDialogFragment");
                 return true;
 
             case R.id.action_settings:
