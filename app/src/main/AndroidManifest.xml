@@ -1,12 +1,52 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.adadapted.sdk.sdk_migration">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
+        android:name=".TestAppApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme" >
+
+        <activity
+            android:name=".ui.todo.activity.ItemDetailActivity"
+            android:label="@string/title_activity_item_detail"
+            android:parentActivityName=".ui.todo.activity.TodoListDetailActivity" >
+        </activity>
+
+        <activity
+            android:name=".ui.todo.activity.TodoListsActivity"
+            android:label="@string/title_activity_todo_lists" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.todo.activity.TodoListDetailActivity"
+            android:label="@string/title_activity_todo_list"
+            android:parentActivityName=".ui.todo.activity.TodoListsActivity" >
+        </activity>
+
+        <activity
+            android:name=".ui.recipe.activity.RecipesActivity"
+            android:label="@string/title_activity_recipes" >
+        </activity>
+
+        <activity
+            android:name=".ui.recipe.activity.RecipeDetailActivity"
+            android:label="@string/title_activity_recipe_detail"
+            android:parentActivityName=".ui.recipe.activity.RecipesActivity">
+        </activity>
+
+        <activity
+            android:name="com.adadapted.android.sdk.ui.activity.AaWebViewPopupActivity"
+            android:label="Popup Activity">
+        </activity>
 
     </application>
 
