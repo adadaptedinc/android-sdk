@@ -84,28 +84,12 @@ public class AaZoneView extends RelativeLayout
 
     @Override
     public void onViewReadyForDisplay(final View view) {
-        if(view instanceof WebView) {
-            view.setOnTouchListener(new OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    switch (event.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            AaZoneView.this.onAdInteraction();
-                            return true;
-                    }
-
-                    return false;
-                }
-            });
-        }
-        else {
-          setOnClickListener(new OnClickListener() {
-              @Override
-              public void onClick(View v) {
-                  AaZoneView.this.onAdInteraction();
-              }
-          });
-        }
+        setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AaZoneView.this.onAdInteraction();
+            }
+        });
 
         if(mVisible) {
             displayAdView(view);

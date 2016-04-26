@@ -6,11 +6,14 @@ import android.util.Log;
 import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.device.DeviceInfoBuilder;
 import com.adadapted.android.sdk.core.device.model.DeviceInfo;
+import com.adadapted.android.sdk.core.session.SessionListener;
 import com.adadapted.android.sdk.core.session.SessionManager;
+import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.ext.cache.ImageCache;
 import com.adadapted.android.sdk.ext.factory.DeviceInfoFactory;
 import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
 import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener;
+import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener;
 import com.adadapted.android.sdk.ui.messaging.SdkEventPublisher;
 import com.adadapted.android.sdk.ui.messaging.SdkEventPublisherFactory;
 
@@ -56,6 +59,25 @@ public class AdAdapted {
 
     public AdAdapted inEnv(boolean environment) {
         mIsProd = environment;
+
+        return this;
+    }
+
+    public AdAdapted setSdkSessionListener(final AaSdkSessionListener listener) {
+        SessionManagerFactory.addListener(new SessionListener() {
+            @Override
+            public void onSessionInitialized(Session session) {
+                listener.onHasAdsToServe(session.hasActiveCampaigns());
+            }
+
+            @Override
+            public void onSessionInitFailed() {
+            }
+
+            @Override
+            public void onNewAdsAvailable(Session session) {
+            }
+        });
 
         return this;
     }

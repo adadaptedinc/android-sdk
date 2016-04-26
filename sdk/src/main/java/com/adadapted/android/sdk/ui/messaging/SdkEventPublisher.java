@@ -26,12 +26,6 @@ public class SdkEventPublisher {
         mListener = null;
     }
 
-    public void publishHasAdsToServe(final Session session) {
-        boolean enabled = (session != null) && session.hasActiveCampaigns();
-
-        mListener.onHasAdsToServe(enabled);
-    }
-
     public void publishAdEvent(final AdEvent event) {
         if(mListener == null) {
             return;

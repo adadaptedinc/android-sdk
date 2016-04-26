@@ -5,8 +5,7 @@ import android.util.Log;
 
 import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener;
-import com.facebook.stetho.Stetho;
-import com.newrelic.agent.android.NewRelic;
+import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener;
 
 /**
  * Created by chrisweeden on 3/16/15.
@@ -23,33 +22,34 @@ public class TestAppApplication extends Application {
         super.onCreate();
 
         // Create an InitializerBuilder
-        Stetho.InitializerBuilder initializerBuilder = Stetho.newInitializerBuilder(this);
+        //Stetho.InitializerBuilder initializerBuilder = Stetho.newInitializerBuilder(this);
 
         // Enable Chrome DevTools
-        initializerBuilder.enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this));
+        //initializerBuilder.enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this));
 
         // Enable command line interface
-        initializerBuilder.enableDumpapp(Stetho.defaultDumperPluginsProvider(this));
+        //initializerBuilder.enableDumpapp(Stetho.defaultDumperPluginsProvider(this));
 
         // Use the InitializerBuilder to generate an Initializer
-        Stetho.Initializer initializer = initializerBuilder.build();
+       // Stetho.Initializer initializer = initializerBuilder.build();
 
         // Initialize Stetho with the Initializer
-        Stetho.initialize(initializer);
+        //Stetho.initialize(initializer);
 
-        NewRelic.withApplicationToken("AAabde692c32523732801586d2c793895d9dae5e0d").start(this);
+        //NewRelic.withApplicationToken("AAabde692c32523732801586d2c793895d9dae5e0d").start(this);
 
         String apiKey = getResources().getString(R.string.adadapted_api_key);
 
         AdAdapted.init(this)
             .withAppId(apiKey)
             .inEnv(AdAdapted.Env.DEV)
-            .setSdkEventListener(new AaSdkEventListener() {
+            .setSdkSessionListener(new AaSdkSessionListener() {
                 @Override
-                public void onHasAdsToServe(boolean enabled) {
-                    Log.i(TAG, "AdAdapted has Campaign: " + enabled);
+                public void onHasAdsToServe(boolean hasAds) {
+                    Log.i(TAG, "Has Ads To Serve: " + hasAds);
                 }
-
+            })
+            .setSdkEventListener(new AaSdkEventListener() {
                 @Override
                 public void onNextAdEvent(String zoneId, String eventType) {
                     Log.i(TAG, "Ad " + eventType + " for Zone " + zoneId);

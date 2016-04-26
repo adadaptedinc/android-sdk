@@ -8,9 +8,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.model.ImageAdType;
-import com.google.android.gms.ads.identifier.AdvertisingIdClient;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -78,18 +75,18 @@ public class DeviceInfo {
     }
 
     private String captureAdvertisingId(final Context context) {
-        try {
-            return AdvertisingIdClient.getAdvertisingIdInfo(context).getId();
-        }
-        catch (GooglePlayServicesNotAvailableException ex) {
-            Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId", ex);
-        }
-        catch (GooglePlayServicesRepairableException ex) {
-            Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId", ex);
-        }
-        catch (IOException ex) {
-            Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId", ex);
-        }
+        //try {
+        //    return AdvertisingIdClient.getAdvertisingIdInfo(context).getId();
+        //}
+        //catch (GooglePlayServicesNotAvailableException ex) {
+        //    Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId");
+        //}
+        //catch (GooglePlayServicesRepairableException ex) {
+        //    Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId");
+        //}
+        //catch (IOException ex) {
+        //    Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId");
+        //}
 
         return captureAndroidId(context);
     }
