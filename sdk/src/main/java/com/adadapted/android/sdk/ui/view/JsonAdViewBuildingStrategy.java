@@ -8,13 +8,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.adadapted.android.sdk.R;
 import com.adadapted.android.sdk.core.ad.AdImageLoader;
 import com.adadapted.android.sdk.core.ad.AdImageLoaderListener;
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.AdComponent;
 import com.adadapted.android.sdk.core.ad.model.JsonAdType;
 import com.adadapted.android.sdk.ext.http.HttpAdImageLoader;
+
+import com.adadapted.android.sdk.R;
 
 /**
  * Created by chrisweeden on 5/26/15

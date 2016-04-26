@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.adadapted.sdk.sdk">
+    package="com.adadapted.android.sdk">
 
     <application
         android:allowBackup="true"

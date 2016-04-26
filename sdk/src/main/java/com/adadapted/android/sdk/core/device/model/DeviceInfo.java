@@ -75,18 +75,18 @@ public class DeviceInfo {
     }
 
     private String captureAdvertisingId(final Context context) {
-        try {
-            return AdvertisingIdClient.getAdvertisingIdInfo(context).getId();
-        }
-        catch (GooglePlayServicesNotAvailableException ex) {
-            Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId");
-        }
-        catch (GooglePlayServicesRepairableException ex) {
-            Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId");
-        }
-        catch (IOException ex) {
-            Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId");
-        }
+        //try {
+        //    return AdvertisingIdClient.getAdvertisingIdInfo(context).getId();
+        //}
+        //catch (GooglePlayServicesNotAvailableException ex) {
+        //    Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId");
+        //}
+        //catch (GooglePlayServicesRepairableException ex) {
+        //    Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId");
+        //}
+        //catch (IOException ex) {
+        //    Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId");
+        //}
 
         return captureAndroidId(context);
     }
