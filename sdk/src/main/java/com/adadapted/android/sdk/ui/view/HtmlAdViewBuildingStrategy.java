@@ -22,20 +22,11 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
         mListener = listener;
 
         mWebView = new WebView(context);
-        mWebView.setEnabled(false);
-        mWebView.setClickable(true);
         mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 return true;
-            }
-        });
-
-        mWebView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
             }
         });
 
