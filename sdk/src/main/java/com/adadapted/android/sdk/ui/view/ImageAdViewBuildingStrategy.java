@@ -6,8 +6,8 @@ import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.adadapted.android.sdk.core.ad.AdImageLoaderListener;
 import com.adadapted.android.sdk.core.ad.model.Ad;
@@ -67,7 +67,7 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
 
     @Override
     public void buildView(Ad ad, int width, int height) {
-        mView.setLayoutParams(new ViewGroup.LayoutParams(width, height));
+        mView.setLayoutParams(new RelativeLayout.LayoutParams(width, height));
 
         ImageAdType adType = (ImageAdType) ad.getAdType();
 

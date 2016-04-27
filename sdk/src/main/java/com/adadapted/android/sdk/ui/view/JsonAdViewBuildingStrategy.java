@@ -4,8 +4,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.adadapted.android.sdk.core.ad.AdImageLoader;
@@ -54,7 +54,7 @@ class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
         }
 
         mView = View.inflate(mContext, resourceId, null);
-        mView.setLayoutParams(new ViewGroup.LayoutParams(width, height));
+        mView.setLayoutParams(new RelativeLayout.LayoutParams(width, height));
 
         AdComponent adComponents = ((JsonAdType)ad.getAdType()).getComponents();
 
