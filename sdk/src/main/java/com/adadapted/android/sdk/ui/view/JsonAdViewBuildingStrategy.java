@@ -2,7 +2,6 @@ package com.adadapted.android.sdk.ui.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -21,7 +20,7 @@ import com.adadapted.android.sdk.ext.http.HttpAdImageLoader;
  * Created by chrisweeden on 5/26/15
  */
 class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
-    private static final String LOGTAG = HtmlAdViewBuildingStrategy.class.getName();
+    private static final String LOGTAG = JsonAdViewBuildingStrategy.class.getName();
 
     private final Listener mListener;
     private final Context mContext;
@@ -54,8 +53,6 @@ class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
         mView = View.inflate(mContext, resourceId, null);
         mView.setLayoutParams(new RelativeLayout.LayoutParams(width, height));
         mView.setBackgroundColor(zoneProperties.getBackgroundColor());
-
-        Log.d(LOGTAG, "Background color is: " + String.format("#%06X", (0xFFFFFF & zoneProperties.getBackgroundColor())));
 
         AdComponent adComponents = ((JsonAdType)ad.getAdType()).getComponents();
 
