@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,14 +28,9 @@ public class AaZoneView extends RelativeLayout
 
     private final Context mContext;
 
-    private String mZoneId;
-    private int mLayoutResourceId;
-
-    private ColorDrawable mBackgroundColor;
-
+    private AaZoneViewController mViewController;
     private AaZoneViewProperties mZoneProperties;
 
-    private AaZoneViewController mViewController;
     private boolean mVisible = true;
 
     public AaZoneView(Context context) {
@@ -64,17 +60,14 @@ public class AaZoneView extends RelativeLayout
     }
 
     public void init(String zoneId, int layoutResourceId) {
-        mZoneId = zoneId;
-        mLayoutResourceId = layoutResourceId;
-
         int color = Color.WHITE;
 
-        mBackgroundColor = (ColorDrawable) getBackground();
+        ColorDrawable mBackgroundColor = (ColorDrawable) getBackground();
         if(mBackgroundColor != null) {
             color = mBackgroundColor.getColor();
         }
 
-        mZoneProperties = new AaZoneViewProperties(mZoneId, mLayoutResourceId, color);
+        mZoneProperties = new AaZoneViewProperties(zoneId, layoutResourceId, color);
 
         setGravity(Gravity.CENTER);
     }
@@ -139,6 +132,11 @@ public class AaZoneView extends RelativeLayout
     }
 
     public void onStart() {
+        if(mZoneProperties == null) {
+            Log.e(LOGTAG, "Zone is being used before it has been initialized.");
+            return;
+        }
+
         mViewController = AaZoneViewControllerFactory.getController(mContext, mZoneProperties);
         mViewController.setListener(this);
     }

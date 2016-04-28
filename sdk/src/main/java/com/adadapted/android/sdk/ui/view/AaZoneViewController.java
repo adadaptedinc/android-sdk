@@ -46,7 +46,12 @@ class AaZoneViewController implements SessionListener, AdZoneRefreshScheduler.Li
 
         mAdActionHandler = new AdActionHandler(context);
 
-        mZone = Zone.createEmptyZone(mZoneProperties.getZoneId());
+        String zoneId = null;
+        if(zoneProperties != null) {
+            zoneId = zoneProperties.getZoneId();
+        }
+
+        mZone = Zone.createEmptyZone(zoneId);
         mCurrentAd = ViewAdWrapper.createEmptyCurrentAd(mSession);
         mTimerRunning = new HashSet<>();
     }
@@ -157,6 +162,10 @@ class AaZoneViewController implements SessionListener, AdZoneRefreshScheduler.Li
 
     @Override
     public void onSessionInitialized(final Session session) {
+        if(mZoneProperties == null) {
+            return;
+        }
+
         mSession = session;
         mZone = session.getZone(mZoneProperties.getZoneId());
 
@@ -173,6 +182,10 @@ class AaZoneViewController implements SessionListener, AdZoneRefreshScheduler.Li
 
     @Override
     public void onNewAdsAvailable(final Session session) {
+        if(mZoneProperties == null) {
+            return;
+        }
+
         mZone = session.getZone(mZoneProperties.getZoneId());
     }
 

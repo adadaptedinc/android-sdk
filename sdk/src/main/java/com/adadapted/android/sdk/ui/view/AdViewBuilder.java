@@ -35,7 +35,14 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
         mAdWebView = new HtmlAdViewBuildingStrategy(context, this);
     }
 
-    public void buildView(ViewAdWrapper currentAd, AaZoneViewProperties zoneProperties, int width, int height) {
+    public void buildView(final ViewAdWrapper currentAd,
+                          final AaZoneViewProperties zoneProperties,
+                          final int width,
+                          final int height) {
+        if(zoneProperties == null) {
+            return;
+        }
+
         mStrategy = null;
         switch(currentAd.getAdType()) {
             case HTML:

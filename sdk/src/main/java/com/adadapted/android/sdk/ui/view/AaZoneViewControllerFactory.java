@@ -23,11 +23,16 @@ class AaZoneViewControllerFactory {
             sInstance = new AaZoneViewControllerFactory();
         }
 
-        if(!sInstance.mZoneControllers.containsKey(zoneProperties.getZoneId())) {
-            AaZoneViewController controller = new AaZoneViewController(context, zoneProperties);
-            sInstance.mZoneControllers.put(zoneProperties.getZoneId(), controller);
+        String zoneId = null;
+        if(zoneProperties != null) {
+            zoneId = zoneProperties.getZoneId();
         }
 
-        return sInstance.mZoneControllers.get(zoneProperties.getZoneId());
+        if(!sInstance.mZoneControllers.containsKey(zoneId)) {
+            AaZoneViewController controller = new AaZoneViewController(context, zoneProperties);
+            sInstance.mZoneControllers.put(zoneId, controller);
+        }
+
+        return sInstance.mZoneControllers.get(zoneId);
     }
 }
