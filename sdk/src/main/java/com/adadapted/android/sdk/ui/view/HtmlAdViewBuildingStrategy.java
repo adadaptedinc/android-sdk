@@ -30,8 +30,6 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
                 return true;
             }
         });
-
-
     }
 
     @Override
