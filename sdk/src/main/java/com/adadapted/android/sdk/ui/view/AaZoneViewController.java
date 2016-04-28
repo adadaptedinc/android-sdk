@@ -25,8 +25,7 @@ class AaZoneViewController implements SessionListener, AdZoneRefreshScheduler.Li
     private static final String LOGTAG = AaZoneViewController.class.getName();
 
     private final Context mContext;
-    private final String mZoneId;
-    private final int mResourceId;
+    private final AaZoneViewProperties mZoneProperties;
 
     private final AdViewBuilder mAdViewBuilder;
     private final AdActionHandler mAdActionHandler;
@@ -38,17 +37,16 @@ class AaZoneViewController implements SessionListener, AdZoneRefreshScheduler.Li
     private ViewAdWrapper mCurrentAd;
     private Set<String> mTimerRunning;
 
-    public AaZoneViewController(final Context context, final String zoneId, final int resourceId) {
+    public AaZoneViewController(final Context context, final AaZoneViewProperties zoneProperties) {
         mContext = context;
-        mZoneId = zoneId;
-        mResourceId = resourceId;
+        mZoneProperties = zoneProperties;
 
         mAdViewBuilder = new AdViewBuilder(context);
         mAdViewBuilder.setListener(this);
 
         mAdActionHandler = new AdActionHandler(context);
 
-        mZone = Zone.createEmptyZone(zoneId);
+        mZone = Zone.createEmptyZone(mZoneProperties.getZoneId());
         mCurrentAd = ViewAdWrapper.createEmptyCurrentAd(mSession);
         mTimerRunning = new HashSet<>();
     }
@@ -77,7 +75,7 @@ class AaZoneViewController implements SessionListener, AdZoneRefreshScheduler.Li
 
     private void displayAd() {
         if(mCurrentAd.hasAd()) {
-            mAdViewBuilder.buildView(mCurrentAd, mResourceId, getZoneWidth(), getZoneHeight());
+            mAdViewBuilder.buildView(mCurrentAd, mZoneProperties, getZoneWidth(), getZoneHeight());
         }
     }
 
@@ -160,7 +158,7 @@ class AaZoneViewController implements SessionListener, AdZoneRefreshScheduler.Li
     @Override
     public void onSessionInitialized(final Session session) {
         mSession = session;
-        mZone = session.getZone(mZoneId);
+        mZone = session.getZone(mZoneProperties.getZoneId());
 
         if(mTimerRunning.size() == 0) {
             setNextAd();
@@ -175,7 +173,7 @@ class AaZoneViewController implements SessionListener, AdZoneRefreshScheduler.Li
 
     @Override
     public void onNewAdsAvailable(final Session session) {
-        mZone = session.getZone(mZoneId);
+        mZone = session.getZone(mZoneProperties.getZoneId());
     }
 
     @Override

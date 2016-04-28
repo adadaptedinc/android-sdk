@@ -35,7 +35,7 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
         mAdWebView = new HtmlAdViewBuildingStrategy(context, this);
     }
 
-    public void buildView(ViewAdWrapper currentAd, int resourceId, int width, int height) {
+    public void buildView(ViewAdWrapper currentAd, AaZoneViewProperties zoneProperties, int width, int height) {
         mStrategy = null;
         switch(currentAd.getAdType()) {
             case HTML:
@@ -54,7 +54,7 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
                 mStrategy = getEmptyViewStrategy();
         }
 
-        loadView(mStrategy, currentAd, width, height, resourceId);
+        loadView(mStrategy, currentAd, width, height, zoneProperties);
     }
 
     private AdViewBuildingStrategy getHtmlViewStrategy() {
@@ -78,11 +78,11 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
                           final ViewAdWrapper currentAd,
                           final int width,
                           final int height,
-                          final int resourceId) {
+                          final AaZoneViewProperties zoneProperties) {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                strategy.buildView(currentAd.getAd(), width, height, resourceId);
+                strategy.buildView(currentAd.getAd(), width, height, zoneProperties);
             }
         });
     }

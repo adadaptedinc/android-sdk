@@ -23,13 +23,8 @@ class EmptyAdViewStrategy implements AdViewBuildingStrategy {
     }
 
     @Override
-    public void buildView(Ad ad, int width, int height) {
+    public void buildView(Ad ad, int width, int height, AaZoneViewProperties zoneProperties) {
         mListener.onStrategyViewLoadFailed();
-    }
-
-    @Override
-    public void buildView(Ad ad, int width, int height, int resourceId) {
-        buildView(ad, width, height);
     }
 
     @Override

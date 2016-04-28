@@ -3,6 +3,8 @@ package com.adadapted.android.sdk.ui.view;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
@@ -27,6 +29,10 @@ public class AaZoneView extends RelativeLayout
 
     private String mZoneId;
     private int mLayoutResourceId;
+
+    private ColorDrawable mBackgroundColor;
+
+    private AaZoneViewProperties mZoneProperties;
 
     private AaZoneViewController mViewController;
     private boolean mVisible = true;
@@ -60,6 +66,15 @@ public class AaZoneView extends RelativeLayout
     public void init(String zoneId, int layoutResourceId) {
         mZoneId = zoneId;
         mLayoutResourceId = layoutResourceId;
+
+        int color = Color.WHITE;
+
+        mBackgroundColor = (ColorDrawable) getBackground();
+        if(mBackgroundColor != null) {
+            color = mBackgroundColor.getColor();
+        }
+
+        mZoneProperties = new AaZoneViewProperties(mZoneId, mLayoutResourceId, color);
 
         setGravity(Gravity.CENTER);
     }
@@ -124,7 +139,7 @@ public class AaZoneView extends RelativeLayout
     }
 
     public void onStart() {
-        mViewController = AaZoneViewControllerFactory.getController(mContext, mZoneId, mLayoutResourceId);
+        mViewController = AaZoneViewControllerFactory.getController(mContext, mZoneProperties);
         mViewController.setListener(this);
     }
 

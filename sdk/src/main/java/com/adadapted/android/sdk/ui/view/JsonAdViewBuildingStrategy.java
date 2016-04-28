@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.adadapted.android.sdk.R;
 import com.adadapted.android.sdk.core.ad.AdImageLoader;
 import com.adadapted.android.sdk.core.ad.AdImageLoaderListener;
 import com.adadapted.android.sdk.core.ad.model.Ad;
@@ -15,13 +16,12 @@ import com.adadapted.android.sdk.core.ad.model.AdComponent;
 import com.adadapted.android.sdk.core.ad.model.JsonAdType;
 import com.adadapted.android.sdk.ext.http.HttpAdImageLoader;
 
-import com.adadapted.android.sdk.R;
 
 /**
  * Created by chrisweeden on 5/26/15
  */
 class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
-    private static final String TAG = HtmlAdViewBuildingStrategy.class.getName();
+    private static final String LOGTAG = HtmlAdViewBuildingStrategy.class.getName();
 
     private final Listener mListener;
     private final Context mContext;
@@ -43,18 +43,19 @@ class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
     }
 
     @Override
-    public void buildView(Ad ad, int width, int height) {}
+    public void buildView(Ad ad, int width, int height, AaZoneViewProperties zoneProperties) {
+        int resourceId = zoneProperties.getResourceId();
 
-    @Override
-    public void buildView(Ad ad, int width, int height, int resourceId) {
         if(resourceId == 0) {
-            Log.w(TAG, "No Resource File passed in for JSON Ad in Zone " + ad.getZoneId());
             mListener.onStrategyViewLoadFailed();
             return;
         }
 
         mView = View.inflate(mContext, resourceId, null);
         mView.setLayoutParams(new RelativeLayout.LayoutParams(width, height));
+        mView.setBackgroundColor(zoneProperties.getBackgroundColor());
+
+        Log.d(LOGTAG, "Background color is: " + String.format("#%06X", (0xFFFFFF & zoneProperties.getBackgroundColor())));
 
         AdComponent adComponents = ((JsonAdType)ad.getAdType()).getComponents();
 

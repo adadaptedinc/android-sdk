@@ -13,7 +13,6 @@ interface AdViewBuildingStrategy {
         void onStrategyViewLoadFailed();
     }
 
-    void buildView(Ad ad, int width, int height);
-    void buildView(Ad ad, int width, int height, int resourceId);
+    void buildView(Ad ad, int width, int height, AaZoneViewProperties zoneProperties);
     View getView();
 }

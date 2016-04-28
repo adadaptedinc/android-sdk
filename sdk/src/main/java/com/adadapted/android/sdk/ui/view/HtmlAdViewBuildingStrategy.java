@@ -1,6 +1,7 @@
 package com.adadapted.android.sdk.ui.view;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -30,8 +31,7 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
             }
         });
 
-        String dummyDocument = "<html><head><meta name=\"viewport\" content=\"width=device-width, user-scalable=no\" /><style>body{width:100px;height100px;}</style></head><body></body></html>";
-        mWebView.loadData(dummyDocument, "text/html", null);
+
     }
 
     @Override
@@ -40,7 +40,10 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
     }
 
     @Override
-    public void buildView(Ad ad, int width, int height) {
+    public void buildView(Ad ad, int width, int height, AaZoneViewProperties zoneProperties) {
+        setDummyDocument(zoneProperties.getBackgroundColor());
+        mWebView.setBackgroundColor(zoneProperties.getBackgroundColor());
+
         final HtmlAdType adType = (HtmlAdType) ad.getAdType();
 
         if(adType.getAdUrl().toLowerCase().startsWith("http")) {
@@ -54,9 +57,11 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
         }
     }
 
-    @Override
-    public void buildView(Ad ad, int width, int height, int resourceId) {
-        buildView(ad, width, height);
+    private void setDummyDocument(final int color) {
+        final String hexColor = String.format("#%06X", (0xFFFFFF & color));
+        final String dummyDocument = "<html><head><meta name=\"viewport\" content=\"width=device-width, user-scalable=no\" /><style>body{background-color:"+hexColor+";width:100px;height100px;}</style></head><body></body></html>";
+
+        mWebView.loadData(dummyDocument, "text/html", null);
     }
 
     @Override

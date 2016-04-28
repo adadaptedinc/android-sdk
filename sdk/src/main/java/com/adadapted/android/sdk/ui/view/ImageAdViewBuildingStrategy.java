@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -66,8 +67,9 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
     }
 
     @Override
-    public void buildView(Ad ad, int width, int height) {
+    public void buildView(Ad ad, int width, int height, AaZoneViewProperties zoneProperties) {
         mView.setLayoutParams(new RelativeLayout.LayoutParams(width, height));
+        mView.setBackgroundColor(zoneProperties.getBackgroundColor());
 
         ImageAdType adType = (ImageAdType) ad.getAdType();
 
@@ -88,11 +90,6 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
                 mListener.onStrategyViewLoadFailed();
             }
         });
-    }
-
-    @Override
-    public void buildView(Ad ad, int width, int height, int resourceId) {
-        buildView(ad, width, height);
     }
 
     @Override

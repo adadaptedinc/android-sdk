@@ -18,17 +18,16 @@ class AaZoneViewControllerFactory {
     }
 
     public static AaZoneViewController getController(final Context context,
-                                                     final String zoneId,
-                                                     final int resourceId) {
+                                                     final AaZoneViewProperties zoneProperties) {
         if(sInstance == null) {
             sInstance = new AaZoneViewControllerFactory();
         }
 
-        if(!sInstance.mZoneControllers.containsKey(zoneId)) {
-            AaZoneViewController controller = new AaZoneViewController(context, zoneId, resourceId);
-            sInstance.mZoneControllers.put(zoneId, controller);
+        if(!sInstance.mZoneControllers.containsKey(zoneProperties.getZoneId())) {
+            AaZoneViewController controller = new AaZoneViewController(context, zoneProperties);
+            sInstance.mZoneControllers.put(zoneProperties.getZoneId(), controller);
         }
 
-        return sInstance.mZoneControllers.get(zoneId);
+        return sInstance.mZoneControllers.get(zoneProperties.getZoneId());
     }
 }
