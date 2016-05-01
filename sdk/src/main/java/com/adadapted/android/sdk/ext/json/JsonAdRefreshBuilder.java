@@ -29,7 +29,7 @@ public class JsonAdRefreshBuilder implements AdRefreshBuilder {
             return mZoneBuilder.buildZones(adJson.getJSONObject(JsonFields.ZONES));
         }
         catch (JSONException ex) {
-            Log.w(LOGTAG, "Problem converting to JSON.", ex);
+            Log.w(LOGTAG, "Problem converting to JSON.");
         }
 
         return new HashMap<>();
