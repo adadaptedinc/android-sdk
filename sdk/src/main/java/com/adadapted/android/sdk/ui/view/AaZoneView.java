@@ -117,7 +117,10 @@ public class AaZoneView extends RelativeLayout
 
         if(mVisible) {
             displayAdView(view);
-            mViewController.acknowledgeDisplay();
+
+            if(mViewController != null) {
+                mViewController.acknowledgeDisplay();
+            }
         }
     }
 
@@ -138,7 +141,9 @@ public class AaZoneView extends RelativeLayout
         }
 
         mViewController = AaZoneViewControllerFactory.getController(mContext, mZoneProperties);
-        mViewController.setListener(this);
+        if(mViewController != null) {
+            mViewController.setListener(this);
+        }
     }
 
     public void onStart(AaSdkContentListener listener) {
@@ -148,7 +153,14 @@ public class AaZoneView extends RelativeLayout
     }
 
     public void onStop() {
-        mViewController.removeListener();
+        if(mZoneProperties == null) {
+            Log.e(LOGTAG, "Zone is being used before it has been initialized.");
+            return;
+        }
+
+        if(mViewController != null) {
+            mViewController.removeListener();
+        }
     }
 
     public void onStop(AaSdkContentListener listener) {
