@@ -9,18 +9,22 @@ import java.util.Set;
  * Created by chrisweeden on 8/18/15.
  */
 public class SdkContentPublisher {
-    private Set<AaSdkContentListener> mListeners;
+    private final Set<AaSdkContentListener> mListeners;
 
     public SdkContentPublisher() {
         mListeners = new HashSet<>();
     }
 
     public void addListener(AaSdkContentListener listener) {
-        mListeners.add(listener);
+        if(listener != null) {
+            mListeners.add(listener);
+        }
     }
 
     public void removeListener(AaSdkContentListener listener) {
-        mListeners.remove(listener);
+        if(listener != null) {
+            mListeners.remove(listener);
+        }
     }
 
     public void publishContent(String zoneId, ContentPayload payload) {

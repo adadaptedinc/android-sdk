@@ -20,7 +20,7 @@ import java.util.Set;
  */
 public class SessionManagerFactory {
     private static SessionManagerFactory sInstance;
-    private static Set<SessionListener> sListeners = new HashSet<>();
+    private final static Set<SessionListener> sListeners = new HashSet<>();
 
     private final SessionManager mSessionManager;
 

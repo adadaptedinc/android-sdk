@@ -15,10 +15,10 @@ public class AaSuggestionTracker {
     private final KeywordInterceptManager mManager;
 
     // Here the key is the Term Text
-    private Map<String, String> mItems = new HashMap<>();
+    private final Map<String, String> mItems = new HashMap<>();
 
     // Here the key is the Replacement Text
-    private Map<String, String> mReplacements = new HashMap<>();
+    private final Map<String, String> mReplacements = new HashMap<>();
 
     private Session mSession;
 

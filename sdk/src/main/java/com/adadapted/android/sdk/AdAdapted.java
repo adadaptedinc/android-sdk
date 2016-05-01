@@ -35,7 +35,7 @@ public class AdAdapted {
 
     private boolean mSdkLoaded = false;
 
-    private Context mContext;
+    private final Context mContext;
 
     private AdAdapted(Context context) {
         mContext = context;

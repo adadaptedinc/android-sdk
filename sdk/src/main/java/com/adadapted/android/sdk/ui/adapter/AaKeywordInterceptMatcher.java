@@ -21,7 +21,7 @@ public class AaKeywordInterceptMatcher implements SessionListener, KeywordInterc
     private static final String LOGTAG = AaKeywordInterceptMatcher.class.getName();
 
     private final KeywordInterceptManager mManager;
-    private AaSuggestionTracker mSuggestionTracker;
+    private final AaSuggestionTracker mSuggestionTracker;
 
     private KeywordIntercept mKeywordIntercept;
     private boolean mLoaded = false;

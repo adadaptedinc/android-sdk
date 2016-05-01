@@ -35,7 +35,7 @@ class AaZoneViewController implements SessionListener, AdZoneRefreshScheduler.Li
     private Session mSession;
     private Zone mZone;
     private ViewAdWrapper mCurrentAd;
-    private Set<String> mTimerRunning;
+    private final Set<String> mTimerRunning;
 
     public AaZoneViewController(final Context context, final AaZoneViewProperties zoneProperties) {
         mContext = context;

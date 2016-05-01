@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.ui.messaging;
 
 import com.adadapted.android.sdk.core.event.model.AdEvent;
-import com.adadapted.android.sdk.core.session.model.Session;
 
 /**
  * Created by chrisweeden on 8/18/15.

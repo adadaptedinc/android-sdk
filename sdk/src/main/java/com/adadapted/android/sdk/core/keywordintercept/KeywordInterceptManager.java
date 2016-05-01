@@ -33,13 +33,13 @@ public class KeywordInterceptManager {
     private final KeywordInterceptRequestBuilder requestBuilder;
 
     private KeywordIntercept keywordIntercept;
-    private Set<KeywordInterceptEvent> keywordInterceptEvents;
+    private final Set<KeywordInterceptEvent> keywordInterceptEvents;
 
     private DeviceInfo deviceInfo;
     private boolean initialized = false;
     private int failedRetries;
 
-    KeywordInterceptTrackListener keywordInterceptTrackListener = new KeywordInterceptTrackListener() {
+    final KeywordInterceptTrackListener keywordInterceptTrackListener = new KeywordInterceptTrackListener() {
         @Override
         public void onSuccess() {
             failedRetries = 0;

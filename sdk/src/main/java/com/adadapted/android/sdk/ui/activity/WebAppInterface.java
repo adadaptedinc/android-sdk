@@ -10,7 +10,7 @@ import android.webkit.JavascriptInterface;
 class WebAppInterface {
     private static final String TAG = WebAppInterface.class.getName();
 
-    Context mContext;
+    final Context mContext;
 
     /** Instantiate the interface and set the context */
     WebAppInterface(Context c) {

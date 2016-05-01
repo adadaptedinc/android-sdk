@@ -22,9 +22,9 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
     private final Context mContext;
 
     private Listener mListener;
-    private Handler mHandler = new Handler(Looper.getMainLooper());
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
 
-    private HtmlAdViewBuildingStrategy mAdWebView;
+    private final HtmlAdViewBuildingStrategy mAdWebView;
     private AdViewBuildingStrategy mStrategy;
 
     public AdViewBuilder(Context context) {

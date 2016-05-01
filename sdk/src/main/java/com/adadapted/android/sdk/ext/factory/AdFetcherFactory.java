@@ -16,7 +16,7 @@ public class AdFetcherFactory {
 
     private static AdFetcherFactory sInstance;
 
-    private AdFetcher mAdFetcher;
+    private final AdFetcher mAdFetcher;
 
     private AdFetcherFactory(final DeviceInfo deviceInfo) {
         mAdFetcher = new AdFetcher(new HttpAdAdapter(determineEndpoint(deviceInfo)),

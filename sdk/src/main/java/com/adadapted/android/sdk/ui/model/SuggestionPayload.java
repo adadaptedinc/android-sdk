@@ -9,7 +9,7 @@ import java.util.Set;
  */
 public class SuggestionPayload {
     private final AaSuggestionTracker mSuggestionTracker;
-    private Set<String> mSuggestions;
+    private final Set<String> mSuggestions;
 
     public SuggestionPayload(AaSuggestionTracker suggestionTracker, Set<String> suggestions) {
         mSuggestionTracker = suggestionTracker;

@@ -14,7 +14,7 @@ public class EventTrackerFactory {
 
     private static EventTrackerFactory sInstance;
 
-    private EventTracker mEventTracker;
+    private final EventTracker mEventTracker;
 
     private EventTrackerFactory(DeviceInfo deviceInfo) {
         mEventTracker = new EventTracker(new HttpEventAdapter(determineEndpoint(deviceInfo)),

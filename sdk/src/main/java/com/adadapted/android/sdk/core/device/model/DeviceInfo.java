@@ -5,11 +5,9 @@ import android.os.Build;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
-import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.model.ImageAdType;
 
-import java.io.IOException;
 import java.util.Locale;
 import java.util.TimeZone;
 

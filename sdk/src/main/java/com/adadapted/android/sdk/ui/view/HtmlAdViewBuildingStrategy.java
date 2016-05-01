@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.ui.view;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;

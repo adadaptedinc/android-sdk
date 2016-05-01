@@ -16,7 +16,7 @@ import com.adadapted.android.sdk.ext.json.JsonKeywordInterceptRequestBuilder;
 public class KeywordInterceptManagerFactory {
     private static KeywordInterceptManagerFactory sInstance;
 
-    private KeywordInterceptManager mInterceptManager;
+    private final KeywordInterceptManager mInterceptManager;
 
     private KeywordInterceptManagerFactory(DeviceInfo deviceInfo) {
         KeywordInterceptAdapter adapter = new HttpKeywordInterceptAdapter(
