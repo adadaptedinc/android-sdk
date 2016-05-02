@@ -25,8 +25,9 @@ public class JsonSessionBuilder implements SessionBuilder {
         mZoneBuilder = new JsonZoneBuilder(deviceScale);
     }
 
-    public Session buildSession(final DeviceInfo deviceInfo, final JSONObject response) {
-        Session session = new Session();
+    public Session buildSession(final DeviceInfo deviceInfo,
+                                final JSONObject response) {
+        final Session session = new Session();
         session.setDeviceInfo(deviceInfo);
 
         try {
@@ -48,8 +49,8 @@ public class JsonSessionBuilder implements SessionBuilder {
 
             if(session.hasActiveCampaigns()) {
                 if(response.has(JsonFields.ZONES)) {
-                    JSONObject jsonZones = response.getJSONObject(JsonFields.ZONES);
-                    Map<String, Zone> zones = mZoneBuilder.buildZones(jsonZones);
+                    final JSONObject jsonZones = response.getJSONObject(JsonFields.ZONES);
+                    final Map<String, Zone> zones = mZoneBuilder.buildZones(jsonZones);
 
                     session.updateZones(zones);
                 }

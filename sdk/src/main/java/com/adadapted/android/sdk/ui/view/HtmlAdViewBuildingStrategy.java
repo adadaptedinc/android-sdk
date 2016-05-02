@@ -37,7 +37,10 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
     }
 
     @Override
-    public void buildView(Ad ad, int width, int height, AaZoneViewProperties zoneProperties) {
+    public void buildView(final Ad ad,
+                          final int width,
+                          final int height,
+                          final AaZoneViewProperties zoneProperties) {
         setDummyDocument(zoneProperties.getBackgroundColor());
         mWebView.setBackgroundColor(zoneProperties.getBackgroundColor());
 
@@ -47,10 +50,14 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
             mWebView.setLayoutParams(new RelativeLayout.LayoutParams(width, height));
             mWebView.loadUrl(adType.getAdUrl());
 
-            mListener.onStrategyViewLoaded();
+            if(mListener != null) {
+                mListener.onStrategyViewLoaded();
+            }
         }
         else {
-            mListener.onStrategyViewLoadFailed();
+            if(mListener != null) {
+                mListener.onStrategyViewLoadFailed();
+            }
         }
     }
 

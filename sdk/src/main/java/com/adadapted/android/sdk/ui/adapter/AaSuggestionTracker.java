@@ -22,37 +22,40 @@ public class AaSuggestionTracker {
 
     private Session mSession;
 
-    AaSuggestionTracker(KeywordInterceptManager manager) {
+    AaSuggestionTracker(final KeywordInterceptManager manager) {
         mManager = manager;
     }
 
-    void suggestionMatched(Session session, String term, String replacement, String userInput) {
+    void suggestionMatched(final Session session,
+                           final String term,
+                           final String replacement,
+                           final String userInput) {
         mSession = session;
 
-        term = term.toLowerCase();
-        userInput = userInput.toLowerCase();
-        replacement = replacement.toLowerCase();
+        final String lcTerm =  convertToLowerCase(term);
+        final String lcUserInput = convertToLowerCase(userInput);
+        final String lcReplacement = convertToLowerCase(replacement);
 
-        mItems.put(term, userInput);
-        mReplacements.put(replacement, term);
+        mItems.put(lcTerm, lcUserInput);
+        mReplacements.put(lcReplacement, lcTerm);
 
-        mManager.trackMatched(session, term, userInput);
+        mManager.trackMatched(session, lcTerm, lcUserInput);
     }
 
     public void suggestionPresented(String term) {
-        term = term.toLowerCase();
+        final String lcTerm = convertToLowerCase(term);
 
-        if(mItems.containsKey(term)) {
-            mManager.trackPresented(mSession, term, mItems.get(term));
+        if(mItems.containsKey(lcTerm)) {
+            mManager.trackPresented(mSession, lcTerm, mItems.get(lcTerm));
         }
     }
 
     public boolean suggestionSelected(String replacement) {
-        replacement = replacement.toLowerCase();
+        final String lcReplacement = convertToLowerCase(replacement);
 
-        if(mReplacements.containsKey(replacement)) {
-            String term = mReplacements.get(replacement);
-            String userInput = mItems.get(term);
+        if(mReplacements.containsKey(lcReplacement)) {
+            final String term = mReplacements.get(lcReplacement);
+            final String userInput = mItems.get(term);
 
             mManager.trackSelected(mSession, term, userInput);
 
@@ -60,5 +63,9 @@ public class AaSuggestionTracker {
         }
 
         return false;
+    }
+
+    private String convertToLowerCase(final String str) {
+        return str != null ? str.toLowerCase() : "";
     }
 }

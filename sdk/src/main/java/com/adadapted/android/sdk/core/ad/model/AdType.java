@@ -14,7 +14,7 @@ public abstract class AdType implements Serializable {
         return adType;
     }
 
-    public void setType(AdTypes adType) {
+    public void setType(final AdTypes adType) {
         this.adType = adType;
     }
 }

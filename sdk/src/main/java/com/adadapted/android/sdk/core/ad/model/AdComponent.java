@@ -24,7 +24,7 @@ public class AdComponent implements Serializable {
         return cta1;
     }
 
-    public void setCta1(String cta1) {
+    public void setCta1(final String cta1) {
         this.cta1 = cta1;
     }
 
@@ -32,7 +32,7 @@ public class AdComponent implements Serializable {
         return cta2;
     }
 
-    public void setCta2(String cta2) {
+    public void setCta2(final String cta2) {
         this.cta2 = cta2;
     }
 
@@ -40,7 +40,7 @@ public class AdComponent implements Serializable {
         return campaignImage;
     }
 
-    public void setCampaignImage(String campaignImage) {
+    public void setCampaignImage(final String campaignImage) {
         this.campaignImage = campaignImage;
     }
 
@@ -48,7 +48,7 @@ public class AdComponent implements Serializable {
         return sponsorLogo;
     }
 
-    public void setSponsorLogo(String sponsorLogo) {
+    public void setSponsorLogo(final String sponsorLogo) {
         this.sponsorLogo = sponsorLogo;
     }
 
@@ -56,7 +56,7 @@ public class AdComponent implements Serializable {
         return sponsorName;
     }
 
-    public void setSponsorName(String sponsorName) {
+    public void setSponsorName(final String sponsorName) {
         this.sponsorName = sponsorName;
     }
 
@@ -64,7 +64,7 @@ public class AdComponent implements Serializable {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(final String title) {
         this.title = title;
     }
 
@@ -72,7 +72,7 @@ public class AdComponent implements Serializable {
         return tagLine;
     }
 
-    public void setTagLine(String tagLine) {
+    public void setTagLine(final String tagLine) {
         this.tagLine = tagLine;
     }
 
@@ -80,7 +80,7 @@ public class AdComponent implements Serializable {
         return longText;
     }
 
-    public void setLongText(String longText) {
+    public void setLongText(final String longText) {
         this.longText = longText;
     }
 
@@ -88,7 +88,7 @@ public class AdComponent implements Serializable {
         return sponsorText;
     }
 
-    public void setSponsorText(String sponsorText) {
+    public void setSponsorText(final String sponsorText) {
         this.sponsorText = sponsorText;
     }
 
@@ -96,7 +96,7 @@ public class AdComponent implements Serializable {
         return appIcon1;
     }
 
-    public void setAppIcon1(String appIcon1) {
+    public void setAppIcon1(final String appIcon1) {
         this.appIcon1 = appIcon1;
     }
 
@@ -104,7 +104,7 @@ public class AdComponent implements Serializable {
         return appIcon2;
     }
 
-    public void setAppIcon2(String appIcon2) {
+    public void setAppIcon2(final String appIcon2) {
         this.appIcon2 = appIcon2;
     }
 }

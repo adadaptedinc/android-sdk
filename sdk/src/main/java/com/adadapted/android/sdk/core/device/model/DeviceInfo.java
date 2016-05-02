@@ -46,7 +46,7 @@ public class DeviceInfo {
                                                final String appId,
                                                final boolean isProd,
                                                final String sdkVersion) {
-        DeviceInfo deviceInfo = new DeviceInfo();
+        final DeviceInfo deviceInfo = new DeviceInfo();
 
         deviceInfo.setAppId(appId);
         deviceInfo.setIsProd(isProd);
@@ -95,7 +95,7 @@ public class DeviceInfo {
     }
 
     private String captureAndroidId(final Context context) {
-        String androidId = Settings.Secure.getString(
+        final String androidId = Settings.Secure.getString(
                 context.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
 
@@ -137,7 +137,7 @@ public class DeviceInfo {
         return appId;
     }
 
-    public void setAppId(String appId) {
+    public void setAppId(final String appId) {
         this.appId = appId;
     }
 
@@ -145,7 +145,7 @@ public class DeviceInfo {
         return isProd;
     }
 
-    public void setIsProd(boolean isProd) {
+    public void setIsProd(final boolean isProd) {
         this.isProd = isProd;
     }
 
@@ -153,7 +153,7 @@ public class DeviceInfo {
         return scale;
     }
 
-    public void setScale(float scale) {
+    public void setScale(final float scale) {
         this.scale = scale;
     }
 
@@ -161,7 +161,7 @@ public class DeviceInfo {
         return bundleId;
     }
 
-    public void setBundleId(String bundleId) {
+    public void setBundleId(final String bundleId) {
         this.bundleId = (bundleId == null) ? UNKNOWN_VALUE : bundleId;
     }
 
@@ -169,7 +169,7 @@ public class DeviceInfo {
         return udid;
     }
 
-    public void setUdid(String udid) {
+    public void setUdid(final String udid) {
         this.udid = (udid == null) ? UNKNOWN_VALUE : udid;
     }
 
@@ -177,7 +177,7 @@ public class DeviceInfo {
         return device;
     }
 
-    public void setDevice(String device) {
+    public void setDevice(final String device) {
         this.device = (device == null) ? UNKNOWN_VALUE : device;
     }
 
@@ -185,7 +185,7 @@ public class DeviceInfo {
         return os;
     }
 
-    public void setOs(String os) {
+    public void setOs(final String os) {
         this.os = (os == null) ? UNKNOWN_VALUE : os;
     }
 
@@ -193,7 +193,7 @@ public class DeviceInfo {
         return osv;
     }
 
-    public void setOsv(String osv) {
+    public void setOsv(final String osv) {
         this.osv = (osv == null) ? UNKNOWN_VALUE : osv;
     }
 
@@ -201,7 +201,7 @@ public class DeviceInfo {
         return locale;
     }
 
-    public void setLocale(String locale) {
+    public void setLocale(final String locale) {
         this.locale = (locale == null) ? UNKNOWN_VALUE : locale;
     }
 
@@ -209,7 +209,7 @@ public class DeviceInfo {
         return timezone;
     }
 
-    public void setTimezone(String timezone) {
+    public void setTimezone(final String timezone) {
         this.timezone = (timezone == null) ? UNKNOWN_VALUE : timezone;
     }
 
@@ -217,7 +217,7 @@ public class DeviceInfo {
         return carrier;
     }
 
-    public void setCarrier(String carrier) {
+    public void setCarrier(final String carrier) {
         this.carrier = (carrier == null) ? UNKNOWN_VALUE : carrier;
     }
 
@@ -225,7 +225,7 @@ public class DeviceInfo {
         return dw;
     }
 
-    public void setDw(int dw) {
+    public void setDw(final int dw) {
         this.dw = dw;
     }
 
@@ -233,7 +233,7 @@ public class DeviceInfo {
         return dh;
     }
 
-    public void setDh(int dh) {
+    public void setDh(final int dh) {
         this.dh = dh;
     }
 
@@ -241,7 +241,7 @@ public class DeviceInfo {
         return density;
     }
 
-    public void setDensity(ScreenDensity density) {
+    public void setDensity(final ScreenDensity density) {
         this.density = density;
     }
 
@@ -249,7 +249,7 @@ public class DeviceInfo {
         return sdkVersion;
     }
 
-    public void setSdkVersion(String sdkVersion) {
+    public void setSdkVersion(final String sdkVersion) {
         this.sdkVersion = (sdkVersion == null) ? UNKNOWN_VALUE : sdkVersion;
     }
 }

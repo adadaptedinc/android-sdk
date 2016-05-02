@@ -16,12 +16,15 @@ public class EventTrackerFactory {
 
     private final EventTracker mEventTracker;
 
-    private EventTrackerFactory(DeviceInfo deviceInfo) {
-        mEventTracker = new EventTracker(new HttpEventAdapter(determineEndpoint(deviceInfo)),
+    private EventTrackerFactory(final DeviceInfo deviceInfo) {
+        final String endpoint = determineEndpoint(deviceInfo);
+
+        mEventTracker = new EventTracker(
+                new HttpEventAdapter(endpoint),
                 new JsonEventRequestBuilder());
     }
 
-    public static synchronized EventTracker createEventTracker(DeviceInfo deviceInfo) {
+    public static synchronized EventTracker createEventTracker(final DeviceInfo deviceInfo) {
         if(sInstance == null) {
             sInstance = new EventTrackerFactory(deviceInfo);
         }
@@ -33,7 +36,7 @@ public class EventTrackerFactory {
         return sInstance.mEventTracker;
     }
 
-    private String determineEndpoint(DeviceInfo deviceInfo) {
+    private String determineEndpoint(final DeviceInfo deviceInfo) {
         if(deviceInfo.isProd()) {
             return Config.Prod.URL_EVENT_BATCH;
         }

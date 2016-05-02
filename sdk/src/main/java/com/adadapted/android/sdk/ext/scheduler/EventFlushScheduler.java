@@ -21,8 +21,8 @@ public class EventFlushScheduler {
 
     private long pollingInterval;
 
-    public EventFlushScheduler(Session session) {
-        DeviceInfo deviceInfo = session.getDeviceInfo();
+    public EventFlushScheduler(final Session session) {
+        final DeviceInfo deviceInfo = session.getDeviceInfo();
 
         mEventTracker = EventTrackerFactory.createEventTracker(deviceInfo);
         mKiManager = KeywordInterceptManagerFactory.createKeywordInterceptManager(deviceInfo);
@@ -35,12 +35,10 @@ public class EventFlushScheduler {
                 mKiManager.publishEvents();
                 mHandler.postDelayed(this, pollingInterval);
             }
-
-
         };
     }
 
-    public void start(long pollingInterval) {
+    public void start(final long pollingInterval) {
         this.pollingInterval = pollingInterval <= 0L ? Config.DEFAULT_EVENT_POLLING : pollingInterval;
         mRunnable.run();
     }

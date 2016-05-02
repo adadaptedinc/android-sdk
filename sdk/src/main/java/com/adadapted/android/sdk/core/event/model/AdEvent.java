@@ -16,7 +16,7 @@ public class AdEvent {
     private final String mEventType;
     private final String mZoneId;
 
-    public AdEvent(String mEventType, String mZoneId) {
+    public AdEvent(final String mEventType, final String mZoneId) {
         this.mEventType = mEventType;
         this.mZoneId = mZoneId;
     }

@@ -20,12 +20,17 @@ public class HttpEventAdapter implements EventAdapter {
     private final String mBatchUrl;
 
     public HttpEventAdapter(final String batchUrl) {
-        mBatchUrl = batchUrl;
+        mBatchUrl = batchUrl == null ? "" : batchUrl;
     }
 
     @Override
-    public void sendBatch(final JSONArray json, final EventAdapterListener listener) {
-        JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST,
+    public void sendBatch(final JSONArray json,
+                          final EventAdapterListener listener) {
+        if(json == null || listener == null) {
+            return;
+        }
+
+        final JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST,
                 mBatchUrl, json, new Response.Listener<JSONArray>(){
 
             @Override

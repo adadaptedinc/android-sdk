@@ -21,7 +21,7 @@ public class Zone {
     private int zoneViews;
     private int adIndex;
 
-    public Zone(String zoneId) {
+    public Zone(final String zoneId) {
         this.zoneId = (zoneId == null) ? "" : zoneId;
         this.ads = new ArrayList<>();
         this.dimensions = new HashMap<>();
@@ -30,7 +30,7 @@ public class Zone {
         adIndex = 0;
     }
 
-    public static Zone createEmptyZone(String zoneId) {
+    public static Zone createEmptyZone(final String zoneId) {
         return new Zone(zoneId);
     }
 
@@ -42,11 +42,11 @@ public class Zone {
         return dimensions;
     }
 
-    public Dimension getDimension(String orientation) {
+    public Dimension getDimension(final String orientation) {
         return getDimensions().get(orientation);
     }
 
-    public void setDimensions(Map<String, Dimension> dimensions) {
+    public void setDimensions(final Map<String, Dimension> dimensions) {
         this.dimensions = new HashMap<>(dimensions);
     }
 
@@ -54,7 +54,7 @@ public class Zone {
         return ads;
     }
 
-    public void setAds(List<Ad> ads) {
+    public void setAds(final List<Ad> ads) {
         this.ads = new ArrayList<>(ads);
 
         zoneViews = 0;
@@ -71,7 +71,7 @@ public class Zone {
         }
 
         adIndex = ++zoneViews % getAdCount();
-        Ad ad = ads.get(adIndex);
+        final Ad ad = ads.get(adIndex);
 
         if(ad.isHidden()) {
             return getNextAd();
@@ -83,7 +83,7 @@ public class Zone {
     public boolean hasVisibleAds() {
         boolean result = false;
 
-        for(Ad ad : getAds()) {
+        for(final Ad ad : getAds()) {
             result |= ad.isNotHidden();
         }
 

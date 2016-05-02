@@ -23,7 +23,8 @@ public class AaWebViewPopupActivity extends Activity {
 
     public static final String EXTRA_POPUP_AD = AaWebViewPopupActivity.class.getName() + ".EXTRA_POPUP_AD";
 
-    public static Intent createActivity(Context context, ViewAdWrapper ad) {
+    public static Intent createActivity(final Context context,
+                                        final ViewAdWrapper ad) {
         Intent intent = new Intent(context, AaWebViewPopupActivity.class);
         intent.putExtra(AaWebViewPopupActivity.EXTRA_POPUP_AD, ad.getAd());
 
@@ -35,31 +36,32 @@ public class AaWebViewPopupActivity extends Activity {
     private Session mSession;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        RelativeLayout.LayoutParams webViewLayout = new RelativeLayout.LayoutParams(
+        final RelativeLayout.LayoutParams webViewLayout = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.MATCH_PARENT);
 
         popupWebView = new WebView(this);
         popupWebView.setLayoutParams(webViewLayout);
 
-        RelativeLayout popupLayout = new RelativeLayout(this);
+        final RelativeLayout popupLayout = new RelativeLayout(this);
         popupLayout.addView(popupWebView);
 
         setContentView(popupLayout);
 
-        Intent intent = getIntent();
+        final Intent intent = getIntent();
         ad = (Ad)intent.getSerializableExtra(EXTRA_POPUP_AD);
 
         mSession = new Session();
-        SessionManager sessionManager = SessionManagerFactory.getSessionManager();
+
+        final SessionManager sessionManager = SessionManagerFactory.getSessionManager();
         if(sessionManager != null) {
             mSession = sessionManager.getCurrentSession();
         }
 
-        PopupAdAction action = (PopupAdAction)ad.getAdAction();
+        final PopupAdAction action = (PopupAdAction)ad.getAdAction();
 
         loadPopup(action.getActionPath());
         setTitle(action.getTitle());
@@ -78,7 +80,8 @@ public class AaWebViewPopupActivity extends Activity {
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
+    public boolean onKeyDown(final int keyCode,
+                             final KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK) && popupWebView.canGoBack()) {
             popupWebView.goBack();
             return true;
@@ -88,11 +91,16 @@ public class AaWebViewPopupActivity extends Activity {
     }
 
     @SuppressLint({"AddJavascriptInterface", "SetJavaScriptEnabled"})
-    private void loadPopup(String url) {
+    private void loadPopup(final String url) {
+        if(url == null) {
+            return;
+        }
+
         popupWebView.getSettings().setJavaScriptEnabled(true);
         popupWebView.setWebViewClient(new WebViewClient() {
             @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            public boolean shouldOverrideUrlLoading(final WebView view,
+                                                    final String url) {
                 return false;
             }
         });

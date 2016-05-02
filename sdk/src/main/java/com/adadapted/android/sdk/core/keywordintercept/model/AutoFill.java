@@ -8,7 +8,9 @@ public class AutoFill {
     private final String icon;
     private final String tagLine;
 
-    public AutoFill(String replacement, String icon, String tagLine) {
+    public AutoFill(final String replacement,
+                    final String icon,
+                    final String tagLine) {
         this.replacement = replacement;
         this.icon = icon;
         this.tagLine = tagLine;

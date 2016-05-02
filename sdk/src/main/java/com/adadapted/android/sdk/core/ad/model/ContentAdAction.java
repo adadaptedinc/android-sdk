@@ -19,7 +19,7 @@ public class ContentAdAction extends AdAction {
         return items;
     }
 
-    public void setItems(List items) {
+    public void setItems(final List items) {
         this.items = items;
     }
 }

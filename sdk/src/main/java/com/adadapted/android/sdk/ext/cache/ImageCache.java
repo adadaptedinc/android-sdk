@@ -23,7 +23,8 @@ public class ImageCache {
 
             @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
             @Override
-            public int sizeOf(String key, Bitmap bitmap) {
+            public int sizeOf(final String key,
+                              final Bitmap bitmap) {
                 return bitmap.getByteCount() / 1024;
             }
         };
@@ -37,11 +38,11 @@ public class ImageCache {
         return instance;
     }
 
-    public Bitmap getImage(String url) {
+    public Bitmap getImage(final String url) {
         return imageCache.get(url);
     }
 
-    public void putImage(String url, Bitmap bitmap) {
+    public void putImage(final String url, final Bitmap bitmap) {
         imageCache.put(url, bitmap);
     }
 

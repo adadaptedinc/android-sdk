@@ -25,13 +25,15 @@ public class ContentPayload {
     private final int mType;
     private final JSONObject mPayload;
 
-    private ContentPayload(ViewAdWrapper ad, int type, JSONObject payload) {
+    private ContentPayload(final ViewAdWrapper ad,
+                           final int type,
+                           final JSONObject payload) {
         mAd = ad;
         mType = type;
         mPayload = payload;
     }
 
-    public static ContentPayload createAddToListContent(ViewAdWrapper ad) {
+    public static ContentPayload createAddToListContent(final ViewAdWrapper ad) {
         List items = ((ContentAdAction)ad.getAd().getAdAction()).getItems();
         JSONObject json = new JSONObject();
 
@@ -45,7 +47,7 @@ public class ContentPayload {
         return new ContentPayload(ad, ADD_TO_LIST, json);
     }
 
-    public static ContentPayload createRecipeFavoriteContent(ViewAdWrapper ad) {
+    public static ContentPayload createRecipeFavoriteContent(final ViewAdWrapper ad) {
         return new ContentPayload(ad, RECIPE_FAVORITE, new JSONObject());
     }
 

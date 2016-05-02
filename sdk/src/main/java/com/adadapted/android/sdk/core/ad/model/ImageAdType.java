@@ -17,11 +17,11 @@ public class ImageAdType extends AdType {
         setType(AdTypes.IMAGE);
     }
 
-    public void setImages(Map<String, AdImage> images) {
+    public void setImages(final Map<String, AdImage> images) {
         this.images = images;
     }
 
-    public String getImageUrlFor(String resolution, String orientation) {
+    public String getImageUrlFor(final String resolution, final String orientation) {
         return images.get(resolution).getOrientation(orientation);
     }
 }

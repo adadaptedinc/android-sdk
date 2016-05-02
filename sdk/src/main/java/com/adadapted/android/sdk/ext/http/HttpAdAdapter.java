@@ -19,12 +19,17 @@ public class HttpAdAdapter implements AdAdapter {
     private final String mAdGetUrl;
 
     public HttpAdAdapter(final String adGetUrl) {
-        mAdGetUrl = adGetUrl;
+        mAdGetUrl = adGetUrl == null ? "" : adGetUrl;
     }
 
     @Override
-    public void getAds(final JSONObject json, final AdAdapterListener listener) {
-        JsonObjectRequest request = new JsonObjectRequest(mAdGetUrl, json,
+    public void getAds(final JSONObject json,
+                       final AdAdapterListener listener) {
+        if(json == null || listener == null) {
+            return;
+        }
+
+        final JsonObjectRequest request = new JsonObjectRequest(mAdGetUrl, json,
             new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject jsonObject) {

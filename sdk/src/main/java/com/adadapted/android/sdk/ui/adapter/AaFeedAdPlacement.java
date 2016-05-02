@@ -15,18 +15,23 @@ public class AaFeedAdPlacement {
     private final int mPlacement;
     private final int mResourceId;
 
-    public AaFeedAdPlacement(Context context, String zoneId, int placement) {
+    public AaFeedAdPlacement(final Context context,
+                             final String zoneId,
+                             final int placement) {
         this(context, zoneId, placement, 0);
     }
 
-    public AaFeedAdPlacement(Context context, String zoneId, int placement, int resourceId) {
+    public AaFeedAdPlacement(final Context context,
+                             final String zoneId,
+                             final int placement,
+                             final int resourceId) {
         mContext = context;
         mZoneId = zoneId;
         mPlacement = (placement <= 0) ? 0 : placement-1;
         mResourceId = resourceId;
     }
 
-    public AaFeedItem getItem(int position) {
+    public AaFeedItem getItem(final int position) {
         if(position == mPlacement) {
             return new AaFeedItem();
         }
@@ -34,7 +39,7 @@ public class AaFeedAdPlacement {
         return null;
     }
 
-    public int getModifiedCount(int count) {
+    public int getModifiedCount(final int count) {
         if(count < mPlacement) {
             return count;
         }
@@ -42,15 +47,15 @@ public class AaFeedAdPlacement {
         return count + 1;
     }
 
-    public int getModifiedPosition(int position) {
+    public int getModifiedPosition(final int position) {
         return (position >= mPlacement) ? position - 1 : position ;
     }
 
-    public long getModifiedItemId(int position) {
+    public long getModifiedItemId(final int position) {
         return (position >= mPlacement) ? position - 1 : position;
     }
 
-    public int getModifiedViewTypeCount(int count) {
+    public int getModifiedViewTypeCount(final int count) {
         return count + 1;
     }
 

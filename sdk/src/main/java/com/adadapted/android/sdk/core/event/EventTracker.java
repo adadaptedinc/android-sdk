@@ -40,7 +40,8 @@ public class EventTracker {
         }
     };
 
-    public EventTracker(final EventAdapter eventAdapter, final EventRequestBuilder builder) {
+    public EventTracker(final EventAdapter eventAdapter,
+                        final EventRequestBuilder builder) {
         mEventAdapter = eventAdapter;
         mBuilder = builder;
 
@@ -55,10 +56,10 @@ public class EventTracker {
 
     public void publishEvents() {
         if(!mQueuedEvents.isEmpty()) {
-            Set<JSONObject> currentEvents = new HashSet<>(getQueuedEvents());
+            final Set<JSONObject> currentEvents = new HashSet<>(getQueuedEvents());
             mQueuedEvents.clear();
 
-            JSONArray eventsArray = new JSONArray(currentEvents);
+            final JSONArray eventsArray = new JSONArray(currentEvents);
             mEventAdapter.sendBatch(eventsArray, mEventAdapterListener);
         }
     }
@@ -73,28 +74,52 @@ public class EventTracker {
     }
 
     public void trackImpressionBeginEvent(final Session session, final Ad ad) {
+        if(session == null || ad == null) {
+            return;
+        }
+
         ad.incrementImpressionViews();
         trackEvent(session, ad, EventTypes.IMPRESSION, "");
     }
 
     public void trackImpressionEndEvent(final Session session, final Ad ad) {
+        if(session == null || ad == null) {
+            return;
+        }
+
         trackEvent(session, ad, EventTypes.IMPRESSION_END, "");
     }
 
 
     public void trackInteractionEvent(final Session session, final Ad ad) {
+        if(session == null || ad == null) {
+            return;
+        }
+
         trackEvent(session, ad, EventTypes.INTERACTION, "");
     }
 
     public void trackPopupBeginEvent(final Session session, final Ad ad) {
+        if(session == null || ad == null) {
+            return;
+        }
+
         trackEvent(session, ad, EventTypes.POPUP_BEGIN, "");
     }
 
     public void trackPopupEndEvent(final Session session, final Ad ad) {
+        if(session == null || ad == null) {
+            return;
+        }
+
         trackEvent(session, ad, EventTypes.POPUP_END, "");
     }
 
     public void trackCustomEvent(final Session session, final Ad ad, final String eventName) {
+        if(session == null || ad == null || eventName == null) {
+            return;
+        }
+
         trackEvent(session, ad, EventTypes.CUSTOM, eventName);
     }
 

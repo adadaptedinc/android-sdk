@@ -11,7 +11,8 @@ public class SuggestionPayload {
     private final AaSuggestionTracker mSuggestionTracker;
     private final Set<String> mSuggestions;
 
-    public SuggestionPayload(AaSuggestionTracker suggestionTracker, Set<String> suggestions) {
+    public SuggestionPayload(final AaSuggestionTracker suggestionTracker,
+                             final Set<String> suggestions) {
         mSuggestionTracker = suggestionTracker;
         mSuggestions = suggestions;
     }
@@ -21,10 +22,14 @@ public class SuggestionPayload {
     }
 
     public void presented(String term) {
-        mSuggestionTracker.suggestionPresented(term);
+        if(mSuggestionTracker != null) {
+            mSuggestionTracker.suggestionPresented(term);
+        }
     }
 
     public void selected(String term) {
-        mSuggestionTracker.suggestionSelected(term);
+        if(mSuggestionTracker != null) {
+            mSuggestionTracker.suggestionSelected(term);
+        }
     }
 }

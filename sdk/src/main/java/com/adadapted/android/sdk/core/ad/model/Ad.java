@@ -28,7 +28,7 @@ public class Ad implements Serializable {
         return adId;
     }
 
-    public void setAdId(String adId) {
+    public void setAdId(final String adId) {
         this.adId = adId;
     }
 
@@ -36,7 +36,7 @@ public class Ad implements Serializable {
         return zoneId;
     }
 
-    public void setZoneId(String zoneId) {
+    public void setZoneId(final String zoneId) {
         this.zoneId = zoneId;
     }
 
@@ -44,7 +44,7 @@ public class Ad implements Serializable {
         return baseImpressionId + ":" + impressionViews;
     }
 
-    public void setImpressionId(String impressionId) {
+    public void setImpressionId(final String impressionId) {
         this.baseImpressionId = impressionId;
     }
 
@@ -56,7 +56,7 @@ public class Ad implements Serializable {
         return refreshTime;
     }
 
-    public void setRefreshTime(int refreshTime) {
+    public void setRefreshTime(final int refreshTime) {
         this.refreshTime = refreshTime;
     }
 
@@ -68,7 +68,7 @@ public class Ad implements Serializable {
         return adType;
     }
 
-    public void setAdType(AdType adType) {
+    public void setAdType(final AdType adType) {
         this.adType = adType;
     }
 
@@ -76,7 +76,7 @@ public class Ad implements Serializable {
         return adAction;
     }
 
-    public void setAdAction(AdAction adAction) {
+    public void setAdAction(final AdAction adAction) {
         this.adAction = adAction;
     }
 
@@ -84,7 +84,7 @@ public class Ad implements Serializable {
         return hideAfterInteraction;
     }
 
-    public void setHideAfterInteraction(boolean hideAfterInteraction) {
+    public void setHideAfterInteraction(final boolean hideAfterInteraction) {
         this.hideAfterInteraction = hideAfterInteraction;
     }
 

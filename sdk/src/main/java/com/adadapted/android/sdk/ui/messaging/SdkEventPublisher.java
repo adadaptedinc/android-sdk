@@ -26,7 +26,7 @@ public class SdkEventPublisher {
     }
 
     public void publishAdEvent(final AdEvent event) {
-        if(mListener == null) {
+        if(mListener == null || event == null) {
             return;
         }
 

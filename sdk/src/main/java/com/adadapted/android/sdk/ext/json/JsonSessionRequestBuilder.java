@@ -30,7 +30,7 @@ public class JsonSessionRequestBuilder implements SessionRequestBuilder {
     }
 
     private JSONObject buildBaseSessionRequest(final DeviceInfo deviceInfo) throws JSONException {
-        JSONObject json = new JSONObject();
+        final JSONObject json = new JSONObject();
 
         json.put(JsonFields.APPID, deviceInfo.getAppId());
         json.put(JsonFields.UDID, deviceInfo.getUdid());

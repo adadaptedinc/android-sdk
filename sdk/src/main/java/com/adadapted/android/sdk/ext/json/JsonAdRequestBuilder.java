@@ -18,8 +18,8 @@ public class JsonAdRequestBuilder implements AdRequestBuilder {
     private static final String LOGTAG = JsonAdRequestBuilder.class.getName();
 
     public JSONObject buildAdRequest(final Session session) {
-        JSONObject json = new JSONObject();
-        DeviceInfo deviceInfo = session.getDeviceInfo();
+        final JSONObject json = new JSONObject();
+        final DeviceInfo deviceInfo = session.getDeviceInfo();
 
         try {
             json.put(JsonFields.APPID, deviceInfo.getAppId());

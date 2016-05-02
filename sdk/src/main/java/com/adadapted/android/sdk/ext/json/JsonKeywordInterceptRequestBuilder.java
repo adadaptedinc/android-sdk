@@ -21,9 +21,9 @@ public class JsonKeywordInterceptRequestBuilder implements KeywordInterceptReque
     private static final String TAG = JsonKeywordInterceptRequestBuilder.class.getName();
 
     @Override
-    public JSONObject buildInitRequest(Session session) {
-        JSONObject json = new JSONObject();
-        DeviceInfo deviceInfo = session.getDeviceInfo();
+    public JSONObject buildInitRequest(final Session session) {
+        final JSONObject json = new JSONObject();
+        final DeviceInfo deviceInfo = session.getDeviceInfo();
 
         try {
             json.put(JsonFields.SESSIONID, session.getSessionId());
@@ -41,10 +41,10 @@ public class JsonKeywordInterceptRequestBuilder implements KeywordInterceptReque
 
     @Override
     public JSONArray buildTrackRequest(Set<KeywordInterceptEvent> events) {
-        JSONArray jsonArray = new JSONArray();
+        final JSONArray jsonArray = new JSONArray();
 
-        for(KeywordInterceptEvent event: events) {
-            JSONObject json = new JSONObject();
+        for(final KeywordInterceptEvent event: events) {
+            final JSONObject json = new JSONObject();
 
             try {
                 json.put(JsonFields.SESSIONID, event.getSessionId());

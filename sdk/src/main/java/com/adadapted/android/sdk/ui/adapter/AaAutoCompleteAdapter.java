@@ -20,14 +20,16 @@ public class AaAutoCompleteAdapter extends ArrayAdapter<String> {
     private final AaKeywordInterceptMatcher mMatcher;
     private final List<String> mAllItems;
 
-    public AaAutoCompleteAdapter(Context context, int resource, List<String> items) {
+    public AaAutoCompleteAdapter(final Context context,
+                                 final int resource,
+                                 final List<String> items) {
         super(context, resource, items);
 
         mMatcher = new AaKeywordInterceptMatcher();
         mAllItems = new ArrayList<>(items);
     }
 
-    public boolean suggestionSelected(String suggestion) {
+    public boolean suggestionSelected(final String suggestion) {
         return mMatcher.suggestionSelected(suggestion);
     }
 
@@ -38,16 +40,16 @@ public class AaAutoCompleteAdapter extends ArrayAdapter<String> {
 
     private final Filter mFilter = new Filter() {
         @Override
-        protected Filter.FilterResults performFiltering(CharSequence constraint) {
-            FilterResults filterResults = new FilterResults();
-            Set<String> suggestions = new HashSet<>();
+        protected Filter.FilterResults performFiltering(final CharSequence constraint) {
+            final FilterResults filterResults = new FilterResults();
+            final Set<String> suggestions = new HashSet<>();
 
             if(constraint != null) {
                 SuggestionPayload suggestionPayload = mMatcher.match(constraint);
                 suggestions.addAll(suggestionPayload.getSuggestions());
 
-                for(String item : mAllItems) {
-                    if (item.toLowerCase().contains(constraint.toString().toLowerCase())) {
+                for(final String item : mAllItems) {
+                    if (item != null && item.toLowerCase().contains(constraint.toString().toLowerCase())) {
                         suggestionPayload.presented(item);
                         suggestions.add(item);
                     }
@@ -61,17 +63,24 @@ public class AaAutoCompleteAdapter extends ArrayAdapter<String> {
         }
 
         @Override
-        protected void publishResults(CharSequence constraint, Filter.FilterResults results) {
-            List<String> filteredList = (ArrayList<String>) results.values;
-            clear();
+        protected void publishResults(final CharSequence constraint,
+                                      final Filter.FilterResults results) {
+            if(results != null) {
+                clear();
 
-            if (results.count > 0) {
-                for (String s : filteredList) {
-                    add(s);
+                if (results.count > 0) {
+                    List<?> filteredList = (ArrayList<?>) results.values;
+
+                    for (final Object o : filteredList) {
+                        if(o instanceof String) {
+                            final String s = (String) o;
+                            add(s);
+                        }
+                    }
                 }
-            }
 
-            notifyDataSetChanged();
+                notifyDataSetChanged();
+            }
         }
     };
 }

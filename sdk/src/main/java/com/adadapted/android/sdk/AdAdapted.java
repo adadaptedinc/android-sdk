@@ -37,13 +37,13 @@ public class AdAdapted {
 
     private final Context mContext;
 
-    private AdAdapted(Context context) {
+    private AdAdapted(final Context context) {
         mContext = context;
 
         ImageCache.getInstance().purgeCache();
     }
 
-    public static AdAdapted init(Context context) {
+    public static AdAdapted init(final Context context) {
         if(sInstance == null) {
             sInstance = new AdAdapted(context);
         }
@@ -51,13 +51,20 @@ public class AdAdapted {
         return sInstance;
     }
 
-    public AdAdapted withAppId(String appId) {
-        mAppId = appId;
+    public AdAdapted withAppId(final String appId) {
+        if(appId == null) {
+            Log.e(LOGTAG, "The Application Id cannot be Null.");
+            mAppId = "";
+            mSdkLoaded = true;
+        }
+        else {
+            mAppId = appId;
+        }
 
         return this;
     }
 
-    public AdAdapted inEnv(boolean environment) {
+    public AdAdapted inEnv(final boolean environment) {
         mIsProd = environment;
 
         return this;
@@ -82,7 +89,7 @@ public class AdAdapted {
         return this;
     }
 
-    public AdAdapted setSdkEventListener(AaSdkEventListener listener) {
+    public AdAdapted setSdkEventListener(final AaSdkEventListener listener) {
         getSdkEventPublisher().setListener(listener);
 
         return this;

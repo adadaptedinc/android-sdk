@@ -66,7 +66,10 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
     }
 
     @Override
-    public void buildView(Ad ad, int width, int height, AaZoneViewProperties zoneProperties) {
+    public void buildView(final Ad ad,
+                          final int width,
+                          final int height,
+                          final AaZoneViewProperties zoneProperties) {
         mView.setLayoutParams(new RelativeLayout.LayoutParams(width, height));
         mView.setBackgroundColor(zoneProperties.getBackgroundColor());
 
@@ -81,12 +84,16 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
                 mAdImage = bitmap;
                 buildAdHandler.post(buildAdRunnable);
 
-                mListener.onStrategyViewLoaded();
+                if(mListener != null) {
+                    mListener.onStrategyViewLoaded();
+                }
             }
 
             @Override
             public void onFailure() {
-                mListener.onStrategyViewLoadFailed();
+                if(mListener != null) {
+                    mListener.onStrategyViewLoadFailed();
+                }
             }
         });
     }

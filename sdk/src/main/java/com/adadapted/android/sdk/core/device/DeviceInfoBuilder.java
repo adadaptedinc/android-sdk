@@ -26,7 +26,7 @@ public class DeviceInfoBuilder extends AsyncTask<BuildDeviceInfoParam, Void, Dev
 
     @Override
     protected DeviceInfo doInBackground(final BuildDeviceInfoParam... params) {
-        if(params.length == 1) {
+        if(params != null && params.length == 1) {
             return DeviceInfo.captureDeviceInfo(
                     params[0].getContext(),
                     params[0].getAppId(),
@@ -51,7 +51,7 @@ public class DeviceInfoBuilder extends AsyncTask<BuildDeviceInfoParam, Void, Dev
     }
 
     private void notifyDeviceInfoCollected(final DeviceInfo deviceInfo) {
-        for(Listener listener : listeners) {
+        for(final Listener listener : listeners) {
             listener.onDeviceInfoCollected(deviceInfo);
         }
     }

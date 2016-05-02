@@ -42,15 +42,29 @@ class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
     }
 
     @Override
-    public void buildView(Ad ad, int width, int height, AaZoneViewProperties zoneProperties) {
+    public void buildView(final Ad ad,
+                          final int width,
+                          final int height,
+                          final AaZoneViewProperties zoneProperties) {
         int resourceId = zoneProperties.getResourceId();
 
         if(resourceId == 0) {
-            mListener.onStrategyViewLoadFailed();
+            if(mListener != null) {
+                mListener.onStrategyViewLoadFailed();
+            }
+
             return;
         }
 
         mView = View.inflate(mContext, resourceId, null);
+        if(mView == null) {
+            if(mListener != null) {
+                mListener.onStrategyViewLoadFailed();
+            }
+
+            return;
+        }
+
         mView.setLayoutParams(new RelativeLayout.LayoutParams(width, height));
         mView.setBackgroundColor(zoneProperties.getBackgroundColor());
 
@@ -111,13 +125,19 @@ class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
             loadImageViewFromUrl(appIcon2, adComponents.getAppIcon2());
         }
 
-        mListener.onStrategyViewLoaded();
+        if(mListener != null) {
+            mListener.onStrategyViewLoaded();
+        }
     }
 
     private void loadImageViewFromUrl(final ImageView imageView, final String url) {
+        if(imageView == null || url == null) {
+            return;
+        }
+
         mImageLoader.getImage(url, new AdImageLoaderListener() {
             @Override
-            public void onSuccess(Bitmap bitmap) {
+            public void onSuccess(final Bitmap bitmap) {
                 imageView.setImageBitmap(bitmap);
             }
 

@@ -21,7 +21,7 @@ public class PopupAdAction extends AdAction {
         return hideBanner;
     }
 
-    public void setHideBanner(boolean hideBanner) {
+    public void setHideBanner(final boolean hideBanner) {
         this.hideBanner = hideBanner;
     }
 
@@ -29,7 +29,7 @@ public class PopupAdAction extends AdAction {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(final String title) {
         this.title = title;
     }
 
@@ -37,7 +37,7 @@ public class PopupAdAction extends AdAction {
         return backgroundColor;
     }
 
-    public void setBackgroundColor(String backgroundColor) {
+    public void setBackgroundColor(final String backgroundColor) {
         this.backgroundColor = backgroundColor;
     }
 
@@ -45,7 +45,7 @@ public class PopupAdAction extends AdAction {
         return textColor;
     }
 
-    public void setTextColor(String textColor) {
+    public void setTextColor(final String textColor) {
         this.textColor = textColor;
     }
 
@@ -53,7 +53,7 @@ public class PopupAdAction extends AdAction {
         return altCloseButton;
     }
 
-    public void setAltCloseButton(String altCloseButton) {
+    public void setAltCloseButton(final String altCloseButton) {
         this.altCloseButton = altCloseButton;
     }
 
@@ -61,7 +61,7 @@ public class PopupAdAction extends AdAction {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
@@ -69,7 +69,7 @@ public class PopupAdAction extends AdAction {
         return hideCloseButton;
     }
 
-    public void setHideCloseButton(boolean hideCloseButton) {
+    public void setHideCloseButton(final boolean hideCloseButton) {
         this.hideCloseButton = hideCloseButton;
     }
 
@@ -77,7 +77,7 @@ public class PopupAdAction extends AdAction {
         return hideBrowserNavigation;
     }
 
-    public void setHideBrowserNavigation(boolean hideBrowserNavigation) {
+    public void setHideBrowserNavigation(final boolean hideBrowserNavigation) {
         this.hideBrowserNavigation = hideBrowserNavigation;
     }
 }

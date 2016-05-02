@@ -15,19 +15,20 @@ public class SdkContentPublisher {
         mListeners = new HashSet<>();
     }
 
-    public void addListener(AaSdkContentListener listener) {
+    public void addListener(final AaSdkContentListener listener) {
         if(listener != null) {
             mListeners.add(listener);
         }
     }
 
-    public void removeListener(AaSdkContentListener listener) {
+    public void removeListener(final AaSdkContentListener listener) {
         if(listener != null) {
             mListeners.remove(listener);
         }
     }
 
-    public void publishContent(String zoneId, ContentPayload payload) {
+    public void publishContent(final String zoneId,
+                               final ContentPayload payload) {
         for(AaSdkContentListener listener : mListeners) {
             listener.onContentAvailable(zoneId, payload);
         }

@@ -18,19 +18,19 @@ public class KeywordInterceptManagerFactory {
 
     private final KeywordInterceptManager mInterceptManager;
 
-    private KeywordInterceptManagerFactory(DeviceInfo deviceInfo) {
-        KeywordInterceptAdapter adapter = new HttpKeywordInterceptAdapter(
+    private KeywordInterceptManagerFactory(final DeviceInfo deviceInfo) {
+        final KeywordInterceptAdapter adapter = new HttpKeywordInterceptAdapter(
                 determineInitEndpoint(deviceInfo),
                 determineTrackEndpoint(deviceInfo)
         );
 
-        KeywordInterceptBuilder builder = new JsonKeywordInterceptBuilder();
-        KeywordInterceptRequestBuilder requestBuilder = new JsonKeywordInterceptRequestBuilder();
+        final KeywordInterceptBuilder builder = new JsonKeywordInterceptBuilder();
+        final KeywordInterceptRequestBuilder requestBuilder = new JsonKeywordInterceptRequestBuilder();
 
         mInterceptManager = new KeywordInterceptManager(adapter, builder, requestBuilder);
     }
 
-    public static KeywordInterceptManager createKeywordInterceptManager(DeviceInfo deviceInfo) {
+    public static KeywordInterceptManager createKeywordInterceptManager(final DeviceInfo deviceInfo) {
         if(sInstance == null) {
             sInstance = new KeywordInterceptManagerFactory(deviceInfo);
         }
@@ -38,7 +38,7 @@ public class KeywordInterceptManagerFactory {
         return sInstance.mInterceptManager;
     }
 
-    private String determineInitEndpoint(DeviceInfo deviceInfo) {
+    private String determineInitEndpoint(final DeviceInfo deviceInfo) {
         if(deviceInfo.isProd()) {
             return Config.Prod.URL_KI_INIT;
         }
@@ -46,7 +46,7 @@ public class KeywordInterceptManagerFactory {
         return Config.Sand.URL_KI_INIT;
     }
 
-    private String determineTrackEndpoint(DeviceInfo deviceInfo) {
+    private String determineTrackEndpoint(final DeviceInfo deviceInfo) {
         if(deviceInfo.isProd()) {
             return Config.Prod.URL_KI_TRACK;
         }

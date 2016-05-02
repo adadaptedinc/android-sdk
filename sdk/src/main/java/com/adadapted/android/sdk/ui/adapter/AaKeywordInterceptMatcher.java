@@ -38,16 +38,22 @@ public class AaKeywordInterceptMatcher implements SessionListener, KeywordInterc
         SessionManagerFactory.addListener(this);
     }
 
-    public SuggestionPayload match(CharSequence constraint) {
-        Set<String> suggestions = new HashSet<>();
+    public SuggestionPayload match(final CharSequence constraint) {
+        final Set<String> suggestions = new HashSet<>();
 
         if((isLoaded() && constraint != null && constraint.length() >= mKeywordIntercept.getMinMatchLength())) {
-            for (String item : mKeywordIntercept.getAutoFill().keySet()) {
-                if (item.toLowerCase().contains(constraint.toString().toLowerCase())) {
-                    AutoFill autofill = mKeywordIntercept.getAutoFill().get(item);
-                    suggestions.add(autofill.getReplacement());
+            for (final String item : mKeywordIntercept.getAutoFill().keySet()) {
+                if (item != null && item.toLowerCase().contains(constraint.toString().toLowerCase())) {
+                    final AutoFill autofill = mKeywordIntercept.getAutoFill().get(item);
+                    if(autofill != null) {
+                        suggestions.add(autofill.getReplacement());
 
-                    mSuggestionTracker.suggestionMatched(mSession, item, autofill.getReplacement(), constraint.toString());
+                        mSuggestionTracker.suggestionMatched(
+                                mSession,
+                                item,
+                                autofill.getReplacement(),
+                                constraint.toString());
+                    }
                 }
             }
         }
@@ -55,7 +61,7 @@ public class AaKeywordInterceptMatcher implements SessionListener, KeywordInterc
         return new SuggestionPayload(mSuggestionTracker, suggestions);
     }
 
-    public boolean suggestionSelected(String suggestion) {
+    public boolean suggestionSelected(final String suggestion) {
         return mSuggestionTracker.suggestionSelected(suggestion);
     }
 
@@ -64,13 +70,13 @@ public class AaKeywordInterceptMatcher implements SessionListener, KeywordInterc
     }
 
     @Override
-    public void onKeywordInterceptInitSuccess(KeywordIntercept keywordIntercept) {
+    public void onKeywordInterceptInitSuccess(final KeywordIntercept keywordIntercept) {
         mKeywordIntercept = keywordIntercept;
         mLoaded = true;
     }
 
     @Override
-    public void onSessionInitialized(Session session) {
+    public void onSessionInitialized(final Session session) {
         mSession = session;
         mManager.init(session);
     }
@@ -79,5 +85,5 @@ public class AaKeywordInterceptMatcher implements SessionListener, KeywordInterc
     public void onSessionInitFailed() {}
 
     @Override
-    public void onNewAdsAvailable(Session session) {}
+    public void onNewAdsAvailable(final Session session) {}
 }

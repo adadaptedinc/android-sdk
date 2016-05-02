@@ -14,16 +14,16 @@ public class DeviceInfoFactory {
 
     private static DeviceInfo sDeviceInfo;
 
-    public static synchronized void createDeviceInfo(Context context,
-                                                     String appId,
-                                                     String sdkVersion,
-                                                     boolean isProd,
+    public static synchronized void createDeviceInfo(final Context context,
+                                                     final String appId,
+                                                     final String sdkVersion,
+                                                     final boolean isProd,
                                                      final DeviceInfoBuilder.Listener listener) {
         DeviceInfoBuilder deviceInfoBuilder = new DeviceInfoBuilder();
         deviceInfoBuilder.execute(new BuildDeviceInfoParam(context, appId, sdkVersion, isProd));
         deviceInfoBuilder.addListener(new DeviceInfoBuilder.Listener() {
             @Override
-            public void onDeviceInfoCollected(DeviceInfo deviceInfo) {
+            public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
                 sDeviceInfo = deviceInfo;
                 listener.onDeviceInfoCollected(deviceInfo);
             }

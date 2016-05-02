@@ -23,10 +23,10 @@ public class JsonEventRequestBuilder implements EventRequestBuilder {
                             final Ad ad,
                             final EventTypes eventType,
                             final String eventName) {
-        JSONObject json = new JSONObject();
+        final JSONObject json = new JSONObject();
 
-        DeviceInfo deviceInfo = session.getDeviceInfo();
-        String sessionId = session.getSessionId();
+        final DeviceInfo deviceInfo = session.getDeviceInfo();
+        final String sessionId = session.getSessionId();
 
         try {
             json.put(JsonFields.APPID, deviceInfo.getAppId());

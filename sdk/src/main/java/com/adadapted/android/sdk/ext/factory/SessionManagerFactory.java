@@ -24,13 +24,14 @@ public class SessionManagerFactory {
 
     private final SessionManager mSessionManager;
 
-    private SessionManagerFactory(final Context context, final DeviceInfo deviceInfo) {
-        HttpSessionAdapter adapter = new HttpSessionAdapter(context, determineInitEndpoint(deviceInfo));
-        SessionRequestBuilder requestBuilder = new JsonSessionRequestBuilder();
-        SessionBuilder sessionBuilder = new JsonSessionBuilder(deviceInfo.getScale());
+    private SessionManagerFactory(final Context context,
+                                  final DeviceInfo deviceInfo) {
+        final HttpSessionAdapter adapter = new HttpSessionAdapter(context, determineInitEndpoint(deviceInfo));
+        final SessionRequestBuilder requestBuilder = new JsonSessionRequestBuilder();
+        final SessionBuilder sessionBuilder = new JsonSessionBuilder(deviceInfo.getScale());
 
         mSessionManager = new SessionManager(context, adapter, requestBuilder, sessionBuilder);
-        for(SessionListener listener : sListeners) {
+        for(final SessionListener listener : sListeners) {
             mSessionManager.addListener(listener);
         }
         sListeners.clear();
@@ -40,7 +41,7 @@ public class SessionManagerFactory {
 
     public static synchronized SessionManager createSessionManager(final Context context) {
         if(sInstance == null) {
-            DeviceInfo deviceInfo = DeviceInfoFactory.getsDeviceInfo();
+            final DeviceInfo deviceInfo = DeviceInfoFactory.getsDeviceInfo();
             if(deviceInfo != null) {
                 sInstance = new SessionManagerFactory(context, deviceInfo);
             }
@@ -62,7 +63,7 @@ public class SessionManagerFactory {
     }
 
     public static void addListener(final SessionListener listener) {
-        SessionManager manager = SessionManagerFactory.getSessionManager();
+        final SessionManager manager = SessionManagerFactory.getSessionManager();
         if(manager != null) {
             manager.addListener(listener);
         }
@@ -72,7 +73,7 @@ public class SessionManagerFactory {
     }
 
     public static void removeListener(final SessionListener listener) {
-        SessionManager manager = SessionManagerFactory.getSessionManager();
+        final SessionManager manager = SessionManagerFactory.getSessionManager();
         if(manager != null) {
             manager.removeListener(listener);
         }
@@ -81,7 +82,7 @@ public class SessionManagerFactory {
         }
     }
 
-    private String determineInitEndpoint(DeviceInfo deviceInfo) {
+    private String determineInitEndpoint(final DeviceInfo deviceInfo) {
         if(deviceInfo.isProd()) {
             return Config.Prod.URL_SESSION_INIT;
         }

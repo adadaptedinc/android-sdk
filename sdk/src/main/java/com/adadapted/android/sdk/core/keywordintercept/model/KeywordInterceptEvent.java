@@ -20,8 +20,14 @@ public class KeywordInterceptEvent {
     private final String term;
     private final String sdkVersion;
 
-    public KeywordInterceptEvent(String appId, String sessionId, String udid, String searchId,
-                                 String event, String userInput, String term, String sdkVersion) {
+    public KeywordInterceptEvent(final String appId,
+                                 final String sessionId,
+                                 final String udid,
+                                 final String searchId,
+                                 final String event,
+                                 final String userInput,
+                                 final String term,
+                                 final String sdkVersion) {
         this.appId = (appId == null) ? "" : appId;
         this.sessionId =  (sessionId == null) ? "" : sessionId;
         this.udid = (udid == null) ? "" : udid;
@@ -69,8 +75,8 @@ public class KeywordInterceptEvent {
         return sdkVersion;
     }
 
-    public boolean supercedes(KeywordInterceptEvent e) {
-        return sessionId.equals(e.getSessionId()) &&
+    public boolean supercedes(final KeywordInterceptEvent e) {
+        return e != null && sessionId.equals(e.getSessionId()) &&
                 event.equals(e.getEvent()) &&
                 term.equals(e.getTerm()) &&
                 userInput.contains(e.getUserInput());

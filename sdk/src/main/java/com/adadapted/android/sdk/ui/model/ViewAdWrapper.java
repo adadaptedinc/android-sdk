@@ -22,7 +22,7 @@ public class ViewAdWrapper {
 
     private boolean trackingHasStarted = false;
 
-    public ViewAdWrapper(Session session, Ad ad) {
+    public ViewAdWrapper(final Session session, final Ad ad) {
         if(ad != null) {
             DeviceInfo deviceInfo = DeviceInfoFactory.getsDeviceInfo();
             mEventTracker = EventTrackerFactory.createEventTracker(deviceInfo);
@@ -32,7 +32,7 @@ public class ViewAdWrapper {
         mAd = ad;
     }
 
-    public static ViewAdWrapper createEmptyCurrentAd(Session session) {
+    public static ViewAdWrapper createEmptyCurrentAd(final Session session) {
         return new ViewAdWrapper(session, null);
     }
 
@@ -61,7 +61,9 @@ public class ViewAdWrapper {
     }
 
     public void markAdAsHidden() {
-        mAd.hideAd();
+        if(hasAd()) {
+            mAd.hideAd();
+        }
     }
 
     public boolean isHiddenOnInteraction() {
@@ -73,7 +75,7 @@ public class ViewAdWrapper {
     }
 
     public void beginAdTracking() {
-        if(hasAd() && !trackingHasStarted) {
+        if(hasAd() && !trackingHasStarted && mEventTracker != null) {
             mEventTracker.trackImpressionBeginEvent(mSession, getAd());
 
             AdEvent adEvent = new AdEvent(AdEvent.Types.IMPRESSION, getAd().getZoneId());
@@ -84,14 +86,14 @@ public class ViewAdWrapper {
     }
 
     public void completeAdTracking() {
-        if(hasAd() && trackingHasStarted) {
+        if(hasAd() && trackingHasStarted && mEventTracker != null) {
             mEventTracker.trackImpressionEndEvent(mSession, getAd());
             trackingHasStarted = false;
         }
     }
 
     public void trackInteraction() {
-        if(hasAd() && trackingHasStarted) {
+        if(hasAd() && trackingHasStarted && mEventTracker != null) {
             mEventTracker.trackInteractionEvent(mSession, getAd());
 
             AdEvent adEvent = new AdEvent(AdEvent.Types.INTERACTION, getAd().getZoneId());
@@ -104,7 +106,7 @@ public class ViewAdWrapper {
     }
 
     public void trackPayloadDelivered() {
-        if(hasAd() && trackingHasStarted) {
+        if(hasAd() && trackingHasStarted && mEventTracker != null) {
             mEventTracker.trackCustomEvent(mSession, getAd(), "payload_delivered");
         }
     }

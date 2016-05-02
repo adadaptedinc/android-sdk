@@ -19,11 +19,11 @@ public class AdImage implements Serializable {
         orientations = new HashMap<>();
     }
 
-    public void addOrientation(String orientation, String url) {
+    public void addOrientation(final String orientation, String url) {
         orientations.put(orientation, url);
     }
 
-    public String getOrientation(String orientation) {
+    public String getOrientation(final String orientation) {
         return orientations.get(orientation);
     }
 }

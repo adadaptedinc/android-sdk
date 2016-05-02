@@ -33,11 +33,11 @@ public class AdFetcher {
     }
 
     public void fetchAdsFor(final Session session) {
-        JSONObject json = requestBuilder.buildAdRequest(session);
+        final JSONObject json = requestBuilder.buildAdRequest(session);
         adAdapter.getAds(json, new AdAdapterListener() {
             @Override
             public void onSuccess(final JSONObject adJson) {
-                Map<String, Zone> zones = refreshBuilder.buildRefreshedAds(adJson);
+                final Map<String, Zone> zones = refreshBuilder.buildRefreshedAds(adJson);
                 notifyOnAdsRefreshed(zones);
             }
 
@@ -57,13 +57,13 @@ public class AdFetcher {
     }
 
     private void notifyOnAdsRefreshed(final Map<String, Zone> zones) {
-        for(AdFetcherListener listener : listeners) {
+        for(final AdFetcherListener listener : listeners) {
             listener.onSuccess(zones);
         }
     }
 
     private void notifyOnAdsNotRefreshed() {
-        for(AdFetcherListener listener : listeners) {
+        for(final AdFetcherListener listener : listeners) {
             listener.onFailure();
         }
     }

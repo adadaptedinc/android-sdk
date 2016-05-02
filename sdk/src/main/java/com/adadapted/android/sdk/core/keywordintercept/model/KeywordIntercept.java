@@ -11,10 +11,10 @@ public class KeywordIntercept {
     private final int minMatchLength;
     private final Map<String, AutoFill> autoFill;
 
-    public KeywordIntercept(String searchId,
-                            long refreshTime,
-                            int minMatchLength,
-                            Map<String, AutoFill> autoFill) {
+    public KeywordIntercept(final String searchId,
+                            final long refreshTime,
+                            final int minMatchLength,
+                            final Map<String, AutoFill> autoFill) {
         this.searchId = searchId;
         this.refreshTime = refreshTime;
         this.minMatchLength = minMatchLength;

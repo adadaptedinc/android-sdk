@@ -15,7 +15,7 @@ class HttpRequestManager {
 
     private HttpRequestManager() {}
 
-    public static synchronized void createQueue(Context context) {
+    public static synchronized void createQueue(final Context context) {
         if(requestQueue == null) {
             requestQueue = Volley.newRequestQueue(context);
         }

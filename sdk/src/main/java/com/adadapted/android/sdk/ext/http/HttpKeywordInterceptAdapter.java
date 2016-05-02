@@ -23,14 +23,20 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
     private final String mInitUrl;
     private final String mTrackUrl;
 
-    public HttpKeywordInterceptAdapter(final String initUrl, final String trackUrl) {
-        mInitUrl = initUrl;
-        mTrackUrl = trackUrl;
+    public HttpKeywordInterceptAdapter(final String initUrl,
+                                       final String trackUrl) {
+        mInitUrl = initUrl == null ? "" : initUrl;
+        mTrackUrl = trackUrl == null ? "" : trackUrl;
     }
 
     @Override
-    public void init(JSONObject json, final KeywordInterceptInitListener listener) {
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
+    public void init(final JSONObject json,
+                     final KeywordInterceptInitListener listener) {
+        if(json == null || listener == null) {
+            return;
+        }
+
+        final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
                 mInitUrl, json, new Response.Listener<JSONObject>(){
             @Override
             public void onResponse(JSONObject jsonObject) {
@@ -50,8 +56,13 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
     }
 
     @Override
-    public void track(final JSONArray json, final KeywordInterceptTrackListener listener) {
-        JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST,
+    public void track(final JSONArray json,
+                      final KeywordInterceptTrackListener listener) {
+        if(json == null || listener == null) {
+            return;
+        }
+
+        final JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST,
                 mTrackUrl, json, new Response.Listener<JSONArray>(){
             @Override
             public void onResponse(JSONArray jsonObject) {

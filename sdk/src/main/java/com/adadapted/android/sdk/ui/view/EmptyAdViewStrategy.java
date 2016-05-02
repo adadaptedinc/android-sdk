@@ -12,7 +12,7 @@ class EmptyAdViewStrategy implements AdViewBuildingStrategy {
     private final Listener mListener;
     private final View mView;
 
-    EmptyAdViewStrategy(Context context, Listener listener) {
+    EmptyAdViewStrategy(final Context context, final Listener listener) {
         mListener = listener;
         mView = new View(context);
     }
@@ -23,8 +23,13 @@ class EmptyAdViewStrategy implements AdViewBuildingStrategy {
     }
 
     @Override
-    public void buildView(Ad ad, int width, int height, AaZoneViewProperties zoneProperties) {
-        mListener.onStrategyViewLoadFailed();
+    public void buildView(final Ad ad,
+                          final int width,
+                          final int height,
+                          final AaZoneViewProperties zoneProperties) {
+        if(mListener != null) {
+            mListener.onStrategyViewLoadFailed();
+        }
     }
 
     @Override

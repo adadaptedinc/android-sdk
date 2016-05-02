@@ -17,7 +17,7 @@ public abstract class AdAction implements Serializable {
     private final String actionType;
     private String actionPath = "";
 
-    public AdAction(String actionType) {
+    public AdAction(final String actionType) {
         this.actionType = actionType;
     }
 
@@ -29,7 +29,7 @@ public abstract class AdAction implements Serializable {
         return actionPath;
     }
 
-    public void setActionPath(String actionPath) {
+    public void setActionPath(final String actionPath) {
         this.actionPath = actionPath;
     }
 }

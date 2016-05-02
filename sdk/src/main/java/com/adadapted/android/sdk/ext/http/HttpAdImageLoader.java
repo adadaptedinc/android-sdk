@@ -18,14 +18,15 @@ public class HttpAdImageLoader implements AdImageLoader {
 
     public HttpAdImageLoader() {}
 
-    public void getImage(final String url, final AdImageLoaderListener listener) {
+    public void getImage(final String url,
+                         final AdImageLoaderListener listener) {
         if(url == null || !url.toLowerCase().startsWith("http")) {
             Log.w(LOGTAG, "No URL has been provided.");
             listener.onFailure();
             return;
         }
 
-        Bitmap bitmap = ImageCache.getInstance().getImage(url);
+        final Bitmap bitmap = ImageCache.getInstance().getImage(url);
 
         if(bitmap == null) {
             loadRemoteImage(url, listener);
@@ -35,7 +36,12 @@ public class HttpAdImageLoader implements AdImageLoader {
         }
     }
 
-    private void loadRemoteImage(final String url, final AdImageLoaderListener listener) {
+    private void loadRemoteImage(final String url,
+                                 final AdImageLoaderListener listener) {
+        if(url == null || listener == null) {
+            return;
+        }
+
         ImageRequest imageRequest = new ImageRequest(url,
                 new Response.Listener<Bitmap>() {
 

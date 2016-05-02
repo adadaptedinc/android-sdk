@@ -62,7 +62,7 @@ public class JsonAdBuilder implements AdBuilder {
     private static final String FIELD_IMAGE_URL = "url";
 
     public List<Ad> buildAds(final JSONArray jsonAds) {
-        List<Ad> ads = new ArrayList<>();
+        final List<Ad> ads = new ArrayList<>();
 
         try {
             int adCount = jsonAds.length();
@@ -79,7 +79,7 @@ public class JsonAdBuilder implements AdBuilder {
     }
 
     public Ad buildAd(final JSONObject jsonAd) throws JSONException {
-        Ad ad = new Ad();
+        final Ad ad = new Ad();
 
         if(jsonAd.has(FIELD_AD_ID)) {
             ad.setAdId(jsonAd.getString(FIELD_AD_ID));
@@ -102,14 +102,14 @@ public class JsonAdBuilder implements AdBuilder {
         }
 
         if(jsonAd.has(FIELD_AD_TYPE)) {
-            String adTypeCode = jsonAd.getString(FIELD_AD_TYPE);
-            AdType adType = parseAdType(adTypeCode, jsonAd);
+            final String adTypeCode = jsonAd.getString(FIELD_AD_TYPE);
+            final AdType adType = parseAdType(adTypeCode, jsonAd);
             ad.setAdType(adType);
         }
 
         if(jsonAd.has(FIELD_ACTION_TYPE)) {
-            String actionTypeCode = jsonAd.getString(FIELD_ACTION_TYPE);
-            AdAction adAction = parseAdAction(actionTypeCode, jsonAd);
+            final String actionTypeCode = jsonAd.getString(FIELD_ACTION_TYPE);
+            final AdAction adAction = parseAdAction(actionTypeCode, jsonAd);
             ad.setAdAction(adAction);
         }
 
@@ -120,11 +120,13 @@ public class JsonAdBuilder implements AdBuilder {
         return ad;
     }
 
-    private AdAction parseAdAction(final String actionTypeCode, final JSONObject jsonAd) {
+    private AdAction parseAdAction(final String actionTypeCode,
+                                   final JSONObject jsonAd) {
         if(actionTypeCode.equalsIgnoreCase(ACTION_TYPE_POPUP)) {
             try {
-                JSONObject popupObject = jsonAd.getJSONObject(FIELD_POPUP);
-                String actionPath = jsonAd.getString(FIELD_ACTION_PATH);
+                final JSONObject popupObject = jsonAd.getJSONObject(FIELD_POPUP);
+                final String actionPath = jsonAd.getString(FIELD_ACTION_PATH);
+
                 return parseAdPopup(popupObject, actionPath);
             }
             catch(JSONException ex) {
@@ -133,7 +135,8 @@ public class JsonAdBuilder implements AdBuilder {
         }
         else if(actionTypeCode.equalsIgnoreCase(ACTION_TYPE_DELEGATE)) {
             try {
-                String actionPath = jsonAd.getString(FIELD_ACTION_PATH);
+                final String actionPath = jsonAd.getString(FIELD_ACTION_PATH);
+
                 return parseAdDelegate(actionPath);
             }
             catch(JSONException ex) {
@@ -142,8 +145,9 @@ public class JsonAdBuilder implements AdBuilder {
         }
         else if(actionTypeCode.equalsIgnoreCase(ACTION_TYPE_CONTENT)) {
             try {
-                JSONObject payloadObject = jsonAd.getJSONObject(FIELD_PAYLOAD);
-                String actionPath = jsonAd.getString(FIELD_ACTION_PATH);
+                final JSONObject payloadObject = jsonAd.getJSONObject(FIELD_PAYLOAD);
+                final String actionPath = jsonAd.getString(FIELD_ACTION_PATH);
+
                 return parseAdContent(payloadObject, actionPath);
             }
             catch(JSONException ex) {
@@ -154,14 +158,15 @@ public class JsonAdBuilder implements AdBuilder {
         return new NullAdAction();
     }
 
-    private ContentAdAction parseAdContent(final JSONObject payloadObject, final String actionPath) {
-        ContentAdAction content = new ContentAdAction();
+    private ContentAdAction parseAdContent(final JSONObject payloadObject,
+                                           final String actionPath) {
+        final ContentAdAction content = new ContentAdAction();
         content.setActionPath(actionPath);
 
-        List<String> listItems = new ArrayList<>();
+        final List<String> listItems = new ArrayList<>();
 
         try {
-            JSONArray jsonItems = payloadObject.getJSONArray("list-items");
+            final JSONArray jsonItems = payloadObject.getJSONArray("list-items");
 
             for(int i = 0; i < jsonItems.length(); i++) {
                 listItems.add(jsonItems.getString(i));
@@ -177,14 +182,15 @@ public class JsonAdBuilder implements AdBuilder {
     }
 
     private DelegateAdAction parseAdDelegate(final String actionPath) {
-        DelegateAdAction delegate = new DelegateAdAction();
+        final DelegateAdAction delegate = new DelegateAdAction();
         delegate.setActionPath(actionPath);
 
         return delegate;
     }
 
-    private PopupAdAction parseAdPopup(final JSONObject popupJson, final String actionPath) {
-        PopupAdAction popup = new PopupAdAction();
+    private PopupAdAction parseAdPopup(final JSONObject popupJson,
+                                       final String actionPath) {
+        final PopupAdAction popup = new PopupAdAction();
         popup.setActionPath(actionPath);
 
         try {
@@ -242,7 +248,7 @@ public class JsonAdBuilder implements AdBuilder {
     }
 
     private HtmlAdType parseHtmlAd(final JSONObject jsonAd) {
-        HtmlAdType adType = new HtmlAdType();
+        final HtmlAdType adType = new HtmlAdType();
 
         try {
             if(jsonAd.has(FIELD_AD_URL)) {
@@ -257,9 +263,9 @@ public class JsonAdBuilder implements AdBuilder {
     }
 
     private ImageAdType parseImageAd(final JSONObject jsonAd) {
-        ImageAdType adType = new ImageAdType();
+        final ImageAdType adType = new ImageAdType();
         try {
-            Map<String, AdImage> images = parseImages(jsonAd.getJSONObject(FIELD_IMAGES));
+            final Map<String, AdImage> images = parseImages(jsonAd.getJSONObject(FIELD_IMAGES));
             adType.setImages(images);
         }
         catch(JSONException ex) {
@@ -270,12 +276,12 @@ public class JsonAdBuilder implements AdBuilder {
     }
 
     private JsonAdType parseJsonAd(JSONObject jsonAd) {
-        JsonAdType adType = new JsonAdType();
+        final JsonAdType adType = new JsonAdType();
 
         try {
-            JSONObject jsonComponents = jsonAd.getJSONObject(FIELD_JSON);
+            final JSONObject jsonComponents = jsonAd.getJSONObject(FIELD_JSON);
 
-            AdComponent adComponents = parseJsonAdComponents(jsonComponents);
+            final AdComponent adComponents = parseJsonAdComponents(jsonComponents);
             adType.setComponents(adComponents);
         }
         catch(JSONException ex) {
@@ -286,7 +292,7 @@ public class JsonAdBuilder implements AdBuilder {
     }
 
     private AdComponent parseJsonAdComponents(final JSONObject json) throws JSONException {
-        AdComponent adComponents = new AdComponent();
+        final AdComponent adComponents = new AdComponent();
 
         if(json.has("ad_cta_1")) {
             adComponents.setCta1(json.getString("ad_cta_1"));
@@ -336,17 +342,17 @@ public class JsonAdBuilder implements AdBuilder {
     }
 
     private Map<String, AdImage> parseImages(final JSONObject jsonImages) {
-        Map<String, AdImage> images = new HashMap<>();
+        final Map<String, AdImage> images = new HashMap<>();
 
         try {
-            for(Iterator<String> imgRes = jsonImages.keys(); imgRes.hasNext();)
+            for(final Iterator<String> imgRes = jsonImages.keys(); imgRes.hasNext();)
             {
-                String resKey = imgRes.next();
-                JSONArray orientation = jsonImages.getJSONArray(resKey);
+                final String resKey = imgRes.next();
+                final JSONArray orientation = jsonImages.getJSONArray(resKey);
 
-                AdImage image = new AdImage();
+                final AdImage image = new AdImage();
                 for(int i = 0; i < orientation.length(); i++) {
-                    JSONObject orien = orientation.getJSONObject(i);
+                    final JSONObject orien = orientation.getJSONObject(i);
                     image.addOrientation(orien.getString(FIELD_IMAGE_ORIENTATION),
                             orien.getString(FIELD_IMAGE_URL));
                 }

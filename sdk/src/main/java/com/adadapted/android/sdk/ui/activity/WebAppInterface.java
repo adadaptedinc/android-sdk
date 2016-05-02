@@ -13,16 +13,16 @@ class WebAppInterface {
     final Context mContext;
 
     /** Instantiate the interface and set the context */
-    WebAppInterface(Context c) {
-        mContext = c;
+    WebAppInterface(final Context context) {
+        mContext = context;
     }
 
-    public void registerImpression(String zoneId, String adId) {
-
+    public void registerImpression(final String zoneId, final String adId) {
+        Log.d(TAG, String.format("Attempting to register Impression for Zone: %s, Ad: %s", zoneId, adId));
     }
 
     @JavascriptInterface
-    public void favoriteRecipe(String recipeId) {
+    public void favoriteRecipe(final String recipeId) {
         Log.d(TAG, "Attempting to favorite recipe: " + recipeId);
     }
 }

@@ -14,16 +14,17 @@ public class AdZoneRefreshScheduler extends Timer {
     private final Listener mListener;
 
     public interface Listener {
-        void onAdZoneRefreshTimer(Ad ad);
+        void onAdZoneRefreshTimer(final Ad ad);
     }
 
-    public AdZoneRefreshScheduler(Listener listener) {
+    public AdZoneRefreshScheduler(final Listener listener) {
         mListener = listener;
     }
 
     public void schedule(final Ad ad) {
-        long interval = ad.getRefreshTimeInMs();
-        if(interval <= 0) { return; }
+        if(ad == null || ad.getRefreshTimeInMs() <= 0) { return; }
+
+        final long interval = ad.getRefreshTimeInMs();
 
         this.schedule(new TimerTask() {
 
@@ -35,7 +36,7 @@ public class AdZoneRefreshScheduler extends Timer {
         }, interval);
     }
 
-    private void notifyAdZoneRefreshTimer(Ad ad) {
+    private void notifyAdZoneRefreshTimer(final Ad ad) {
         mListener.onAdZoneRefreshTimer(ad);
     }
 }

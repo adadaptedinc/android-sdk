@@ -17,7 +17,7 @@ class AdActionHandler {
 
     private final Context mContext;
 
-    public AdActionHandler(Context context) {
+    public AdActionHandler(final Context context) {
         mContext = context;
     }
 
@@ -26,8 +26,8 @@ class AdActionHandler {
      * @param ad The Ad to handle the action for
      * @return Whether the Ad Interaction should be tracked or not.
      */
-    public boolean handleAction(ViewAdWrapper ad) {
-        if(!ad.hasAd()) { return false; }
+    public boolean handleAction(final ViewAdWrapper ad) {
+        if(ad == null || !ad.hasAd()) { return false; }
 
         boolean result = true;
         switch(ad.getAd().getAdAction().getActionType()) {
@@ -58,22 +58,22 @@ class AdActionHandler {
         return result;
     }
 
-    private void handleContentAction(ViewAdWrapper ad) {
+    private void handleContentAction(final ViewAdWrapper ad) {
         String zoneId = ad.getAd().getZoneId();
 
         ContentPayload payload = ContentPayload.createAddToListContent(ad);
         SdkContentPublisherFactory.getContentPublisher().publishContent(zoneId, payload);
     }
 
-    private void handleDelegateAction(ViewAdWrapper ad) {
+    private void handleDelegateAction(final ViewAdWrapper ad) {
 
     }
 
-    private void handleLinkAction(ViewAdWrapper ad) {
+    private void handleLinkAction(final ViewAdWrapper ad) {
 
     }
 
-    private void handlePopupAction(ViewAdWrapper ad) {
+    private void handlePopupAction(final ViewAdWrapper ad) {
         Intent intent = AaWebViewPopupActivity.createActivity(mContext, ad);
         mContext.startActivity(intent);
     }

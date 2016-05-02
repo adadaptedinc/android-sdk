@@ -45,10 +45,10 @@ public class SessionManager {
         public void onFailure() {}
     };
 
-    public SessionManager(Context context,
-                          SessionAdapter sessionAdapter,
-                          SessionRequestBuilder requestBuilder,
-                          SessionBuilder sessionBuilder) {
+    public SessionManager(final Context context,
+                          final SessionAdapter sessionAdapter,
+                          final SessionRequestBuilder requestBuilder,
+                          final SessionBuilder sessionBuilder) {
         mListeners = new HashSet<>();
 
         mContext = context;
@@ -68,7 +68,7 @@ public class SessionManager {
     }
 
     public void initialize(final DeviceInfo deviceInfo) {
-        JSONObject request = mRequestBuilder.buildSessionInitRequest(deviceInfo);
+        final JSONObject request = mRequestBuilder.buildSessionInitRequest(deviceInfo);
         mSessionAdapter.sendInit(request, new SessionAdapterListener() {
             @Override
             public void onSuccess(JSONObject json) {
@@ -95,7 +95,7 @@ public class SessionManager {
         mAdRefreshScheduler.schedule(getCurrentSession());
     }
 
-    public void addListener(SessionListener listener) {
+    public void addListener(final SessionListener listener) {
         if(mSessionLoaded) {
             listener.onSessionInitialized(mCurrentSession);
         }
@@ -103,24 +103,24 @@ public class SessionManager {
         mListeners.add(listener);
     }
 
-    public void removeListener(SessionListener listener) {
+    public void removeListener(final SessionListener listener) {
         mListeners.remove(listener);
     }
 
     private void notifySessionInitialized() {
-        for(SessionListener listener: mListeners) {
+        for(final SessionListener listener: mListeners) {
            listener.onSessionInitialized(mCurrentSession);
         }
     }
 
     private void notifySessionInitFailed() {
-        for(SessionListener listener: mListeners) {
+        for(final SessionListener listener: mListeners) {
             listener.onSessionInitFailed();
         }
     }
 
     private void notifyNewAdsAvailable() {
-        for(SessionListener listener: mListeners) {
+        for(final SessionListener listener: mListeners) {
             listener.onNewAdsAvailable(mCurrentSession);
         }
     }

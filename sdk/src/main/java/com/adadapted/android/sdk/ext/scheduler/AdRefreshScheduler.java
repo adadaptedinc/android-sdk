@@ -29,7 +29,7 @@ public class AdRefreshScheduler extends Timer {
     private final AdFetcher mAdFetcher;
 
     public AdRefreshScheduler(Context context, Session session) {
-        DeviceInfo deviceInfo = session.getDeviceInfo();
+        final DeviceInfo deviceInfo = session.getDeviceInfo();
 
         mSessionManager = SessionManagerFactory.createSessionManager(context);
         mKiManager = KeywordInterceptManagerFactory.createKeywordInterceptManager(deviceInfo);
@@ -38,8 +38,9 @@ public class AdRefreshScheduler extends Timer {
     }
 
     public void schedule(final Session session) {
-        long interval = session.getPollingInterval();
-        if(interval <= 0L) { return; }
+        if(session == null || session.getPollingInterval() <= 0L) { return; }
+
+        final long interval = session.getPollingInterval();
 
         this.schedule(new TimerTask() {
 

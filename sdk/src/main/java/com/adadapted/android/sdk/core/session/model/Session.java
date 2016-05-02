@@ -11,7 +11,7 @@ import java.util.Map;
  * Created by chrisweeden on 3/23/15.
  */
 public class Session {
-    private static final String TAG = Session.class.getName();
+    private static final String LOGTAG = Session.class.getName();
 
     private DeviceInfo deviceInfo;
     private String sessionId;
@@ -31,7 +31,7 @@ public class Session {
         return deviceInfo;
     }
 
-    public void setDeviceInfo(DeviceInfo deviceInfo) {
+    public void setDeviceInfo(final DeviceInfo deviceInfo) {
         this.deviceInfo = deviceInfo;
     }
 
@@ -39,7 +39,7 @@ public class Session {
         return sessionId;
     }
 
-    public void setSessionId(String sessionId) {
+    public void setSessionId(final String sessionId) {
         this.sessionId = sessionId;
     }
 
@@ -47,7 +47,7 @@ public class Session {
         return activeCampaigns;
     }
 
-    public void setActiveCampaigns(boolean activeCampaigns) {
+    public void setActiveCampaigns(final boolean activeCampaigns) {
         this.activeCampaigns = activeCampaigns;
     }
 
@@ -59,11 +59,11 @@ public class Session {
         return expiresAt;
     }
 
-    public void setExpiresAt(Date expiresAt) {
+    public void setExpiresAt(final Date expiresAt) {
         this.expiresAt = expiresAt;
     }
 
-    public void setExpiresAt(Long expiresAtTime) {
+    public void setExpiresAt(final Long expiresAtTime) {
         this.expiresAt = new Date();
         this.expiresAt.setTime(expiresAtTime * 1000);
     }
@@ -72,7 +72,7 @@ public class Session {
         return pollingInterval;
     }
 
-    public void setPollingInterval(long pollingInterval) {
+    public void setPollingInterval(final long pollingInterval) {
         this.pollingInterval = pollingInterval;
     }
 
@@ -80,17 +80,17 @@ public class Session {
         return zones;
     }
 
-    public Zone getZone(String zoneId) {
-        Zone zone = zones.get(zoneId);
+    public Zone getZone(final String zoneId) {
+        final Zone zone = zones.get(zoneId);
 
         if(zone == null) {
-            zone = Zone.createEmptyZone(zoneId);
+            return Zone.createEmptyZone(zoneId);
         }
 
         return zone;
     }
 
-    public void updateZones(Map<String, Zone> zones) {
+    public void updateZones(final Map<String, Zone> zones) {
         this.zones = new HashMap<>(zones);
     }
 

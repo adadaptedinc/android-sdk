@@ -27,7 +27,7 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
     private final HtmlAdViewBuildingStrategy mAdWebView;
     private AdViewBuildingStrategy mStrategy;
 
-    public AdViewBuilder(Context context) {
+    public AdViewBuilder(final Context context) {
         mContext = context;
 
         // For whatever reason the WebView has to be created ahead of time.
@@ -39,7 +39,7 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
                           final AaZoneViewProperties zoneProperties,
                           final int width,
                           final int height) {
-        if(zoneProperties == null) {
+        if(currentAd == null || zoneProperties == null) {
             return;
         }
 
@@ -68,7 +68,7 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
         return mAdWebView;
     }
 
-    private AdViewBuildingStrategy getImageViewStrategy(ViewAdWrapper currentAd) {
+    private AdViewBuildingStrategy getImageViewStrategy(final ViewAdWrapper currentAd) {
         DeviceInfo deviceInfo = currentAd.getSession().getDeviceInfo();
         return new ImageAdViewBuildingStrategy(mContext, deviceInfo, this);
     }
@@ -94,17 +94,17 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
         });
     }
 
-    public void setListener(Listener listener) {
+    public void setListener(final Listener listener) {
         mListener = listener;
     }
 
-    public void removeListener(Listener listener) {
+    public void removeListener(final Listener listener) {
         if(mListener != null && mListener.equals(listener)) {
             mListener = null;
         }
     }
 
-    public void notifyViewLoaded(View v) {
+    public void notifyViewLoaded(final View v) {
         if(mListener != null) {
             mListener.onViewLoaded(v);
         }

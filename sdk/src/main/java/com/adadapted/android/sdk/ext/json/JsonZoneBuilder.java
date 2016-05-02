@@ -31,13 +31,13 @@ public class JsonZoneBuilder implements ZoneBuilder {
     }
 
     public Map<String, Zone> buildZones(final JSONObject jsonZones) {
-        Map<String, Zone> zones = new HashMap<>();
+        final Map<String, Zone> zones = new HashMap<>();
 
         try {
-            for(Iterator<String> z = jsonZones.keys(); z.hasNext();) {
-                String zoneId = z.next();
-                JSONObject jsonZone = jsonZones.getJSONObject(zoneId);
-                Zone zone = buildZone(zoneId, jsonZone);
+            for(final Iterator<String> z = jsonZones.keys(); z.hasNext();) {
+                final String zoneId = z.next();
+                final JSONObject jsonZone = jsonZones.getJSONObject(zoneId);
+                final Zone zone = buildZone(zoneId, jsonZone);
 
                 zones.put(zoneId, zone);
             }
@@ -49,12 +49,13 @@ public class JsonZoneBuilder implements ZoneBuilder {
         return zones;
     }
 
-    public Zone buildZone(final String zoneId, final JSONObject jsonZone) {
-        Zone zone = new Zone(zoneId);
+    public Zone buildZone(final String zoneId,
+                          final JSONObject jsonZone) {
+        final Zone zone = new Zone(zoneId);
 
         try {
             if(jsonZone.has(JsonFields.PORTZONEHEIGHT) && jsonZone.has(JsonFields.PORTZONEWIDTH)) {
-                Dimension portDimension = new Dimension();
+                final Dimension portDimension = new Dimension();
 
                 if(jsonZone.has(JsonFields.PORTZONEHEIGHT)) {
                     portDimension.setHeight(calculateDimensionValue(jsonZone.getString(JsonFields.PORTZONEHEIGHT)));
@@ -74,7 +75,7 @@ public class JsonZoneBuilder implements ZoneBuilder {
             }
 
             if(jsonZone.has(JsonFields.LANDZONEHEIGHT) && jsonZone.has(JsonFields.LANDZONEWIDTH)) {
-                Dimension landDimension = new Dimension();
+                final Dimension landDimension = new Dimension();
 
                 if(jsonZone.has(JsonFields.LANDZONEHEIGHT)) {
                     landDimension.setHeight(calculateDimensionValue(jsonZone.getString(JsonFields.LANDZONEHEIGHT)));
@@ -93,7 +94,7 @@ public class JsonZoneBuilder implements ZoneBuilder {
                 zone.getDimensions().put(Dimension.ORIEN.LAND, landDimension);
             }
 
-            JSONArray jsonAds = jsonZone.getJSONArray(JsonFields.ADS);
+            final JSONArray jsonAds = jsonZone.getJSONArray(JsonFields.ADS);
             zone.setAds(mAdBuilder.buildAds(jsonAds));
         }
         catch(JSONException ex) {

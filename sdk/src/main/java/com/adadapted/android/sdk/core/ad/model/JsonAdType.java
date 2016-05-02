@@ -15,7 +15,7 @@ public class JsonAdType extends AdType {
         return components;
     }
 
-    public void setComponents(AdComponent components) {
+    public void setComponents(final AdComponent components) {
         this.components = components;
     }
 }

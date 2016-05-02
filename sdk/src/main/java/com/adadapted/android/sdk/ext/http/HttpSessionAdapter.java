@@ -20,15 +20,21 @@ public class HttpSessionAdapter implements SessionAdapter {
 
     private final String mInitUrl;
 
-    public HttpSessionAdapter(Context context, String initUrl) {
+    public HttpSessionAdapter(final Context context,
+                              final String initUrl) {
         HttpRequestManager.createQueue(context);
 
-        mInitUrl = initUrl;
+        mInitUrl = initUrl == null ? "" : initUrl;
     }
 
     @Override
-    public void sendInit(JSONObject json, final SessionAdapterListener listener) {
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
+    public void sendInit(final JSONObject json,
+                         final SessionAdapterListener listener) {
+        if(json == null || listener == null) {
+            return;
+        }
+
+        final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
                 mInitUrl, json, new Response.Listener<JSONObject>(){
 
             @Override

@@ -20,28 +20,38 @@ public class AaFeedAdapter extends BaseAdapter {
 
     private AaZoneView currentZoneView;
 
-    public AaFeedAdapter(Context context, BaseAdapter adapter, String zoneId, int placement) {
+    public AaFeedAdapter(final Context context,
+                         final BaseAdapter adapter,
+                         final String zoneId,
+                         final int placement) {
         this(context, adapter, zoneId, placement, 0);
     }
 
-    public AaFeedAdapter(Context context, BaseAdapter adapter, String zoneId, int placement,
-                         int resourceId) {
+    public AaFeedAdapter(final Context context,
+                         final BaseAdapter adapter,
+                         final String zoneId,
+                         final int placement,
+                         final int resourceId) {
         mAdapter = adapter;
         mPlacement = new AaFeedAdPlacement(context, zoneId, placement, resourceId);
     }
 
     @Override
     public int getCount() {
-        return mPlacement.getModifiedCount(mAdapter.getCount());
+        if(mPlacement != null && mAdapter != null) {
+            return mPlacement.getModifiedCount(mAdapter.getCount());
+        }
+
+        return 0;
     }
 
     @Override
-    public Object getItem(int position) {
+    public Object getItem(final int position) {
         return position;
     }
 
     @Override
-    public long getItemId(int position) {
+    public long getItemId(final int position) {
         AaFeedItem feedItem = mPlacement.getItem(position);
 
         if(feedItem == null) {
@@ -52,7 +62,9 @@ public class AaFeedAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position,
+                        final View convertView,
+                        final ViewGroup parent) {
         AaZoneView view = mPlacement.getView(position);
 
         if(view == null) {
@@ -62,6 +74,7 @@ public class AaFeedAdapter extends BaseAdapter {
 
         currentZoneView = view;
         onStart();
+
         return currentZoneView;
     }
 
@@ -71,7 +84,7 @@ public class AaFeedAdapter extends BaseAdapter {
     }
 
     @Override
-    public int getItemViewType(int position) {
+    public int getItemViewType(final int position) {
         AaFeedItem feedItem = mPlacement.getItem(position);
         if(feedItem == null) {
             return mAdapter.getViewTypeCount();
@@ -88,7 +101,7 @@ public class AaFeedAdapter extends BaseAdapter {
         }
     }
 
-    public void onStart(AaSdkContentListener listener) {
+    public void onStart(final AaSdkContentListener listener) {
         if(currentZoneView != null) {
             currentZoneView.onStart();
         }
@@ -102,7 +115,7 @@ public class AaFeedAdapter extends BaseAdapter {
         }
     }
 
-    public void onStop(AaSdkContentListener listener) {
+    public void onStop(final AaSdkContentListener listener) {
         if(currentZoneView != null) {
             currentZoneView.onStop();
         }

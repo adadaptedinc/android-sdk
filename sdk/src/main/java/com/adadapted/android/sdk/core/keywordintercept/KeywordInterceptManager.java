@@ -46,15 +46,15 @@ public class KeywordInterceptManager {
         }
 
         @Override
-        public void onFailure(JSONArray json) {
+        public void onFailure(final JSONArray json) {
             failedRetries++;
             sendBatchRetry(json);
         }
     };
 
-    public KeywordInterceptManager(KeywordInterceptAdapter adapter,
-                                   KeywordInterceptBuilder builder,
-                                   KeywordInterceptRequestBuilder requestBuilder) {
+    public KeywordInterceptManager(final KeywordInterceptAdapter adapter,
+                                   final KeywordInterceptBuilder builder,
+                                   final KeywordInterceptRequestBuilder requestBuilder) {
         this.adapter = adapter;
 
         this.builder = builder;
@@ -64,13 +64,13 @@ public class KeywordInterceptManager {
         this.failedRetries = 0;
     }
 
-    public void init(Session session) {
+    public void init(final Session session) {
         this.deviceInfo = session.getDeviceInfo();
 
-        JSONObject request = requestBuilder.buildInitRequest(session);
+        final JSONObject request = requestBuilder.buildInitRequest(session);
         adapter.init(request, new KeywordInterceptInitListener() {
             @Override
-            public void onSuccess(JSONObject json) {
+            public void onSuccess(final JSONObject json) {
                 keywordIntercept = builder.build(json);
                 initialized = true;
 
@@ -82,11 +82,11 @@ public class KeywordInterceptManager {
         });
     }
 
-    public void trackMatched(Session session, String term, String userInput) {
+    public void trackMatched(final Session session, final String term, final String userInput) {
         trackEvent(session, term, userInput, KeywordInterceptEvent.MATCHED);
     }
 
-    public void trackPresented(Session session, String term, String userInput) {
+    public void trackPresented(final Session session, final String term, final String userInput) {
         trackEvent(session, term, userInput, KeywordInterceptEvent.PRESENTED);
     }
 
@@ -94,29 +94,32 @@ public class KeywordInterceptManager {
         trackEvent(session, term, userInput, KeywordInterceptEvent.SELECTED);
     }
 
-    private void trackEvent(Session session, String term, String userInput, String eventType) {
-        String appId = deviceInfo.getAppId();
-        String sessionId = session != null ? session.getSessionId() : "";
-        String udid = deviceInfo.getUdid();
-        String searchId = keywordIntercept.getSearchId();
-        String sdkVersion = deviceInfo.getSdkVersion();
+    private void trackEvent(final Session session,
+                            final String term,
+                            final String userInput,
+                            final String eventType) {
+        final String appId = deviceInfo.getAppId();
+        final String sessionId = session != null ? session.getSessionId() : "";
+        final String udid = deviceInfo.getUdid();
+        final String searchId = keywordIntercept.getSearchId();
+        final String sdkVersion = deviceInfo.getSdkVersion();
 
-        KeywordInterceptEvent event = new KeywordInterceptEvent(appId, sessionId, udid, searchId,
+        final KeywordInterceptEvent event = new KeywordInterceptEvent(appId, sessionId, udid, searchId,
                 eventType, userInput, term, sdkVersion);
         fileEvent(event);
     }
 
     public void publishEvents() {
         if(isInitialized() && !keywordInterceptEvents.isEmpty()) {
-            Set<KeywordInterceptEvent> events = new HashSet<>(keywordInterceptEvents);
+            final Set<KeywordInterceptEvent> events = new HashSet<>(keywordInterceptEvents);
             keywordInterceptEvents.clear();
 
-            JSONArray json = requestBuilder.buildTrackRequest(events);
+            final JSONArray json = requestBuilder.buildTrackRequest(events);
             adapter.track(json, keywordInterceptTrackListener);
         }
     }
 
-    private void sendBatchRetry(JSONArray json) {
+    private void sendBatchRetry(final JSONArray json) {
         if(failedRetries <= MAX_FAILED_RETRIES) {
             adapter.track(json, keywordInterceptTrackListener);
         }
@@ -125,10 +128,10 @@ public class KeywordInterceptManager {
         }
     }
 
-    private void fileEvent(KeywordInterceptEvent event) {
-        Set<KeywordInterceptEvent> events = new HashSet<>(keywordInterceptEvents);
+    private void fileEvent(final KeywordInterceptEvent event) {
+        final Set<KeywordInterceptEvent> events = new HashSet<>(keywordInterceptEvents);
 
-        for(KeywordInterceptEvent e : keywordInterceptEvents) {
+        for(final KeywordInterceptEvent e : keywordInterceptEvents) {
             if(event.supercedes(e)) {
                 events.remove(e);
             }
@@ -157,6 +160,8 @@ public class KeywordInterceptManager {
     }
 
     private void notifyInitSuccess() {
-       listener.onKeywordInterceptInitSuccess(keywordIntercept);
+        if(listener != null) {
+            listener.onKeywordInterceptInitSuccess(keywordIntercept);
+        }
     }
 }

@@ -25,34 +25,36 @@ public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
         int minMatchLength = 2;
 
         try {
-            if (json.has(JsonFields.SEARCHID)) {
-                searchId = json.getString(JsonFields.SEARCHID);
-            }
+            if(json != null) {
+                if (json.has(JsonFields.SEARCHID)) {
+                    searchId = json.getString(JsonFields.SEARCHID);
+                }
 
-            if (json.has(JsonFields.REFRESHTIME)) {
-                refreshTime = Long.parseLong(json.getString(JsonFields.REFRESHTIME));
-            }
+                if (json.has(JsonFields.REFRESHTIME)) {
+                    refreshTime = Long.parseLong(json.getString(JsonFields.REFRESHTIME));
+                }
 
-            if (json.has(JsonFields.MINMATCHLENGTH)) {
-                minMatchLength = Integer.parseInt(json.getString(JsonFields.MINMATCHLENGTH));
+                if (json.has(JsonFields.MINMATCHLENGTH)) {
+                    minMatchLength = Integer.parseInt(json.getString(JsonFields.MINMATCHLENGTH));
+                }
             }
         }
         catch(JSONException ex) {
             Log.w(TAG, "Problem parsing JSON", ex);
         }
 
-        Map<String, AutoFill> interceptMap = parseAutofill(json);
+        final Map<String, AutoFill> interceptMap = parseAutofill(json);
 
         return new KeywordIntercept(searchId, refreshTime, minMatchLength, interceptMap);
     }
 
     private Map<String, AutoFill> parseAutofill(final JSONObject json) {
-        Map<String, AutoFill> interceptMap = new HashMap<>();
+        final Map<String, AutoFill> interceptMap = new HashMap<>();
 
         try {
-            if(json.has(JsonFields.AUTOFILL)) {
-                JSONObject autofillJson = json.getJSONObject(JsonFields.AUTOFILL);
-                for(Iterator<String> z = autofillJson.keys(); z.hasNext();) {
+            if(json != null && json.has(JsonFields.AUTOFILL)) {
+                final JSONObject autofillJson = json.getJSONObject(JsonFields.AUTOFILL);
+                for(final Iterator<String> z = autofillJson.keys(); z.hasNext();) {
                     String term = z.next();
                     JSONObject jsonTerm = autofillJson.getJSONObject(term);
 
@@ -72,7 +74,7 @@ public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
                         tagline = jsonTerm.getString(JsonFields.TAGLINE);
                     }
 
-                    AutoFill autofill = new AutoFill(replacement, icon, tagline);
+                    final AutoFill autofill = new AutoFill(replacement, icon, tagline);
 
                     interceptMap.put(term, autofill);
                 }
