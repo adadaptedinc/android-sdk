@@ -65,7 +65,7 @@ public class AaFeedAdapter extends BaseAdapter {
     public View getView(final int position,
                         final View convertView,
                         final ViewGroup parent) {
-        AaZoneView view = mPlacement.getView(position);
+        final AaZoneView view = mPlacement.getView(position);
 
         if(view == null) {
             int modPos = mPlacement.getModifiedPosition(position);
@@ -74,6 +74,8 @@ public class AaFeedAdapter extends BaseAdapter {
 
         currentZoneView = view;
         onStart();
+
+        notifyDataSetChanged();
 
         return currentZoneView;
     }
@@ -91,6 +93,7 @@ public class AaFeedAdapter extends BaseAdapter {
         }
         else {
             int modPos = mPlacement.getModifiedPosition(position);
+
             return mAdapter.getItemViewType(modPos);
         }
     }
