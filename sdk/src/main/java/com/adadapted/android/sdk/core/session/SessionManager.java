@@ -91,7 +91,7 @@ public class SessionManager {
         });
     }
 
-    public void scheduleAdRefresh() {
+    private void scheduleAdRefresh() {
         mAdRefreshScheduler.schedule(getCurrentSession());
     }
 

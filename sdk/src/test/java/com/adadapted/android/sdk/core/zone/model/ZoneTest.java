@@ -1,5 +1,7 @@
 package com.adadapted.android.sdk.core.zone.model;
 
+import org.junit.Assert;
+
 import static org.junit.Assert.*;
 
 /**

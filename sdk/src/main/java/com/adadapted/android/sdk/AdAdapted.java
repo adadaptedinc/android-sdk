@@ -18,11 +18,14 @@ import com.adadapted.android.sdk.ui.messaging.SdkEventPublisher;
 import com.adadapted.android.sdk.ui.messaging.SdkEventPublisherFactory;
 
 /**
- * Created by chrisweeden on 8/18/15.
+ *
  */
 public class AdAdapted {
     private static final String LOGTAG = AdAdapted.class.getName();
 
+    /**
+     *
+     */
     public static class Env {
         public static final boolean PROD = true;
         public static final boolean DEV = false;

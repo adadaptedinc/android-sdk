@@ -3,6 +3,7 @@ package com.adadapted.android.sdk.ui.view;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.AndroidRuntimeException;
 import android.view.View;
 
 import com.adadapted.android.sdk.core.device.model.DeviceInfo;
@@ -104,13 +105,13 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
         }
     }
 
-    public void notifyViewLoaded(final View v) {
+    private void notifyViewLoaded(final View v) {
         if(mListener != null) {
             mListener.onViewLoaded(v);
         }
     }
 
-    public void notifyViewLoadFailed() {
+    private void notifyViewLoadFailed() {
         if(mListener != null) {
             mListener.onViewLoadFailed();
         }

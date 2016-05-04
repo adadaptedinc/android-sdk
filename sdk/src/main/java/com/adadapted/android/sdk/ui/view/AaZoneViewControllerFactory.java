@@ -13,7 +13,7 @@ class AaZoneViewControllerFactory {
 
     private final Map<String, AaZoneViewController> mZoneControllers;
 
-    public AaZoneViewControllerFactory() {
+    private AaZoneViewControllerFactory() {
         mZoneControllers = new HashMap<>();
     }
 

@@ -4,7 +4,7 @@ package com.adadapted.android.sdk.core.common;
  * Created by chrisweeden on 7/20/15.
  */
 public class DimensionConverter {
-    final float scale;
+    private final float scale;
 
     public DimensionConverter(final float scale) {
         this.scale = scale;
