@@ -1,6 +1,7 @@
 package com.adadapted.android.sdk.ui.view;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -16,19 +17,24 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
     private static final String LOGTAG = HtmlAdViewBuildingStrategy.class.getName();
 
     private final Listener mListener;
-    private final WebView mWebView;
+    private WebView mWebView;
 
     public HtmlAdViewBuildingStrategy(final Context context, final Listener listener) {
         mListener = listener;
 
-        mWebView = new WebView(context);
-        mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        mWebView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                return true;
-            }
-        });
+        try {
+            mWebView = new WebView(context);
+            mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+            mWebView.setWebViewClient(new WebViewClient() {
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                    return true;
+                }
+            });
+        }
+        catch(Throwable ex) {
+            Log.e(LOGTAG, "Problem initializing HTML Ad WebView");
+        }
     }
 
     @Override
@@ -41,6 +47,14 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
                           final int width,
                           final int height,
                           final AaZoneViewProperties zoneProperties) {
+        if(mWebView == null) {
+            if(mListener != null) {
+                mListener.onStrategyViewLoadFailed();
+            }
+
+            return;
+        }
+
         setDummyDocument(zoneProperties.getBackgroundColor());
         mWebView.setBackgroundColor(zoneProperties.getBackgroundColor());
 
