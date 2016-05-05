@@ -15,7 +15,6 @@ public abstract class SpinnerActionBarActivity extends SingleFragmentActivity
     protected String [] menuItems;
 
     private ActionBar actionBar;
-    private SpinnerAdapter menuSpinnerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,13 +23,16 @@ public abstract class SpinnerActionBarActivity extends SingleFragmentActivity
         menuItems = getResources().getStringArray(R.array.action_list);
 
         actionBar = getSupportActionBar();
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        if(actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        }
 
-        menuSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.action_list,
+        SpinnerAdapter menuSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.action_list,
                 android.R.layout.simple_spinner_dropdown_item);
-
-        actionBar.setListNavigationCallbacks(menuSpinnerAdapter, this);
+        if(menuSpinnerAdapter != null) {
+            actionBar.setListNavigationCallbacks(menuSpinnerAdapter, this);
+        }
     }
 
     protected String getMenuItem(int i) {
