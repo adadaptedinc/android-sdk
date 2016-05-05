@@ -77,11 +77,14 @@ public class AdAdapted {
         SessionManagerFactory.addListener(new SessionListener() {
             @Override
             public void onSessionInitialized(Session session) {
+                Log.i(LOGTAG, String.format("AdAdapted Android SDK v%s initialized.", Config.SDK_VERSION));
+
                 listener.onHasAdsToServe(session.hasActiveCampaigns());
             }
 
             @Override
             public void onSessionInitFailed() {
+                Log.e(LOGTAG, String.format("AdAdapted Android SDK v%s failed to initialize.", Config.SDK_VERSION));
             }
 
             @Override
