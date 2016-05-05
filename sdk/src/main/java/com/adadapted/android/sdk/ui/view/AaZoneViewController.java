@@ -137,8 +137,6 @@ class AaZoneViewController implements SessionListener, AdZoneRefreshScheduler.Li
     public void setListener(AaZoneViewControllerListener listener) {
         mListener = listener;
         SessionManagerFactory.addListener(this);
-
-        mCurrentAd.beginAdTracking();
     }
 
     public void removeListener() {
