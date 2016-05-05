@@ -21,6 +21,9 @@ public class EventTracker {
     private static final int MAX_QUEUE_SIZE = 10;
     private static final int MAX_FAILED_RETRIES = 2;
 
+    public static final String EVENTNAME_EMPTY = "";
+    public static final String EVENTNAME_PAYLOAD_DELIVERED = "";
+
     private final EventAdapter mEventAdapter;
     private final EventRequestBuilder mBuilder;
     private final Set<JSONObject> mQueuedEvents;
@@ -79,7 +82,7 @@ public class EventTracker {
         }
 
         ad.incrementImpressionViews();
-        trackEvent(session, ad, EventTypes.IMPRESSION, "");
+        trackEvent(session, ad, EventTypes.IMPRESSION, EVENTNAME_EMPTY);
     }
 
     public void trackImpressionEndEvent(final Session session, final Ad ad) {
@@ -87,7 +90,7 @@ public class EventTracker {
             return;
         }
 
-        trackEvent(session, ad, EventTypes.IMPRESSION_END, "");
+        trackEvent(session, ad, EventTypes.IMPRESSION_END, EVENTNAME_EMPTY);
     }
 
 
@@ -96,7 +99,7 @@ public class EventTracker {
             return;
         }
 
-        trackEvent(session, ad, EventTypes.INTERACTION, "");
+        trackEvent(session, ad, EventTypes.INTERACTION, EVENTNAME_EMPTY);
     }
 
     public void trackPopupBeginEvent(final Session session, final Ad ad) {
@@ -104,7 +107,7 @@ public class EventTracker {
             return;
         }
 
-        trackEvent(session, ad, EventTypes.POPUP_BEGIN, "");
+        trackEvent(session, ad, EventTypes.POPUP_BEGIN, EVENTNAME_EMPTY);
     }
 
     public void trackPopupEndEvent(final Session session, final Ad ad) {
@@ -112,7 +115,7 @@ public class EventTracker {
             return;
         }
 
-        trackEvent(session, ad, EventTypes.POPUP_END, "");
+        trackEvent(session, ad, EventTypes.POPUP_END, EVENTNAME_EMPTY);
     }
 
     public void trackCustomEvent(final Session session, final Ad ad, final String eventName) {
