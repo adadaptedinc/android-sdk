@@ -61,10 +61,10 @@ public class AaFeedAdPlacement {
 
     public AaZoneView getView(int position) {
         if(position == mPlacement) {
-            AaZoneView view = new AaZoneView(mContext);
-            view.init(mZoneId, mResourceId);
+            AaZoneView zoneView = new AaZoneView(mContext);
+            zoneView.init(mZoneId, mResourceId);
 
-            return view;
+            return zoneView;
         }
 
         return null;

@@ -71,13 +71,14 @@ public class AaFeedAdapter extends BaseAdapter {
             int modPos = mPlacement.getModifiedPosition(position);
             return mAdapter.getView(modPos, convertView, parent);
         }
+        else {
+            currentZoneView = view;
+            notifyDataSetChanged();
 
-        currentZoneView = view;
-        onStart();
+            onStart();
 
-        notifyDataSetChanged();
-
-        return currentZoneView;
+            return currentZoneView;
+        }
     }
 
     @Override
