@@ -75,8 +75,21 @@ public class AaZoneView extends RelativeLayout
     protected void displayAdView(final View view) {
         if(view == null) { return; }
 
-        Activity activity = (Activity)mContext;
-        activity.runOnUiThread(new Runnable() {
+        //Activity activity = (Activity)mContext;
+        //activity.runOnUiThread(new Runnable() {
+        //    @Override
+        //    public void run() {
+        //        ViewGroup parent = ((ViewGroup) view.getParent());
+        //        if (parent != null) {
+        //            parent.removeView(view);
+        //        }
+
+        //        AaZoneView.this.removeAllViews();
+        //        AaZoneView.this.addView(view);
+        //    }
+        //});
+
+        view.post(new Runnable() {
             @Override
             public void run() {
                 ViewGroup parent = ((ViewGroup) view.getParent());
