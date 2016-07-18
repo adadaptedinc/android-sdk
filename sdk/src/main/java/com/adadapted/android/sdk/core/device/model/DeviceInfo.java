@@ -30,6 +30,7 @@ public class DeviceInfo {
     private String bundleId;
     private String udid;
     private String device;
+    private String deviceUdid;
     private String os;
     private String osv;
     private String locale;
@@ -56,6 +57,7 @@ public class DeviceInfo {
 
         deviceInfo.setBundleId(context.getPackageName());
         deviceInfo.setDevice(Build.MANUFACTURER + " " + Build.MODEL);
+        deviceInfo.setDeviceUdid(deviceInfo.captureAndroidId(context));
         deviceInfo.setOs("Android");
         deviceInfo.setOsv(Integer.toString(Build.VERSION.SDK_INT));
 
@@ -179,6 +181,14 @@ public class DeviceInfo {
 
     public void setDevice(final String device) {
         this.device = (device == null) ? UNKNOWN_VALUE : device;
+    }
+
+    public String getDeviceUdid() {
+        return deviceUdid;
+    }
+
+    public void setDeviceUdid(final String deviceUdid) {
+        this.deviceUdid = (deviceUdid == null) ? UNKNOWN_VALUE : deviceUdid;
     }
 
     public String getOs() {

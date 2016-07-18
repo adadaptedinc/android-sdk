@@ -12,6 +12,7 @@ public class JsonFields {
     public static final String POLLINGINTERVALMS = "polling_interval_ms";
     public static final String ZONES = "zones";
     public static final String DEVICE = "device";
+    public static final String DEVICEUDID = "device_udid";
     public static final String OS = "os";
     public static final String OSV = "osv";
     public static final String LOCALE = "locale";

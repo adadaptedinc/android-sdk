@@ -36,6 +36,7 @@ public class JsonSessionRequestBuilder implements SessionRequestBuilder {
         json.put(JsonFields.UDID, deviceInfo.getUdid());
         json.put(JsonFields.BUNDLEID, deviceInfo.getBundleId());
         json.put(JsonFields.DEVICE, deviceInfo.getDevice());
+        json.put(JsonFields.DEVICEUDID, deviceInfo.getDeviceUdid());
         json.put(JsonFields.OS, deviceInfo.getOs());
         json.put(JsonFields.OSV, deviceInfo.getOsv());
         json.put(JsonFields.LOCALE, deviceInfo.getLocale());
