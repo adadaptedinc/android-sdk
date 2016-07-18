@@ -4,7 +4,7 @@ package com.adadapted.android.sdk.config;
  * Created by chrisweeden on 7/27/15.
  */
 public class Config {
-    public static final String SDK_VERSION = "0.9.7";
+    public static final String SDK_VERSION = "0.9.8";
     public static final long DEFAULT_EVENT_POLLING = 20000L;
 
     public static class Prod {
