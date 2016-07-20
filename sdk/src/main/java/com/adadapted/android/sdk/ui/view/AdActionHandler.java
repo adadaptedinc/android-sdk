@@ -75,6 +75,7 @@ class AdActionHandler {
 
     private void handlePopupAction(final ViewAdWrapper ad) {
         Intent intent = AaWebViewPopupActivity.createActivity(mContext, ad);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mContext.startActivity(intent);
     }
 }
