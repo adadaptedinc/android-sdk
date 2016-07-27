@@ -39,6 +39,7 @@ public class DeviceInfo {
     private int dw;
     private int dh;
     private ScreenDensity density;
+    private boolean allowRetargeting;
     private String sdkVersion;
 
     public DeviceInfo() {}
@@ -74,6 +75,8 @@ public class DeviceInfo {
 
         deviceInfo.setDensity(deviceInfo.determineScreenDensity(context));
 
+        deviceInfo.setAllowRetargeting(deviceInfo.captureRetargetingEnabled(context));
+
         deviceInfo.setSdkVersion(sdkVersion);
 
         return deviceInfo;
@@ -83,17 +86,22 @@ public class DeviceInfo {
         try {
             return AdvertisingIdClient.getAdvertisingIdInfo(context).getId();
         }
-        catch (GooglePlayServicesNotAvailableException ex) {
-            Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId");
-        }
-        catch (GooglePlayServicesRepairableException ex) {
-            Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId");
-        }
-        catch (IOException ex) {
-            Log.w(LOGTAG, "Problem retrieving Google Play AdvertiserId");
+        catch (GooglePlayServicesNotAvailableException | GooglePlayServicesRepairableException | IOException ex) {
+            Log.w(LOGTAG, "Problem retrieving Google Play Advertiser Info");
         }
 
         return captureAndroidId(context);
+    }
+
+    private boolean captureRetargetingEnabled(Context context) {
+        try {
+            return !AdvertisingIdClient.getAdvertisingIdInfo(context).isLimitAdTrackingEnabled();
+        }
+        catch (GooglePlayServicesNotAvailableException | GooglePlayServicesRepairableException | IOException ex) {
+            Log.w(LOGTAG, "Problem retrieving Google Play Advertiser Info");
+        }
+
+        return true;
     }
 
     private String captureAndroidId(final Context context) {
@@ -253,6 +261,14 @@ public class DeviceInfo {
 
     public void setDensity(final ScreenDensity density) {
         this.density = density;
+    }
+
+    public boolean allowRetargetingEnabled() {
+        return allowRetargeting;
+    }
+
+    public void setAllowRetargeting(boolean allowRetargeting) {
+        this.allowRetargeting = allowRetargeting;
     }
 
     public String getSdkVersion() {

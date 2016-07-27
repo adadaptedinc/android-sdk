@@ -46,7 +46,7 @@ public class JsonSessionRequestBuilder implements SessionRequestBuilder {
         json.put(JsonFields.DW, deviceInfo.getDw());
         json.put(JsonFields.DENSITY, deviceInfo.getDensity());
         json.put(JsonFields.DATETIME, new Date().getTime());
-        json.put(JsonFields.ALLOWRETARGETING, 1);
+        json.put(JsonFields.ALLOWRETARGETING, deviceInfo.allowRetargetingEnabled() ? 1 : 0);
         json.put(JsonFields.SDKVERSION, deviceInfo.getSdkVersion());
 
         return json;
