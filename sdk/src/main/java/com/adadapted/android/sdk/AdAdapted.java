@@ -36,6 +36,7 @@ public class AdAdapted {
     private String mAppId;
     private boolean mIsProd;
 
+    private boolean mSdkStarting = false;
     private boolean mSdkLoaded = false;
 
     private final Context mContext;
@@ -102,12 +103,15 @@ public class AdAdapted {
     }
 
     public void start() {
-        if(!mSdkLoaded) {
+        if(!mSdkStarting && !mSdkLoaded) {
+            mSdkStarting = true;
             DeviceInfoFactory.createDeviceInfo(mContext, mAppId, Config.SDK_VERSION,
                     mIsProd, new DeviceInfoBuilder.Listener() {
                 @Override
                 public void onDeviceInfoCollected(DeviceInfo deviceInfo) {
                     getSessionManager().initialize(deviceInfo);
+
+                    mSdkStarting = false;
                     mSdkLoaded = true;
                 }
             });
@@ -115,6 +119,10 @@ public class AdAdapted {
         else {
             Log.w(LOGTAG, "AdAdapted SDK has already been loaded with App Id: " + mAppId + ".");
         }
+    }
+
+    public boolean isLoaded() {
+        return mSdkStarting || mSdkLoaded;
     }
 
     private SessionManager getSessionManager() {
