@@ -7,6 +7,7 @@ public class JsonFields {
     public static final String APPID = "app_id";
     public static final String UDID = "udid";
     public static final String BUNDLEID = "bundle_id";
+    public static final String BUNDLEVERSION = "bundle_version";
     public static final String ACTIVECAMPAIGNS = "active_campaigns";
     public static final String SESSIONEXPIRESAT = "session_expires_at";
     public static final String POLLINGINTERVALMS = "polling_interval_ms";

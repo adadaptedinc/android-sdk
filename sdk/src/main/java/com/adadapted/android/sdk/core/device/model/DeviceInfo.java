@@ -1,6 +1,7 @@
 package com.adadapted.android.sdk.core.device.model;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -28,6 +29,7 @@ public class DeviceInfo {
     private boolean isProd;
     private float scale;
     private String bundleId;
+    private String bundleVersion;
     private String udid;
     private String device;
     private String deviceUdid;
@@ -57,6 +59,15 @@ public class DeviceInfo {
         deviceInfo.setUdid(deviceInfo.captureAdvertisingId(context));
 
         deviceInfo.setBundleId(context.getPackageName());
+
+        try {
+            int version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode;
+            deviceInfo.setBundleVersion(String.valueOf(version));
+        }
+        catch(PackageManager.NameNotFoundException ex) {
+            deviceInfo.setBundleVersion(UNKNOWN_VALUE);
+        }
+
         deviceInfo.setDevice(Build.MANUFACTURER + " " + Build.MODEL);
         deviceInfo.setDeviceUdid(deviceInfo.captureAndroidId(context));
         deviceInfo.setOs("Android");
@@ -173,6 +184,14 @@ public class DeviceInfo {
 
     public void setBundleId(final String bundleId) {
         this.bundleId = (bundleId == null) ? UNKNOWN_VALUE : bundleId;
+    }
+
+    public String getBundleVersion() {
+        return bundleVersion;
+    }
+
+    public void setBundleVersion(String bundleVersion) {
+        this.bundleVersion = (bundleVersion == null) ? UNKNOWN_VALUE : bundleVersion;
     }
 
     public String getUdid() {
