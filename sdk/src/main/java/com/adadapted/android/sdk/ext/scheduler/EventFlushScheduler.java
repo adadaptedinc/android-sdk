@@ -8,6 +8,7 @@ import com.adadapted.android.sdk.core.event.AdEventTracker;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptManager;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.ext.factory.AdEventTrackerFactory;
+import com.adadapted.android.sdk.ext.factory.AppEventTrackerFactory;
 import com.adadapted.android.sdk.ext.factory.KeywordInterceptManagerFactory;
 
 /**
@@ -27,15 +28,22 @@ public class EventFlushScheduler {
         mEventTracker = AdEventTrackerFactory.createEventTracker(deviceInfo);
         mKiManager = KeywordInterceptManagerFactory.createKeywordInterceptManager(deviceInfo);
 
+        flushEvents();
+
         mHandler = new Handler();
         mRunnable = new Runnable() {
             @Override
             public void run() {
-                mEventTracker.publishEvents();
-                mKiManager.publishEvents();
+                flushEvents();
                 mHandler.postDelayed(this, pollingInterval);
             }
         };
+    }
+
+    public void flushEvents() {
+        mEventTracker.publishEvents();
+        mKiManager.publishEvents();
+        AppEventTrackerFactory.publishEvents();
     }
 
     public void start(final long pollingInterval) {
