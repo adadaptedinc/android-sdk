@@ -3,11 +3,11 @@ package com.adadapted.android.sdk.ui.model;
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.AdTypes;
 import com.adadapted.android.sdk.core.device.model.DeviceInfo;
-import com.adadapted.android.sdk.core.event.EventTracker;
+import com.adadapted.android.sdk.core.event.AdEventTracker;
 import com.adadapted.android.sdk.core.event.model.AdEvent;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.ext.factory.DeviceInfoFactory;
-import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
+import com.adadapted.android.sdk.ext.factory.AdEventTrackerFactory;
 import com.adadapted.android.sdk.ui.messaging.SdkEventPublisherFactory;
 
 /**
@@ -16,7 +16,7 @@ import com.adadapted.android.sdk.ui.messaging.SdkEventPublisherFactory;
 public class ViewAdWrapper {
     private static final String LOGTAG = ViewAdWrapper.class.getName();
 
-    private EventTracker mEventTracker;
+    private AdEventTracker mEventTracker;
     private final Session mSession;
     private final Ad mAd;
 
@@ -26,7 +26,7 @@ public class ViewAdWrapper {
     public ViewAdWrapper(final Session session, final Ad ad) {
         if(ad != null) {
             DeviceInfo deviceInfo = DeviceInfoFactory.getsDeviceInfo();
-            mEventTracker = EventTrackerFactory.createEventTracker(deviceInfo);
+            mEventTracker = AdEventTrackerFactory.createEventTracker(deviceInfo);
         }
 
         mSession = session;
@@ -129,7 +129,7 @@ public class ViewAdWrapper {
 
     public void trackPayloadDelivered() {
         if(hasAd() && trackingHasBegun()) {
-            mEventTracker.trackCustomEvent(mSession, getAd(), EventTracker.EVENTNAME_PAYLOAD_DELIVERED);
+            mEventTracker.trackCustomEvent(mSession, getAd(), AdEventTracker.EVENTNAME_PAYLOAD_DELIVERED);
         }
     }
 }

@@ -3,7 +3,7 @@ package com.adadapted.android.sdk.core.event.model;
 /**
  * Created by chrisweeden on 3/23/15.
  */
-public enum EventTypes {
+public enum AdEventTypes {
     IMPRESSION,
     IMPRESSION_END,
     INTERACTION,

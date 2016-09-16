@@ -3,7 +3,7 @@ package com.adadapted.android.sdk.core.event;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.model.Ad;
-import com.adadapted.android.sdk.core.event.model.EventTypes;
+import com.adadapted.android.sdk.core.event.model.AdEventTypes;
 import com.adadapted.android.sdk.core.session.model.Session;
 
 import org.json.JSONArray;
@@ -15,8 +15,8 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 3/23/15.
  */
-public class EventTracker {
-    private static final String LOGTAG = EventTracker.class.getName();
+public class AdEventTracker {
+    private static final String LOGTAG = AdEventTracker.class.getName();
 
     private static final int MAX_QUEUE_SIZE = 10;
     private static final int MAX_FAILED_RETRIES = 2;
@@ -24,13 +24,13 @@ public class EventTracker {
     public static final String EVENTNAME_EMPTY = "";
     public static final String EVENTNAME_PAYLOAD_DELIVERED = "";
 
-    private final EventAdapter mEventAdapter;
-    private final EventRequestBuilder mBuilder;
+    private final AdEventAdapter mEventAdapter;
+    private final AdEventRequestBuilder mBuilder;
     private final Set<JSONObject> mQueuedEvents;
 
     private int mFailedRetries;
 
-    private final EventAdapterListener mEventAdapterListener = new EventAdapterListener() {
+    private final AdEventAdapterListener mEventAdapterListener = new AdEventAdapterListener() {
         @Override
         public void onSuccess() {
             mFailedRetries = 0;
@@ -43,8 +43,8 @@ public class EventTracker {
         }
     };
 
-    public EventTracker(final EventAdapter eventAdapter,
-                        final EventRequestBuilder builder) {
+    public AdEventTracker(final AdEventAdapter eventAdapter,
+                          final AdEventRequestBuilder builder) {
         mEventAdapter = eventAdapter;
         mBuilder = builder;
 
@@ -82,7 +82,7 @@ public class EventTracker {
         }
 
         ad.incrementImpressionViews();
-        trackEvent(session, ad, EventTypes.IMPRESSION, EVENTNAME_EMPTY);
+        trackEvent(session, ad, AdEventTypes.IMPRESSION, EVENTNAME_EMPTY);
     }
 
     public void trackImpressionEndEvent(final Session session, final Ad ad) {
@@ -90,7 +90,7 @@ public class EventTracker {
             return;
         }
 
-        trackEvent(session, ad, EventTypes.IMPRESSION_END, EVENTNAME_EMPTY);
+        trackEvent(session, ad, AdEventTypes.IMPRESSION_END, EVENTNAME_EMPTY);
     }
 
 
@@ -99,7 +99,7 @@ public class EventTracker {
             return;
         }
 
-        trackEvent(session, ad, EventTypes.INTERACTION, EVENTNAME_EMPTY);
+        trackEvent(session, ad, AdEventTypes.INTERACTION, EVENTNAME_EMPTY);
     }
 
     public void trackPopupBeginEvent(final Session session, final Ad ad) {
@@ -107,7 +107,7 @@ public class EventTracker {
             return;
         }
 
-        trackEvent(session, ad, EventTypes.POPUP_BEGIN, EVENTNAME_EMPTY);
+        trackEvent(session, ad, AdEventTypes.POPUP_BEGIN, EVENTNAME_EMPTY);
     }
 
     public void trackPopupEndEvent(final Session session, final Ad ad) {
@@ -115,7 +115,7 @@ public class EventTracker {
             return;
         }
 
-        trackEvent(session, ad, EventTypes.POPUP_END, EVENTNAME_EMPTY);
+        trackEvent(session, ad, AdEventTypes.POPUP_END, EVENTNAME_EMPTY);
     }
 
     public void trackCustomEvent(final Session session, final Ad ad, final String eventName) {
@@ -123,12 +123,12 @@ public class EventTracker {
             return;
         }
 
-        trackEvent(session, ad, EventTypes.CUSTOM, eventName);
+        trackEvent(session, ad, AdEventTypes.CUSTOM, eventName);
     }
 
     private void trackEvent(final Session session,
                             final Ad ad,
-                            final EventTypes eventType,
+                            final AdEventTypes eventType,
                             final String eventName) {
         mQueuedEvents.add(mBuilder.build(session, ad, eventType, eventName));
 
@@ -139,7 +139,7 @@ public class EventTracker {
 
     @Override
     public String toString() {
-        return "EventTracker{" +
+        return "AdEventTracker{" +
                 "eventAdapter=" + mEventAdapter +
                 ", builder=" + mBuilder +
                 ", queuedEvents=" + mQueuedEvents +

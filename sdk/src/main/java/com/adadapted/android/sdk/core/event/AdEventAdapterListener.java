@@ -7,4 +7,4 @@ import org.json.JSONArray;
 /**
  * Created by chrisweeden on 8/18/15.
  */
-public interface EventAdapterListener extends NegativeListener<JSONArray> {}
+public interface AdEventAdapterListener extends NegativeListener<JSONArray> {}

@@ -5,12 +5,12 @@ import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.AdFetcher;
 import com.adadapted.android.sdk.core.device.model.DeviceInfo;
-import com.adadapted.android.sdk.core.event.EventTracker;
+import com.adadapted.android.sdk.core.event.AdEventTracker;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptManager;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.core.session.SessionManager;
 import com.adadapted.android.sdk.ext.factory.AdFetcherFactory;
-import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
+import com.adadapted.android.sdk.ext.factory.AdEventTrackerFactory;
 import com.adadapted.android.sdk.ext.factory.KeywordInterceptManagerFactory;
 import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
 
@@ -25,7 +25,7 @@ public class AdRefreshScheduler extends Timer {
 
     private final SessionManager mSessionManager;
     private final KeywordInterceptManager mKiManager;
-    private final EventTracker mEventTracker;
+    private final AdEventTracker mEventTracker;
     private final AdFetcher mAdFetcher;
 
     public AdRefreshScheduler(Context context, Session session) {
@@ -33,7 +33,7 @@ public class AdRefreshScheduler extends Timer {
 
         mSessionManager = SessionManagerFactory.createSessionManager(context);
         mKiManager = KeywordInterceptManagerFactory.createKeywordInterceptManager(deviceInfo);
-        mEventTracker = EventTrackerFactory.createEventTracker(deviceInfo);
+        mEventTracker = AdEventTrackerFactory.createEventTracker(deviceInfo);
         mAdFetcher = AdFetcherFactory.createAdFetcher(deviceInfo);
     }
 

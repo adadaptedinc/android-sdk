@@ -14,7 +14,7 @@ import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.PopupAdAction;
 import com.adadapted.android.sdk.core.session.SessionManager;
 import com.adadapted.android.sdk.core.session.model.Session;
-import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
+import com.adadapted.android.sdk.ext.factory.AdEventTrackerFactory;
 import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
@@ -71,12 +71,12 @@ public class AaWebViewPopupActivity extends Activity {
     public void onStart() {
         super.onStart();
 
-        EventTrackerFactory.getEventTracker().trackPopupBeginEvent(mSession, ad);
+        AdEventTrackerFactory.getEventTracker().trackPopupBeginEvent(mSession, ad);
     }
 
     public void onPause() {
         super.onPause();
-        EventTrackerFactory.getEventTracker().trackPopupEndEvent(mSession, ad);
+        AdEventTrackerFactory.getEventTracker().trackPopupEndEvent(mSession, ad);
     }
 
     @Override

@@ -5,6 +5,6 @@ import org.json.JSONArray;
 /**
  * Created by chrisweeden on 3/26/15.
  */
-public interface EventAdapter {
-    void sendBatch(JSONArray events, EventAdapterListener listener);
+public interface AdEventAdapter {
+    void sendBatch(JSONArray events, AdEventAdapterListener listener);
 }

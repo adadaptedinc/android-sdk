@@ -4,8 +4,8 @@ import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.device.model.DeviceInfo;
-import com.adadapted.android.sdk.core.event.EventRequestBuilder;
-import com.adadapted.android.sdk.core.event.model.EventTypes;
+import com.adadapted.android.sdk.core.event.AdEventRequestBuilder;
+import com.adadapted.android.sdk.core.event.model.AdEventTypes;
 import com.adadapted.android.sdk.core.session.model.Session;
 
 import org.json.JSONException;
@@ -16,12 +16,12 @@ import java.util.Date;
 /**
  * Created by chrisweeden on 4/28/15.
  */
-public class JsonEventRequestBuilder implements EventRequestBuilder {
-    private static final String LOGTAG = JsonEventRequestBuilder.class.getName();
+public class JsonAdEventRequestBuilder implements AdEventRequestBuilder {
+    private static final String LOGTAG = JsonAdEventRequestBuilder.class.getName();
 
     public JSONObject build(final Session session,
                             final Ad ad,
-                            final EventTypes eventType,
+                            final AdEventTypes eventType,
                             final String eventName) {
         final JSONObject json = new JSONObject();
 

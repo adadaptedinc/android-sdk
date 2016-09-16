@@ -4,17 +4,17 @@ import android.os.Handler;
 
 import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.device.model.DeviceInfo;
-import com.adadapted.android.sdk.core.event.EventTracker;
+import com.adadapted.android.sdk.core.event.AdEventTracker;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptManager;
 import com.adadapted.android.sdk.core.session.model.Session;
-import com.adadapted.android.sdk.ext.factory.EventTrackerFactory;
+import com.adadapted.android.sdk.ext.factory.AdEventTrackerFactory;
 import com.adadapted.android.sdk.ext.factory.KeywordInterceptManagerFactory;
 
 /**
  * Created by chrisweeden on 7/16/15.
  */
 public class EventFlushScheduler {
-    private final EventTracker mEventTracker;
+    private final AdEventTracker mEventTracker;
     private final KeywordInterceptManager mKiManager;
     private final Handler mHandler;
     private final Runnable mRunnable;
@@ -24,7 +24,7 @@ public class EventFlushScheduler {
     public EventFlushScheduler(final Session session) {
         final DeviceInfo deviceInfo = session.getDeviceInfo();
 
-        mEventTracker = EventTrackerFactory.createEventTracker(deviceInfo);
+        mEventTracker = AdEventTrackerFactory.createEventTracker(deviceInfo);
         mKiManager = KeywordInterceptManagerFactory.createKeywordInterceptManager(deviceInfo);
 
         mHandler = new Handler();
