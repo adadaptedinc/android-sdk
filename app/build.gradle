@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'newrelic'
 
 android {
     compileSdkVersion 23
@@ -19,6 +20,16 @@ android {
     }
 }
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "com.newrelic.agent.android:agent-gradle-plugin:5.+"
+    }
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':sdk')
@@ -26,4 +37,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.android.support:support-v4:23.3.0'
     compile 'com.google.android.gms:play-services:8.4.0'
+    compile 'com.newrelic.agent.android:android-agent:5.+'
+    compile 'com.flurry.android:analytics:6.2.0'
 }
