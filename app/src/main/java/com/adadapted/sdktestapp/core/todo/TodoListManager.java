@@ -85,6 +85,18 @@ public class TodoListManager implements TodoLoader.Listener {
         return null;
     }
 
+    public TodoList getDefaultList() {
+        if(lists.size() > 0) {
+            return lists.get(0);
+        }
+        else {
+            final TodoList newList = new TodoList("Addit Default List");
+            lists.add(newList);
+
+            return newList;
+        }
+    }
+
     public void addNewList(String listName) {
         lists.add(new TodoList(listName));
 
@@ -107,7 +119,7 @@ public class TodoListManager implements TodoLoader.Listener {
     }
 
     public void setLists(List<TodoList> lists) {
-        this.lists.clear();
+        //this.lists.clear();
         this.lists.addAll(lists);
     }
 

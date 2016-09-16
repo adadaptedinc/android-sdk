@@ -16,7 +16,7 @@ import android.widget.ListView;
 
 import com.adadapted.android.sdk.ui.adapter.AaFeedAdapter;
 import com.adadapted.android.sdk.ui.messaging.AaSdkContentListener;
-import com.adadapted.android.sdk.ui.model.ContentPayload;
+import com.adadapted.android.sdk.ui.model.AdContentPayload;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.todo.TodoList;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;
@@ -165,9 +165,9 @@ public class TodoListDetailFragment extends ListFragment implements AaSdkContent
     }
 
     @Override
-    public void onContentAvailable(String zoneId, ContentPayload contentPayload) {
+    public void onContentAvailable(String zoneId, AdContentPayload adContentPayload) {
         try {
-            JSONArray array = contentPayload.getPayload().getJSONArray("add_to_list_items");
+            JSONArray array = adContentPayload.getPayload().getJSONArray("add_to_list_items");
             for(int i = 0; i < array.length(); i++) {
                 String item = array.getString(i);
                 TodoListManager.getInstance(getActivity()).addItemToList(listId, item);
@@ -175,7 +175,7 @@ public class TodoListDetailFragment extends ListFragment implements AaSdkContent
                 adapter.notifyDataSetChanged();
             }
 
-            contentPayload.acknowledge();
+            adContentPayload.acknowledge();
         }
         catch(JSONException ex) {
             Log.w(TAG, "Problem parsing JSON.");

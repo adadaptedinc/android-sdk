@@ -15,6 +15,9 @@
             android:name=".ui.todo.activity.ItemDetailActivity"
             android:label="@string/title_activity_item_detail"
             android:parentActivityName=".ui.todo.activity.TodoListDetailActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.todo.activity.TodoListDetailActivity"/>
         </activity>
 
         <activity
@@ -51,6 +54,38 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.todo.activity.TodoListDetailActivity" />
+        </activity>
+
+        <activity
+            android:name="com.adadapted.android.sdk.addit.AdditInterceptActivity"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:excludeFromRecents="true">
+            <intent-filter android:label="@string/filter_title_viewadditintercept">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
+                <!-- note that the leading "/" is required for pathPrefix -->
+                <data
+                    android:host="dl.adadapted.com"
+                    android:pathPrefix="/demo"
+                    android:scheme="http" />
+
+                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
+                <!-- note that the leading "/" is required for pathPrefix -->
+                <data
+                    android:host="dl.adadapted.com"
+                    android:pathPrefix="/demo"
+                    android:scheme="https" />
+
+                <!-- Accepts URIs that begin with "example://gizmos” -->
+                <data
+                    android:host="demo"
+                    android:scheme="addit" />
+            </intent-filter>
         </activity>
 
     </application>
