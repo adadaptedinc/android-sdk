@@ -1,6 +1,6 @@
 package com.adadapted.android.sdk.ui.messaging;
 
-import com.adadapted.android.sdk.ui.model.ContentPayload;
+import com.adadapted.android.sdk.ui.model.AdContentPayload;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,7 +28,7 @@ public class SdkContentPublisher {
     }
 
     public void publishContent(final String zoneId,
-                               final ContentPayload payload) {
+                               final AdContentPayload payload) {
         for(AaSdkContentListener listener : mListeners) {
             listener.onContentAvailable(zoneId, payload);
         }

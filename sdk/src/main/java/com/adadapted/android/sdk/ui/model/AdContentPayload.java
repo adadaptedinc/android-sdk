@@ -3,6 +3,7 @@ package com.adadapted.android.sdk.ui.model;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.model.ContentAdAction;
+import com.adadapted.android.sdk.core.content.ContentPayload;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,8 +14,8 @@ import java.util.List;
 /**
  * Created by chrisweeden on 6/5/15.
  */
-public class ContentPayload {
-    private static final String LOGTAG = ContentPayload.class.getName();
+public class AdContentPayload implements ContentPayload {
+    private static final String LOGTAG = AdContentPayload.class.getName();
 
     public static final int ADD_TO_LIST = 0;
     public static final int RECIPE_FAVORITE = 1;
@@ -25,15 +26,15 @@ public class ContentPayload {
     private final int mType;
     private final JSONObject mPayload;
 
-    private ContentPayload(final ViewAdWrapper ad,
-                           final int type,
-                           final JSONObject payload) {
+    private AdContentPayload(final ViewAdWrapper ad,
+                             final int type,
+                             final JSONObject payload) {
         mAd = ad;
         mType = type;
         mPayload = payload;
     }
 
-    public static ContentPayload createAddToListContent(final ViewAdWrapper ad) {
+    public static AdContentPayload createAddToListContent(final ViewAdWrapper ad) {
         List items = ((ContentAdAction)ad.getAd().getAdAction()).getItems();
         JSONObject json = new JSONObject();
 
@@ -44,11 +45,11 @@ public class ContentPayload {
             Log.w(LOGTAG, "Problem parsing JSON");
         }
 
-        return new ContentPayload(ad, ADD_TO_LIST, json);
+        return new AdContentPayload(ad, ADD_TO_LIST, json);
     }
 
-    public static ContentPayload createRecipeFavoriteContent(final ViewAdWrapper ad) {
-        return new ContentPayload(ad, RECIPE_FAVORITE, new JSONObject());
+    public static AdContentPayload createRecipeFavoriteContent(final ViewAdWrapper ad) {
+        return new AdContentPayload(ad, RECIPE_FAVORITE, new JSONObject());
     }
 
     public void acknowledge() {
@@ -70,6 +71,6 @@ public class ContentPayload {
 
     @Override
     public String toString() {
-        return "ContentPayload";
+        return "AdContentPayload";
     }
 }

@@ -35,7 +35,6 @@ public class AppEventTrackerFactory implements SessionListener {
                                                    final String eventName,
                                                    final Map<String, String> eventParams) {
         if(getEventTracker() == null) {
-            Log.d(LOGTAG, "App Event Tracker not initialized. Creating temp event: " + eventName);
             tempEvents.add(new AppEventHolder(trackingId, eventName, eventParams));
         }
         else {
@@ -46,9 +45,6 @@ public class AppEventTrackerFactory implements SessionListener {
     public static synchronized  void publishEvents() {
         if(getEventTracker() != null && sInstance.mSession != null) {
             sInstance.mEventTracker.publishEvents(sInstance.mSession);
-        }
-        else {
-            Log.d(LOGTAG, "Not Publishing App Events");
         }
     }
 

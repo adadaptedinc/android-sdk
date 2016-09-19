@@ -1,8 +1,6 @@
 package com.adadapted.android.sdk.addit;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,21 +26,13 @@ public class AdditInterceptActivity extends AppCompatActivity {
         AppEventTrackerFactory.registerEvent("","addit_app_opened", new HashMap<String, String>());
 
         final Intent intent = getIntent();
-        final String action = intent.getAction();
         final Uri uri = intent.getData();
-
-        Log.i(LOGTAG, "Intent Action: " +action);
-        Log.i(LOGTAG, "Intent URI: " + uri.toString());
-
         final String data = uri.getQueryParameter("data");
-        Log.i(LOGTAG, "Base64 Data: " + data);
         final byte[] decodedData = Base64.decode(data, Base64.NO_WRAP);
 
         try {
             final String jsonString = new String(decodedData, "UTF-8");
             JSONObject jsonObject = new JSONObject(jsonString);
-            Log.i(LOGTAG, "Parsed JSON String: " + jsonObject.toString());
-
             JSONArray detailListItems = jsonObject.getJSONArray("detailed-list-items");
 
             JSONObject payload = new JSONObject();

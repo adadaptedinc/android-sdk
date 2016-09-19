@@ -30,8 +30,6 @@ public class HttpAppEventAdapter implements AppEventAdapter {
             return;
         }
 
-        Log.d(LOGTAG, json.toString());
-
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
                 mBatchUrl, json, new Response.Listener<JSONObject>(){
             @Override
@@ -42,7 +40,7 @@ public class HttpAppEventAdapter implements AppEventAdapter {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.i(LOGTAG, "Event Batch Request Failed.", error);
+                Log.e(LOGTAG, "Event Batch Request Failed.", error);
                 //listener.onFailure(json);
             }
         });
