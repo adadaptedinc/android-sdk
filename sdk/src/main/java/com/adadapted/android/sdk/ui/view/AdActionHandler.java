@@ -6,7 +6,7 @@ import android.content.Intent;
 import com.adadapted.android.sdk.core.ad.model.AdAction;
 import com.adadapted.android.sdk.ui.activity.AaWebViewPopupActivity;
 import com.adadapted.android.sdk.ui.messaging.SdkContentPublisherFactory;
-import com.adadapted.android.sdk.ui.model.ContentPayload;
+import com.adadapted.android.sdk.ui.model.AdContentPayload;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
 /**
@@ -61,17 +61,13 @@ class AdActionHandler {
     private void handleContentAction(final ViewAdWrapper ad) {
         String zoneId = ad.getAd().getZoneId();
 
-        ContentPayload payload = ContentPayload.createAddToListContent(ad);
+        AdContentPayload payload = AdContentPayload.createAddToListContent(ad);
         SdkContentPublisherFactory.getContentPublisher().publishContent(zoneId, payload);
     }
 
-    private void handleDelegateAction(final ViewAdWrapper ad) {
+    private void handleDelegateAction(final ViewAdWrapper ad) {}
 
-    }
-
-    private void handleLinkAction(final ViewAdWrapper ad) {
-
-    }
+    private void handleLinkAction(final ViewAdWrapper ad) {}
 
     private void handlePopupAction(final ViewAdWrapper ad) {
         Intent intent = AaWebViewPopupActivity.createActivity(mContext, ad);
