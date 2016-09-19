@@ -44,7 +44,9 @@ public class AdditContentPayload implements ContentPayload {
             }
         }
         catch(JSONException ex) {
-
+            final Map<String, String> failedParams = new HashMap<>();
+            failedParams.put("payload", getPayload().toString());
+            AppEventTrackerFactory.registerEvent("", "addit_added_to_list_failed", failedParams);
         }
     }
 
