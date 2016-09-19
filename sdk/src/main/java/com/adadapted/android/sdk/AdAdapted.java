@@ -3,6 +3,8 @@ package com.adadapted.android.sdk;
 import android.content.Context;
 import android.util.Log;
 
+import com.adadapted.android.sdk.addit.AaSdkAdditContentListener;
+import com.adadapted.android.sdk.addit.AdditContentPublisher;
 import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.device.DeviceInfoBuilder;
 import com.adadapted.android.sdk.core.device.model.DeviceInfo;
@@ -10,12 +12,16 @@ import com.adadapted.android.sdk.core.session.SessionListener;
 import com.adadapted.android.sdk.core.session.SessionManager;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.ext.cache.ImageCache;
+import com.adadapted.android.sdk.ext.factory.AppEventTrackerFactory;
 import com.adadapted.android.sdk.ext.factory.DeviceInfoFactory;
 import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
 import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener;
 import com.adadapted.android.sdk.ui.messaging.SdkEventPublisher;
 import com.adadapted.android.sdk.ui.messaging.SdkEventPublisherFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -102,6 +108,12 @@ public class AdAdapted {
         return this;
     }
 
+    public AdAdapted setSdkAdditContentListener(final AaSdkAdditContentListener listener) {
+        AdditContentPublisher.getInstance().addListener(listener);
+
+        return this;
+    }
+
     public void start() {
         if(!mSdkStarting && !mSdkLoaded) {
             mSdkStarting = true;
@@ -119,6 +131,15 @@ public class AdAdapted {
         else {
             Log.w(LOGTAG, "AdAdapted SDK has already been loaded with App Id: " + mAppId + ".");
         }
+    }
+
+    public static synchronized void registerEvent(final String eventName) {
+        registerEvent(eventName, new HashMap<String, String>());
+    }
+
+    public static synchronized void registerEvent(final String eventName,
+                                                  final Map<String, String> eventParams) {
+        AppEventTrackerFactory.registerEvent("", eventName, eventParams);
     }
 
     public boolean isLoaded() {
