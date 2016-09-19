@@ -10,11 +10,14 @@ import com.adadapted.android.sdk.core.common.Dimension;
 import com.adadapted.android.sdk.core.session.SessionListener;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.core.zone.model.Zone;
+import com.adadapted.android.sdk.ext.factory.AppEventTrackerFactory;
 import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
 import com.adadapted.android.sdk.ext.scheduler.AdZoneRefreshScheduler;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -54,6 +57,10 @@ class AaZoneViewController implements SessionListener, AdZoneRefreshScheduler.Li
         mZone = Zone.createEmptyZone(zoneId);
         mCurrentAd = ViewAdWrapper.createEmptyCurrentAd(mSession);
         mTimerRunning = new HashSet<>();
+
+        Map<String, String> params = new HashMap<>();
+        params.put("zone_id", zoneId);
+        AppEventTrackerFactory.registerEvent("", "zone_loaded", params);
     }
 
     private void setNextAd() {
