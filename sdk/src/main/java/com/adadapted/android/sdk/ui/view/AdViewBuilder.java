@@ -3,7 +3,6 @@ package com.adadapted.android.sdk.ui.view;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.AndroidRuntimeException;
 import android.view.View;
 
 import com.adadapted.android.sdk.core.device.model.DeviceInfo;

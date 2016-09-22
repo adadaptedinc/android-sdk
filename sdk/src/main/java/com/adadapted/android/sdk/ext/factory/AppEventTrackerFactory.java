@@ -1,7 +1,5 @@
 package com.adadapted.android.sdk.ext.factory;
 
-import android.util.Log;
-
 import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.event.AppEventTracker;
 import com.adadapted.android.sdk.core.session.SessionListener;
