@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 
+import com.adadapted.android.sdk.core.event.model.AppEventSource;
 import com.adadapted.android.sdk.ext.factory.AppEventTrackerFactory;
 
 import org.json.JSONArray;
@@ -23,7 +24,7 @@ public class AdditInterceptActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AppEventTrackerFactory.registerEvent("","addit_app_opened", new HashMap<String, String>());
+        AppEventTrackerFactory.registerEvent(AppEventSource.SDK,"addit_app_opened", new HashMap<String, String>());
 
         final Intent intent = getIntent();
         final Uri uri = intent.getData();

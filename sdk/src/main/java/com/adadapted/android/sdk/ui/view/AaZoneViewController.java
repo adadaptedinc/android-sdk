@@ -7,6 +7,7 @@ import android.view.View;
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.AdImage;
 import com.adadapted.android.sdk.core.common.Dimension;
+import com.adadapted.android.sdk.core.event.model.AppEventSource;
 import com.adadapted.android.sdk.core.session.SessionListener;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.core.zone.model.Zone;
@@ -60,7 +61,7 @@ class AaZoneViewController implements SessionListener, AdZoneRefreshScheduler.Li
 
         Map<String, String> params = new HashMap<>();
         params.put("zone_id", zoneId);
-        AppEventTrackerFactory.registerEvent("", "zone_loaded", params);
+        AppEventTrackerFactory.registerEvent(AppEventSource.SDK, "zone_loaded", params);
     }
 
     private void setNextAd() {

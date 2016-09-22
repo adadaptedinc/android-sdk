@@ -3,6 +3,7 @@ package com.adadapted.android.sdk.addit;
 import android.app.Activity;
 
 import com.adadapted.android.sdk.core.content.ContentPayload;
+import com.adadapted.android.sdk.core.event.model.AppEventSource;
 import com.adadapted.android.sdk.ext.factory.AppEventTrackerFactory;
 
 import org.json.JSONArray;
@@ -35,10 +36,11 @@ public class AdditContentPayload implements ContentPayload {
                 JSONObject item = (JSONObject) listItems.get(i);
 
                 Map<String, String> eventParams = new HashMap<>();
-                eventParams.put("product_title", item.getString("product_title"));
+                eventParams.put("tracking_id", item.getString("tracking_id"));
+                eventParams.put("item_name", item.getString("product_title"));
 
                 AppEventTrackerFactory.registerEvent(
-                        item.getString("tracking_id"),
+                        AppEventSource.SDK,
                         "addit_added_to_list",
                         eventParams);
             }
@@ -46,7 +48,12 @@ public class AdditContentPayload implements ContentPayload {
         catch(JSONException ex) {
             final Map<String, String> failedParams = new HashMap<>();
             failedParams.put("payload", getPayload().toString());
-            AppEventTrackerFactory.registerEvent("", "addit_added_to_list_failed", failedParams);
+            failedParams.put("message", ex.getMessage());
+
+            AppEventTrackerFactory.registerEvent(
+                    AppEventSource.SDK,
+                    "addit_added_to_list_failed",
+                    failedParams);
         }
     }
 

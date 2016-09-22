@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.ui.view;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;

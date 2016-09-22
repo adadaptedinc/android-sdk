@@ -8,6 +8,7 @@ import com.adadapted.android.sdk.addit.AdditContentPublisher;
 import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.device.DeviceInfoBuilder;
 import com.adadapted.android.sdk.core.device.model.DeviceInfo;
+import com.adadapted.android.sdk.core.event.model.AppEventSource;
 import com.adadapted.android.sdk.core.session.SessionListener;
 import com.adadapted.android.sdk.core.session.SessionManager;
 import com.adadapted.android.sdk.core.session.model.Session;
@@ -139,7 +140,7 @@ public class AdAdapted {
 
     public static synchronized void registerEvent(final String eventName,
                                                   final Map<String, String> eventParams) {
-        AppEventTrackerFactory.registerEvent("", eventName, eventParams);
+        AppEventTrackerFactory.registerEvent(AppEventSource.APP, eventName, eventParams);
     }
 
     public boolean isLoaded() {

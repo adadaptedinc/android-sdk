@@ -6,9 +6,13 @@ import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.event.AdEventTracker;
 import com.adadapted.android.sdk.core.event.model.AdEvent;
 import com.adadapted.android.sdk.core.session.model.Session;
+import com.adadapted.android.sdk.ext.factory.AppEventTrackerFactory;
 import com.adadapted.android.sdk.ext.factory.DeviceInfoFactory;
 import com.adadapted.android.sdk.ext.factory.AdEventTrackerFactory;
 import com.adadapted.android.sdk.ui.messaging.SdkEventPublisherFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by chrisweeden on 5/26/15.

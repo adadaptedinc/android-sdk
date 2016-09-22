@@ -52,13 +52,13 @@ public class JsonAppEventBuilder implements AppEventBuilder {
     }
 
     @Override
-    public JSONObject buildItem(final String trackingId,
+    public JSONObject buildItem(final String eventSource,
                                 final String eventName,
                                 final Map<String, String> params) {
         JSONObject item = new JSONObject();
 
         try {
-            item.put("tracking_id", trackingId);
+            item.put("event_source", eventSource);
             item.put("event_name", eventName);
             item.put("event_timestamp", new Date().getTime());
             item.put("event_params", buildParams(params));

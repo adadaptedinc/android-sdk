@@ -4,12 +4,16 @@ import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.model.ContentAdAction;
 import com.adadapted.android.sdk.core.content.ContentPayload;
+import com.adadapted.android.sdk.core.event.model.AppEventSource;
+import com.adadapted.android.sdk.ext.factory.AppEventTrackerFactory;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by chrisweeden on 6/5/15.
@@ -54,6 +58,23 @@ public class AdContentPayload implements ContentPayload {
 
     public void acknowledge() {
         Log.d(LOGTAG, "Content Payload acknowledged.");
+
+        try {
+            final JSONArray array = getPayload().getJSONArray("add_to_list_items");
+            for (int i = 0; i < array.length(); i++) {
+                final String item = array.getString(i);
+
+                final Map<String, String> params = new HashMap<>();
+                params.put("ad_id", mAd.getAdId());
+                params.put("item_name", item);
+
+                AppEventTrackerFactory.registerEvent(AppEventSource.SDK, "atl_added_to_list", params);
+            }
+        }
+        catch(JSONException ex) {
+            Log.w(LOGTAG, "Problem parsing JSON");
+        }
+
         mAd.trackPayloadDelivered();
     }
 

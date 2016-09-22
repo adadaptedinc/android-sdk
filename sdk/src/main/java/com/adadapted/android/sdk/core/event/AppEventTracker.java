@@ -39,10 +39,10 @@ public class AppEventTracker {
         this.events = new HashSet<>();
     }
 
-    public void trackAppEvent(final String trackingId,
+    public void trackAppEvent(final String source,
                               final String eventName,
                               final Map<String, String> params) {
-        final JSONObject event = builder.buildItem(trackingId, eventName, params);
+        final JSONObject event = builder.buildItem(source, eventName, params);
         events.add(event);
     }
 
