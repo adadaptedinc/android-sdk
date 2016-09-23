@@ -7,6 +7,7 @@ import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.ext.http.HttpAppEventAdapter;
 import com.adadapted.android.sdk.ext.json.JsonAppEventBuilder;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -29,15 +30,20 @@ public class AppEventTrackerFactory implements SessionListener {
         return sInstance.mEventTracker;
     }
 
-    public static synchronized  void registerEvent(final String trackingId,
+    public static synchronized  void registerEvent(final String eventSource,
                                                    final String eventName,
                                                    final Map<String, String> eventParams) {
         if(getEventTracker() == null) {
-            tempEvents.add(new AppEventHolder(trackingId, eventName, eventParams));
+            tempEvents.add(new AppEventHolder(eventSource, eventName, eventParams));
         }
         else {
-            getEventTracker().trackAppEvent(trackingId, eventName, eventParams);
+            getEventTracker().trackAppEvent(eventSource, eventName, eventParams);
         }
+    }
+
+    public static synchronized  void registerEvent(final String eventSource,
+                                                   final String eventName) {
+        registerEvent(eventSource, eventName, new HashMap<String, String>());
     }
 
     public static synchronized  void publishEvents() {
