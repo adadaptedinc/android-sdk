@@ -4,6 +4,7 @@ import android.app.Activity;
 
 import com.adadapted.android.sdk.core.content.ContentPayload;
 import com.adadapted.android.sdk.core.event.model.AppEventSource;
+import com.adadapted.android.sdk.ext.factory.AnomalyTrackerFactory;
 import com.adadapted.android.sdk.ext.factory.AppEventTrackerFactory;
 
 import org.json.JSONArray;
@@ -46,14 +47,10 @@ public class AdditContentPayload implements ContentPayload {
             }
         }
         catch(JSONException ex) {
-            final Map<String, String> failedParams = new HashMap<>();
-            failedParams.put("payload", getPayload().toString());
-            failedParams.put("message", ex.getMessage());
-
-            AppEventTrackerFactory.registerEvent(
-                    AppEventSource.SDK,
-                    "addit_added_to_list_failed",
-                    failedParams);
+            AnomalyTrackerFactory.registerAnomaly("",
+                    getPayload().toString(),
+                    "ADDIT_ADDED_TO_LIST_FAILED",
+                    "Failed to parse Addit payload for processing.");
         }
     }
 

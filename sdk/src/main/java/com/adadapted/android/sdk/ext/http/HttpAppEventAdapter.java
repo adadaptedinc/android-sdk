@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.adadapted.android.sdk.core.event.AppEventAdapter;
 import com.adadapted.android.sdk.core.event.AppEventAdapterListener;
+import com.adadapted.android.sdk.ext.factory.AnomalyTrackerFactory;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -41,6 +42,10 @@ public class HttpAppEventAdapter implements AppEventAdapter {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(LOGTAG, "Event Batch Request Failed.", error);
+                AnomalyTrackerFactory.registerAnomaly("",
+                        mBatchUrl,
+                        "APP_EVENT_REQUEST_FAILED",
+                        error.getMessage());
                 //listener.onFailure(json);
             }
         });

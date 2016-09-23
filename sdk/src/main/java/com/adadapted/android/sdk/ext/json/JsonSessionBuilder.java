@@ -7,6 +7,7 @@ import com.adadapted.android.sdk.core.session.SessionBuilder;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.core.zone.ZoneBuilder;
 import com.adadapted.android.sdk.core.zone.model.Zone;
+import com.adadapted.android.sdk.ext.factory.AnomalyTrackerFactory;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,6 +59,10 @@ public class JsonSessionBuilder implements SessionBuilder {
         }
         catch(JSONException ex) {
             Log.w(LOGTAG, "Problem converting to JSON.", ex);
+            AnomalyTrackerFactory.registerAnomaly("",
+                    response.toString(),
+                    "SESSION_PAYLOAD_PARSE_FAILED",
+                    "Failed to parse Session payload for processing.");
         }
 
         return session;

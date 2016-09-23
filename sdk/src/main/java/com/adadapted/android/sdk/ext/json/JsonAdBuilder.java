@@ -16,6 +16,7 @@ import com.adadapted.android.sdk.core.ad.model.JsonAdType;
 import com.adadapted.android.sdk.core.ad.model.NullAdAction;
 import com.adadapted.android.sdk.core.ad.model.NullAdType;
 import com.adadapted.android.sdk.core.ad.model.PopupAdAction;
+import com.adadapted.android.sdk.ext.factory.AnomalyTrackerFactory;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -73,6 +74,10 @@ public class JsonAdBuilder implements AdBuilder {
         }
         catch(JSONException ex) {
             Log.w(LOGTAG, "Problem converting to JSON.", ex);
+            AnomalyTrackerFactory.registerAnomaly("",
+                    jsonAds.toString(),
+                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                    "Failed to parse Session Ad payload for processing.");
         }
 
         return ads;
@@ -98,6 +103,11 @@ public class JsonAdBuilder implements AdBuilder {
         }
         catch(NumberFormatException ex) {
             Log.w(LOGTAG, "Ad " + ad.getAdId() + " has an improperly set refresh_time.");
+            AnomalyTrackerFactory.registerAnomaly(
+                    ad.getAdId(),
+                    jsonAd.toString(),
+                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                    "Ad " + ad.getAdId() + " has an improperly set refresh_time.");
             ad.setRefreshTime(DEFAULT_REFRESH_TIME);
         }
 
@@ -130,7 +140,11 @@ public class JsonAdBuilder implements AdBuilder {
                 return parseAdPopup(popupObject, actionPath);
             }
             catch(JSONException ex) {
-                Log.w(LOGTAG, "Problem converting to JSON.", ex);
+                Log.w(LOGTAG, "Problem parsing to JSON.", ex);
+                AnomalyTrackerFactory.registerAnomaly("",
+                        jsonAd.toString(),
+                        "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                        "Problem parsing to JSON.");
             }
         }
         else if(actionTypeCode.equalsIgnoreCase(ACTION_TYPE_DELEGATE)) {
@@ -140,7 +154,11 @@ public class JsonAdBuilder implements AdBuilder {
                 return parseAdDelegate(actionPath);
             }
             catch(JSONException ex) {
-                Log.w(LOGTAG, "Problem converting to JSON.", ex);
+                Log.w(LOGTAG, "Problem parsing to JSON", ex);
+                AnomalyTrackerFactory.registerAnomaly("",
+                        jsonAd.toString(),
+                        "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                        "Problem parsing to JSON.");
             }
         }
         else if(actionTypeCode.equalsIgnoreCase(ACTION_TYPE_CONTENT)) {
@@ -151,7 +169,11 @@ public class JsonAdBuilder implements AdBuilder {
                 return parseAdContent(payloadObject, actionPath);
             }
             catch(JSONException ex) {
-                Log.w(LOGTAG, "Problem converting to JSON.", ex);
+                Log.w(LOGTAG, "Problem parsing to JSON", ex);
+                AnomalyTrackerFactory.registerAnomaly("",
+                        jsonAd.toString(),
+                        "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                        "Problem parsing to JSON.");
             }
         }
 
@@ -173,7 +195,11 @@ public class JsonAdBuilder implements AdBuilder {
             }
         }
         catch(JSONException ex) {
-            Log.w(LOGTAG, "Problem converting to JSON.", ex);
+            Log.w(LOGTAG, "Problem parsing to JSON", ex);
+            AnomalyTrackerFactory.registerAnomaly("",
+                    payloadObject.toString(),
+                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                    "Problem parsing to JSON.");
         }
 
         content.setItems(listItems);
@@ -227,7 +253,11 @@ public class JsonAdBuilder implements AdBuilder {
             }
         }
         catch(JSONException ex) {
-            Log.w(LOGTAG, "Problem converting to JSON.", ex);
+            Log.w(LOGTAG, "Problem parsing to JSON", ex);
+            AnomalyTrackerFactory.registerAnomaly("",
+                    popupJson.toString(),
+                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                    "Problem parsing Popup JSON.");
         }
 
         return popup;
@@ -256,7 +286,11 @@ public class JsonAdBuilder implements AdBuilder {
             }
         }
         catch(JSONException ex) {
-            Log.w(LOGTAG, "Problem converting to JSON.", ex);
+            Log.w(LOGTAG, "Problem parsing HTML JSON", ex);
+            AnomalyTrackerFactory.registerAnomaly("",
+                    jsonAd.toString(),
+                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                    "Problem parsing HTML JSON.");
         }
 
         return adType;
@@ -269,7 +303,11 @@ public class JsonAdBuilder implements AdBuilder {
             adType.setImages(images);
         }
         catch(JSONException ex) {
-            Log.w(LOGTAG, "Problem converting to JSON.", ex);
+            Log.w(LOGTAG, "Problem parsing Image JSON", ex);
+            AnomalyTrackerFactory.registerAnomaly("",
+                    jsonAd.toString(),
+                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                    "Problem parsing Image JSON.");
         }
 
         return adType;
@@ -285,7 +323,11 @@ public class JsonAdBuilder implements AdBuilder {
             adType.setComponents(adComponents);
         }
         catch(JSONException ex) {
-            Log.w(LOGTAG, "Problem converting to JSON.", ex);
+            Log.w(LOGTAG, "Problem parsing JSON", ex);
+            AnomalyTrackerFactory.registerAnomaly("",
+                    jsonAd.toString(),
+                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                    "Problem parsing JSON Display JSON.");
         }
 
         return adType;
@@ -361,7 +403,11 @@ public class JsonAdBuilder implements AdBuilder {
             }
         }
         catch(JSONException ex) {
-            Log.w(LOGTAG, "Problem converting to JSON.", ex);
+            Log.w(LOGTAG, "Problem parsing Image JSON", ex);
+            AnomalyTrackerFactory.registerAnomaly("",
+                    jsonImages.toString(),
+                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                    "Problem parsing Image JSON.");
         }
 
         return images;

@@ -6,6 +6,7 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.ad.AdImageLoader;
 import com.adadapted.android.sdk.core.ad.AdImageLoaderListener;
 import com.adadapted.android.sdk.ext.cache.ImageCache;
+import com.adadapted.android.sdk.ext.factory.AnomalyTrackerFactory;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
@@ -22,6 +23,10 @@ public class HttpAdImageLoader implements AdImageLoader {
                          final AdImageLoaderListener listener) {
         if(url == null || !url.toLowerCase().startsWith("http")) {
             Log.w(LOGTAG, "No URL has been provided.");
+            AnomalyTrackerFactory.registerAnomaly("",
+                    url,
+                    "AD_IMAGE_REQUEST_FAILED",
+                    "No URL has been provided.");
             listener.onFailure();
             return;
         }
@@ -61,6 +66,10 @@ public class HttpAdImageLoader implements AdImageLoader {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.w(LOGTAG, "Problem loading image URL: " + url);
+                        AnomalyTrackerFactory.registerAnomaly("",
+                                url,
+                                "AD_IMAGE_REQUEST_FAILED",
+                                error.getMessage());
                         listener.onFailure();
                     }
                 }

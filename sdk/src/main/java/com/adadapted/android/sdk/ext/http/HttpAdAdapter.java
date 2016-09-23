@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.AdAdapter;
 import com.adadapted.android.sdk.core.ad.AdAdapterListener;
+import com.adadapted.android.sdk.ext.factory.AnomalyTrackerFactory;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -38,9 +39,14 @@ public class HttpAdAdapter implements AdAdapter {
             },
             new Response.ErrorListener() {
                 @Override
-                public void onErrorResponse(VolleyError volleyError) {
-                    listener.onFailure();
+                public void onErrorResponse(VolleyError error) {
                     Log.i(LOGTAG, "Ad Get Request Failed.");
+                    AnomalyTrackerFactory.registerAnomaly("",
+                            mAdGetUrl,
+                            "AD_GET_REQUEST_FAILED",
+                            error.getMessage());
+
+                    listener.onFailure();
                 }
             }
         );

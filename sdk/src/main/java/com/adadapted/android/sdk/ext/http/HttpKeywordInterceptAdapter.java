@@ -5,6 +5,7 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptAdapter;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptInitListener;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptTrackListener;
+import com.adadapted.android.sdk.ext.factory.AnomalyTrackerFactory;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -44,8 +45,12 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
             }
         }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError volleyError) {
+            public void onErrorResponse(VolleyError error) {
                 Log.d(LOGTAG, "KI Init Request Failed.");
+                AnomalyTrackerFactory.registerAnomaly("",
+                        mInitUrl,
+                        "KI_SESSION_REQUEST_FAILED",
+                        error.getMessage());
                 listener.onFailure();
             }
         });
@@ -70,8 +75,12 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
             }
         }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError volleyError) {
+            public void onErrorResponse(VolleyError error) {
                 Log.d(LOGTAG, "KI Track Request Failed.");
+                AnomalyTrackerFactory.registerAnomaly("",
+                        mTrackUrl,
+                        "KI_EVENT_REQUEST_FAILED",
+                        error.getMessage());
                 listener.onFailure(json);
             }
         });

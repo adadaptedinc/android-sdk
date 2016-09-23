@@ -5,6 +5,7 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.ad.AdRefreshBuilder;
 import com.adadapted.android.sdk.core.zone.ZoneBuilder;
 import com.adadapted.android.sdk.core.zone.model.Zone;
+import com.adadapted.android.sdk.ext.factory.AnomalyTrackerFactory;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,6 +31,10 @@ public class JsonAdRefreshBuilder implements AdRefreshBuilder {
         }
         catch (JSONException ex) {
             Log.w(LOGTAG, "Problem converting to JSON.");
+            AnomalyTrackerFactory.registerAnomaly("",
+                    adJson.toString(),
+                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                    "Failed to parse Ad payload for processing.");
         }
 
         return new HashMap<>();

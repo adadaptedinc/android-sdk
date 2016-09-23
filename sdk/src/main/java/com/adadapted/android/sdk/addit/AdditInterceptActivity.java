@@ -9,6 +9,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.event.model.AppEventSource;
+import com.adadapted.android.sdk.ext.factory.AnomalyTrackerFactory;
 import com.adadapted.android.sdk.ext.factory.AppEventTrackerFactory;
 
 import org.json.JSONArray;
@@ -30,10 +31,9 @@ public class AdditInterceptActivity extends AppCompatActivity {
         final Uri uri = additIntent.getData();
         final String data = uri.getQueryParameter("data");
         final byte[] decodedData = Base64.decode(data, Base64.DEFAULT);
+        final String jsonString = new String(decodedData);
 
         try {
-            final String jsonString = new String(decodedData);
-
             final JSONObject jsonObject = new JSONObject(jsonString);
             final JSONArray detailListItems = jsonObject.getJSONArray("detailed-list-items");
 
@@ -45,6 +45,10 @@ public class AdditInterceptActivity extends AppCompatActivity {
         }
         catch(JSONException ex) {
             Log.e(LOGTAG, "Problem parsing Addit JSON input. Redirecting to launcher.");
+            AnomalyTrackerFactory.registerAnomaly("",
+                    "{\"raw\":\""+data+"\", \"parsed\":\""+jsonString+"\"}",
+                    "ADDIT_PAYLOAD_PARSE_FAILED",
+                    "Problem parsing Addit JSON input");
 
             final PackageManager pm = getPackageManager();
             final Intent mainActivityIntent =pm.getLaunchIntentForPackage(getPackageName());

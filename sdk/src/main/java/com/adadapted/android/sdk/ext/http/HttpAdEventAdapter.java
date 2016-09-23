@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.adadapted.android.sdk.core.event.AdEventAdapter;
 import com.adadapted.android.sdk.core.event.AdEventAdapterListener;
+import com.adadapted.android.sdk.ext.factory.AnomalyTrackerFactory;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -43,6 +44,10 @@ public class HttpAdEventAdapter implements AdEventAdapter {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.i(LOGTAG, "Event Batch Request Failed.", error);
+                AnomalyTrackerFactory.registerAnomaly("",
+                        mBatchUrl,
+                        "AD_EVENT_TRACK_REQUEST_FAILED",
+                        error.getMessage());
                 listener.onFailure(json);
             }
 

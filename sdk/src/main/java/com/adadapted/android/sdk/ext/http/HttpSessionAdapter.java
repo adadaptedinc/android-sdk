@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.adadapted.android.sdk.core.session.SessionAdapter;
 import com.adadapted.android.sdk.core.session.SessionAdapterListener;
+import com.adadapted.android.sdk.ext.factory.AnomalyTrackerFactory;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -47,6 +48,10 @@ public class HttpSessionAdapter implements SessionAdapter {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.i(LOGTAG, "Session Init Request Failed.", error);
+                AnomalyTrackerFactory.registerAnomaly("",
+                        mInitUrl,
+                        "SESSION_REQUEST_FAILED",
+                        error.getMessage());
                 listener.onFailure();
             }
 
