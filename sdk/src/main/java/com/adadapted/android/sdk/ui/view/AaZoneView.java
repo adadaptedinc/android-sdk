@@ -18,6 +18,8 @@ import android.widget.RelativeLayout;
 import com.adadapted.android.sdk.ui.messaging.AaSdkContentListener;
 import com.adadapted.android.sdk.ui.messaging.SdkContentPublisherFactory;
 
+import java.util.HashMap;
+
 /**
  * Created by chrisweeden on 3/30/15
  */
@@ -74,19 +76,7 @@ public class AaZoneView extends RelativeLayout
     protected void displayAdView(final View view) {
         if(view == null) { return; }
 
-        //Activity activity = (Activity)mContext;
-        //activity.runOnUiThread(new Runnable() {
-        //    @Override
-        //    public void run() {
-        //        ViewGroup parent = ((ViewGroup) view.getParent());
-        //        if (parent != null) {
-        //            parent.removeView(view);
-        //        }
-
-        //        AaZoneView.this.removeAllViews();
-        //        AaZoneView.this.addView(view);
-        //    }
-        //});
+        setVisibility(View.VISIBLE);
 
         view.post(new Runnable() {
             @Override
