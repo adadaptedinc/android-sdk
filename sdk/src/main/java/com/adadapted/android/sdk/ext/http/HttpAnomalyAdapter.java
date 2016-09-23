@@ -36,7 +36,6 @@ public class HttpAnomalyAdapter implements AnomalyAdapter {
                 new Listener<String>() {
                     @Override
                     public void onResponse(String s) {
-                        Log.i(LOGTAG, "Anomaly Track Request Succeeded: " + json.toString());
                         listener.onSuccess();
                     }
                 }, new ErrorListener() {
