@@ -61,8 +61,8 @@ public class DeviceInfo {
         deviceInfo.setBundleId(context.getPackageName());
 
         try {
-            int version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode;
-            deviceInfo.setBundleVersion(String.valueOf(version));
+            final String version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+            deviceInfo.setBundleVersion(version);
         }
         catch(PackageManager.NameNotFoundException ex) {
             deviceInfo.setBundleVersion(UNKNOWN_VALUE);
@@ -76,11 +76,11 @@ public class DeviceInfo {
         deviceInfo.setTimezone(TimeZone.getDefault().getID());
         deviceInfo.setLocale(Locale.getDefault().toString());
 
-        TelephonyManager manager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
-        String carrier = manager.getNetworkOperatorName().length() > 0 ? manager.getNetworkOperatorName() : "None";
+        final TelephonyManager manager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+        final String carrier = manager.getNetworkOperatorName().length() > 0 ? manager.getNetworkOperatorName() : "None";
         deviceInfo.setCarrier(carrier);
 
-        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        final DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         deviceInfo.setDh(metrics.heightPixels);
         deviceInfo.setDw(metrics.widthPixels);
 
