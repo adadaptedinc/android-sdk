@@ -25,6 +25,14 @@ public class JsonAnomalyBuilder implements AnomalyBuilder {
         final JSONObject json = new JSONObject();
 
         try {
+            final JSONObject ad = new JSONObject();
+            ad.put("ad_id", adId);
+            ad.put("event_path", eventPath);
+
+            final JSONObject payload = new JSONObject();
+            payload.put("message", message);
+            payload.put("code", code);
+
             json.put("datetime", new Date().getTime());
             json.put("app_id", session.getDeviceInfo().getAppId());
             json.put("session_id", session.getSessionId());
@@ -32,12 +40,17 @@ public class JsonAnomalyBuilder implements AnomalyBuilder {
             json.put("bundle_version", session.getDeviceInfo().getBundleVersion());
             json.put("udid", session.getDeviceInfo().getUdid());
             json.put("sdk_version", session.getDeviceInfo().getSdkVersion());
+            json.put("device", session.getDeviceInfo().getDevice());
+            json.put("dh", session.getDeviceInfo().getDh());
+            json.put("dw", session.getDeviceInfo().getDw());
             json.put("os", session.getDeviceInfo().getOs());
             json.put("osv", session.getDeviceInfo().getOsv());
-            json.put("message", message);
-            json.put("code", code);
-            json.put("ad_id", adId);
-            json.put("event_path", eventPath);
+            json.put("locale", session.getDeviceInfo().getLocale());
+            json.put("timezone", session.getDeviceInfo().getTimezone());
+            json.put("test_mode", !session.getDeviceInfo().isProd());
+            json.put("allow_retargeting", session.getDeviceInfo().allowRetargetingEnabled());
+            json.put("payload", payload);
+            json.put("ad", ad);
         }
         catch(JSONException ex) {
             Log.w(LOGTAG, "Problem generating JSON.", ex);
