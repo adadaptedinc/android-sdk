@@ -89,7 +89,5 @@ public class TestAppApplication extends Application {
                 }
             })
             .start();
-
-        AdAdapted.registerEvent("app_opened");
     }
 }
