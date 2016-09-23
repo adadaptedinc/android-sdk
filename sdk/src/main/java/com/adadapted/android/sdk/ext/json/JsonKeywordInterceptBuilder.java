@@ -7,6 +7,7 @@ import com.adadapted.android.sdk.core.keywordintercept.model.AutoFill;
 import com.adadapted.android.sdk.core.keywordintercept.model.KeywordIntercept;
 import com.adadapted.android.sdk.ext.factory.AnomalyTrackerFactory;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,7 +44,7 @@ public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
         catch(JSONException ex) {
             Log.w(TAG, "Problem parsing JSON", ex);
             AnomalyTrackerFactory.registerAnomaly("",
-                    json == null ? "" : json.toString(),
+                    json.toString(),
                     "KI_PAYLOAD_PARSE_FAILED",
                     "Failed to parse KI payload for processing.");
         }
@@ -58,30 +59,34 @@ public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
 
         try {
             if(json != null && json.has(JsonFields.AUTOFILL)) {
-                final JSONObject autofillJson = json.getJSONObject(JsonFields.AUTOFILL);
-                for(final Iterator<String> z = autofillJson.keys(); z.hasNext();) {
-                    String term = z.next();
-                    JSONObject jsonTerm = autofillJson.getJSONObject(term);
+                Object obj = json.get(JsonFields.AUTOFILL);
+                if(obj instanceof JSONObject) {
+                    final JSONObject autofillJson = (JSONObject)obj;
 
-                    String replacement = "";
-                    String icon = "";
-                    String tagline = "";
+                    for(final Iterator<String> z = autofillJson.keys(); z.hasNext();) {
+                        final String term = z.next();
+                        final JSONObject jsonTerm = autofillJson.getJSONObject(term);
 
-                    if (jsonTerm.has(JsonFields.REPLACEMENT)) {
-                        replacement = jsonTerm.getString(JsonFields.REPLACEMENT);
+                        String replacement = "";
+                        String icon = "";
+                        String tagline = "";
+
+                        if (jsonTerm.has(JsonFields.REPLACEMENT)) {
+                            replacement = jsonTerm.getString(JsonFields.REPLACEMENT);
+                        }
+
+                        if (jsonTerm.has(JsonFields.ICON)) {
+                            icon = jsonTerm.getString(JsonFields.ICON);
+                        }
+
+                        if (jsonTerm.has(JsonFields.TAGLINE)) {
+                            tagline = jsonTerm.getString(JsonFields.TAGLINE);
+                        }
+
+                        final AutoFill autofill = new AutoFill(replacement, icon, tagline);
+
+                        interceptMap.put(term, autofill);
                     }
-
-                    if (jsonTerm.has(JsonFields.ICON)) {
-                        icon = jsonTerm.getString(JsonFields.ICON);
-                    }
-
-                    if (jsonTerm.has(JsonFields.TAGLINE)) {
-                        tagline = jsonTerm.getString(JsonFields.TAGLINE);
-                    }
-
-                    final AutoFill autofill = new AutoFill(replacement, icon, tagline);
-
-                    interceptMap.put(term, autofill);
                 }
             }
         }
