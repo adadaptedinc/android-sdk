@@ -40,7 +40,7 @@ public class JsonAnomalyBuilder implements AnomalyBuilder {
             json.put("event_path", eventPath);
         }
         catch(JSONException ex) {
-            Log.w(LOGTAG, "Problem generating JSON.");
+            Log.w(LOGTAG, "Problem generating JSON.", ex);
         }
 
         return json;
