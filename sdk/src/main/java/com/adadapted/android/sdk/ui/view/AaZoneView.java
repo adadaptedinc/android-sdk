@@ -18,8 +18,6 @@ import android.widget.RelativeLayout;
 import com.adadapted.android.sdk.ui.messaging.AaSdkContentListener;
 import com.adadapted.android.sdk.ui.messaging.SdkContentPublisherFactory;
 
-import java.util.HashMap;
-
 /**
  * Created by chrisweeden on 3/30/15
  */
