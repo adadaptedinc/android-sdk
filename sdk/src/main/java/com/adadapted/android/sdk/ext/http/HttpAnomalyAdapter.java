@@ -5,9 +5,10 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.anomaly.AnomalyAdapter;
 import com.adadapted.android.sdk.core.anomaly.AnomalyAdapterListener;
 import com.android.volley.Request;
-import com.android.volley.Response;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 
@@ -24,26 +25,34 @@ public class HttpAnomalyAdapter implements AnomalyAdapter {
     }
 
     @Override
-    public void sendBatch(final JSONArray json, final AnomalyAdapterListener listener) {
+    public void sendBatch(final JSONArray json,
+                          final AnomalyAdapterListener listener) {
         if(json == null || listener == null) {
             return;
         }
+        final StringRequest stringRequest = new StringRequest(
+                Request.Method.POST,
+                mBatchUrl,
+                new Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                        Log.i(LOGTAG, "Anomaly Track Request Succeeded: " + json.toString());
+                        listener.onSuccess();
+                    }
+                }, new ErrorListener() {
 
-        final JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST,
-                mBatchUrl, json, new Response.Listener<JSONArray>(){
-            @Override
-            public void onResponse(JSONArray response) {
-                listener.onSuccess();
-            }
-
-        }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(LOGTAG, "Event Batch Request Failed.", error);
-                //listener.onFailure(json);
+                Log.e(LOGTAG, "Anomaly Track Request Failed.", error);
+                listener.onFailure(json);
             }
-        });
+        }){
+            @Override
+            public byte[] getBody() {
+                return json.toString().getBytes();
+            }
+        };
 
-        HttpRequestManager.getQueue().add(jsonRequest);
+        HttpRequestManager.getQueue().add(stringRequest);
     }
 }
