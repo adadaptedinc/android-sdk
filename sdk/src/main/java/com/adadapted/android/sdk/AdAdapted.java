@@ -51,6 +51,7 @@ public class AdAdapted {
     private AdAdapted(final Context context) {
         mContext = context;
 
+        AppEventTrackerFactory.registerEvent(AppEventSource.SDK, "app_opened");
         ImageCache.getInstance().purgeCache();
     }
 
