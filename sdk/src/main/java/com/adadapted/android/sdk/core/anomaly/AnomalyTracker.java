@@ -17,19 +17,12 @@ public class AnomalyTracker {
     private final AnomalyAdapter adapter;
     private final AnomalyBuilder builder;
 
-    private int mFailedRetries;
-
     private final AnomalyAdapterListener mAnomalyListener = new AnomalyAdapterListener() {
         @Override
-        public void onSuccess() {
-            mFailedRetries = 0;
-        }
+        public void onSuccess() {}
 
         @Override
-        public void onFailure(final JSONArray json) {
-            mFailedRetries++;
-            //sendBatchRetry(json);
-        }
+        public void onFailure(final JSONArray json) {}
     };
 
     public AnomalyTracker(final AnomalyAdapter adapter,
@@ -38,7 +31,6 @@ public class AnomalyTracker {
         this.builder = builder;
 
         mQueuedEvents = new HashSet<>();
-        mFailedRetries = 0;
     }
 
     public Set<JSONObject> getQueuedEvents() {
@@ -50,7 +42,7 @@ public class AnomalyTracker {
                                 final String eventPath,
                                 final String code,
                                 final String message) {
-
+        mQueuedEvents.add(builder.build(session, adId, eventPath, code, message));
     }
 
     public void publishEvents() {
