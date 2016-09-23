@@ -19,7 +19,7 @@ public class AnomalyTrackerFactory implements SessionListener {
 
     private static final Set<AnomalyTrackerFactory.AnomalyHolder> tempAnomalies = new HashSet<>();
 
-    private static synchronized AnomalyTracker getEventTracker() {
+    private static synchronized AnomalyTracker getAnomalyTracker() {
         if(sInstance == null) {
             sInstance = new AnomalyTrackerFactory();
         }
@@ -31,7 +31,7 @@ public class AnomalyTrackerFactory implements SessionListener {
                                                     final String eventPath,
                                                     final String code,
                                                     final String message) {
-        if(getEventTracker() == null) {
+        if(getAnomalyTracker() == null) {
             tempAnomalies.add(new AnomalyHolder(adId, eventPath, code, message));
         }
         else {
@@ -39,8 +39,8 @@ public class AnomalyTrackerFactory implements SessionListener {
         }
     }
 
-    public static synchronized  void publishEvents() {
-        if(getEventTracker() != null && sInstance.mSession != null) {
+    public static synchronized void publishEvents() {
+        if(getAnomalyTracker() != null && sInstance.mSession != null) {
             sInstance.mAnomalyTracker.publishEvents();
         }
     }
@@ -60,7 +60,7 @@ public class AnomalyTrackerFactory implements SessionListener {
                 new HttpAnomalyAdapter(determineEndpoint(session)),
                 new JsonAnomalyBuilder());
 
-        for(AnomalyHolder a : tempAnomalies) {
+        for(final AnomalyHolder a : tempAnomalies) {
             mAnomalyTracker.registerAnomaly(
                     session,
                     a.getAdId(),
