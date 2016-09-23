@@ -30,12 +30,12 @@ public class AdditContentPayload implements ContentPayload {
     public void acknowledge() {
 
         try {
-            JSONArray listItems = getPayload().getJSONArray("add_to_list_items");
+            final JSONArray listItems = getPayload().getJSONArray("add_to_list_items");
             int itemCount = listItems.length();
             for (int i = 0; i < itemCount; i++) {
-                JSONObject item = (JSONObject) listItems.get(i);
+                final JSONObject item = (JSONObject) listItems.get(i);
 
-                Map<String, String> eventParams = new HashMap<>();
+                final Map<String, String> eventParams = new HashMap<>();
                 eventParams.put("tracking_id", item.getString("tracking_id"));
                 eventParams.put("item_name", item.getString("product_title"));
 
