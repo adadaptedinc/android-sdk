@@ -129,18 +129,23 @@ public class DeviceInfo {
         {
             case DisplayMetrics.DENSITY_MEDIUM:
                 return ScreenDensity.MDPI;
+
             case DisplayMetrics.DENSITY_HIGH:
                 return ScreenDensity.HDPI;
+
             case DisplayMetrics.DENSITY_LOW:
                 return ScreenDensity.LDPI;
+
             case DisplayMetrics.DENSITY_XHIGH:
                 return ScreenDensity.XHDPI;
+
             case DisplayMetrics.DENSITY_TV:
-                return ScreenDensity.TV;
             case DisplayMetrics.DENSITY_XXHIGH:
                 return ScreenDensity.XXHDPI;
+
             case DisplayMetrics.DENSITY_XXXHIGH:
                 return ScreenDensity.XXXHDPI;
+
             default:
                 return ScreenDensity.UNKNOWN;
         }
