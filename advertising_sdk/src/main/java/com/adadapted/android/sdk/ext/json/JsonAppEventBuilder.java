@@ -55,7 +55,7 @@ public class JsonAppEventBuilder implements AppEventBuilder {
     public JSONObject buildItem(final String eventSource,
                                 final String eventName,
                                 final Map<String, String> params) {
-        JSONObject item = new JSONObject();
+        final JSONObject item = new JSONObject();
 
         try {
             item.put("event_source", eventSource);
@@ -71,7 +71,7 @@ public class JsonAppEventBuilder implements AppEventBuilder {
     }
 
     private JSONObject buildParams(final Map<String, String> params) throws JSONException {
-        JSONObject p = new JSONObject();
+        final JSONObject p = new JSONObject();
 
         for(String key : params.keySet()) {
             p.put(key, params.get(key));
