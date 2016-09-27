@@ -3,7 +3,7 @@ package com.adadapted.sdk.addit.ext.factory;
 import android.content.Context;
 
 import com.adadapted.sdk.addit.core.common.Interactor;
-import com.adadapted.sdk.addit.core.config.Config;
+import com.adadapted.sdk.addit.config.Config;
 import com.adadapted.sdk.addit.core.device.CollectDeviceInfoCommand;
 import com.adadapted.sdk.addit.core.device.CollectDeviceInfoInteractor;
 import com.adadapted.sdk.addit.core.device.DeviceInfo;

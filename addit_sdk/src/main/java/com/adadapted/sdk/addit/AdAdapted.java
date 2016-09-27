@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.adadapted.sdk.addit.core.app.AppEventSource;
-import com.adadapted.sdk.addit.core.config.Config;
+import com.adadapted.sdk.addit.config.Config;
 import com.adadapted.sdk.addit.core.device.DeviceInfo;
 import com.adadapted.sdk.addit.ext.factory.AppEventTrackingManager;
 import com.adadapted.sdk.addit.ext.factory.DeviceInfoManager;
