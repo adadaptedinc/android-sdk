@@ -9,7 +9,7 @@ import com.adadapted.sdk.addit.core.device.DeviceInfo;
 import com.adadapted.sdk.addit.ext.factory.AppEventTrackingManager;
 import com.adadapted.sdk.addit.ext.factory.DeviceInfoManager;
 import com.adadapted.sdk.addit.ext.http.HttpRequestManager;
-import com.adadapted.sdk.addit.ui.AaSdkAdditContentListener;
+import com.adadapted.sdk.addit.ui.AdditContentListener;
 import com.adadapted.sdk.addit.ui.AdditContentPublisher;
 
 import java.util.HashMap;
@@ -53,12 +53,12 @@ public class AdAdapted {
         return this;
     }
 
-    public AdAdapted setSdkAdditContentListener(final AaSdkAdditContentListener listener) {
+    public AdAdapted setAdditContentListener(final AdditContentListener listener) {
         if(listener != null) {
             AdditContentPublisher.getInstance().addListener(listener);
         }
         else {
-            Log.w(LOGTAG, "Cannot use NULL AaSdkAdditContentListener");
+            Log.w(LOGTAG, "Cannot use NULL AdditContentListener");
         }
 
         return this;

@@ -14,11 +14,11 @@ public class AdditContentPublisher {
         return sInstance;
     }
 
-    private AaSdkAdditContentListener mListener;
+    private AdditContentListener mListener;
 
     private AdditContentPublisher() {}
 
-    public void addListener(final AaSdkAdditContentListener listener) {
+    public void addListener(final AdditContentListener listener) {
         if(listener != null) {
             mListener = listener;
         }
