@@ -16,7 +16,7 @@ public class Config {
         public static final String URL_ANOMALY_BATCH = "https://ads.adadapted.com/v/0.9.3/anomaly/track";
         public static final String URL_CONTENT_TRACK = "https://ads.adadapted.com/v/0.9.3/content/track";
 
-        public static final String URL_APP_EVENT_TRACK = "";
+        public static final String URL_APP_EVENT_TRACK = "https://eventcollector.adadapted.com/v/1/android/events";
     }
 
     public static class Sand {
@@ -28,6 +28,6 @@ public class Config {
         public static final String URL_ANOMALY_BATCH = "https://sandbox.adadapted.com/v/0.9.3/anomaly/track";
         public static final String URL_CONTENT_TRACK = "https://sandbox.adadapted.com/v/0.9.3/content/track";
 
-        public static final String URL_APP_EVENT_TRACK = "http://eventcollector.t.adadapted.com/v/1/android/events";
+        public static final String URL_APP_EVENT_TRACK = "https://eventcollector.t.adadapted.com/v/1/android/events";
     }
 }
