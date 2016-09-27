@@ -1,10 +1,10 @@
 package com.adadapted.sdk.addit.ext.factory;
 
+import com.adadapted.sdk.addit.config.Config;
 import com.adadapted.sdk.addit.core.app.AppEventSink;
 import com.adadapted.sdk.addit.core.app.AppEventTracker;
 import com.adadapted.sdk.addit.core.app.RegisterAppEventCommand;
 import com.adadapted.sdk.addit.core.app.RegisterAppEventInteractor;
-import com.adadapted.sdk.addit.config.Config;
 import com.adadapted.sdk.addit.core.device.DeviceInfo;
 import com.adadapted.sdk.addit.ext.concurrency.ThreadPoolInteractorExecuter;
 import com.adadapted.sdk.addit.ext.http.HttpAppEventSink;

@@ -1,11 +1,11 @@
 package com.adadapted.sdk.addit.ext.factory;
 
+import com.adadapted.sdk.addit.config.Config;
 import com.adadapted.sdk.addit.core.anomaly.AnomalySink;
 import com.adadapted.sdk.addit.core.anomaly.AnomalyTracker;
 import com.adadapted.sdk.addit.core.anomaly.TrackAnomalyCommand;
 import com.adadapted.sdk.addit.core.anomaly.TrackAnomalyInteractor;
 import com.adadapted.sdk.addit.core.common.Interactor;
-import com.adadapted.sdk.addit.config.Config;
 import com.adadapted.sdk.addit.core.device.DeviceInfo;
 import com.adadapted.sdk.addit.ext.concurrency.ThreadPoolInteractorExecuter;
 import com.adadapted.sdk.addit.ext.http.HttpAnomalySink;
