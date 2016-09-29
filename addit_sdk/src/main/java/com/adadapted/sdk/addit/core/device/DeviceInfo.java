@@ -5,7 +5,7 @@ package com.adadapted.sdk.addit.core.device;
  */
 
 public class DeviceInfo {
-    public static final String UNKNOWN_VALUE = "Unknown";
+    static final String UNKNOWN_VALUE = "Unknown";
 
     private String appId;
     private boolean isProd;

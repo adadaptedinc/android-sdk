@@ -76,15 +76,10 @@ public class AppErrorTrackingManager implements DeviceInfoManager.Callback {
 
     private String determineEndpoint(final DeviceInfo deviceInfo) {
         if(deviceInfo.isProd()) {
-            return Config.Prod.URL_APP_EVENT_TRACK;
+            return Config.Prod.URL_APP_ERROR_TRACK;
         }
 
-        return Config.Dev.URL_APP_EVENT_TRACK;
-    }
-
-    @Override
-    public void onDeviceInfoCollectionError(Throwable e) {
-
+        return Config.Dev.URL_APP_ERROR_TRACK;
     }
 
     private static class TempErrorItem {

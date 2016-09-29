@@ -83,11 +83,6 @@ public class AppEventTrackingManager implements DeviceInfoManager.Callback {
         return Config.Dev.URL_APP_EVENT_TRACK;
     }
 
-    @Override
-    public void onDeviceInfoCollectionError(Throwable e) {
-
-    }
-
     private static class TempEventItem {
         private final String eventSource;
         private final String eventName;

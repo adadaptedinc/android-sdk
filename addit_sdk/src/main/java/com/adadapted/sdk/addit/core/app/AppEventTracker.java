@@ -18,14 +18,11 @@ public class AppEventTracker {
     private static final String LOGTAG = AppEventTracker.class.getName();
 
     private final JSONObject appEventWrapper;
-    private final DeviceInfo deviceInfo;
     private final AppEventSink sink;
 
     public AppEventTracker(final DeviceInfo deviceInfo,
                            final AppEventSink sink) {
-        this.deviceInfo = deviceInfo;
         this.sink = sink;
-
         this.appEventWrapper = buildAppEventWrapper(deviceInfo);
     }
 

@@ -52,7 +52,7 @@ public class AdditInterceptActivity extends AppCompatActivity {
             final JSONObject payload = new JSONObject();
             payload.put("add_to_list_items", detailListItems);
 
-            final AdditContent content = new AdditContent(this, payload);
+            final AdditContent content = new AdditContent(this, AdditContent.ADD_TO_LIST_ITEMS, payload);
             AdditContentPublisher.getInstance().publishContent(content);
         }
         catch(JSONException ex) {

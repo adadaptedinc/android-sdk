@@ -19,11 +19,16 @@ import java.util.Map;
  */
 public class AdditContent implements Content {
     private final Activity activity;
+    private final int type;
     private final JSONObject payload;
 
+    public static final int ADD_TO_LIST_ITEMS = 1;
+
     public AdditContent(final Activity activity,
+                        final int type,
                         final JSONObject payload) {
         this.activity = activity;
+        this.type = type;
         this.payload = payload;
     }
 
@@ -50,6 +55,7 @@ public class AdditContent implements Content {
             final Map<String, String> errorParams = new HashMap<>();
             errorParams.put("payload", getPayload().toString());
             errorParams.put("exception_message", ex.getMessage());
+
             AppErrorTrackingManager.registerEvent(
                     "ADDIT_ADDED_TO_LIST_FAILED",
                     "Failed to parse Addit payload for processing.",
@@ -59,7 +65,7 @@ public class AdditContent implements Content {
 
     @Override
     public int getType() {
-        return 0;
+        return type;
     }
 
     public Activity getActivity() {

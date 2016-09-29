@@ -83,16 +83,11 @@ public class AdAdapted {
                 if(!deviceInfo.isProd()) {
                     AppErrorTrackingManager.registerEvent(
                             "NOT_AN_ERROR",
-                            "Error Collection Test Message. This message only send from Dev environment.",
+                            "Error Collection Test Message. This message is only sent from the Dev environment.",
                             new HashMap<String, String>());
                 }
 
                 Log.i(LOGTAG, String.format("AdAdapted Android Addit SDK v%s initialized.", Config.SDK_VERSION));
-            }
-
-            @Override
-            public void onDeviceInfoCollectionError(final Throwable e) {
-                Log.e(LOGTAG, String.format("AdAdapted Android Addit SDK v%s failed to initialize.", Config.SDK_VERSION));
             }
         });
     }

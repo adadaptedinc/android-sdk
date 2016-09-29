@@ -139,6 +139,5 @@ public class CollectDeviceInfoInteractor implements Interactor {
 
     public interface Callback {
         void onDeviceInfoCollected(DeviceInfo deviceInfo);
-        void onDeviceInfoCollectionError(Throwable e);
     }
 }

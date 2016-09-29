@@ -28,9 +28,9 @@ public class DeviceInfoManager implements CollectDeviceInfoInteractor.Callback {
     }
 
     private DeviceInfo deviceInfo;
-    private Set<Callback> callbacks;
+    final private Set<Callback> callbacks;
 
-    public DeviceInfoManager() {
+    private DeviceInfoManager() {
         callbacks = new HashSet<>();
     }
 
@@ -52,7 +52,7 @@ public class DeviceInfoManager implements CollectDeviceInfoInteractor.Callback {
         addCallback(callback);
     }
 
-    public void addCallback(final Callback callback) {
+    private void addCallback(final Callback callback) {
         callbacks.add(callback);
 
         if(deviceInfo != null) {
@@ -60,28 +60,17 @@ public class DeviceInfoManager implements CollectDeviceInfoInteractor.Callback {
         }
     }
 
-    public void removeCallback(final Callback callback) {
-        callbacks.remove(callback);
-    }
-
     @Override
     public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
         this.deviceInfo = deviceInfo;
 
-        for(Callback callback : callbacks) {
+        final Set<Callback> currentCallbacks = new HashSet<>(callbacks);
+        for(Callback callback : currentCallbacks) {
             callback.onDeviceInfoCollected(deviceInfo);
-        }
-    }
-
-    @Override
-    public void onDeviceInfoCollectionError(final Throwable e) {
-        for(Callback callback : callbacks) {
-            callback.onDeviceInfoCollectionError(e);
         }
     }
 
     public interface Callback {
         void onDeviceInfoCollected(DeviceInfo deviceInfo);
-        void onDeviceInfoCollectionError(Throwable e);
     }
 }
