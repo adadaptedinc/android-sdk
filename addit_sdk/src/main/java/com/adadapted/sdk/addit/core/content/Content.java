@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 public interface Content {
     void acknowledge();
+    void failed(String message);
     int getType();
     JSONObject getPayload();
 }

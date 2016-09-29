@@ -64,6 +64,14 @@ public class AdditContent implements Content {
     }
 
     @Override
+    public void failed(final String message) {
+        AppErrorTrackingManager.registerEvent(
+                "ADDIT_CONTENT_FAILED",
+                message,
+                new HashMap<String, String>());
+    }
+
+    @Override
     public int getType() {
         return type;
     }
