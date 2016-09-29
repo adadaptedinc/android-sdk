@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.adadapted.sdk.demoadditapp">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:name=".DemoAdditApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity" android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.adadapted.sdk.addit.ui.AdditInterceptActivity"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:excludeFromRecents="true">
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- Accepts URIs that begin with "http://dl.adadapted.com/additdemo” -->
+                <!-- note that the leading "/" is required for pathPrefix -->
+                <data
+                    android:host="dl.adadapted.com"
+                    android:pathPrefix="/additdemo"
+                    android:scheme="http" />
+
+                <!-- Accepts URIs that begin with "https://dl.adadapted.com/additdemo” -->
+                <!-- note that the leading "/" is required for pathPrefix -->
+                <data
+                    android:host="dl.adadapted.com"
+                    android:pathPrefix="/additdemo"
+                    android:scheme="https" />
+
+                <!-- Accepts URIs that begin with "addit://additdemo/” -->
+                <!-- note that the leading "/" is required for pathPrefix -->
+                <data
+                    android:host="additdemo"
+                    android:pathPrefix="/"
+                    android:scheme="addit" />
+
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
