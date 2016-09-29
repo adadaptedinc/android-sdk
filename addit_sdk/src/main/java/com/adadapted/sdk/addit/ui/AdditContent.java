@@ -4,7 +4,7 @@ import android.app.Activity;
 
 import com.adadapted.sdk.addit.core.app.AppEventSource;
 import com.adadapted.sdk.addit.core.content.Content;
-import com.adadapted.sdk.addit.ext.factory.AnomalyTrackingManager;
+import com.adadapted.sdk.addit.ext.factory.AppErrorTrackingManager;
 import com.adadapted.sdk.addit.ext.factory.AppEventTrackingManager;
 
 import org.json.JSONArray;
@@ -47,10 +47,13 @@ public class AdditContent implements Content {
             }
         }
         catch(JSONException ex) {
-            AnomalyTrackingManager.registerAnomaly(
-                    getPayload().toString(),
+            final Map<String, String> errorParams = new HashMap<>();
+            errorParams.put("payload", getPayload().toString());
+            errorParams.put("exception_message", ex.getMessage());
+            AppErrorTrackingManager.registerEvent(
                     "ADDIT_ADDED_TO_LIST_FAILED",
-                    "Failed to parse Addit payload for processing.");
+                    "Failed to parse Addit payload for processing.",
+                    errorParams);
         }
     }
 

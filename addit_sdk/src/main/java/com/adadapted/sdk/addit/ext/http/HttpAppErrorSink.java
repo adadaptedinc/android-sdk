@@ -2,8 +2,7 @@ package com.adadapted.sdk.addit.ext.http;
 
 import android.util.Log;
 
-import com.adadapted.sdk.addit.core.app.AppEventSink;
-import com.adadapted.sdk.addit.ext.factory.AppErrorTrackingManager;
+import com.adadapted.sdk.addit.core.app.AppErrorSink;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -11,24 +10,21 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Created by chrisweeden on 9/26/16.
+ * Created by chrisweeden on 9/29/16.
  */
 
-public class HttpAppEventSink implements AppEventSink {
-    private static final String LOGTAG = HttpAppEventSink.class.getName();
+public class HttpAppErrorSink implements AppErrorSink {
+    private static final String LOGTAG = HttpAppErrorSink.class.getName();
 
     private final String endpoint;
 
-    public HttpAppEventSink(final String endpoint) {
+    public HttpAppErrorSink(final String endpoint) {
         this.endpoint = endpoint;
     }
 
     @Override
-    public void publishEvent(final JSONObject json) {
+    public void publishError(final JSONObject json) {
         if(json == null) {
             return;
         }
@@ -41,14 +37,7 @@ public class HttpAppEventSink implements AppEventSink {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(LOGTAG, "App Event Request Failed.", error);
-
-                final Map<String, String> errorParams = new HashMap<>();
-                errorParams.put("endpoint", endpoint);
-                AppErrorTrackingManager.registerEvent(
-                        "APP_EVENT_REQUEST_FAILED",
-                        error.getMessage(),
-                        errorParams);
+                Log.e(LOGTAG, "App Error Request Failed.", error);
             }
         });
 

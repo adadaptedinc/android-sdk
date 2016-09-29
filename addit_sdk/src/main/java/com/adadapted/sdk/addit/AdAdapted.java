@@ -6,6 +6,7 @@ import android.util.Log;
 import com.adadapted.sdk.addit.core.app.AppEventSource;
 import com.adadapted.sdk.addit.config.Config;
 import com.adadapted.sdk.addit.core.device.DeviceInfo;
+import com.adadapted.sdk.addit.ext.factory.AppErrorTrackingManager;
 import com.adadapted.sdk.addit.ext.factory.AppEventTrackingManager;
 import com.adadapted.sdk.addit.ext.factory.DeviceInfoManager;
 import com.adadapted.sdk.addit.ext.http.HttpRequestManager;
@@ -78,6 +79,13 @@ public class AdAdapted {
                         AppEventSource.SDK,
                         "app_opened",
                         new HashMap<String, String>());
+
+                if(!deviceInfo.isProd()) {
+                    AppErrorTrackingManager.registerEvent(
+                            "NOT_AN_ERROR",
+                            "Error Collection Test Message. This message only send from Dev environment.",
+                            new HashMap<String, String>());
+                }
 
                 Log.i(LOGTAG, String.format("AdAdapted Android Addit SDK v%s initialized.", Config.SDK_VERSION));
             }
