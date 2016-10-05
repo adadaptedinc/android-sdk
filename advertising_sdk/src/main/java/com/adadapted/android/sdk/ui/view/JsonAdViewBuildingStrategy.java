@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import com.adadapted.android.sdk.R;
 import com.adadapted.android.sdk.core.ad.AdImageLoader;
-import com.adadapted.android.sdk.core.ad.AdImageLoaderListener;
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.AdComponent;
 import com.adadapted.android.sdk.core.ad.model.JsonAdType;
@@ -135,14 +134,16 @@ class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
             return;
         }
 
-        mImageLoader.getImage(url, new AdImageLoaderListener() {
+        mImageLoader.getImage(url, new AdImageLoader.Callback() {
             @Override
-            public void onSuccess(final Bitmap bitmap) {
+            public void adImageLoaded(Bitmap bitmap) {
                 imageView.setImageBitmap(bitmap);
             }
 
             @Override
-            public void onFailure() {}
+            public void adImageLoadFailed() {
+
+            }
         });
     }
 

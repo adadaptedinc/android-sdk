@@ -48,7 +48,7 @@ public class JsonAnomalyBuilder implements AnomalyBuilder {
             json.put("locale", session.getDeviceInfo().getLocale());
             json.put("timezone", session.getDeviceInfo().getTimezone());
             json.put("test_mode", !session.getDeviceInfo().isProd());
-            json.put("allow_retargeting", session.getDeviceInfo().allowRetargetingEnabled());
+            json.put("allow_retargeting", session.getDeviceInfo().isAllowRetargetingEnabled());
             json.put("payload", payload);
             json.put("ad", ad);
         }

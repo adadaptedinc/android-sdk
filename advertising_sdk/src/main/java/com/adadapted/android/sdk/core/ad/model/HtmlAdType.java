@@ -7,7 +7,7 @@ public class HtmlAdType extends AdType {
     private String adUrl = "";
 
     public HtmlAdType() {
-        this.setType(AdTypes.HTML);
+        this.setType(HTML);
     }
 
     public String getAdUrl() {

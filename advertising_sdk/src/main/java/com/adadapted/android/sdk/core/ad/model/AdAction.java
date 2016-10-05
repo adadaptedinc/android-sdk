@@ -8,11 +8,11 @@ import java.io.Serializable;
 public abstract class AdAction implements Serializable {
     private static final long serialVersionUID = 42L;
 
-    public static final String CONTENT = "content";
-    public static final String DELEGATE = "delegate";
-    public static final String LINK = "link";
+    public static final String CONTENT = "c";
+    public static final String DELEGATE = "d";
+    public static final String LINK = "l";
     public static final String NULLACTION = "null";
-    public static final String POPUP = "popup";
+    public static final String POPUP = "p";
 
     private final String actionType;
     private String actionPath = "";

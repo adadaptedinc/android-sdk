@@ -54,11 +54,12 @@ public class AaZoneView extends RelativeLayout
         mContext = context;
     }
 
-    public void init(String zoneId) {
+    public void init(final String zoneId) {
         init(zoneId, 0);
     }
 
-    public void init(String zoneId, int layoutResourceId) {
+    public void init(final String zoneId,
+                     final int layoutResourceId) {
         int color = Color.WHITE;
 
         ColorDrawable mBackgroundColor = (ColorDrawable) getBackground();
@@ -79,6 +80,7 @@ public class AaZoneView extends RelativeLayout
         view.post(new Runnable() {
             @Override
             public void run() {
+                Log.i(LOGTAG, String.format("Pushing Ad display to Zone %s", mZoneProperties.getZoneId()));
                 ViewGroup parent = ((ViewGroup) view.getParent());
                 if (parent != null) {
                     parent.removeView(view);
@@ -136,7 +138,6 @@ public class AaZoneView extends RelativeLayout
 
     public void onStart() {
         if(mZoneProperties == null) {
-            Log.e(LOGTAG, "Zone is being used before it has been initialized.");
             return;
         }
 
@@ -154,7 +155,6 @@ public class AaZoneView extends RelativeLayout
 
     public void onStop() {
         if(mZoneProperties == null) {
-            Log.e(LOGTAG, "Zone is being used before it has been initialized.");
             return;
         }
 
@@ -176,6 +176,7 @@ public class AaZoneView extends RelativeLayout
         switch(visibility) {
             case View.GONE:
             case View.INVISIBLE:
+                Log.i(LOGTAG, String.format("Ad Zone %s not viewable. No ads will display", mZoneProperties.getZoneId()));
                 mVisible = false;
                 onStop();
                 break;

@@ -7,7 +7,7 @@ import com.adadapted.android.sdk.core.common.Dimension;
 import com.adadapted.android.sdk.core.common.DimensionConverter;
 import com.adadapted.android.sdk.core.zone.ZoneBuilder;
 import com.adadapted.android.sdk.core.zone.model.Zone;
-import com.adadapted.android.sdk.ext.factory.AnomalyTrackerFactory;
+import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,7 +45,7 @@ public class JsonZoneBuilder implements ZoneBuilder {
         }
         catch(JSONException ex) {
             Log.w(LOGTAG, "Problem converting to JSON.", ex);
-            AnomalyTrackerFactory.registerAnomaly("",
+            AdAnomalyTrackingManager.registerAnomaly("",
                     jsonZones.toString(),
                     "SESSION_ZONE_PAYLOAD_PARSE_FAILED",
                     "Failed to parse Session Zone payload for processing.");
@@ -104,7 +104,7 @@ public class JsonZoneBuilder implements ZoneBuilder {
         }
         catch(JSONException ex) {
             Log.w(LOGTAG, "Problem converting to JSON.", ex);
-            AnomalyTrackerFactory.registerAnomaly("",
+            AdAnomalyTrackingManager.registerAnomaly("",
                     jsonZone.toString(),
                     "SESSION_ZONE_PAYLOAD_PARSE_FAILED",
                     "Failed to parse Session Zone payload for processing.");

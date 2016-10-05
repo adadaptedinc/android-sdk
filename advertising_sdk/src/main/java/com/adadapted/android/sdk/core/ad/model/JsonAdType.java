@@ -7,7 +7,7 @@ public class JsonAdType extends AdType {
     private AdComponent components;
 
     public JsonAdType() {
-        setType(AdTypes.JSON);
+        setType(JSON);
         components = new AdComponent();
     }
 

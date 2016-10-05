@@ -28,4 +28,12 @@ public class AdEvent {
     public String getZoneId() {
         return mZoneId;
     }
+
+    @Override
+    public String toString() {
+        return "AdEvent{" +
+                "mEventType='" + mEventType + '\'' +
+                ", mZoneId='" + mZoneId + '\'' +
+                '}';
+    }
 }

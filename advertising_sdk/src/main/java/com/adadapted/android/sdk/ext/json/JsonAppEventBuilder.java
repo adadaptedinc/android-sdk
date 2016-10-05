@@ -11,7 +11,6 @@ import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by chrisweeden on 9/16/16.
@@ -20,29 +19,27 @@ public class JsonAppEventBuilder implements AppEventBuilder {
     private static final String LOGTAG = JsonAppEventBuilder.class.getName();
 
     @Override
-    public JSONObject build(final Session session,
-                            final Set<JSONObject> events) {
+    public JSONObject buildWrapper(final Session session) {
         JSONObject item = new JSONObject();
 
         try {
-            item.put("session_id", session.getSessionId());
-            item.put("app_id", session.getDeviceInfo().getAppId());
-            item.put("udid", session.getDeviceInfo().getUdid());
-            item.put("device_udid", session.getDeviceInfo().getDeviceUdid());
-            item.put("bundle_id", session.getDeviceInfo().getBundleId());
-            item.put("bundle_version", session.getDeviceInfo().getBundleVersion());
-            item.put("allow_retargeting", session.getDeviceInfo().allowRetargetingEnabled() ? 1 : 0);
-            item.put("os", session.getDeviceInfo().getOs());
-            item.put("osv", session.getDeviceInfo().getOsv());
-            item.put("device", session.getDeviceInfo().getDevice());
-            item.put("carrier", session.getDeviceInfo().getCarrier());
-            item.put("dw", session.getDeviceInfo().getDw());
-            item.put("dh", session.getDeviceInfo().getDh());
-            item.put("density", session.getDeviceInfo().getDensity().toString());
-            item.put("timezone", session.getDeviceInfo().getTimezone());
-            item.put("locale", session.getDeviceInfo().getLocale());
-            item.put("sdk_version", session.getDeviceInfo().getSdkVersion());
-            item.put("events", new JSONArray(events));
+            item.put(JsonFields.SESSIONID, session.getSessionId());
+            item.put(JsonFields.APPID, session.getDeviceInfo().getAppId());
+            item.put(JsonFields.UDID, session.getDeviceInfo().getUdid());
+            item.put(JsonFields.DEVICEUDID, session.getDeviceInfo().getDeviceUdid());
+            item.put(JsonFields.BUNDLEID, session.getDeviceInfo().getBundleId());
+            item.put(JsonFields.BUNDLEVERSION, session.getDeviceInfo().getBundleVersion());
+            item.put(JsonFields.ALLOWRETARGETING, session.getDeviceInfo().isAllowRetargetingEnabled() ? 1 : 0);
+            item.put(JsonFields.OS, session.getDeviceInfo().getOs());
+            item.put(JsonFields.OSV, session.getDeviceInfo().getOsv());
+            item.put(JsonFields.DEVICE, session.getDeviceInfo().getDevice());
+            item.put(JsonFields.CARRIER, session.getDeviceInfo().getCarrier());
+            item.put(JsonFields.DW, session.getDeviceInfo().getDw());
+            item.put(JsonFields.DH, session.getDeviceInfo().getDh());
+            item.put(JsonFields.DENSITY, session.getDeviceInfo().getDensity().toString());
+            item.put(JsonFields.TIMEZONE, session.getDeviceInfo().getTimezone());
+            item.put(JsonFields.LOCALE, session.getDeviceInfo().getLocale());
+            item.put(JsonFields.SDKVERSION, session.getDeviceInfo().getSdkVersion());
         }
         catch (JSONException ex) {
             Log.d(LOGTAG, "Problem converting to JSON.", ex);
@@ -52,22 +49,27 @@ public class JsonAppEventBuilder implements AppEventBuilder {
     }
 
     @Override
-    public JSONObject buildItem(final String eventSource,
+    public JSONObject buildItem(final JSONObject eventWrapper,
+                                final String eventSource,
                                 final String eventName,
                                 final Map<String, String> params) {
-        final JSONObject item = new JSONObject();
-
         try {
-            item.put("event_source", eventSource);
-            item.put("event_name", eventName);
-            item.put("event_timestamp", new Date().getTime());
-            item.put("event_params", buildParams(params));
+            final JSONObject item = new JSONObject();
+            item.put(JsonFields.APP_EVENTSOURCE, eventSource);
+            item.put(JsonFields.APP_EVENTNAME, eventName);
+            item.put(JsonFields.APP_EVENTTIMESTAMP, new Date().getTime());
+            item.put(JsonFields.APP_EVENTPARAMS, buildParams(params));
+
+            final JSONArray items = new JSONArray();
+            items.put(item);
+
+            eventWrapper.put(JsonFields.APP_EVENTS, items);
         }
         catch (JSONException ex) {
             Log.d(LOGTAG, "Problem converting to JSON.", ex);
         }
 
-        return item;
+        return eventWrapper;
     }
 
     private JSONObject buildParams(final Map<String, String> params) throws JSONException {

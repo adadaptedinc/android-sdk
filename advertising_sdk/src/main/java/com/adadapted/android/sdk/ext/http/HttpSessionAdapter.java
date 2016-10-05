@@ -1,11 +1,11 @@
 package com.adadapted.android.sdk.ext.http;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.session.SessionAdapter;
-import com.adadapted.android.sdk.core.session.SessionAdapterListener;
-import com.adadapted.android.sdk.ext.factory.AnomalyTrackerFactory;
+import com.adadapted.android.sdk.core.session.SessionBuilder;
+import com.adadapted.android.sdk.core.session.model.Session;
+import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -19,28 +19,29 @@ import org.json.JSONObject;
 public class HttpSessionAdapter implements SessionAdapter {
     private static final String LOGTAG = HttpSessionAdapter.class.getName();
 
-    private final String mInitUrl;
+    private final String initUrl;
+    private final SessionBuilder builder;
 
-    public HttpSessionAdapter(final Context context,
-                              final String initUrl) {
-        HttpRequestManager.createQueue(context);
-
-        mInitUrl = initUrl == null ? "" : initUrl;
+    public HttpSessionAdapter(final String initUrl,
+                              final SessionBuilder builder) {
+        this.initUrl = initUrl == null ? "" : initUrl;
+        this.builder = builder;
     }
 
     @Override
     public void sendInit(final JSONObject json,
-                         final SessionAdapterListener listener) {
+                         final SessionAdapter.Callback listener) {
         if(json == null || listener == null) {
             return;
         }
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
-                mInitUrl, json, new Response.Listener<JSONObject>(){
+                initUrl, json, new Response.Listener<JSONObject>(){
 
             @Override
-            public void onResponse(JSONObject response) {
-                listener.onSuccess(response);
+            public void onResponse(final JSONObject response) {
+                final Session session = builder.buildSession(response);
+                listener.onSuccess(session);
             }
 
         }, new Response.ErrorListener() {
@@ -48,8 +49,8 @@ public class HttpSessionAdapter implements SessionAdapter {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.i(LOGTAG, "Session Init Request Failed.", error);
-                AnomalyTrackerFactory.registerAnomaly("",
-                        mInitUrl,
+                AdAnomalyTrackingManager.registerAnomaly("",
+                        initUrl,
                         "SESSION_REQUEST_FAILED",
                         error.getMessage());
                 listener.onFailure();
@@ -57,6 +58,6 @@ public class HttpSessionAdapter implements SessionAdapter {
 
         });
 
-        HttpRequestManager.getQueue().add(jsonRequest);
+        HttpRequestManager.queueRequest(jsonRequest);
     }
 }

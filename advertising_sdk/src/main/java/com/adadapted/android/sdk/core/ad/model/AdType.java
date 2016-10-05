@@ -8,13 +8,18 @@ import java.io.Serializable;
 public abstract class AdType implements Serializable {
     private static final long serialVersionUID = 42L;
 
-    private AdTypes adType = AdTypes.NULL;
+    public static final String HTML = "html";
+    public static final String IMAGE = "image";
+    public static final String JSON = "json";
+    public static final String NULL = "null";
 
-    public AdTypes getType() {
+    private String adType = NULL;
+
+    public String getType() {
         return adType;
     }
 
-    public void setType(final AdTypes adType) {
+    public void setType(final String adType) {
         this.adType = adType;
     }
 }

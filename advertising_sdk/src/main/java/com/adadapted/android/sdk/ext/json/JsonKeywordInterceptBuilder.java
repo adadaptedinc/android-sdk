@@ -5,9 +5,8 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptBuilder;
 import com.adadapted.android.sdk.core.keywordintercept.model.AutoFill;
 import com.adadapted.android.sdk.core.keywordintercept.model.KeywordIntercept;
-import com.adadapted.android.sdk.ext.factory.AnomalyTrackerFactory;
+import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,7 +42,7 @@ public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
         }
         catch(JSONException ex) {
             Log.w(TAG, "Problem parsing JSON", ex);
-            AnomalyTrackerFactory.registerAnomaly("",
+            AdAnomalyTrackingManager.registerAnomaly("",
                     json.toString(),
                     "KI_PAYLOAD_PARSE_FAILED",
                     "Failed to parse KI payload for processing.");
@@ -92,8 +91,8 @@ public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
         }
         catch(JSONException ex) {
             Log.w(TAG, "Problem parsing JSON", ex);
-            AnomalyTrackerFactory.registerAnomaly("",
-                    json == null ? "" : json.toString(),
+            AdAnomalyTrackingManager.registerAnomaly("",
+                    json.toString(),
                     "KI_PAYLOAD_PARSE_FAILED",
                     "Failed to parse KI payload for processing.");
         }

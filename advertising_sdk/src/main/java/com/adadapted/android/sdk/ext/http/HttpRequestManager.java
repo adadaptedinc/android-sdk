@@ -1,14 +1,16 @@
 package com.adadapted.android.sdk.ext.http;
 
 import android.content.Context;
+import android.util.Log;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
 /**
  * Created by chrisweeden on 3/24/15.
  */
-class HttpRequestManager {
+public class HttpRequestManager {
     private static final String LOGTAG = HttpRequestManager.class.getName();
 
     private static RequestQueue requestQueue;
@@ -21,7 +23,12 @@ class HttpRequestManager {
         }
     }
 
-    public static synchronized RequestQueue getQueue() {
-        return requestQueue;
+    static synchronized void queueRequest(Request request) {
+        if(requestQueue != null) {
+            requestQueue.add(request);
+        }
+        else {
+            Log.e(LOGTAG, "HTTP Request Queue has not been initialized.");
+        }
     }
 }

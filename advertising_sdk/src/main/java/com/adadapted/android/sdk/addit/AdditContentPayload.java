@@ -4,8 +4,8 @@ import android.app.Activity;
 
 import com.adadapted.android.sdk.core.content.ContentPayload;
 import com.adadapted.android.sdk.core.event.model.AppEventSource;
-import com.adadapted.android.sdk.ext.factory.AnomalyTrackerFactory;
-import com.adadapted.android.sdk.ext.factory.AppEventTrackerFactory;
+import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
+import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,14 +40,14 @@ public class AdditContentPayload implements ContentPayload {
                 eventParams.put("tracking_id", item.getString("tracking_id"));
                 eventParams.put("item_name", item.getString("product_title"));
 
-                AppEventTrackerFactory.registerEvent(
+                AppEventTrackingManager.registerEvent(
                         AppEventSource.SDK,
                         "addit_added_to_list",
                         eventParams);
             }
         }
         catch(JSONException ex) {
-            AnomalyTrackerFactory.registerAnomaly("",
+            AdAnomalyTrackingManager.registerAnomaly("",
                     getPayload().toString(),
                     "ADDIT_ADDED_TO_LIST_FAILED",
                     "Failed to parse Addit payload for processing.");

@@ -16,7 +16,8 @@ import com.adadapted.android.sdk.core.ad.model.JsonAdType;
 import com.adadapted.android.sdk.core.ad.model.NullAdAction;
 import com.adadapted.android.sdk.core.ad.model.NullAdType;
 import com.adadapted.android.sdk.core.ad.model.PopupAdAction;
-import com.adadapted.android.sdk.ext.factory.AnomalyTrackerFactory;
+import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
+import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,48 +37,20 @@ public class JsonAdBuilder implements AdBuilder {
 
     private static final int DEFAULT_REFRESH_TIME = 90;
 
-    private static final String FIELD_AD_ID = "ad_id";
-    private static final String FIELD_ZONE = "zone";
-    private static final String FIELD_IMPRESSION_ID = "impression_id";
-    private static final String FIELD_REFRESH_TIME = "refresh_time";
-    private static final String FIELD_AD_TYPE = "ad_type";
-    private static final String FIELD_ACTION_TYPE = "act_type";
-    private static final String FIELD_ACTION_PATH = "act_path";
-    private static final String FIELD_POPUP = "popup";
-    private static final String FIELD_PAYLOAD = "payload";
-    private static final String FIELD_HIDE_AFTER_INTERACTION = "hide_after_interaction";
-    private static final String FIELD_IMAGES = "images";
-    private static final String FIELD_JSON = "json";
-
-    private static final String AD_TYPE_HTML = "html";
-    private static final String AD_TYPE_IMAGE = "image";
-    private static final String AD_TYPE_JSON = "json";
-
-    private static final String ACTION_TYPE_POPUP = "p";
-    private static final String ACTION_TYPE_DELEGATE = "d";
-    private static final String ACTION_TYPE_CONTENT = "c";
-
-    private static final String FIELD_AD_URL = "ad_url";
-
-    private static final String FIELD_IMAGE_ORIENTATION = "orientation";
-    private static final String FIELD_IMAGE_URL = "url";
-
     public List<Ad> buildAds(final JSONArray jsonAds) {
         final List<Ad> ads = new ArrayList<>();
 
         try {
             int adCount = jsonAds.length();
             for(int i = 0; i < adCount; i++) {
-                JSONObject jsonAd = jsonAds.getJSONObject(i);
-                ads.add(buildAd(jsonAd));
+                final JSONObject jsonAd = jsonAds.getJSONObject(i);
+                final Ad ad  = buildAd(jsonAd);
+
+                ads.add(ad);
             }
         }
         catch(JSONException ex) {
-            Log.w(LOGTAG, "Problem converting to JSON.", ex);
-            AnomalyTrackerFactory.registerAnomaly("",
-                    jsonAds.toString(),
-                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                    "Failed to parse Session Ad payload for processing.");
+            logJsonParseError(jsonAds.toString(), ex);
         }
 
         return ads;
@@ -86,24 +59,23 @@ public class JsonAdBuilder implements AdBuilder {
     public Ad buildAd(final JSONObject jsonAd) throws JSONException {
         final Ad ad = new Ad();
 
-        if(jsonAd.has(FIELD_AD_ID)) {
-            ad.setAdId(jsonAd.getString(FIELD_AD_ID));
+        if(jsonAd.has(JsonFields.ADID)) {
+            ad.setAdId(jsonAd.getString(JsonFields.ADID));
         }
 
-        if(jsonAd.has(FIELD_ZONE)) {
-            ad.setZoneId(jsonAd.getString(FIELD_ZONE));
+        if(jsonAd.has(JsonFields.ZONE)) {
+            ad.setZoneId(jsonAd.getString(JsonFields.ZONE));
         }
 
-        if(jsonAd.has(FIELD_IMPRESSION_ID)) {
-            ad.setImpressionId(jsonAd.getString(FIELD_IMPRESSION_ID));
+        if(jsonAd.has(JsonFields.IMPRESSIONID)) {
+            ad.setImpressionId(jsonAd.getString(JsonFields.IMPRESSIONID));
         }
 
         try {
-            ad.setRefreshTime(Integer.parseInt(jsonAd.getString(FIELD_REFRESH_TIME)));
+            ad.setRefreshTime(Integer.parseInt(jsonAd.getString(JsonFields.REFRESH_TIME)));
         }
         catch(NumberFormatException ex) {
-            Log.w(LOGTAG, "Ad " + ad.getAdId() + " has an improperly set refresh_time.");
-            AnomalyTrackerFactory.registerAnomaly(
+            AdAnomalyTrackingManager.registerAnomaly(
                     ad.getAdId(),
                     jsonAd.toString(),
                     "SESSION_AD_PAYLOAD_PARSE_FAILED",
@@ -111,20 +83,20 @@ public class JsonAdBuilder implements AdBuilder {
             ad.setRefreshTime(DEFAULT_REFRESH_TIME);
         }
 
-        if(jsonAd.has(FIELD_AD_TYPE)) {
-            final String adTypeCode = jsonAd.getString(FIELD_AD_TYPE);
+        if(jsonAd.has(JsonFields.AD_TYPE)) {
+            final String adTypeCode = jsonAd.getString(JsonFields.AD_TYPE);
             final AdType adType = parseAdType(adTypeCode, jsonAd);
             ad.setAdType(adType);
         }
 
-        if(jsonAd.has(FIELD_ACTION_TYPE)) {
-            final String actionTypeCode = jsonAd.getString(FIELD_ACTION_TYPE);
+        if(jsonAd.has(JsonFields.ACTION_TYPE)) {
+            final String actionTypeCode = jsonAd.getString(JsonFields.ACTION_TYPE);
             final AdAction adAction = parseAdAction(actionTypeCode, jsonAd);
             ad.setAdAction(adAction);
         }
 
-        if(jsonAd.has(FIELD_HIDE_AFTER_INTERACTION)) {
-            ad.setHideAfterInteraction(jsonAd.getString(FIELD_HIDE_AFTER_INTERACTION).equals("1"));
+        if(jsonAd.has(JsonFields.HIDE_AFTER_INTERACTION)) {
+            ad.setHideAfterInteraction(jsonAd.getString(JsonFields.HIDE_AFTER_INTERACTION).equals("1"));
         }
 
         return ad;
@@ -132,48 +104,36 @@ public class JsonAdBuilder implements AdBuilder {
 
     private AdAction parseAdAction(final String actionTypeCode,
                                    final JSONObject jsonAd) {
-        if(actionTypeCode.equalsIgnoreCase(ACTION_TYPE_POPUP)) {
+        if(actionTypeCode.equalsIgnoreCase(AdAction.POPUP)) {
             try {
-                final JSONObject popupObject = jsonAd.getJSONObject(FIELD_POPUP);
-                final String actionPath = jsonAd.getString(FIELD_ACTION_PATH);
+                final JSONObject popupObject = jsonAd.getJSONObject(JsonFields.POPUP);
+                final String actionPath = jsonAd.getString(JsonFields.ACTION_PATH);
 
                 return parseAdPopup(popupObject, actionPath);
             }
             catch(JSONException ex) {
-                Log.w(LOGTAG, "Problem parsing to JSON.", ex);
-                AnomalyTrackerFactory.registerAnomaly("",
-                        jsonAd.toString(),
-                        "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                        "Problem parsing to JSON.");
+                logJsonParseError(jsonAd.toString(), ex);
             }
         }
-        else if(actionTypeCode.equalsIgnoreCase(ACTION_TYPE_DELEGATE)) {
+        else if(actionTypeCode.equalsIgnoreCase(AdAction.DELEGATE)) {
             try {
-                final String actionPath = jsonAd.getString(FIELD_ACTION_PATH);
+                final String actionPath = jsonAd.getString(JsonFields.ACTION_PATH);
 
                 return parseAdDelegate(actionPath);
             }
             catch(JSONException ex) {
-                Log.w(LOGTAG, "Problem parsing to JSON", ex);
-                AnomalyTrackerFactory.registerAnomaly("",
-                        jsonAd.toString(),
-                        "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                        "Problem parsing to JSON.");
+                logJsonParseError(jsonAd.toString(), ex);
             }
         }
-        else if(actionTypeCode.equalsIgnoreCase(ACTION_TYPE_CONTENT)) {
+        else if(actionTypeCode.equalsIgnoreCase(AdAction.CONTENT)) {
             try {
-                final JSONObject payloadObject = jsonAd.getJSONObject(FIELD_PAYLOAD);
-                final String actionPath = jsonAd.getString(FIELD_ACTION_PATH);
+                final JSONObject payloadObject = jsonAd.getJSONObject(JsonFields.PAYLOAD);
+                final String actionPath = jsonAd.getString(JsonFields.ACTION_PATH);
 
                 return parseAdContent(payloadObject, actionPath);
             }
             catch(JSONException ex) {
-                Log.w(LOGTAG, "Problem parsing to JSON", ex);
-                AnomalyTrackerFactory.registerAnomaly("",
-                        jsonAd.toString(),
-                        "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                        "Problem parsing to JSON.");
+                logJsonParseError(jsonAd.toString(), ex);
             }
         }
 
@@ -188,18 +148,14 @@ public class JsonAdBuilder implements AdBuilder {
         final List<String> listItems = new ArrayList<>();
 
         try {
-            final JSONArray jsonItems = payloadObject.getJSONArray("list-items");
+            final JSONArray jsonItems = payloadObject.getJSONArray(JsonFields.CONTENT_LIST_ITEMS);
 
             for(int i = 0; i < jsonItems.length(); i++) {
                 listItems.add(jsonItems.getString(i));
             }
         }
         catch(JSONException ex) {
-            Log.w(LOGTAG, "Problem parsing to JSON", ex);
-            AnomalyTrackerFactory.registerAnomaly("",
-                    payloadObject.toString(),
-                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                    "Problem parsing to JSON.");
+            logJsonParseError(payloadObject.toString(), ex);
         }
 
         content.setItems(listItems);
@@ -220,59 +176,57 @@ public class JsonAdBuilder implements AdBuilder {
         popup.setActionPath(actionPath);
 
         try {
-            if(popupJson.has("hide_banner")) {
-                popup.setHideBanner(Boolean.parseBoolean(popupJson.getString("hide_banner")));
+            if(popupJson.has(JsonFields.POPUP_HIDE_BANNER)) {
+                popup.setHideBanner(Boolean.parseBoolean(popupJson.getString(JsonFields.POPUP_HIDE_BANNER)));
             }
 
-            if(popupJson.has("title_text")) {
-                popup.setTitle(popupJson.getString("title_text"));
+            if(popupJson.has(JsonFields.POPUP_TITLE_TEXT)) {
+                popup.setTitle(popupJson.getString(JsonFields.POPUP_TITLE_TEXT));
             }
 
-            if(popupJson.has("background_color")) {
-                popup.setBackgroundColor(popupJson.getString("background_color"));
+            if(popupJson.has(JsonFields.POPUP_BACKGROUND_COLOR)) {
+                popup.setBackgroundColor(popupJson.getString(JsonFields.POPUP_BACKGROUND_COLOR));
             }
 
-            if(popupJson.has("text_color")) {
-                popup.setTextColor(popupJson.getString("text_color"));
+            if(popupJson.has(JsonFields.POPUP_TEXT_COLOR)) {
+                popup.setTextColor(popupJson.getString(JsonFields.POPUP_TEXT_COLOR));
             }
 
-            if(popupJson.has("alt_close_btn")) {
-                popup.setAltCloseButton(popupJson.getString("alt_close_btn"));
+            if(popupJson.has(JsonFields.POPUP_ALT_CLOSE_BTN)) {
+                popup.setAltCloseButton(popupJson.getString(JsonFields.POPUP_ALT_CLOSE_BTN));
             }
 
-            if(popupJson.has("type")) {
-                popup.setType(popupJson.getString("type"));
+            if(popupJson.has(JsonFields.POPUP_TYPE)) {
+                popup.setType(popupJson.getString(JsonFields.POPUP_TYPE));
             }
 
-            if(popupJson.has("hide_close_btn")) {
-                popup.setHideCloseButton(Boolean.parseBoolean(popupJson.getString("hide_close_btn")));
+            if(popupJson.has(JsonFields.POPUP_HIDE_CLOSE_BTN)) {
+                popup.setHideCloseButton(Boolean.parseBoolean(popupJson.getString(JsonFields.POPUP_HIDE_CLOSE_BTN)));
             }
 
-            if(popupJson.has("hide_browser_nav")) {
-                popup.setHideBrowserNavigation(Boolean.parseBoolean(popupJson.getString("hide_browser_nav")));
+            if(popupJson.has(JsonFields.POPUP_HIDE_BROWSER_NAV)) {
+                popup.setHideBrowserNavigation(Boolean.parseBoolean(popupJson.getString(JsonFields.POPUP_HIDE_BROWSER_NAV)));
             }
         }
         catch(JSONException ex) {
-            Log.w(LOGTAG, "Problem parsing to JSON", ex);
-            AnomalyTrackerFactory.registerAnomaly("",
-                    popupJson.toString(),
-                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                    "Problem parsing Popup JSON.");
+            logJsonParseError(popupJson.toString(), ex);
         }
 
         return popup;
     }
 
     private AdType parseAdType(final String adTypeCode, final JSONObject jsonAd) {
-        if(adTypeCode.equalsIgnoreCase(AD_TYPE_HTML)) {
+        if(adTypeCode.equalsIgnoreCase(AdType.HTML)) {
             return parseHtmlAd(jsonAd);
         }
-        else if(adTypeCode.equalsIgnoreCase(AD_TYPE_IMAGE)) {
+        else if(adTypeCode.equalsIgnoreCase(AdType.IMAGE)) {
             return parseImageAd(jsonAd);
         }
-        else if(adTypeCode.equalsIgnoreCase(AD_TYPE_JSON)) {
+        else if(adTypeCode.equalsIgnoreCase(AdType.JSON)) {
             return parseJsonAd(jsonAd);
         }
+
+        Log.w(LOGTAG, "Unsupported Ad Type: " + adTypeCode);
 
         return new NullAdType();
     }
@@ -281,16 +235,12 @@ public class JsonAdBuilder implements AdBuilder {
         final HtmlAdType adType = new HtmlAdType();
 
         try {
-            if(jsonAd.has(FIELD_AD_URL)) {
-                adType.setAdUrl(jsonAd.getString(FIELD_AD_URL));
+            if(jsonAd.has(JsonFields.AD_URL)) {
+                adType.setAdUrl(jsonAd.getString(JsonFields.AD_URL));
             }
         }
         catch(JSONException ex) {
-            Log.w(LOGTAG, "Problem parsing HTML JSON", ex);
-            AnomalyTrackerFactory.registerAnomaly("",
-                    jsonAd.toString(),
-                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                    "Problem parsing HTML JSON.");
+            logJsonParseError(jsonAd.toString(), ex);
         }
 
         return adType;
@@ -299,15 +249,11 @@ public class JsonAdBuilder implements AdBuilder {
     private ImageAdType parseImageAd(final JSONObject jsonAd) {
         final ImageAdType adType = new ImageAdType();
         try {
-            final Map<String, AdImage> images = parseImages(jsonAd.getJSONObject(FIELD_IMAGES));
+            final Map<String, AdImage> images = parseImages(jsonAd.getJSONObject(JsonFields.IMAGES));
             adType.setImages(images);
         }
         catch(JSONException ex) {
-            Log.w(LOGTAG, "Problem parsing Image JSON", ex);
-            AnomalyTrackerFactory.registerAnomaly("",
-                    jsonAd.toString(),
-                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                    "Problem parsing Image JSON.");
+            logJsonParseError(jsonAd.toString(), ex);
         }
 
         return adType;
@@ -317,17 +263,13 @@ public class JsonAdBuilder implements AdBuilder {
         final JsonAdType adType = new JsonAdType();
 
         try {
-            final JSONObject jsonComponents = jsonAd.getJSONObject(FIELD_JSON);
+            final JSONObject jsonComponents = jsonAd.getJSONObject(JsonFields.JSON);
 
             final AdComponent adComponents = parseJsonAdComponents(jsonComponents);
             adType.setComponents(adComponents);
         }
         catch(JSONException ex) {
-            Log.w(LOGTAG, "Problem parsing JSON", ex);
-            AnomalyTrackerFactory.registerAnomaly("",
-                    jsonAd.toString(),
-                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                    "Problem parsing JSON Display JSON.");
+            logJsonParseError(jsonAd.toString(), ex);
         }
 
         return adType;
@@ -336,48 +278,48 @@ public class JsonAdBuilder implements AdBuilder {
     private AdComponent parseJsonAdComponents(final JSONObject json) throws JSONException {
         final AdComponent adComponents = new AdComponent();
 
-        if(json.has("ad_cta_1")) {
-            adComponents.setCta1(json.getString("ad_cta_1"));
+        if(json.has(JsonFields.JSON_AD_CTA_1)) {
+            adComponents.setCta1(json.getString(JsonFields.JSON_AD_CTA_1));
         }
 
-        if(json.has("ad_cta_2")) {
-            adComponents.setCta2(json.getString("ad_cta_2"));
+        if(json.has(JsonFields.JSON_AD_CTA_2)) {
+            adComponents.setCta2(json.getString(JsonFields.JSON_AD_CTA_2));
         }
 
-        if(json.has("ad_campaign_img")) {
-            adComponents.setCampaignImage(json.getString("ad_campaign_img"));
+        if(json.has(JsonFields.JSON_AD_CAMPAIGN_IMG)) {
+            adComponents.setCampaignImage(json.getString(JsonFields.JSON_AD_CAMPAIGN_IMG));
         }
 
-        if(json.has("ad_sponsor_logo")) {
-            adComponents.setSponsorLogo(json.getString("ad_sponsor_logo"));
+        if(json.has(JsonFields.JSON_AD_SPONSOR_LOGO)) {
+            adComponents.setSponsorLogo(json.getString(JsonFields.JSON_AD_SPONSOR_LOGO));
         }
 
-        if(json.has("ad_sponsor_name")) {
-            adComponents.setSponsorName(json.getString("ad_sponsor_name"));
+        if(json.has(JsonFields.JSON_AD_SPONSOR_NAME)) {
+            adComponents.setSponsorName(json.getString(JsonFields.JSON_AD_SPONSOR_NAME));
         }
 
-        if(json.has("ad_title")) {
-            adComponents.setTitle(json.getString("ad_title"));
+        if(json.has(JsonFields.JSON_AD_TITLE)) {
+            adComponents.setTitle(json.getString(JsonFields.JSON_AD_TITLE));
         }
 
-        if(json.has("ad_tagline")) {
-            adComponents.setTagLine(json.getString("ad_tagline"));
+        if(json.has(JsonFields.JSON_AD_TAGLINE)) {
+            adComponents.setTagLine(json.getString(JsonFields.JSON_AD_TAGLINE));
         }
 
-        if(json.has("ad_text_long")) {
-            adComponents.setLongText(json.getString("ad_text_long"));
+        if(json.has(JsonFields.JSON_AD_TEXT_LONG)) {
+            adComponents.setLongText(json.getString(JsonFields.JSON_AD_TEXT_LONG));
         }
 
-        if(json.has("ad_sponsor_text")) {
-            adComponents.setSponsorText(json.getString("ad_sponsor_text"));
+        if(json.has(JsonFields.JSON_AD_SPONSOR_TEXT)) {
+            adComponents.setSponsorText(json.getString(JsonFields.JSON_AD_SPONSOR_TEXT));
         }
 
-        if(json.has("ad_app_icon_1")) {
-            adComponents.setAppIcon1(json.getString("ad_app_icon_1"));
+        if(json.has(JsonFields.JSON_AD_APP_ICON_1)) {
+            adComponents.setAppIcon1(json.getString(JsonFields.JSON_AD_APP_ICON_1));
         }
 
-        if(json.has("ad_app_icon_2")) {
-            adComponents.setAppIcon2(json.getString("ad_app_icon_2"));
+        if(json.has(JsonFields.JSON_AD_APP_ICON_2)) {
+            adComponents.setAppIcon2(json.getString(JsonFields.JSON_AD_APP_ICON_2));
         }
 
         return adComponents;
@@ -395,21 +337,30 @@ public class JsonAdBuilder implements AdBuilder {
                 final AdImage image = new AdImage();
                 for(int i = 0; i < orientation.length(); i++) {
                     final JSONObject orien = orientation.getJSONObject(i);
-                    image.addOrientation(orien.getString(FIELD_IMAGE_ORIENTATION),
-                            orien.getString(FIELD_IMAGE_URL));
+                    image.addOrientation(orien.getString(JsonFields.IMAGE_ORIENTATION),
+                            orien.getString(JsonFields.IMAGE_URL));
                 }
 
                 images.put(resKey, image);
             }
         }
         catch(JSONException ex) {
-            Log.w(LOGTAG, "Problem parsing Image JSON", ex);
-            AnomalyTrackerFactory.registerAnomaly("",
-                    jsonImages.toString(),
-                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                    "Problem parsing Image JSON.");
+            logJsonParseError(jsonImages.toString(), ex);
         }
 
         return images;
+    }
+
+    private void logJsonParseError(final String errorJson, final Throwable ex) {
+        Log.w(LOGTAG, "Problem parsing Image JSON", ex);
+
+        final Map<String, String> errorParams = new HashMap<>();
+        errorParams.put("bad_json", errorJson);
+        errorParams.put("exception", ex.getMessage());
+
+        AppErrorTrackingManager.registerEvent(
+                "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                "Problem parsing Image JSON.",
+                errorParams);
     }
 }

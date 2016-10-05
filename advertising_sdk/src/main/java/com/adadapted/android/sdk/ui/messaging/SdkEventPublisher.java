@@ -1,20 +1,38 @@
 package com.adadapted.android.sdk.ui.messaging;
 
 import com.adadapted.android.sdk.core.event.model.AdEvent;
+import com.adadapted.android.sdk.ext.management.AdEventTrackingManager;
 
 /**
  * Created by chrisweeden on 8/18/15.
  */
-public class SdkEventPublisher {
-    public static class EventTypes {
-        public static final String IMPRESSION = "impression";
-        public static final String CLICK = "click";
+public class SdkEventPublisher implements AdEventTrackingManager.Callback {
+    private static final String LOGTAG = SdkEventPublisher.class.getName();
+
+    private static SdkEventPublisher sPublisherManager;
+
+    public static SdkEventPublisher getInstance() {
+        if(sPublisherManager == null) {
+            sPublisherManager = new SdkEventPublisher();
+        }
+
+        return sPublisherManager;
+    }
+
+    private static class EventTypes {
+        static final String IMPRESSION = "impression";
+        static final String CLICK = "click";
     }
 
     private AaSdkEventListener mListener;
 
-    public SdkEventPublisher() {
+    private SdkEventPublisher() {
+        AdEventTrackingManager.addCallback(this);
+    }
 
+    @Override
+    public void onAdEventTracked(final AdEvent event) {
+        publishAdEvent(event);
     }
 
     public void setListener(final AaSdkEventListener listener) {
@@ -25,7 +43,7 @@ public class SdkEventPublisher {
         mListener = null;
     }
 
-    public void publishAdEvent(final AdEvent event) {
+    private void publishAdEvent(final AdEvent event) {
         if(mListener == null || event == null) {
             return;
         }

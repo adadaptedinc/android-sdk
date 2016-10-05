@@ -14,7 +14,7 @@ public class ImageAdType extends AdType {
 
     public ImageAdType() {
         images = new HashMap<>();
-        setType(AdTypes.IMAGE);
+        setType(IMAGE);
     }
 
     public void setImages(final Map<String, AdImage> images) {

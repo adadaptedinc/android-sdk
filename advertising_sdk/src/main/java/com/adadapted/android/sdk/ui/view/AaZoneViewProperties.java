@@ -8,7 +8,9 @@ public class AaZoneViewProperties {
     private final int resourceId;
     private final int backgroundColor;
 
-    public AaZoneViewProperties(final String zoneId, final int resourceId, final int backgroundColor) {
+    public AaZoneViewProperties(final String zoneId,
+                                final int resourceId,
+                                final int backgroundColor) {
         this.zoneId = zoneId;
         this.resourceId = resourceId;
         this.backgroundColor = backgroundColor;

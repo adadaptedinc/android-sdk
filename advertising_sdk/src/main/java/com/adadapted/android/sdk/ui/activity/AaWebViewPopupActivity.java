@@ -12,10 +12,9 @@ import android.widget.RelativeLayout;
 
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.PopupAdAction;
-import com.adadapted.android.sdk.core.session.SessionManager;
 import com.adadapted.android.sdk.core.session.model.Session;
-import com.adadapted.android.sdk.ext.factory.AdEventTrackerFactory;
-import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
+import com.adadapted.android.sdk.ext.management.AdEventTrackingManager;
+import com.adadapted.android.sdk.ext.management.SessionManager;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
 public class AaWebViewPopupActivity extends Activity {
@@ -55,11 +54,7 @@ public class AaWebViewPopupActivity extends Activity {
         ad = (Ad)intent.getSerializableExtra(EXTRA_POPUP_AD);
 
         mSession = new Session();
-
-        final SessionManager sessionManager = SessionManagerFactory.getSessionManager();
-        if(sessionManager != null) {
-            mSession = sessionManager.getCurrentSession();
-        }
+        mSession = SessionManager.getCurrentSession();
 
         final PopupAdAction action = (PopupAdAction)ad.getAdAction();
 
@@ -70,13 +65,12 @@ public class AaWebViewPopupActivity extends Activity {
     @Override
     public void onStart() {
         super.onStart();
-
-        AdEventTrackerFactory.getEventTracker().trackPopupBeginEvent(mSession, ad);
+        AdEventTrackingManager.trackPopupBeginEvent(mSession, ad);
     }
 
     public void onPause() {
         super.onPause();
-        AdEventTrackerFactory.getEventTracker().trackPopupEndEvent(mSession, ad);
+        AdEventTrackingManager.trackPopupEndEvent(mSession, ad);
     }
 
     @Override

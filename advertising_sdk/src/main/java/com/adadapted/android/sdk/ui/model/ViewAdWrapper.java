@@ -1,14 +1,10 @@
 package com.adadapted.android.sdk.ui.model;
 
 import com.adadapted.android.sdk.core.ad.model.Ad;
-import com.adadapted.android.sdk.core.ad.model.AdTypes;
-import com.adadapted.android.sdk.core.device.model.DeviceInfo;
-import com.adadapted.android.sdk.core.event.AdEventTracker;
-import com.adadapted.android.sdk.core.event.model.AdEvent;
+import com.adadapted.android.sdk.core.ad.model.AdType;
+import com.adadapted.android.sdk.core.ad.model.CustomAdEvents;
 import com.adadapted.android.sdk.core.session.model.Session;
-import com.adadapted.android.sdk.ext.factory.DeviceInfoFactory;
-import com.adadapted.android.sdk.ext.factory.AdEventTrackerFactory;
-import com.adadapted.android.sdk.ui.messaging.SdkEventPublisherFactory;
+import com.adadapted.android.sdk.ext.management.AdEventTrackingManager;
 
 /**
  * Created by chrisweeden on 5/26/15.
@@ -16,7 +12,6 @@ import com.adadapted.android.sdk.ui.messaging.SdkEventPublisherFactory;
 public class ViewAdWrapper {
     private static final String LOGTAG = ViewAdWrapper.class.getName();
 
-    private AdEventTracker mEventTracker;
     private final Session mSession;
     private final Ad mAd;
 
@@ -24,11 +19,6 @@ public class ViewAdWrapper {
     private boolean hasTrackedImpression = false;
 
     public ViewAdWrapper(final Session session, final Ad ad) {
-        if(ad != null) {
-            DeviceInfo deviceInfo = DeviceInfoFactory.getsDeviceInfo();
-            mEventTracker = AdEventTrackerFactory.createEventTracker(deviceInfo);
-        }
-
         mSession = session;
         mAd = ad;
     }
@@ -53,12 +43,12 @@ public class ViewAdWrapper {
         return (mAd != null);
     }
 
-    public AdTypes getAdType() {
+    public String getAdType() {
         if(hasAd()) {
             return mAd.getAdType().getType();
         }
 
-        return AdTypes.NULL;
+        return AdType.NULL;
     }
 
     private boolean trackingHasStarted() {
@@ -69,16 +59,12 @@ public class ViewAdWrapper {
         return hasTrackedImpression;
     }
 
-    private boolean hasEventTracker() {
-        return mEventTracker != null;
-    }
-
     private boolean shouldBeginTracking() {
-        return !trackingHasStarted() && !impressionHasBeenTracked() && hasEventTracker();
+        return !trackingHasStarted() && !impressionHasBeenTracked();
     }
 
     private boolean trackingHasBegun() {
-        return trackingHasStarted() && hasEventTracker();
+        return trackingHasStarted();
     }
 
     public void markAdAsHidden() {
@@ -97,10 +83,7 @@ public class ViewAdWrapper {
 
     public void beginAdTracking() {
         if(hasAd() && shouldBeginTracking()) {
-            mEventTracker.trackImpressionBeginEvent(mSession, getAd());
-
-            AdEvent adEvent = new AdEvent(AdEvent.Types.IMPRESSION, getAd().getZoneId());
-            SdkEventPublisherFactory.getSdkEventPublisher().publishAdEvent(adEvent);
+            AdEventTrackingManager.trackImpressionBeginEvent(mSession, getAd());
 
             trackingHasStarted = true;
             hasTrackedImpression = true;
@@ -109,17 +92,14 @@ public class ViewAdWrapper {
 
     public void completeAdTracking() {
         if(hasAd() && trackingHasBegun()) {
-            mEventTracker.trackImpressionEndEvent(mSession, getAd());
+            AdEventTrackingManager.trackImpressionEndEvent(mSession, getAd());
             trackingHasStarted = false;
         }
     }
 
     public void trackInteraction() {
         if(hasAd() && trackingHasBegun()) {
-            mEventTracker.trackInteractionEvent(mSession, getAd());
-
-            AdEvent adEvent = new AdEvent(AdEvent.Types.INTERACTION, getAd().getZoneId());
-            SdkEventPublisherFactory.getSdkEventPublisher().publishAdEvent(adEvent);
+            AdEventTrackingManager.trackInteractionEvent(mSession, getAd());
 
             if(mAd.isHiddenAfterInteraction()) {
                 markAdAsHidden();
@@ -129,7 +109,10 @@ public class ViewAdWrapper {
 
     public void trackPayloadDelivered() {
         if(hasAd() && trackingHasBegun()) {
-            mEventTracker.trackCustomEvent(mSession, getAd(), AdEventTracker.EVENTNAME_PAYLOAD_DELIVERED);
+            AdEventTrackingManager.trackCustomEvent(
+                    mSession,
+                    getAd(),
+                    CustomAdEvents.EVENTNAME_PAYLOAD_DELIVERED);
         }
     }
 }

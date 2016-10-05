@@ -6,20 +6,16 @@ import android.util.Log;
 import com.adadapted.android.sdk.addit.AaSdkAdditContentListener;
 import com.adadapted.android.sdk.addit.AdditContentPublisher;
 import com.adadapted.android.sdk.config.Config;
-import com.adadapted.android.sdk.core.device.DeviceInfoBuilder;
-import com.adadapted.android.sdk.core.device.model.DeviceInfo;
 import com.adadapted.android.sdk.core.event.model.AppEventSource;
-import com.adadapted.android.sdk.core.session.SessionListener;
-import com.adadapted.android.sdk.core.session.SessionManager;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.ext.cache.ImageCache;
-import com.adadapted.android.sdk.ext.factory.AppEventTrackerFactory;
-import com.adadapted.android.sdk.ext.factory.DeviceInfoFactory;
-import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
+import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
+import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
+import com.adadapted.android.sdk.ext.management.SessionManager;
+import com.adadapted.android.sdk.ext.scheduler.EventFlushScheduler;
 import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener;
 import com.adadapted.android.sdk.ui.messaging.SdkEventPublisher;
-import com.adadapted.android.sdk.ui.messaging.SdkEventPublisherFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,22 +38,13 @@ public class AdAdapted {
 
     private String mAppId;
     private boolean mIsProd;
+    private AaSdkSessionListener sessionListener;
 
-    private boolean mSdkStarting = false;
-    private boolean mSdkLoaded = false;
+    private AdAdapted() {}
 
-    private final Context mContext;
-
-    private AdAdapted(final Context context) {
-        mContext = context;
-
-        AppEventTrackerFactory.registerEvent(AppEventSource.SDK, "app_opened");
-        ImageCache.getInstance().purgeCache();
-    }
-
-    public static AdAdapted init(final Context context) {
+    public static AdAdapted init() {
         if(sInstance == null) {
-            sInstance = new AdAdapted(context);
+            sInstance = new AdAdapted();
         }
 
         return sInstance;
@@ -67,7 +54,6 @@ public class AdAdapted {
         if(appId == null) {
             Log.e(LOGTAG, "The Application Id cannot be Null.");
             mAppId = "";
-            mSdkLoaded = true;
         }
         else {
             mAppId = appId;
@@ -83,29 +69,13 @@ public class AdAdapted {
     }
 
     public AdAdapted setSdkSessionListener(final AaSdkSessionListener listener) {
-        SessionManagerFactory.addListener(new SessionListener() {
-            @Override
-            public void onSessionInitialized(Session session) {
-                Log.i(LOGTAG, String.format("AdAdapted Android SDK v%s initialized.", Config.SDK_VERSION));
-
-                listener.onHasAdsToServe(session.hasActiveCampaigns());
-            }
-
-            @Override
-            public void onSessionInitFailed() {
-                Log.e(LOGTAG, String.format("AdAdapted Android SDK v%s failed to initialize.", Config.SDK_VERSION));
-            }
-
-            @Override
-            public void onNewAdsAvailable(Session session) {
-            }
-        });
+        sessionListener = listener;
 
         return this;
     }
 
     public AdAdapted setSdkEventListener(final AaSdkEventListener listener) {
-        getSdkEventPublisher().setListener(listener);
+        SdkEventPublisher.getInstance().setListener(listener);
 
         return this;
     }
@@ -116,23 +86,37 @@ public class AdAdapted {
         return this;
     }
 
-    public void start() {
-        if(!mSdkStarting && !mSdkLoaded) {
-            mSdkStarting = true;
-            DeviceInfoFactory.createDeviceInfo(mContext, mAppId, Config.SDK_VERSION,
-                    mIsProd, new DeviceInfoBuilder.Listener() {
-                @Override
-                public void onDeviceInfoCollected(DeviceInfo deviceInfo) {
-                    getSessionManager().initialize(deviceInfo);
-
-                    mSdkStarting = false;
-                    mSdkLoaded = true;
+    public void start(final Context context) {
+        SessionManager.start(context, mAppId, mIsProd, new SessionManager.Callback() {
+            @Override
+            public void onSessionAvailable(final Session session) {
+                if(!session.getDeviceInfo().isProd()) {
+                    AppErrorTrackingManager.registerEvent(
+                            "NOT_AN_ERROR",
+                            "Error Collection Test Message. This message is only sent from the Dev environment.",
+                            new HashMap<String, String>());
                 }
-            });
-        }
-        else {
-            Log.w(LOGTAG, "AdAdapted SDK has already been loaded with App Id: " + mAppId + ".");
-        }
+
+                if(sessionListener != null) {
+                    sessionListener.onHasAdsToServe(session.hasActiveCampaigns());
+                }
+            }
+
+            @Override
+            public void onNewAdsAvailable(final Session session) {
+                if(sessionListener != null) {
+                    sessionListener.onHasAdsToServe(session.hasActiveCampaigns());
+                }
+            }
+        });
+
+        AppEventTrackingManager.registerEvent(
+                AppEventSource.SDK,
+                "app_opened",
+                new HashMap<String, String>());
+
+        new EventFlushScheduler().start(Config.DEFAULT_EVENT_POLLING);
+        Log.i(LOGTAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", Config.SDK_VERSION));
     }
 
     public static synchronized void registerEvent(final String eventName) {
@@ -141,18 +125,6 @@ public class AdAdapted {
 
     public static synchronized void registerEvent(final String eventName,
                                                   final Map<String, String> eventParams) {
-        AppEventTrackerFactory.registerEvent(AppEventSource.APP, eventName, eventParams);
-    }
-
-    public boolean isLoaded() {
-        return mSdkStarting || mSdkLoaded;
-    }
-
-    private SessionManager getSessionManager() {
-        return SessionManagerFactory.createSessionManager(mContext);
-    }
-
-    private SdkEventPublisher getSdkEventPublisher() {
-        return SdkEventPublisherFactory.getSdkEventPublisher();
+        AppEventTrackingManager.registerEvent(AppEventSource.APP, eventName, eventParams);
     }
 }

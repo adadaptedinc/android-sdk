@@ -3,9 +3,8 @@ package com.adadapted.android.sdk.ext.json;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.model.Ad;
-import com.adadapted.android.sdk.core.device.model.DeviceInfo;
-import com.adadapted.android.sdk.core.event.AdEventRequestBuilder;
-import com.adadapted.android.sdk.core.event.model.AdEventTypes;
+import com.adadapted.android.sdk.core.device.DeviceInfo;
+import com.adadapted.android.sdk.core.ad.AdEventRequestBuilder;
 import com.adadapted.android.sdk.core.session.model.Session;
 
 import org.json.JSONException;
@@ -21,7 +20,7 @@ public class JsonAdEventRequestBuilder implements AdEventRequestBuilder {
 
     public JSONObject build(final Session session,
                             final Ad ad,
-                            final AdEventTypes eventType,
+                            final String eventType,
                             final String eventName) {
         final JSONObject json = new JSONObject();
 
@@ -34,7 +33,7 @@ public class JsonAdEventRequestBuilder implements AdEventRequestBuilder {
             json.put(JsonFields.UDID, deviceInfo.getUdid());
             json.put(JsonFields.ADID, ad.getAdId());
             json.put(JsonFields.IMPRESSIONID, ad.getImpressionId());
-            json.put(JsonFields.EVENTTYPE, eventType.toString());
+            json.put(JsonFields.EVENTTYPE, eventType);
             json.put(JsonFields.EVENTNAME, eventName);
             json.put(JsonFields.DATETIME, new Date().getTime());
             json.put(JsonFields.SDKVERSION, deviceInfo.getSdkVersion());

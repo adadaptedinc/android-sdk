@@ -7,5 +7,5 @@ import org.json.JSONArray;
  */
 
 public interface AnomalyAdapter {
-    void sendBatch(JSONArray events, AnomalyAdapterListener listener);
+    void sendBatch(JSONArray events);
 }

@@ -4,9 +4,8 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.AdImageLoader;
-import com.adadapted.android.sdk.core.ad.AdImageLoaderListener;
 import com.adadapted.android.sdk.ext.cache.ImageCache;
-import com.adadapted.android.sdk.ext.factory.AnomalyTrackerFactory;
+import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
@@ -20,30 +19,30 @@ public class HttpAdImageLoader implements AdImageLoader {
     public HttpAdImageLoader() {}
 
     public void getImage(final String url,
-                         final AdImageLoaderListener listener) {
+                         final Callback callback) {
         if(url == null || !url.toLowerCase().startsWith("http")) {
             Log.w(LOGTAG, "No URL has been provided.");
-            AnomalyTrackerFactory.registerAnomaly("",
+            AdAnomalyTrackingManager.registerAnomaly("",
                     url,
                     "AD_IMAGE_REQUEST_FAILED",
                     "No URL has been provided.");
-            listener.onFailure();
+            callback.adImageLoadFailed();
             return;
         }
 
         final Bitmap bitmap = ImageCache.getInstance().getImage(url);
 
         if(bitmap == null) {
-            loadRemoteImage(url, listener);
+            loadRemoteImage(url, callback);
         }
         else {
-            listener.onSuccess(bitmap);
+            callback.adImageLoaded(bitmap);
         }
     }
 
     private void loadRemoteImage(final String url,
-                                 final AdImageLoaderListener listener) {
-        if(url == null || listener == null) {
+                                 final Callback callback) {
+        if(url == null || callback == null) {
             return;
         }
 
@@ -56,7 +55,7 @@ public class HttpAdImageLoader implements AdImageLoader {
                             ImageCache.getInstance().putImage(url, bitmap);
                         }
 
-                        listener.onSuccess(bitmap);
+                        callback.adImageLoaded(bitmap);
                     }
 
                 }, 0, 0, Bitmap.Config.ARGB_8888,
@@ -66,15 +65,15 @@ public class HttpAdImageLoader implements AdImageLoader {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.w(LOGTAG, "Problem loading image URL: " + url);
-                        AnomalyTrackerFactory.registerAnomaly("",
+                        AdAnomalyTrackingManager.registerAnomaly("",
                                 url,
                                 "AD_IMAGE_REQUEST_FAILED",
                                 error.getMessage());
-                        listener.onFailure();
+                        callback.adImageLoadFailed();
                     }
                 }
         );
 
-        HttpRequestManager.getQueue().add(imageRequest);
+        HttpRequestManager.queueRequest(imageRequest);
     }
 }

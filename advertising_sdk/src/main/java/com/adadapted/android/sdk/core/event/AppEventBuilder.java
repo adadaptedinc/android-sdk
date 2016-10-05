@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by chrisweeden on 9/16/16.
+ * Created by chrisweeden on 9/30/16.
  */
 public interface AppEventBuilder {
-    JSONObject build(Session session, Set<JSONObject> currentEvents);
-    JSONObject buildItem(String trackingId, String eventName, Map<String, String> params);
+    JSONObject buildWrapper(Session session);
+    JSONObject buildItem(JSONObject eventWrapper, String eventSource, String eventName, Map<String, String> params);
 }

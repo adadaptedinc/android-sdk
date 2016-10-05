@@ -9,8 +9,8 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.event.model.AppEventSource;
-import com.adadapted.android.sdk.ext.factory.AnomalyTrackerFactory;
-import com.adadapted.android.sdk.ext.factory.AppEventTrackerFactory;
+import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
+import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,7 +25,10 @@ public class AdditInterceptActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AppEventTrackerFactory.registerEvent(AppEventSource.SDK,"addit_app_opened", new HashMap<String, String>());
+        AppEventTrackingManager.registerEvent(
+                AppEventSource.SDK,
+                "addit_app_opened",
+                new HashMap<String, String>());
 
         final Intent additIntent = getIntent();
         final Uri uri = additIntent.getData();
@@ -45,7 +48,7 @@ public class AdditInterceptActivity extends AppCompatActivity {
         }
         catch(JSONException ex) {
             Log.e(LOGTAG, "Problem parsing Addit JSON input. Redirecting to launcher.");
-            AnomalyTrackerFactory.registerAnomaly("",
+            AdAnomalyTrackingManager.registerAnomaly("",
                     "{\"raw\":\""+data+"\", \"parsed\":\""+jsonString+"\"}",
                     "ADDIT_PAYLOAD_PARSE_FAILED",
                     "Problem parsing Addit JSON input");

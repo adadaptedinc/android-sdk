@@ -9,9 +9,9 @@ import org.json.JSONObject;
  */
 
 public interface AnomalyBuilder {
-    public JSONObject build(final Session session,
-                            final String adId,
-                            final String eventPath,
-                            final String code,
-                            final String message);
+    JSONObject build(final Session session,
+                     final String adId,
+                     final String eventPath,
+                     final String code,
+                     final String message);
 }

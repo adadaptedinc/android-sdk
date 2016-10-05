@@ -5,7 +5,7 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.ad.model.ContentAdAction;
 import com.adadapted.android.sdk.core.content.ContentPayload;
 import com.adadapted.android.sdk.core.event.model.AppEventSource;
-import com.adadapted.android.sdk.ext.factory.AppEventTrackerFactory;
+import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -68,7 +68,7 @@ public class AdContentPayload implements ContentPayload {
                 params.put("ad_id", mAd.getAdId());
                 params.put("item_name", item);
 
-                AppEventTrackerFactory.registerEvent(AppEventSource.SDK, "atl_added_to_list", params);
+                AppEventTrackingManager.registerEvent(AppEventSource.SDK, "atl_added_to_list", params);
             }
         }
         catch(JSONException ex) {

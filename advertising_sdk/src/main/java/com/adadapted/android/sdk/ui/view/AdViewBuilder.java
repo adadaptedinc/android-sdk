@@ -5,7 +5,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
 
-import com.adadapted.android.sdk.core.device.model.DeviceInfo;
+import com.adadapted.android.sdk.core.ad.model.AdType;
+import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
 /**
@@ -45,15 +46,15 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
 
         mStrategy = null;
         switch(currentAd.getAdType()) {
-            case HTML:
+            case AdType.HTML:
                 mStrategy = getHtmlViewStrategy();
                 break;
 
-            case IMAGE:
+            case AdType.IMAGE:
                 mStrategy = getImageViewStrategy(currentAd);
                 break;
 
-            case JSON:
+            case AdType.JSON:
                 mStrategy = getJsonViewStrategy();
                 break;
 

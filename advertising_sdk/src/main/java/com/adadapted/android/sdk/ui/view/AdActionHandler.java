@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.ui.view;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.model.AdAction;
 import com.adadapted.android.sdk.ui.activity.AaWebViewPopupActivity;
@@ -44,6 +45,7 @@ class AdActionHandler {
                 break;
 
             case AdAction.NULLACTION:
+                Log.w(LOGTAG, "Cannot handle Action type: " + ad.getAd().getAdAction().getActionType());
                 result = false;
                 break;
 
@@ -52,6 +54,7 @@ class AdActionHandler {
                 break;
 
             default:
+                Log.w(LOGTAG, "Cannot handle Action type: " + ad.getAd().getAdAction().getActionType());
                 result = false;
         }
 

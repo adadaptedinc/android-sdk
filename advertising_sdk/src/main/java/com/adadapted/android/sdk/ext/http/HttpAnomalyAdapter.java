@@ -3,7 +3,6 @@ package com.adadapted.android.sdk.ext.http;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.anomaly.AnomalyAdapter;
-import com.adadapted.android.sdk.core.anomaly.AnomalyAdapterListener;
 import com.android.volley.Request;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
@@ -25,9 +24,8 @@ public class HttpAnomalyAdapter implements AnomalyAdapter {
     }
 
     @Override
-    public void sendBatch(final JSONArray json,
-                          final AnomalyAdapterListener listener) {
-        if(json == null || listener == null) {
+    public void sendBatch(final JSONArray json) {
+        if(json == null) {
             return;
         }
         final StringRequest stringRequest = new StringRequest(
@@ -36,14 +34,12 @@ public class HttpAnomalyAdapter implements AnomalyAdapter {
                 new Listener<String>() {
                     @Override
                     public void onResponse(String s) {
-                        listener.onSuccess();
                     }
                 }, new ErrorListener() {
 
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(LOGTAG, "Anomaly Track Request Failed.", error);
-                listener.onFailure(json);
             }
         }){
             @Override
@@ -52,6 +48,6 @@ public class HttpAnomalyAdapter implements AnomalyAdapter {
             }
         };
 
-        HttpRequestManager.getQueue().add(stringRequest);
+        HttpRequestManager.queueRequest(stringRequest);
     }
 }

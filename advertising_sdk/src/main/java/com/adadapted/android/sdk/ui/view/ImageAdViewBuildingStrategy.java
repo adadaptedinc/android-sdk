@@ -9,11 +9,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import com.adadapted.android.sdk.core.ad.AdImageLoaderListener;
+import com.adadapted.android.sdk.core.ad.AdImageLoader;
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.AdImage;
 import com.adadapted.android.sdk.core.ad.model.ImageAdType;
-import com.adadapted.android.sdk.core.device.model.DeviceInfo;
+import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.ext.http.HttpAdImageLoader;
 
 /**
@@ -73,14 +73,14 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
         mView.setLayoutParams(new RelativeLayout.LayoutParams(width, height));
         mView.setBackgroundColor(zoneProperties.getBackgroundColor());
 
-        ImageAdType adType = (ImageAdType) ad.getAdType();
+        final ImageAdType adType = (ImageAdType) ad.getAdType();
 
-        String imageResolution = mDeviceInfo.chooseImageSize();
+        final String imageResolution = mDeviceInfo.chooseImageSize();
 
-        String imageUrl = adType.getImageUrlFor(imageResolution, getPresentOrientation());
-        mImageLoader.getImage(imageUrl, new AdImageLoaderListener() {
+        final String imageUrl = adType.getImageUrlFor(imageResolution, getPresentOrientation());
+        mImageLoader.getImage(imageUrl, new AdImageLoader.Callback() {
             @Override
-            public void onSuccess(final Bitmap bitmap) {
+            public void adImageLoaded(final Bitmap bitmap) {
                 mAdImage = bitmap;
                 buildAdHandler.post(buildAdRunnable);
 
@@ -90,7 +90,7 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
             }
 
             @Override
-            public void onFailure() {
+            public void adImageLoadFailed() {
                 if(mListener != null) {
                     mListener.onStrategyViewLoadFailed();
                 }

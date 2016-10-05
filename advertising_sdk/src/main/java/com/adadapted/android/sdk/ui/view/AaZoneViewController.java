@@ -8,11 +8,10 @@ import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.AdImage;
 import com.adadapted.android.sdk.core.common.Dimension;
 import com.adadapted.android.sdk.core.event.model.AppEventSource;
-import com.adadapted.android.sdk.core.session.SessionListener;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.core.zone.model.Zone;
-import com.adadapted.android.sdk.ext.factory.AppEventTrackerFactory;
-import com.adadapted.android.sdk.ext.factory.SessionManagerFactory;
+import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
+import com.adadapted.android.sdk.ext.management.SessionManager;
 import com.adadapted.android.sdk.ext.scheduler.AdZoneRefreshScheduler;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
@@ -24,7 +23,9 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 7/1/15
  */
-class AaZoneViewController implements SessionListener, AdZoneRefreshScheduler.Listener,
+class AaZoneViewController
+        implements SessionManager.Callback,
+        AdZoneRefreshScheduler.Listener,
         AdViewBuilder.Listener {
     private static final String LOGTAG = AaZoneViewController.class.getName();
 
@@ -61,7 +62,7 @@ class AaZoneViewController implements SessionListener, AdZoneRefreshScheduler.Li
 
         Map<String, String> params = new HashMap<>();
         params.put("zone_id", zoneId);
-        AppEventTrackerFactory.registerEvent(AppEventSource.SDK, "zone_loaded", params);
+        AppEventTrackingManager.registerEvent(AppEventSource.SDK, "zone_loaded", params);
     }
 
     private void setNextAd() {
@@ -144,14 +145,14 @@ class AaZoneViewController implements SessionListener, AdZoneRefreshScheduler.Li
 
     public void setListener(AaZoneViewControllerListener listener) {
         mListener = listener;
-        SessionManagerFactory.addListener(this);
+        SessionManager.getSession(this);
     }
 
     public void removeListener() {
         mCurrentAd.completeAdTracking();
 
         mListener = null;
-        SessionManagerFactory.removeListener(this);
+        SessionManager.removeCallback(this);
     }
 
     private void notifyViewReadyForDisplay(final View v) {
@@ -167,7 +168,7 @@ class AaZoneViewController implements SessionListener, AdZoneRefreshScheduler.Li
     }
 
     @Override
-    public void onSessionInitialized(final Session session) {
+    public void onSessionAvailable(Session session) {
         if(mZoneProperties == null) {
             return;
         }
@@ -182,9 +183,6 @@ class AaZoneViewController implements SessionListener, AdZoneRefreshScheduler.Li
             displayAd();
         }
     }
-
-    @Override
-    public void onSessionInitFailed() {}
 
     @Override
     public void onNewAdsAvailable(final Session session) {
