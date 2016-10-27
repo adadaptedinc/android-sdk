@@ -58,7 +58,7 @@ public class AppErrorTracker {
     public void trackError(final String errorCode,
                            final String errorMessage,
                            final Map<String, String> errorParams) {
-        Log.w(LOGTAG, "Tracking Error: " + errorCode);
+        Log.w(LOGTAG, "Tracking Error: " + errorCode + ": " + errorMessage);
 
         try {
             final JSONObject errorItem = new JSONObject();

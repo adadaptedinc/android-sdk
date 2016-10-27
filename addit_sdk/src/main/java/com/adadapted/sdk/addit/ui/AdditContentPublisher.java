@@ -1,5 +1,7 @@
 package com.adadapted.sdk.addit.ui;
 
+import com.adadapted.sdk.addit.core.content.AdditContent;
+
 /**
  * Created by chrisweeden on 9/16/16.
  */
@@ -25,7 +27,7 @@ public class AdditContentPublisher {
     }
 
     public void publishContent(final AdditContent payload) {
-        if(mListener != null) {
+        if(mListener != null && payload != null) {
             mListener.onContentAvailable(payload);
         }
     }
