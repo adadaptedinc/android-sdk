@@ -86,7 +86,11 @@ public class ViewAdWrapper {
     public void beginAdTracking(final WebView trackingWebView) {
         if(hasAd() && shouldBeginTracking()) {
             AdEventTrackingManager.trackImpressionBeginEvent(mSession, getAd());
-            trackingWebView.loadData(getAd().getTrackingHtml(), "text/html", null);
+
+            final String trackingHtml = getAd().getTrackingHtml();
+            if(trackingHtml != null && !trackingHtml.isEmpty()) {
+                trackingWebView.loadData(getAd().getTrackingHtml(), "text/html", null);
+            }
 
             trackingHasStarted = true;
             hasTrackedImpression = true;
