@@ -12,7 +12,7 @@ public class Ad implements Serializable {
     private String zoneId = "";
     private String baseImpressionId = "";
     private boolean hideAfterInteraction = false;
-    private String trackingHtml;
+    private String trackingHtml = "";
     private int refreshTime = 0;
     private AdType adType = new NullAdType();
     private AdAction adAction = new NullAdAction();
