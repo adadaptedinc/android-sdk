@@ -47,6 +47,7 @@ class JsonFields {
     static final String ADID = "ad_id";
     static final String ZONE = "zone";
     static final String REFRESH_TIME = "refresh_time";
+    static final String TRACKING_HTML = "tracking_html";
     static final String AD_TYPE = "ad_type";
     static final String ACTION_TYPE = "act_type";
     static final String ACTION_PATH = "act_path";

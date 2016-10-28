@@ -99,6 +99,10 @@ public class JsonAdBuilder implements AdBuilder {
             ad.setHideAfterInteraction(jsonAd.getString(JsonFields.HIDE_AFTER_INTERACTION).equals("1"));
         }
 
+        if(jsonAd.has(JsonFields.TRACKING_HTML)) {
+            ad.setTrackingHtml(jsonAd.getString(JsonFields.TRACKING_HTML));
+        }
+
         return ad;
     }
 

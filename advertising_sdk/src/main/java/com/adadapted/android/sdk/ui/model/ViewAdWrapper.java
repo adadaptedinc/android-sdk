@@ -1,5 +1,7 @@
 package com.adadapted.android.sdk.ui.model;
 
+import android.webkit.WebView;
+
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.AdType;
 import com.adadapted.android.sdk.core.ad.model.CustomAdEvents;
@@ -81,9 +83,10 @@ public class ViewAdWrapper {
         return mSession;
     }
 
-    public void beginAdTracking() {
+    public void beginAdTracking(final WebView trackingWebView) {
         if(hasAd() && shouldBeginTracking()) {
             AdEventTrackingManager.trackImpressionBeginEvent(mSession, getAd());
+            trackingWebView.loadData(getAd().getTrackingHtml(), "text/html", null);
 
             trackingHasStarted = true;
             hasTrackedImpression = true;

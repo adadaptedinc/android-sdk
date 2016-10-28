@@ -12,6 +12,7 @@ public class Ad implements Serializable {
     private String zoneId = "";
     private String baseImpressionId = "";
     private boolean hideAfterInteraction = false;
+    private String trackingHtml;
     private int refreshTime = 0;
     private AdType adType = new NullAdType();
     private AdAction adAction = new NullAdAction();
@@ -50,6 +51,14 @@ public class Ad implements Serializable {
 
     public void incrementImpressionViews() {
         impressionViews++;
+    }
+
+    public String getTrackingHtml() {
+        return trackingHtml;
+    }
+
+    public void setTrackingHtml(String trackingHtml) {
+        this.trackingHtml = trackingHtml;
     }
 
     public int getRefreshTime() {

@@ -3,6 +3,11 @@ package com.adadapted.android.sdk.ui.view;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.view.View;
+import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.AdImage;
@@ -10,6 +15,7 @@ import com.adadapted.android.sdk.core.common.Dimension;
 import com.adadapted.android.sdk.core.event.model.AppEventSource;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.core.zone.model.Zone;
+import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
 import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
 import com.adadapted.android.sdk.ext.management.SessionManager;
 import com.adadapted.android.sdk.ext.scheduler.AdZoneRefreshScheduler;
@@ -32,6 +38,8 @@ class AaZoneViewController
     private final Context mContext;
     private final AaZoneViewProperties mZoneProperties;
 
+    private final WebView mTrackingWebView;
+
     private final AdViewBuilder mAdViewBuilder;
     private final AdActionHandler mAdActionHandler;
 
@@ -45,6 +53,22 @@ class AaZoneViewController
     public AaZoneViewController(final Context context, final AaZoneViewProperties zoneProperties) {
         mContext = context;
         mZoneProperties = zoneProperties;
+
+        mTrackingWebView = new WebView(context);
+        mTrackingWebView.setWebChromeClient(new WebChromeClient());
+        mTrackingWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onReceivedError(WebView view,
+                                        WebResourceRequest request,
+                                        WebResourceError error) {
+                super.onReceivedError(view, request, error);
+
+                AppErrorTrackingManager.registerEvent(
+                        "TRACKING_PIXEL_LOAD_ERROR",
+                        "Problem loading tracking pixel for Ad: " + mCurrentAd.getAdId(),
+                        new HashMap<String, String>());
+            }
+        });
 
         mAdViewBuilder = new AdViewBuilder(context);
         mAdViewBuilder.setListener(this);
@@ -100,7 +124,7 @@ class AaZoneViewController
 
     public void acknowledgeDisplay() {
         if(!mTimerRunning.contains(mCurrentAd.getAdId())) {
-            mCurrentAd.beginAdTracking();
+            mCurrentAd.beginAdTracking(mTrackingWebView);
             setTimer();
         }
     }
