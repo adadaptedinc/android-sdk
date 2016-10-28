@@ -1,5 +1,7 @@
 package com.adadapted.android.sdk.core.event;
 
+import android.util.Log;
+
 import com.adadapted.android.sdk.core.device.DeviceInfo;
 
 import org.json.JSONObject;
@@ -29,6 +31,8 @@ public class AppErrorTracker {
     public void trackError(final String errorCode,
                            final String errorMessage,
                            final Map<String, String> errorParams) {
+        Log.w(LOGTAG, "Tracking Error: " + errorCode + ": " + errorMessage);
+
         final JSONObject json = builder.buildItem(errorWrapper, errorCode, errorMessage, errorParams);
         sink.publishError(json);
     }
