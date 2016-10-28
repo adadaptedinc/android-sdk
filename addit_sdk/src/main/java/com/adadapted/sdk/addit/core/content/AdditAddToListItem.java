@@ -1,10 +1,24 @@
 package com.adadapted.sdk.addit.core.content;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by chrisweeden on 10/27/16.
  */
+public final class AdditAddToListItem implements Parcelable {
+    public static final Creator<AdditAddToListItem> CREATOR = new Creator<AdditAddToListItem>() {
+        @Override
+        public AdditAddToListItem createFromParcel(Parcel in) {
+            return new AdditAddToListItem(in);
+        }
 
-public final class AdditAddToListItem {
+        @Override
+        public AdditAddToListItem[] newArray(int size) {
+            return new AdditAddToListItem[size];
+        }
+    };
+
     private final String trackingId;
     private final String title;
     private final String brand;
@@ -27,6 +41,32 @@ public final class AdditAddToListItem {
         this.barCode = barCode;
         this.discount = discount;
         this.productImage = productImage;
+    }
+
+    private AdditAddToListItem(Parcel in) {
+        trackingId = in.readString();
+        title = in.readString();
+        brand = in.readString();
+        category = in.readString();
+        barCode = in.readString();
+        discount = in.readString();
+        productImage = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(trackingId);
+        dest.writeString(title);
+        dest.writeString(brand);
+        dest.writeString(category);
+        dest.writeString(barCode);
+        dest.writeString(discount);
+        dest.writeString(productImage);
     }
 
     public String getTrackingId() {
