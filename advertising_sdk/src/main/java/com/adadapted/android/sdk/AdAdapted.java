@@ -3,18 +3,17 @@ package com.adadapted.android.sdk;
 import android.content.Context;
 import android.util.Log;
 
-import com.adadapted.android.sdk.addit.AaSdkAdditContentListener;
-import com.adadapted.android.sdk.addit.AdditContentPublisher;
 import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.event.model.AppEventSource;
 import com.adadapted.android.sdk.core.session.model.Session;
-import com.adadapted.android.sdk.ext.cache.ImageCache;
 import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
 import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
 import com.adadapted.android.sdk.ext.management.SessionManager;
 import com.adadapted.android.sdk.ext.scheduler.EventFlushScheduler;
+import com.adadapted.android.sdk.ui.messaging.AaSdkAdditContentListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener;
+import com.adadapted.android.sdk.ui.messaging.AdditContentPublisher;
 import com.adadapted.android.sdk.ui.messaging.SdkEventPublisher;
 
 import java.util.HashMap;
@@ -116,7 +115,7 @@ public class AdAdapted {
                 new HashMap<String, String>());
 
         new EventFlushScheduler().start(Config.DEFAULT_EVENT_POLLING);
-        Log.i(LOGTAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", Config.SDK_VERSION));
+        Log.i(LOGTAG, String.format("Addit Android Advertising SDK v%s initialized.", Config.SDK_VERSION));
     }
 
     public static synchronized void registerEvent(final String eventName) {

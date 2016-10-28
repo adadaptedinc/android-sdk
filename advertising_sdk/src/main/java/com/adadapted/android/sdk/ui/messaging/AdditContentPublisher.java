@@ -1,4 +1,6 @@
-package com.adadapted.android.sdk.addit;
+package com.adadapted.android.sdk.ui.messaging;
+
+import com.adadapted.android.sdk.core.addit.AdditContent;
 
 /**
  * Created by chrisweeden on 9/16/16.
@@ -24,8 +26,8 @@ public class AdditContentPublisher {
         }
     }
 
-    public void publishContent(final AdditContentPayload payload) {
-        if(mListener != null) {
+    public void publishContent(final AdditContent payload) {
+        if(mListener != null && payload != null) {
             mListener.onContentAvailable(payload);
         }
     }
