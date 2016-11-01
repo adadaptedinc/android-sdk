@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.adadapted.sdk.demoadditapp">
+    package="com.adadapted.demo.baskethandle">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:name=".DemoAdditApplication"
+        android:name="com.adadapted.demo.baskethandle.BasketHandleApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity" android:label="@string/app_name"
+        <activity
+            android:name="com.adadapted.demo.baskethandle.app.common.MainActivity"
+            android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,12 +22,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name="com.adadapted.sdk.addit.ui.AdditInterceptActivity"
+            android:excludeFromRecents="true"
             android:launchMode="singleTask"
-            android:taskAffinity=""
-            android:excludeFromRecents="true">
+            android:taskAffinity="">
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.VIEW" />
 
@@ -52,9 +53,13 @@
                     android:host="additdemo"
                     android:pathPrefix="/"
                     android:scheme="addit" />
-
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.adadapted.demo.baskethandle.app.common.Main2Activity"
+            android:label="@string/title_activity_main2"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".app.common.MainActivity" />
     </application>
 
 </manifest>

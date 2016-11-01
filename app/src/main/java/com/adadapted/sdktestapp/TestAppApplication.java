@@ -5,13 +5,14 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.adadapted.android.sdk.AdAdapted;
-import com.adadapted.android.sdk.addit.AaSdkAdditContentListener;
-import com.adadapted.android.sdk.addit.AdditContentPayload;
+
+import com.adadapted.android.sdk.core.addit.AdditAddToListItem;
+import com.adadapted.android.sdk.core.addit.AdditContent;
+import com.adadapted.android.sdk.ui.messaging.AaSdkAdditContentListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener;
 import com.adadapted.sdktestapp.core.todo.TodoList;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;
-import com.adadapted.sdktestapp.ui.todo.activity.TodoListDetailActivity;
 import com.adadapted.sdktestapp.ui.todo.activity.TodoListsActivity;
 import com.flurry.android.FlurryAgent;
 import com.newrelic.agent.android.NewRelic;
@@ -20,8 +21,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Created by chrisweeden on 3/16/15.
@@ -44,7 +44,7 @@ public class TestAppApplication extends Application {
 
         String apiKey = getResources().getString(R.string.adadapted_api_key);
 
-        AdAdapted.init(this)
+        AdAdapted.init()
             .withAppId(apiKey)
             .inEnv(AdAdapted.Env.DEV)
             .setSdkSessionListener(new AaSdkSessionListener() {
@@ -61,18 +61,16 @@ public class TestAppApplication extends Application {
             })
             .setSdkAdditContentListener(new AaSdkAdditContentListener() {
                 @Override
-                public void onContentAvailable(AdditContentPayload payload) {
+                public void onContentAvailable(AdditContent payload) {
                     try {
-                        JSONArray listItems = payload.getPayload().getJSONArray("add_to_list_items");
+                        List<AdditAddToListItem> listItems = payload.getPayload();
 
                         TodoList list = TodoListManager.getInstance(TestAppApplication.this).getDefaultList();
 
-                        int itemCount = listItems.length();
-                        for (int i = 0; i < itemCount; i++) {
-                            JSONObject item = (JSONObject) listItems.get(i);
+                        for (AdditAddToListItem item : listItems) {
                             TodoListManager
                                     .getInstance(TestAppApplication.this)
-                                    .addItemToList(list.getId(), item.getString("product_title"));
+                                    .addItemToList(list.getId(), item.getTitle());
                         }
 
                         payload.acknowledge();
@@ -83,11 +81,12 @@ public class TestAppApplication extends Application {
                         payload.getActivity().finish();
                         startActivity(intent);
                     }
-                    catch(JSONException ex) {
+                    catch(Exception ex) {
                         Log.e(TAG, "Error handling Addit payload", ex);
+                        payload.failed("Client Error handling Addit payload");
                     }
                 }
             })
-            .start();
+            .start(this);
     }
 }

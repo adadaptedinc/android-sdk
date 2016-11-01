@@ -30,4 +30,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.google.android.gms:play-services-ads:9.6.1'
     compile 'com.android.support:support-v4:24.2.1'
+    compile 'com.android.volley:volley:1.0.0'
 }
