@@ -29,7 +29,7 @@ public class Session {
         this.activeCampaigns = activeCampaigns;
         this.expiresAt = expiresAt == null ? new Date() : expiresAt;
         this.pollingInterval = pollingInterval;
-        this.zones = zones;
+        this.zones = zones == null ? new HashMap<String, Zone>() : zones;
     }
 
     public Session() {
@@ -71,13 +71,11 @@ public class Session {
     }
 
     public Zone getZone(final String zoneId) {
-        final Zone zone = zones.get(zoneId);
-
-        if(zone == null) {
-            return Zone.createEmptyZone(zoneId);
+        if(zones.containsKey(zoneId)) {
+            return zones.get(zoneId);
         }
 
-        return zone;
+        return Zone.createEmptyZone(zoneId);
     }
 
     public Session updateZones(final Map<String, Zone> zones) {
