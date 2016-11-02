@@ -8,6 +8,8 @@ import com.adadapted.android.sdk.core.ad.model.CustomAdEvents;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.ext.management.AdEventTrackingManager;
 
+import java.util.Date;
+
 /**
  * Created by chrisweeden on 5/26/15.
  */
@@ -88,8 +90,12 @@ public class ViewAdWrapper {
             AdEventTrackingManager.trackImpressionBeginEvent(mSession, getAd());
 
             final String trackingHtml = getAd().getTrackingHtml();
+
             if(trackingHtml != null && !trackingHtml.isEmpty()) {
-                trackingWebView.loadData(getAd().getTrackingHtml(), "text/html", null);
+                final long timestamp = new Date().getTime();
+                final String parsedTrackingHtml = trackingHtml.replace("[timestamp]", String.valueOf(timestamp));
+
+                trackingWebView.loadData(parsedTrackingHtml, "text/html", null);
             }
 
             trackingHasStarted = true;
