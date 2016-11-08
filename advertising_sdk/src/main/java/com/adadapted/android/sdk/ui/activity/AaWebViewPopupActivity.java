@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
@@ -14,8 +17,12 @@ import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.PopupAdAction;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.ext.management.AdEventTrackingManager;
+import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
 import com.adadapted.android.sdk.ext.management.SessionManager;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class AaWebViewPopupActivity extends Activity {
     private static final String LOGTAG = AaWebViewPopupActivity.class.getName();
@@ -97,26 +104,37 @@ public class AaWebViewPopupActivity extends Activity {
                                                     final String url) {
                 return false;
             }
+
+            @Override
+            public void onReceivedError(WebView view,
+                                        WebResourceRequest request,
+                                        WebResourceError error) {
+                super.onReceivedError(view, request, error);
+
+                final Map<String, String> params = new HashMap<>();
+                params.put("url", url);
+                params.put("error", error.toString());
+                AppErrorTrackingManager.registerEvent(
+                        "POPUP_URL_LOAD_FAILED",
+                        "Problem loading popup url",
+                        params);
+            }
+
+            @Override
+            public void onReceivedHttpError(WebView view,
+                                            WebResourceRequest request,
+                                            WebResourceResponse errorResponse) {
+                super.onReceivedHttpError(view, request, errorResponse);
+
+                final Map<String, String> params = new HashMap<>();
+                params.put("url", url);
+                params.put("error", errorResponse.toString());
+                AppErrorTrackingManager.registerEvent(
+                        "POPUP_URL_LOAD_FAILED",
+                        "Problem loading popup url",
+                        params);
+            }
         });
         popupWebView.loadUrl(url);
     }
-
-    //private void styleActivity(PopupAdAction action) {
-    //
-
-    //    ActionBar bar = getActionBar();
-    //    try {
-    //        setTitleColor(Color.parseColor(action.getTextColor()));
-    //    } catch (Exception ex) {
-    //        Log.w(LOGTAG, "Problem setting text color " + action.getTextColor());
-    //    }
-
-    //    try {
-    //        if(bar != null) {
-    //            bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(action.getBackgroundColor())));
-    //        }
-    //    } catch (Exception ex) {
-    //        Log.w(LOGTAG, "Problem setting background color " + action.getBackgroundColor());
-    //    }
-    //}
 }
