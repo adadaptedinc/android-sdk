@@ -4,12 +4,16 @@ import android.util.Log;
 
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptEventSink;
 import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
+import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 
 import org.json.JSONArray;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by chrisweeden on 9/30/16.
@@ -39,10 +43,13 @@ public class HttpKeywordInterceptEventSink implements KeywordInterceptEventSink 
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d(LOGTAG, "KI Track Request Failed.");
-                AdAnomalyTrackingManager.registerAnomaly("",
-                        endpoint,
+
+                final Map<String, String> params = new HashMap<>();
+                params.put("url", endpoint);
+                AppErrorTrackingManager.registerEvent(
                         "KI_EVENT_REQUEST_FAILED",
-                        error.getMessage());
+                        error.getMessage(),
+                        params);
             }
         });
 

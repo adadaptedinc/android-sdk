@@ -4,12 +4,16 @@ import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.AdEventSink;
 import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
+import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 
 import org.json.JSONArray;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by chrisweeden on 3/23/15.
@@ -41,10 +45,13 @@ public class HttpAdEventSink implements AdEventSink {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.i(LOGTAG, "Ad Event Batch Request Failed.", error);
-                AdAnomalyTrackingManager.registerAnomaly("",
-                        mBatchUrl,
+
+                final Map<String, String> params = new HashMap<>();
+                params.put("url", mBatchUrl);
+                AppErrorTrackingManager.registerEvent(
                         "AD_EVENT_TRACK_REQUEST_FAILED",
-                        error.getMessage());
+                        error.getMessage(),
+                        params);
             }
 
         });

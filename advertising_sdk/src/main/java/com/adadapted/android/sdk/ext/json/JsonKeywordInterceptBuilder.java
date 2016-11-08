@@ -6,6 +6,7 @@ import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptBuilder;
 import com.adadapted.android.sdk.core.keywordintercept.model.AutoFill;
 import com.adadapted.android.sdk.core.keywordintercept.model.KeywordIntercept;
 import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
+import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,10 +43,14 @@ public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
         }
         catch(JSONException ex) {
             Log.w(TAG, "Problem parsing JSON", ex);
-            AdAnomalyTrackingManager.registerAnomaly("",
-                    json.toString(),
+
+            final Map<String, String> params = new HashMap<>();
+            params.put("error", ex.getMessage());
+            params.put("payload", json.toString());
+            AppEventTrackingManager.registerEvent(
                     "KI_PAYLOAD_PARSE_FAILED",
-                    "Failed to parse KI payload for processing.");
+                    "Failed to parse KI payload for processing.",
+                    params);
         }
 
         final Map<String, AutoFill> interceptMap = parseAutofill(json);
@@ -91,10 +96,14 @@ public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
         }
         catch(JSONException ex) {
             Log.w(TAG, "Problem parsing JSON", ex);
-            AdAnomalyTrackingManager.registerAnomaly("",
-                    json.toString(),
+
+            final Map<String, String> params = new HashMap<>();
+            params.put("exception", ex.getMessage());
+            params.put("bad_json", json.toString());
+            AppEventTrackingManager.registerEvent(
                     "KI_PAYLOAD_PARSE_FAILED",
-                    "Failed to parse KI payload for processing.");
+                    "Failed to parse KI payload for processing.",
+                    params);
         }
 
         return interceptMap;

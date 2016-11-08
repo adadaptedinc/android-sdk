@@ -6,12 +6,16 @@ import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptAdapter;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptBuilder;
 import com.adadapted.android.sdk.core.keywordintercept.model.KeywordIntercept;
 import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
+import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by chrisweeden on 6/23/15.
@@ -46,10 +50,14 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d(LOGTAG, "KI Init Request Failed.");
-                AdAnomalyTrackingManager.registerAnomaly("",
-                        endpoint,
+
+                final Map<String, String> params = new HashMap<>();
+                params.put("url", endpoint);
+                AppErrorTrackingManager.registerEvent(
                         "KI_SESSION_REQUEST_FAILED",
-                        error.getMessage());
+                        error.getMessage(),
+                        params);
+
                 callback.onFailure();
             }
         });

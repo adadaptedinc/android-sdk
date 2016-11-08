@@ -8,6 +8,7 @@ import com.adadapted.android.sdk.core.common.DimensionConverter;
 import com.adadapted.android.sdk.core.zone.ZoneBuilder;
 import com.adadapted.android.sdk.core.zone.model.Zone;
 import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
+import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,10 +46,15 @@ public class JsonZoneBuilder implements ZoneBuilder {
         }
         catch(JSONException ex) {
             Log.w(LOGTAG, "Problem converting to JSON.", ex);
-            AdAnomalyTrackingManager.registerAnomaly("",
-                    jsonZones.toString(),
+
+            final Map<String, String> errorParams = new HashMap<>();
+            errorParams.put("bad_json", jsonZones.toString());
+            errorParams.put("exception", ex.getMessage());
+
+            AppErrorTrackingManager.registerEvent(
                     "SESSION_ZONE_PAYLOAD_PARSE_FAILED",
-                    "Failed to parse Session Zone payload for processing.");
+                    "Failed to parse Session Zone payload for processing.",
+                    errorParams);
         }
 
         return zones;
@@ -104,10 +110,15 @@ public class JsonZoneBuilder implements ZoneBuilder {
         }
         catch(JSONException ex) {
             Log.w(LOGTAG, "Problem converting to JSON.", ex);
-            AdAnomalyTrackingManager.registerAnomaly("",
-                    jsonZone.toString(),
+
+            final Map<String, String> errorParams = new HashMap<>();
+            errorParams.put("bad_json", jsonZone.toString());
+            errorParams.put("exception", ex.getMessage());
+
+            AppErrorTrackingManager.registerEvent(
                     "SESSION_ZONE_PAYLOAD_PARSE_FAILED",
-                    "Failed to parse Session Zone payload for processing.");
+                    "Failed to parse Session Zone payload for processing.",
+                    errorParams);
 
         }
 
