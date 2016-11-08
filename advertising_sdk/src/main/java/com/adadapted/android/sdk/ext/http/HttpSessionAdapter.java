@@ -6,12 +6,16 @@ import com.adadapted.android.sdk.core.session.SessionAdapter;
 import com.adadapted.android.sdk.core.session.SessionBuilder;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
+import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by chrisweeden on 3/23/15.
@@ -49,10 +53,14 @@ public class HttpSessionAdapter implements SessionAdapter {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.i(LOGTAG, "Session Init Request Failed.", error);
-                AdAnomalyTrackingManager.registerAnomaly("",
-                        initUrl,
+
+                final Map<String, String> params = new HashMap<>();
+                params.put("url", initUrl);
+                AppErrorTrackingManager.registerEvent(
                         "SESSION_REQUEST_FAILED",
-                        error.getMessage());
+                        error.getMessage(),
+                        params);
+
                 listener.onFailure();
             }
 
