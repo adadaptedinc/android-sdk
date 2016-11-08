@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -28,6 +27,7 @@ public class AaZoneView extends RelativeLayout
     private static final String LOGTAG = AaZoneView.class.getName();
 
     private final Context mContext;
+    private final Handler mViewHandler;
 
     private AaZoneViewController mViewController;
     private AaZoneViewProperties mZoneProperties;
@@ -37,23 +37,27 @@ public class AaZoneView extends RelativeLayout
     public AaZoneView(Context context) {
         super(context);
         mContext = context;
+        mViewHandler = new Handler(Looper.getMainLooper());
     }
 
     public AaZoneView(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
+        mViewHandler = new Handler(Looper.getMainLooper());
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public AaZoneView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mContext = context;
+        mViewHandler = new Handler(Looper.getMainLooper());
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public AaZoneView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         mContext = context;
+        mViewHandler = new Handler(Looper.getMainLooper());
     }
 
     public void init(final String zoneId) {
@@ -78,13 +82,10 @@ public class AaZoneView extends RelativeLayout
         //Log.i(LOGTAG, "displayAdView called");
         if(view == null) { return; }
 
-        setVisibility(View.VISIBLE);
-
-        final Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
+        mViewHandler.post(new Runnable() {
             @Override
             public void run() {
-                Log.i(LOGTAG, String.format("Pushing Ad display to Zone %s", mZoneProperties.getZoneId()));
+                //Log.i(LOGTAG, String.format("Pushing Ad display to Zone %s", mZoneProperties.getZoneId()));
                 ViewGroup parent = ((ViewGroup) view.getParent());
                 if (parent != null) {
                     parent.removeView(view);
@@ -143,6 +144,8 @@ public class AaZoneView extends RelativeLayout
     }
 
     public void onStart() {
+        //Log.i(LOGTAG, "onStart called");
+
         if(mZoneProperties == null) {
             return;
         }
@@ -160,6 +163,8 @@ public class AaZoneView extends RelativeLayout
     }
 
     public void onStop() {
+        //Log.i(LOGTAG, "onResetDisplayView called");
+
         if(mZoneProperties == null) {
             return;
         }
@@ -179,16 +184,20 @@ public class AaZoneView extends RelativeLayout
     protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
 
+        //final String zoneId = mZoneProperties != null ? mZoneProperties.getZoneId() : "None";
+        //Log.i(LOGTAG, String.format("Zone %s visibility changed to %d", zoneId, visibility));
+        //Log.i(LOGTAG, String.format("Visibilities: %d - GONE, %d - INVISIBLE, %d - VISIBLE", View.GONE, View.INVISIBLE, View.VISIBLE));
+
         switch(visibility) {
             case View.GONE:
             case View.INVISIBLE:
-                //Log.i(LOGTAG, String.format("Ad Zone %s NOT viewable. NO ads will display", mZoneProperties.getZoneId()));
+                //Log.i(LOGTAG, String.format("Ad Zone %s NOT viewable. NO ads will display", zoneId));
                 mVisible = false;
                 onStop();
                 break;
 
             case View.VISIBLE:
-                //Log.i(LOGTAG, String.format("Ad Zone %s viewable. Ads will display", mZoneProperties.getZoneId()));
+                //Log.i(LOGTAG, String.format("Ad Zone %s viewable. Ads will display", zoneId));
                 onStart();
                 mVisible = true;
                 break;
