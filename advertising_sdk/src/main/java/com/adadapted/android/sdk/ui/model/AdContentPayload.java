@@ -62,13 +62,7 @@ public class AdContentPayload implements ContentPayload {
         try {
             final JSONArray array = getPayload().getJSONArray("add_to_list_items");
             for (int i = 0; i < array.length(); i++) {
-                final String item = array.getString(i);
-
-                final Map<String, String> params = new HashMap<>();
-                params.put("ad_id", mAd.getAdId());
-                params.put("item_name", item);
-
-                AppEventTrackingManager.registerEvent(AppEventSource.SDK, "atl_added_to_list", params);
+                trackItem(mAd.getAdId(), array.getString(i));
             }
         }
         catch(JSONException ex) {
@@ -76,6 +70,14 @@ public class AdContentPayload implements ContentPayload {
         }
 
         mAd.trackPayloadDelivered();
+    }
+
+    private void trackItem(final String adId, final String itemName) {
+        final Map<String, String> params = new HashMap<>();
+        params.put("ad_id", adId);
+        params.put("item_name", itemName);
+
+        AppEventTrackingManager.registerEvent(AppEventSource.SDK, "atl_added_to_list", params);
     }
 
     public String getZoneId() {
