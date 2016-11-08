@@ -5,8 +5,11 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -72,14 +75,16 @@ public class AaZoneView extends RelativeLayout
     }
 
     protected void displayAdView(final View view) {
+        //Log.i(LOGTAG, "displayAdView called");
         if(view == null) { return; }
 
         setVisibility(View.VISIBLE);
 
-        view.post(new Runnable() {
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
             @Override
             public void run() {
-                //Log.i(LOGTAG, String.format("Pushing Ad display to Zone %s", mZoneProperties.getZoneId()));
+                Log.i(LOGTAG, String.format("Pushing Ad display to Zone %s", mZoneProperties.getZoneId()));
                 ViewGroup parent = ((ViewGroup) view.getParent());
                 if (parent != null) {
                     parent.removeView(view);
@@ -93,6 +98,7 @@ public class AaZoneView extends RelativeLayout
 
     @Override
     public void onViewReadyForDisplay(final View view) {
+        //Log.i(LOGTAG, "onViewReadyForDisplay called");
         if(view instanceof WebView) {
             view.setOnTouchListener(new OnTouchListener() {
                 @Override
@@ -127,6 +133,7 @@ public class AaZoneView extends RelativeLayout
 
     @Override
     public void onResetDisplayView() {
+        //Log.i(LOGTAG, "onResetDisplayView called");
         this.post(new Runnable() {
             @Override
             public void run() {
@@ -175,12 +182,13 @@ public class AaZoneView extends RelativeLayout
         switch(visibility) {
             case View.GONE:
             case View.INVISIBLE:
-                //Log.i(LOGTAG, String.format("Ad Zone %s not viewable. No ads will display", mZoneProperties.getZoneId()));
+                //Log.i(LOGTAG, String.format("Ad Zone %s NOT viewable. NO ads will display", mZoneProperties.getZoneId()));
                 mVisible = false;
                 onStop();
                 break;
 
             case View.VISIBLE:
+                //Log.i(LOGTAG, String.format("Ad Zone %s viewable. Ads will display", mZoneProperties.getZoneId()));
                 onStart();
                 mVisible = true;
                 break;
