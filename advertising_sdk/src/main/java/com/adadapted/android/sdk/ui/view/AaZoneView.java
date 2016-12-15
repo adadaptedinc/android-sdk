@@ -78,6 +78,10 @@ public class AaZoneView extends RelativeLayout
         setGravity(Gravity.CENTER);
     }
 
+    public void shutdown() {
+        this.setVisibility(View.GONE);
+    }
+
     protected void displayAdView(final View view) {
         //Log.i(LOGTAG, "displayAdView called");
         if(view == null) { return; }
