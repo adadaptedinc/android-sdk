@@ -7,7 +7,6 @@ import com.adadapted.android.sdk.core.session.SessionBuilder;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.core.zone.ZoneBuilder;
 import com.adadapted.android.sdk.core.zone.model.Zone;
-import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
 import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
 
 import org.json.JSONException;
@@ -52,11 +51,13 @@ public class JsonSessionBuilder implements SessionBuilder {
             }
 
             if(builder.hasActiveCampaigns()) {
-                if(response.has(JsonFields.ZONES)) {
+                if(response.has(JsonFields.ZONES) && (response.get(JsonFields.ZONES).getClass() == JSONObject.class)) {
                     final JSONObject jsonZones = response.getJSONObject(JsonFields.ZONES);
                     final Map<String, Zone> zones = zoneBuilder.buildZones(jsonZones);
-
                     builder.setZones(zones);
+                }
+                else {
+                    Log.i(LOGTAG, "No ads returned. Not parsing JSONArray.");
                 }
             }
         }
