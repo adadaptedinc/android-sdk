@@ -41,12 +41,16 @@ public class AdAdapted {
 
     private AdAdapted() {}
 
-    public static AdAdapted init() {
+    private synchronized static AdAdapted getsInstance() {
         if(sInstance == null) {
             sInstance = new AdAdapted();
         }
 
         return sInstance;
+    }
+
+    public static AdAdapted init() {
+        return getsInstance();
     }
 
     public AdAdapted withAppId(final String appId) {
@@ -116,6 +120,15 @@ public class AdAdapted {
 
         new EventFlushScheduler().start(Config.DEFAULT_EVENT_POLLING);
         Log.i(LOGTAG, String.format("Addit Android Advertising SDK v%s initialized.", Config.SDK_VERSION));
+    }
+
+    public static synchronized void hasAdsToServe() {
+        if(getsInstance().sessionListener != null) {
+            final Session session = SessionManager.getCurrentSession();
+            final boolean hasAds = (session != null) && session.hasActiveCampaigns();
+
+            getsInstance().sessionListener.onHasAdsToServe(hasAds);
+        }
     }
 
     public static synchronized void registerEvent(final String eventName) {
