@@ -52,7 +52,7 @@ public class HttpSessionAdapter implements SessionAdapter {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.i(LOGTAG, "Session Init Request Failed.", error);
+                Log.w(LOGTAG, "Session Init Request Failed.", error);
 
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", initUrl);
