@@ -102,6 +102,15 @@ public class Session {
         private long pollingInterval;
         private Map<String, Zone> zones;
 
+        public Builder() {
+            deviceInfo = new DeviceInfo();
+            sessionId = "";
+            activeCampaigns = false;
+            expiresAt = new Date();
+            pollingInterval = 300000;
+            zones = new HashMap<>();
+        }
+
         public DeviceInfo getDeviceInfo() {
             return deviceInfo;
         }
