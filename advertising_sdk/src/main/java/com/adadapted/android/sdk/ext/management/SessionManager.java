@@ -112,11 +112,7 @@ public class SessionManager
     }
 
     public static synchronized Session getCurrentSession() {
-        if(sSession != null) {
-            return sSession;
-        }
-
-        return new Session();
+        return sSession;
     }
 
     @Override

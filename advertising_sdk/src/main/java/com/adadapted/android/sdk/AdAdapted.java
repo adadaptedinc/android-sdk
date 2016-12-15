@@ -125,9 +125,10 @@ public class AdAdapted {
     public static synchronized void hasAdsToServe() {
         if(getsInstance().sessionListener != null) {
             final Session session = SessionManager.getCurrentSession();
-            final boolean hasAds = (session != null) && session.hasActiveCampaigns();
 
-            getsInstance().sessionListener.onHasAdsToServe(hasAds);
+            if(session != null) {
+                getsInstance().sessionListener.onHasAdsToServe(session.hasActiveCampaigns());
+            }
         }
     }
 

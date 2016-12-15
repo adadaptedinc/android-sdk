@@ -60,8 +60,10 @@ public class AaWebViewPopupActivity extends Activity {
         final Intent intent = getIntent();
         ad = (Ad)intent.getSerializableExtra(EXTRA_POPUP_AD);
 
-        mSession = new Session();
         mSession = SessionManager.getCurrentSession();
+        if(mSession == null) {
+            mSession = new Session();
+        }
 
         final PopupAdAction action = (PopupAdAction)ad.getAdAction();
 
