@@ -44,9 +44,9 @@ public class SessionManager
     private static Session sSession;
 
     public static synchronized void start(final Context context,
-                                                    final String appId,
-                                                    final boolean isProd,
-                                                    final Callback callback) {
+                                          final String appId,
+                                          final boolean isProd,
+                                          final Callback callback) {
         if(sInstance == null) {
             sInstance = new SessionManager(context, appId, isProd, callback);
         }
