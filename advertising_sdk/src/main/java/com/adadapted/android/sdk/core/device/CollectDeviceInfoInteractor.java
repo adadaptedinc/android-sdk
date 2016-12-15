@@ -82,7 +82,13 @@ public class CollectDeviceInfoInteractor implements Interactor {
 
     private String captureAdvertisingId(final Context context) {
         try {
-            return AdvertisingIdClient.getAdvertisingIdInfo(context).getId();
+            final AdvertisingIdClient.Info info = AdvertisingIdClient.getAdvertisingIdInfo(context);
+            if (info != null) {
+                return info.getId();
+            }
+            else {
+                Log.w(LOGTAG, "No Google Play Advertiser Info available.");
+            }
         }
         catch (GooglePlayServicesNotAvailableException | GooglePlayServicesRepairableException | IOException ex) {
             Log.w(LOGTAG, "Problem retrieving Google Play Advertiser Info");
