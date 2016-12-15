@@ -5,7 +5,6 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.ad.AdRefreshBuilder;
 import com.adadapted.android.sdk.core.zone.ZoneBuilder;
 import com.adadapted.android.sdk.core.zone.model.Zone;
-import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
 import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
 
 import org.json.JSONException;
@@ -27,8 +26,14 @@ public class JsonAdRefreshBuilder implements AdRefreshBuilder {
     }
 
     public Map<String, Zone> buildRefreshedAds(final JSONObject adJson) {
+        Map<String, Zone> zones = new HashMap<>();
         try {
-            return mZoneBuilder.buildZones(adJson.getJSONObject(JsonFields.ZONES));
+            if(adJson.has(JsonFields.ZONES) && (adJson.get(JsonFields.ZONES).getClass() == JSONObject.class)) {
+                zones = mZoneBuilder.buildZones(adJson.getJSONObject(JsonFields.ZONES));
+            }
+
+            Log.i(LOGTAG, "No ads returned. Not parsing JSONArray.");
+            return zones;
         }
         catch (JSONException ex) {
             Log.w(LOGTAG, "Problem converting to JSON.");
