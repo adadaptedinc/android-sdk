@@ -1,4 +1,4 @@
-package com.adadapted.sdk.addit.ext.factory;
+package com.adadapted.sdk.addit.ext.management;
 
 import com.adadapted.sdk.addit.config.Config;
 import com.adadapted.sdk.addit.core.app.AppEventSink;

@@ -1,4 +1,4 @@
-package com.adadapted.sdk.addit.ext.factory;
+package com.adadapted.sdk.addit.ext.management;
 
 import android.content.Context;
 
@@ -15,7 +15,6 @@ import java.util.Set;
 /**
  * Created by chrisweeden on 9/26/16.
  */
-
 public class DeviceInfoManager implements CollectDeviceInfoInteractor.Callback {
     private static DeviceInfoManager sInstance;
 
