@@ -2,6 +2,9 @@ package com.adadapted.sdk.addit.ui;
 
 import com.adadapted.sdk.addit.core.content.Content;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by chrisweeden on 9/16/16.
  */
@@ -16,9 +19,12 @@ public class AdditContentPublisher {
         return sInstance;
     }
 
+    private Map<String, Content> publishedContent;
     private AdditContentListener mListener;
 
-    private AdditContentPublisher() {}
+    private AdditContentPublisher() {
+        publishedContent = new HashMap<>();
+    }
 
     public void addListener(final AdditContentListener listener) {
         if(listener != null) {
@@ -27,7 +33,17 @@ public class AdditContentPublisher {
     }
 
     public void publishContent(final Content content) {
-        if(mListener != null && content != null) {
+        if(content == null) {
+            return;
+        }
+
+        if(publishedContent.containsKey(content.getPayloadId())) {
+            content.duplicate();
+            return;
+        }
+
+        if(mListener != null) {
+            publishedContent.put(content.getPayloadId(), content);
             mListener.onContentAvailable(content);
         }
     }
