@@ -7,10 +7,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.adadapted.sdk.addit.core.app.AppEventSource;
-import com.adadapted.sdk.addit.core.content.AdditContent;
-import com.adadapted.sdk.addit.core.content.ContentPayloadParser;
-import com.adadapted.sdk.addit.ext.factory.AppErrorTrackingManager;
-import com.adadapted.sdk.addit.ext.factory.AppEventTrackingManager;
+import com.adadapted.sdk.addit.core.deeplink.DeeplinkContent;
+import com.adadapted.sdk.addit.core.deeplink.DeeplinkContentParser;
+import com.adadapted.sdk.addit.ext.management.AppErrorTrackingManager;
+import com.adadapted.sdk.addit.ext.management.AppEventTrackingManager;
+import com.adadapted.sdk.addit.ext.management.PayloadPickupManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +23,8 @@ public class AdditInterceptActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        PayloadPickupManager.deeplinkInProgress();
+
         AppEventTrackingManager.registerEvent(
                 AppEventSource.SDK,
                 "addit_app_opened",
@@ -31,8 +34,8 @@ public class AdditInterceptActivity extends AppCompatActivity {
             final Intent additIntent = getIntent();
             final Uri uri = additIntent.getData();
 
-            final ContentPayloadParser parser = new ContentPayloadParser(this);
-            final AdditContent content = parser.parse(uri);
+            final DeeplinkContentParser parser = new DeeplinkContentParser();
+            final DeeplinkContent content = parser.parse(uri);
 
             AdditContentPublisher.getInstance().publishContent(content);
         }
@@ -49,5 +52,7 @@ public class AdditInterceptActivity extends AppCompatActivity {
 
             startActivity(mainActivityIntent);
         }
+
+        PayloadPickupManager.deeplinkCompleted();
     }
 }
