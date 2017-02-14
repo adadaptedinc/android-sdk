@@ -3,6 +3,7 @@ package com.adadapted.sdk.addit.ext.http;
 import android.util.Log;
 
 import com.adadapted.sdk.addit.core.app.AppErrorSink;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -41,6 +42,8 @@ public class HttpAppErrorSink implements AppErrorSink {
                 Log.e(LOGTAG, "App Error Request Failed.", error);
             }
         });
+
+        jsonRequest.setRetryPolicy(new DefaultRetryPolicy(1000 * 20, 2, 1.0f));
 
         HttpRequestManager.getQueue().add(jsonRequest);
     }
