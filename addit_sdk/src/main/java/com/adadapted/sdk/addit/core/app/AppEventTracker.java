@@ -57,7 +57,6 @@ public class AppEventTracker {
     public void trackEvent(final String eventSource,
                            final String eventName,
                            final Map<String, String> eventParams) {
-
         try {
             final JSONObject appEventItem = new JSONObject();
 
