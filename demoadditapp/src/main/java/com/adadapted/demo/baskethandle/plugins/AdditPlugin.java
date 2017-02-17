@@ -6,18 +6,16 @@ import android.util.Log;
 
 import com.adadapted.demo.baskethandle.app.common.MainActivity;
 import com.adadapted.sdk.addit.AdAdapted;
-import com.adadapted.sdk.addit.core.content.AdditAddToListItem;
-import com.adadapted.sdk.addit.core.content.AdditContent;
+import com.adadapted.sdk.addit.core.content.AddToListItem;
+import com.adadapted.sdk.addit.core.content.Content;
+import com.adadapted.sdk.addit.core.content.ContentTypes;
 import com.adadapted.sdk.addit.ui.AdditContentListener;
-
-import org.json.JSONObject;
 
 import java.util.List;
 
 /**
  * Created by chrisweeden on 10/4/16.
  */
-
 public class AdditPlugin implements Plugin {
     private static final String LOGTAG = AdditPlugin.class.getName();
 
@@ -25,24 +23,23 @@ public class AdditPlugin implements Plugin {
     public void initialize(final Context context) {
         Log.i(LOGTAG, "Initializing Addit SDK.");
         AdAdapted.init()
-                .withAppId("BASKETHANDLEAPP")
+                .withAppId("NTGXMGZHNTDIY2FK")
                 .inEnv(AdAdapted.Env.DEV)
                 .setAdditContentListener(new AdditContentListener() {
                     @Override
-                    public void onContentAvailable(final AdditContent content) {
+                    public void onContentAvailable(final Content content) {
                         if(content != null) {
                             switch(content.getType()) {
-                                case AdditContent.ADD_TO_LIST_ITEMS:
-                                    List<AdditAddToListItem> payloadJson = content.getPayload();
+                                case ContentTypes.ADD_TO_LIST_ITEMS:
+                                    List<AddToListItem> payload = content.getPayload();
 
-                                    Log.i(LOGTAG, "Received Addit Json Payload: " + payloadJson.toString());
+                                    Log.i(LOGTAG, "Received Addit Content: " + payload.toString());
 
                                     content.acknowledge();
 
-                                    final Intent intent = new Intent(content.getActivity(), MainActivity.class);
+                                    final Intent intent = new Intent(context.getApplicationContext(), MainActivity.class);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                                    content.getActivity().finish();
                                     context.startActivity(intent);
                                     break;
 
@@ -59,4 +56,6 @@ public class AdditPlugin implements Plugin {
                 })
                 .start(context);
     }
+
+
 }

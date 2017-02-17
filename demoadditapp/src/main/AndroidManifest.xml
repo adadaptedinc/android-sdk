@@ -33,24 +33,24 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <!-- Accepts URIs that begin with "http://dl.adadapted.com/additdemo” -->
+                <!-- Accepts URIs that begin with "http://dl.adadapted.com/baskethandle” -->
                 <!-- note that the leading "/" is required for pathPrefix -->
                 <data
                     android:host="dl.adadapted.com"
-                    android:pathPrefix="/additdemo"
+                    android:pathPrefix="/baskethandle"
                     android:scheme="http" />
 
-                <!-- Accepts URIs that begin with "https://dl.adadapted.com/additdemo” -->
+                <!-- Accepts URIs that begin with "https://dl.adadapted.com/baskethandle” -->
                 <!-- note that the leading "/" is required for pathPrefix -->
                 <data
                     android:host="dl.adadapted.com"
-                    android:pathPrefix="/additdemo"
+                    android:pathPrefix="/baskethandle"
                     android:scheme="https" />
 
-                <!-- Accepts URIs that begin with "addit://additdemo/” -->
+                <!-- Accepts URIs that begin with "addit://baskethandle/” -->
                 <!-- note that the leading "/" is required for pathPrefix -->
                 <data
-                    android:host="additdemo"
+                    android:host="baskethandle"
                     android:pathPrefix="/"
                     android:scheme="addit" />
             </intent-filter>
