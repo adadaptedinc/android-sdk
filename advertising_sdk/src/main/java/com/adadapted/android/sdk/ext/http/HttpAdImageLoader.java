@@ -6,6 +6,8 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.ad.AdImageLoader;
 import com.adadapted.android.sdk.ext.cache.ImageCache;
 import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
@@ -65,6 +67,11 @@ public class HttpAdImageLoader implements AdImageLoader {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.w(LOGTAG, "Problem loading image URL: " + url);
+
+                        if(error instanceof NoConnectionError || error instanceof NetworkError) {
+                            return;
+                        }
+
                         AdAnomalyTrackingManager.registerAnomaly("",
                                 url,
                                 "AD_IMAGE_REQUEST_FAILED",

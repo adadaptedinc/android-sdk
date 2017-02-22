@@ -4,6 +4,8 @@ import android.util.Log;
 
 import com.adadapted.android.sdk.core.event.AppEventSink;
 import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -42,6 +44,10 @@ public class HttpAppEventSink implements AppEventSink {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(LOGTAG, "App Event Request Failed.", error);
+
+                if(error instanceof NoConnectionError || error instanceof NetworkError) {
+                    return;
+                }
 
                 final Map<String, String> errorParams = new HashMap<>();
                 errorParams.put("endpoint", endpoint);
