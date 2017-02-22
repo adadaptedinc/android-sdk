@@ -7,7 +7,6 @@ import com.adadapted.android.sdk.core.common.Dimension;
 import com.adadapted.android.sdk.core.common.DimensionConverter;
 import com.adadapted.android.sdk.core.zone.ZoneBuilder;
 import com.adadapted.android.sdk.core.zone.model.Zone;
-import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
 import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
 
 import org.json.JSONArray;

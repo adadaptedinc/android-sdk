@@ -1,7 +1,5 @@
 package com.adadapted.android.sdk.ext.management;
 
-import android.util.Log;
-
 import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.ad.AdEventTracker;
 import com.adadapted.android.sdk.core.ad.PublishAdEventsInteractor;

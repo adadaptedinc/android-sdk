@@ -5,7 +5,6 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptBuilder;
 import com.adadapted.android.sdk.core.keywordintercept.model.AutoFill;
 import com.adadapted.android.sdk.core.keywordintercept.model.KeywordIntercept;
-import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
 import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
 
 import org.json.JSONException;
