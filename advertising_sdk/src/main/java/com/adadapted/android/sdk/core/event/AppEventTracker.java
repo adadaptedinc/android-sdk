@@ -2,7 +2,6 @@ package com.adadapted.android.sdk.core.event;
 
 import com.adadapted.android.sdk.core.session.model.Session;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Map;
