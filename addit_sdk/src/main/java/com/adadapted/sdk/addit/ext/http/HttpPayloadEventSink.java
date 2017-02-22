@@ -40,17 +40,16 @@ public class HttpPayloadEventSink implements PayloadEventSink {
             public void onErrorResponse(VolleyError error) {
                 Log.e(LOGTAG, "Payload Event Request Failed.", error);
 
+                if(error instanceof NoConnectionError || error instanceof NetworkError) {
+                    return;
+                }
+
                 final Map<String, String> errorParams = new HashMap<>();
                 errorParams.put("endpoint", endpoint);
                 errorParams.put("exception", error.getClass().getName());
 
-                String errorType = "PAYLOAD_EVENT_REQUEST_FAILED";
-                if(error instanceof NoConnectionError || error instanceof NetworkError) {
-                    errorType = "PAYLOAD_EVENT_NO_NETWORK_CONNECTION";
-                }
-
                 AppErrorTrackingManager.registerEvent(
-                        errorType,
+                        "PAYLOAD_EVENT_REQUEST_FAILED",
                         error.getMessage(),
                         errorParams);
             }

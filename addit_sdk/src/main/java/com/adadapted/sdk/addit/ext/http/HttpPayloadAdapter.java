@@ -51,15 +51,14 @@ public class HttpPayloadAdapter implements PayloadAdapter {
             public void onErrorResponse(VolleyError error) {
                 Log.e(LOGTAG, "Payload Pickup Request Failed.", error);
 
-                String errorType = "PAYLOAD_PICKUP_REQUEST_FAILED";
                 if(error instanceof NoConnectionError || error instanceof NetworkError) {
-                    errorType = "PAYLOAD_PICKUP_NO_NETWORK_CONNECTION";
+                    return;
                 }
 
                 final Map<String, String> errorParams = new HashMap<>();
                 errorParams.put("endpoint", endpoint);
                 AppErrorTrackingManager.registerEvent(
-                        errorType,
+                        "PAYLOAD_PICKUP_REQUEST_FAILED",
                         error.getMessage(),
                         errorParams);
 
