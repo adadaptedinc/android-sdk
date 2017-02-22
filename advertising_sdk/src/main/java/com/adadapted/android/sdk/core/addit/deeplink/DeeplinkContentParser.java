@@ -1,9 +1,11 @@
-package com.adadapted.android.sdk.core.addit;
+package com.adadapted.android.sdk.core.addit.deeplink;
 
-import android.app.Activity;
 import android.net.Uri;
 import android.util.Base64;
 
+import com.adadapted.android.sdk.core.addit.AddToListItem;
+import com.adadapted.android.sdk.core.addit.ContentTypes;
+import com.adadapted.android.sdk.core.addit.JsonFields;
 import com.adadapted.android.sdk.core.event.model.AppEventSource;
 import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
 import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
@@ -20,16 +22,10 @@ import java.util.Map;
 /**
  * Created by chrisweeden on 10/26/16.
  */
-public class AdditContentPayloadParser {
-    private static final String LOGTAG = AdditContentPayloadParser.class.getName();
+public class DeeplinkContentParser {
+    private static final String LOGTAG = DeeplinkContentParser.class.getName();
 
-    private final Activity activity;
-
-    public AdditContentPayloadParser(final Activity activity) {
-        this.activity = activity;
-    }
-
-    public AdditContent parse(final Uri uri) throws Exception {
+    public DeeplinkContent parse(final Uri uri) throws Exception {
         if(uri == null) {
             AppErrorTrackingManager.registerEvent(
                     "ADDIT_NO_DEEPLINK_RECEIVED",
@@ -51,26 +47,29 @@ public class AdditContentPayloadParser {
         final String jsonString = new String(decodedData);
 
         try {
-            final List<AdditAddToListItem> payload = new ArrayList<>();
+            final List<AddToListItem> payload = new ArrayList<>();
+
+            final JSONObject jsonObject = new JSONObject(jsonString);
+            final String payloadId = jsonObject.has(JsonFields.PayloadId) ? jsonObject.getString(JsonFields.PayloadId) : "";
+            final String message = jsonObject.has(JsonFields.PayloadMessage) ? jsonObject.getString(JsonFields.PayloadMessage) : "";
+            final String image = jsonObject.has(JsonFields.PayloadImage) ? jsonObject.getString(JsonFields.PayloadImage) : "";
 
             if(uri.getPath().endsWith("addit_add_list_items")) {
-                final JSONObject jsonObject = new JSONObject(jsonString);
-                final JSONArray detailListItems = jsonObject.getJSONArray("detailed_list_items");
+                final JSONArray detailListItems = jsonObject.getJSONArray(JsonFields.DetailedListItems);
 
                 for(int i = 0; i < detailListItems.length(); i++) {
                     final JSONObject item = (JSONObject) detailListItems.get(i);
                     payload.add(parseItem(item));
                 }
 
-                return new AdditContent(activity, AdditContent.ADD_TO_LIST_ITEMS, payload);
+                return new DeeplinkContent(payloadId, message, image, ContentTypes.ADD_TO_LIST_ITEMS, payload);
             }
             else if (uri.getPath().endsWith("addit_add_list_item")) {
-                final JSONObject jsonObject = new JSONObject(jsonString);
-                final JSONObject detailListItem = jsonObject.getJSONObject("detailed_list_item");
+                final JSONObject detailListItem = jsonObject.getJSONObject(JsonFields.DetailedListItem);
 
                 payload.add(parseItem(detailListItem));
 
-                return new AdditContent(activity, AdditContent.ADD_TO_LIST_ITEM, payload);
+                return new DeeplinkContent(payloadId, message, image, ContentTypes.ADD_TO_LIST_ITEM, payload);
             }
 
             final Map<String, String> errorParams = new HashMap<>();
@@ -95,16 +94,16 @@ public class AdditContentPayloadParser {
         }
     }
 
-    private AdditAddToListItem parseItem(final JSONObject itemJson) {
-        final String trackingId = parseField(itemJson, "tracking_id");
-        final String title = parseField(itemJson, "product_title");
-        final String brand = parseField(itemJson, "product_brand");
-        final String category = parseField(itemJson, "product_category");
-        final String barCode = parseField(itemJson, "product_barcode");
-        final String discount = parseField(itemJson, "product_discount");
-        final String productImage = parseField(itemJson, "product_image");
+    private AddToListItem parseItem(final JSONObject itemJson) {
+        final String trackingId = parseField(itemJson, JsonFields.TrackingId);
+        final String title = parseField(itemJson, JsonFields.ProductTitle);
+        final String brand = parseField(itemJson, JsonFields.ProductBrand);
+        final String category = parseField(itemJson, JsonFields.ProductCategory);
+        final String barCode = parseField(itemJson, JsonFields.ProductBarCode);
+        final String discount = parseField(itemJson, JsonFields.ProductDiscount);
+        final String productImage = parseField(itemJson, JsonFields.ProductImage);
 
-        return new AdditAddToListItem(trackingId, title, brand, category, barCode, discount, productImage);
+        return new AddToListItem(trackingId, title, brand, category, barCode, discount, productImage);
     }
 
     private String parseField(final JSONObject itemJson, final String fieldName) {

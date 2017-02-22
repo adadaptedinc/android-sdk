@@ -8,6 +8,7 @@ import com.adadapted.android.sdk.core.event.model.AppEventSource;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
 import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
+import com.adadapted.android.sdk.ext.management.PayloadPickupManager;
 import com.adadapted.android.sdk.ext.management.SessionManager;
 import com.adadapted.android.sdk.ext.scheduler.EventFlushScheduler;
 import com.adadapted.android.sdk.ui.messaging.AaSdkAdditContentListener;
@@ -103,6 +104,8 @@ public class AdAdapted {
                 if(sessionListener != null) {
                     sessionListener.onHasAdsToServe(session.hasActiveCampaigns());
                 }
+
+                PayloadPickupManager.pickupPayloads(session.getDeviceInfo());
             }
 
             @Override

@@ -13,7 +13,6 @@ import com.adadapted.android.sdk.core.ad.AdImageLoader;
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.AdImage;
 import com.adadapted.android.sdk.core.ad.model.ImageAdType;
-import com.adadapted.android.sdk.core.anomaly.AnomalyAdapter;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.ext.http.HttpAdImageLoader;
 import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;

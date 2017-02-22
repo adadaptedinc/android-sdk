@@ -4,7 +4,7 @@ package com.adadapted.android.sdk.config;
  * Created by chrisweeden on 7/27/15.
  */
 public class Config {
-    public static final String SDK_VERSION = "0.14.4";
+    public static final String SDK_VERSION = "0.15.0";
     public static final long DEFAULT_EVENT_POLLING = 5000L;
 
     public static class Prod {
@@ -18,6 +18,9 @@ public class Config {
 
         public static final String URL_APP_EVENT_TRACK = "https://ec.adadapted.com/v/1/android/events";
         public static final String URL_APP_ERROR_TRACK = "https://ec.adadapted.com/v/1/android/errors";
+
+        public static final String URL_APP_PAYLOAD_PICKUP = "https://payload.adadapted.com/v/1/pickup";
+        public static final String URL_APP_PAYLOAD_TRACK = "https://payload.adadapted.com/v/1/tracking";
     }
 
     public static class Sand {
@@ -31,5 +34,8 @@ public class Config {
 
         public static final String URL_APP_EVENT_TRACK = "https://sandec.adadapted.com/v/1/android/events";
         public static final String URL_APP_ERROR_TRACK = "https://sandec.adadapted.com/v/1/android/errors";
+
+        public static final String URL_APP_PAYLOAD_PICKUP = "https://sandpayload.adadapted.com/v/1/pickup";
+        public static final String URL_APP_PAYLOAD_TRACK = "https://sandpayload.adadapted.com/v/1/tracking";
     }
 }

@@ -199,7 +199,6 @@ public class AaZoneView extends RelativeLayout
                 mVisible = false;
                 onStop();
                 break;
-
             case View.VISIBLE:
                 //Log.i(LOGTAG, String.format("Ad Zone %s viewable. Ads will display", zoneId));
                 onStart();

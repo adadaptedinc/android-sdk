@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.ui.view;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.model.AdAction;
@@ -70,11 +71,17 @@ class AdActionHandler {
 
     private void handleDelegateAction(final ViewAdWrapper ad) {}
 
-    private void handleLinkAction(final ViewAdWrapper ad) {}
+    private void handleLinkAction(final ViewAdWrapper ad) {
+        final Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(ad.getAd().getAdAction().getActionPath()));
+
+        mContext.startActivity(intent);
+    }
 
     private void handlePopupAction(final ViewAdWrapper ad) {
-        Intent intent = AaWebViewPopupActivity.createActivity(mContext, ad);
+        final Intent intent = AaWebViewPopupActivity.createActivity(mContext, ad);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
         mContext.startActivity(intent);
     }
 }
