@@ -45,7 +45,7 @@ public class CollectDeviceInfoInteractor implements Interactor {
         final AdvertisingIdClient.Info info = getAdvertisingIdClientInfo(context);
         if (info != null) {
             deviceInfo.setUdid(info.getId());
-            deviceInfo.setAllowRetargeting(info.isLimitAdTrackingEnabled());
+            deviceInfo.setAllowRetargeting(!info.isLimitAdTrackingEnabled());
         }
         else {
             deviceInfo.setUdid(captureAndroidId(context));
