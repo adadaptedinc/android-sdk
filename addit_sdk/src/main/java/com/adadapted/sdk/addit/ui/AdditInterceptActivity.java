@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.adadapted.sdk.addit.core.app.AppEventSource;
-import com.adadapted.sdk.addit.core.deeplink.DeeplinkContent;
+import com.adadapted.sdk.addit.core.content.Content;
 import com.adadapted.sdk.addit.core.deeplink.DeeplinkContentParser;
 import com.adadapted.sdk.addit.ext.management.AppErrorTrackingManager;
 import com.adadapted.sdk.addit.ext.management.AppEventTrackingManager;
@@ -35,7 +35,7 @@ public class AdditInterceptActivity extends AppCompatActivity {
             final Uri uri = additIntent.getData();
 
             final DeeplinkContentParser parser = new DeeplinkContentParser();
-            final DeeplinkContent content = parser.parse(uri);
+            final Content content = parser.parse(uri);
 
             AdditContentPublisher.getInstance().publishContent(content);
         }
