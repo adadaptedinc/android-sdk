@@ -5,12 +5,14 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
-import com.adadapted.android.sdk.core.addit.deeplink.DeeplinkContent;
+import com.adadapted.android.sdk.core.addit.Content;
 import com.adadapted.android.sdk.core.addit.deeplink.DeeplinkContentParser;
 import com.adadapted.android.sdk.core.event.model.AppEventSource;
 import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
 import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
+import com.adadapted.android.sdk.ext.management.PayloadPickupManager;
 import com.adadapted.android.sdk.ui.messaging.AdditContentPublisher;
 
 import java.util.HashMap;
@@ -23,6 +25,10 @@ public class AdditInterceptActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.i(LOGTAG, "Addit Intercept Activity Launched.");
+
+        PayloadPickupManager.deeplinkInProgress();
+
         AppEventTrackingManager.registerEvent(
                 AppEventSource.SDK,
                 "addit_app_opened",
@@ -33,11 +39,15 @@ public class AdditInterceptActivity extends AppCompatActivity {
             final Uri uri = additIntent.getData();
 
             final DeeplinkContentParser parser = new DeeplinkContentParser();
-            final DeeplinkContent content = parser.parse(uri);
+            final Content content = parser.parse(uri);
 
             AdditContentPublisher.getInstance().publishContent(content);
+
+            Log.i(LOGTAG, "Addit content dispactched to App.");
         }
         catch(Exception ex) {
+            Log.w(LOGTAG, "Problem dealing with Addit content. Recovering. " + ex.getMessage());
+
             final Map<String, String> errorParams = new HashMap<>();
             errorParams.put("exception_message", ex.getMessage());
             AppErrorTrackingManager.registerEvent(
@@ -50,5 +60,7 @@ public class AdditInterceptActivity extends AppCompatActivity {
 
             startActivity(mainActivityIntent);
         }
+
+        PayloadPickupManager.deeplinkCompleted();
     }
 }

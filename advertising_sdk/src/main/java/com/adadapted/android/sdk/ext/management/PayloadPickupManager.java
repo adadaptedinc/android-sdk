@@ -2,8 +2,8 @@ package com.adadapted.android.sdk.ext.management;
 
 
 import com.adadapted.android.sdk.config.Config;
+import com.adadapted.android.sdk.core.addit.Content;
 import com.adadapted.android.sdk.core.addit.payload.PayloadAdapter;
-import com.adadapted.android.sdk.core.addit.payload.PayloadContent;
 import com.adadapted.android.sdk.core.addit.payload.PickupPayloadCommand;
 import com.adadapted.android.sdk.core.addit.payload.PickupPayloadInteractor;
 import com.adadapted.android.sdk.core.common.Interactor;
@@ -49,12 +49,12 @@ public class PayloadPickupManager implements PickupPayloadInteractor.Callback {
     }
 
     @Override
-    public void onPayloadAvailable(final List<PayloadContent> content) {
+    public void onPayloadAvailable(final List<Content> content) {
         if(content == null) {
             return;
         }
 
-        for(final PayloadContent c : content) {
+        for(final Content c : content) {
             AdditContentPublisher.getInstance().publishContent(c);
         }
     }

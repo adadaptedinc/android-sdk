@@ -38,7 +38,7 @@ public class AaFeedAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        if(mPlacement != null && mAdapter != null) {
+        if(mAdapter != null) {
             return mPlacement.getModifiedCount(mAdapter.getCount());
         }
 

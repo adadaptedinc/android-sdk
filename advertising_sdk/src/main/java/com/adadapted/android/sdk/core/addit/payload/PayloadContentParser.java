@@ -1,6 +1,7 @@
 package com.adadapted.android.sdk.core.addit.payload;
 
 import com.adadapted.android.sdk.core.addit.AddToListItem;
+import com.adadapted.android.sdk.core.addit.Content;
 import com.adadapted.android.sdk.core.addit.ContentTypes;
 import com.adadapted.android.sdk.core.addit.JsonFields;
 import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
@@ -18,8 +19,8 @@ import java.util.Map;
  * Created by chrisweeden on 2/10/17.
  */
 public class PayloadContentParser {
-    public List<PayloadContent> parse(JSONObject json) {
-        final List<PayloadContent> content = new ArrayList<>();
+    public List<Content> parse(JSONObject json) {
+        final List<Content> content = new ArrayList<>();
 
         if(json != null) {
             try {
@@ -40,7 +41,7 @@ public class PayloadContentParser {
         return content;
     }
 
-    private PayloadContent parsePayload(JSONObject json) throws JSONException {
+    private Content parsePayload(JSONObject json) throws JSONException {
         final String payloadId = json.has(JsonFields.PayloadId) ? json.getString(JsonFields.PayloadId) : "";
         final String message = json.has(JsonFields.PayloadMessage) ? json.getString(JsonFields.PayloadMessage) : "";
         final String image = json.has(JsonFields.PayloadImage) ? json.getString(JsonFields.PayloadImage) : "";
@@ -63,7 +64,7 @@ public class PayloadContentParser {
                     errorParams);
         }
 
-        return new PayloadContent(payloadId, message, image, ContentTypes.ADD_TO_LIST_ITEMS, payload);
+        return Content.createPayloadContent(payloadId, message, image, ContentTypes.ADD_TO_LIST_ITEMS, payload);
     }
 
     private AddToListItem parseItem(final JSONObject itemJson) {

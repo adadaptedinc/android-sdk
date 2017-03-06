@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.core.addit.payload;
 
 import android.util.Log;
 
+import com.adadapted.android.sdk.core.addit.Content;
 import com.adadapted.android.sdk.core.common.Interactor;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.event.model.AppEventSource;
@@ -63,7 +64,7 @@ public class PickupPayloadInteractor implements Interactor {
 
         adapter.pickup(request, new PayloadAdapter.Callback() {
             @Override
-            public void onSuccess(final List<PayloadContent> content) {
+            public void onSuccess(final List<Content> content) {
                 callback.onPayloadAvailable(content);
             }
 
@@ -75,7 +76,7 @@ public class PickupPayloadInteractor implements Interactor {
     }
 
     public interface Callback {
-        void onPayloadAvailable(List<PayloadContent> content);
+        void onPayloadAvailable(List<Content> content);
         void onError();
     }
 }

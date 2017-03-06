@@ -122,7 +122,7 @@ public class AdAdapted {
                 new HashMap<String, String>());
 
         new EventFlushScheduler().start(Config.DEFAULT_EVENT_POLLING);
-        Log.i(LOGTAG, String.format("Addit Android Advertising SDK v%s initialized.", Config.SDK_VERSION));
+        Log.i(LOGTAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", Config.SDK_VERSION));
     }
 
     public static synchronized void hasAdsToServe() {
