@@ -1,5 +1,7 @@
 package com.adadapted.android.sdk.core.event;
 
+import android.util.Log;
+
 import com.adadapted.android.sdk.core.session.model.Session;
 
 import org.json.JSONObject;
@@ -27,6 +29,7 @@ public class AppEventTracker {
     public void trackEvent(final String eventSource,
                            final String eventName,
                            final Map<String, String> eventParams) {
+        Log.i(LOGTAG, "Tracking Event: " + eventName);
 
         final JSONObject json = builder.buildItem(eventWrapper, eventSource, eventName, eventParams);
         sink.publishEvent(json);

@@ -41,9 +41,9 @@ public class AdditInterceptActivity extends AppCompatActivity {
             final DeeplinkContentParser parser = new DeeplinkContentParser();
             final Content content = parser.parse(uri);
 
-            AdditContentPublisher.getInstance().publishContent(content);
-
             Log.i(LOGTAG, "Addit content dispactched to App.");
+
+            AdditContentPublisher.getInstance().publishContent(content);
         }
         catch(Exception ex) {
             Log.w(LOGTAG, "Problem dealing with Addit content. Recovering. " + ex.getMessage());
@@ -62,5 +62,7 @@ public class AdditInterceptActivity extends AppCompatActivity {
         }
 
         PayloadPickupManager.deeplinkCompleted();
+
+        finish();
     }
 }
