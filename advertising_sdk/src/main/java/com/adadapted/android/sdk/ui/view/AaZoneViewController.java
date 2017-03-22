@@ -20,6 +20,8 @@ import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
 import com.adadapted.android.sdk.ext.management.SessionManager;
 import com.adadapted.android.sdk.ext.scheduler.AdZoneRefreshScheduler;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,10 +65,13 @@ class AaZoneViewController
                                         WebResourceError error) {
                 super.onReceivedError(view, request, error);
 
+                final Map<String, String> params = new HashMap<>();
+                params.put("error", error.toString());
+
                 AppErrorTrackingManager.registerEvent(
                         "TRACKING_PIXEL_LOAD_ERROR",
                         "Problem loading tracking pixel for Ad: " + mCurrentAd.getAdId(),
-                        new HashMap<String, String>());
+                        params);
             }
         });
 
