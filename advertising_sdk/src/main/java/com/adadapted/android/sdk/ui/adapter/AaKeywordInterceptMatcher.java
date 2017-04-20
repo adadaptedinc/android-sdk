@@ -66,7 +66,7 @@ public class AaKeywordInterceptMatcher implements SessionManager.Callback, Keywo
     }
 
     @Override
-    public void onSessionAvailable(Session session) {
+    public void onSessionAvailable(final Session session) {
         mSession = session;
         KeywordInterceptManager.initialize(this);
     }
