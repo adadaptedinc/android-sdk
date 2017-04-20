@@ -31,7 +31,7 @@ public class ThreadPoolInteractorExecuter implements InteractorExecuter {
         return instance;
     }
 
-    private static final int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
+    //private static final int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
 
     private final ThreadPoolExecutor pool;
     private final InteractorMainThread mainThread;
@@ -40,8 +40,8 @@ public class ThreadPoolInteractorExecuter implements InteractorExecuter {
         final ThreadFactory backgroundPriorityThreadFactory = new InteractorBackgroundThreadFactory();
 
         this.pool = new ThreadPoolExecutor(
-                NUMBER_OF_CORES * 2,
-                NUMBER_OF_CORES * 2,
+                2,
+                2,
                 60L,
                 TimeUnit.SECONDS,
                 new LinkedBlockingQueue<Runnable>(),
