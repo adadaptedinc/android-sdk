@@ -30,9 +30,10 @@ public class JsonAdRefreshBuilder implements AdRefreshBuilder {
         try {
             if(adJson.has(JsonFields.ZONES) && (adJson.get(JsonFields.ZONES).getClass() == JSONObject.class)) {
                 zones = mZoneBuilder.buildZones(adJson.getJSONObject(JsonFields.ZONES));
+            } else {
+                Log.i(LOGTAG, "No ads returned. Not parsing JSONArray.");
             }
 
-            Log.i(LOGTAG, "No ads returned. Not parsing JSONArray.");
             return zones;
         }
         catch (JSONException ex) {
