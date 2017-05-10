@@ -19,16 +19,13 @@ class AaZoneViewControllerFactory {
         mZoneControllers = new HashMap<>();
     }
 
-    public static AaZoneViewController getController(final Context context,
-                                                     final AaZoneViewProperties zoneProperties) {
+    static AaZoneViewController getController(final Context context,
+                                              final AaZoneViewProperties zoneProperties) {
         if(sInstance == null) {
             sInstance = new AaZoneViewControllerFactory();
         }
 
-        String zoneId = "";
-        if(zoneProperties != null) {
-            zoneId = zoneProperties.getZoneId();
-        }
+        final String zoneId = zoneProperties == null ? "" : zoneProperties.getZoneId();
 
         if(!sInstance.mZoneControllers.containsKey(zoneId)) {
             //Log.d(LOGTAG, String.format("No controller found for Zone: %s. Creating one.", zoneId));
