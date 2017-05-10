@@ -10,10 +10,12 @@ import com.adadapted.android.sdk.ui.view.AaZoneView;
 public class AaFeedAdPlacement {
     private static final String LOGTAG = AaFeedAdPlacement.class.getName();
 
-    private final Context mContext;
-    private final String mZoneId;
+    //private final Context mContext;
+    //private final String mZoneId;
     private final int mPlacement;
-    private final int mResourceId;
+    //private final int mResourceId;
+
+    private final AaZoneView zoneView;
 
     public AaFeedAdPlacement(final Context context,
                              final String zoneId,
@@ -25,10 +27,13 @@ public class AaFeedAdPlacement {
                              final String zoneId,
                              final int placement,
                              final int resourceId) {
-        mContext = context;
-        mZoneId = zoneId;
+
+        //mZoneId = zoneId;
         mPlacement = (placement <= 0) ? 0 : placement-1;
-        mResourceId = resourceId;
+        //mResourceId = resourceId;
+
+        zoneView = new AaZoneView(context);
+        zoneView.init(zoneId, resourceId);
     }
 
     public AaFeedItem getItem(final int position) {
@@ -61,8 +66,8 @@ public class AaFeedAdPlacement {
 
     public AaZoneView getView(int position) {
         if(position == mPlacement) {
-            AaZoneView zoneView = new AaZoneView(mContext);
-            zoneView.init(mZoneId, mResourceId);
+            //AaZoneView zoneView = new AaZoneView(mContext);
+            //zoneView.init(mZoneId, mResourceId);
 
             return zoneView;
         }
@@ -73,7 +78,6 @@ public class AaFeedAdPlacement {
     @Override
     public String toString() {
         return "AaFeedAdPlacement{" +
-                "zoneId='" + mZoneId + '\'' +
                 ", placement=" + mPlacement +
                 '}';
     }
