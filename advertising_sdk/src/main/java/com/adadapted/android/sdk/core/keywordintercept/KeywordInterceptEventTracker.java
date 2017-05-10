@@ -24,7 +24,7 @@ public class KeywordInterceptEventTracker {
         keywordInterceptEvents = new HashSet<>();
     }
 
-    public void trackEvent(final Session session,
+    public synchronized void trackEvent(final Session session,
                             final String searchId,
                             final String term,
                             final String userInput,
