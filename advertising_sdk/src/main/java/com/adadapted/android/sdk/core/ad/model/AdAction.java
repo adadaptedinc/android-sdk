@@ -15,10 +15,11 @@ public abstract class AdAction implements Serializable {
     public static final String POPUP = "p";
 
     private final String actionType;
-    private String actionPath = "";
+    private String actionPath;
 
-    public AdAction(final String actionType) {
+    AdAction(final String actionType) {
         this.actionType = actionType;
+        this.actionPath = "";
     }
 
     public String getActionType() {

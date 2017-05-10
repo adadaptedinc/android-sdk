@@ -13,6 +13,7 @@ import com.adadapted.android.sdk.core.ad.model.DelegateAdAction;
 import com.adadapted.android.sdk.core.ad.model.HtmlAdType;
 import com.adadapted.android.sdk.core.ad.model.ImageAdType;
 import com.adadapted.android.sdk.core.ad.model.JsonAdType;
+import com.adadapted.android.sdk.core.ad.model.LinkAdAction;
 import com.adadapted.android.sdk.core.ad.model.NullAdAction;
 import com.adadapted.android.sdk.core.ad.model.NullAdType;
 import com.adadapted.android.sdk.core.ad.model.PopupAdAction;
@@ -57,53 +58,53 @@ public class JsonAdBuilder implements AdBuilder {
     }
 
     public Ad buildAd(final JSONObject jsonAd) throws JSONException {
-        final Ad ad = new Ad();
+        final Ad.Builder builder = new Ad.Builder();
 
         if(jsonAd.has(JsonFields.ADID)) {
-            ad.setAdId(jsonAd.getString(JsonFields.ADID));
+            builder.setAdId(jsonAd.getString(JsonFields.ADID));
         }
 
         if(jsonAd.has(JsonFields.ZONE)) {
-            ad.setZoneId(jsonAd.getString(JsonFields.ZONE));
+            builder.setZoneId(jsonAd.getString(JsonFields.ZONE));
         }
 
         if(jsonAd.has(JsonFields.IMPRESSIONID)) {
-            ad.setImpressionId(jsonAd.getString(JsonFields.IMPRESSIONID));
+            builder.setBaseImpressionId(jsonAd.getString(JsonFields.IMPRESSIONID));
         }
 
         try {
-            ad.setRefreshTime(Integer.parseInt(jsonAd.getString(JsonFields.REFRESH_TIME)));
+            builder.setRefreshTime(Integer.parseInt(jsonAd.getString(JsonFields.REFRESH_TIME)));
         }
         catch(NumberFormatException ex) {
             AdAnomalyTrackingManager.registerAnomaly(
-                    ad.getAdId(),
+                    builder.getAdId(),
                     jsonAd.toString(),
                     "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                    "Ad " + ad.getAdId() + " has an improperly set refresh_time.");
-            ad.setRefreshTime(DEFAULT_REFRESH_TIME);
+                    "Ad " + builder.getAdId() + " has an improperly set refresh_time.");
+            builder.setRefreshTime(DEFAULT_REFRESH_TIME);
         }
 
         if(jsonAd.has(JsonFields.AD_TYPE)) {
             final String adTypeCode = jsonAd.getString(JsonFields.AD_TYPE);
             final AdType adType = parseAdType(adTypeCode, jsonAd);
-            ad.setAdType(adType);
+            builder.setAdType(adType);
         }
 
         if(jsonAd.has(JsonFields.ACTION_TYPE)) {
             final String actionTypeCode = jsonAd.getString(JsonFields.ACTION_TYPE);
             final AdAction adAction = parseAdAction(actionTypeCode, jsonAd);
-            ad.setAdAction(adAction);
+            builder.setAdAction(adAction);
         }
 
         if(jsonAd.has(JsonFields.HIDE_AFTER_INTERACTION)) {
-            ad.setHideAfterInteraction(jsonAd.getString(JsonFields.HIDE_AFTER_INTERACTION).equals("1"));
+            builder.setHideAfterInteraction(jsonAd.getString(JsonFields.HIDE_AFTER_INTERACTION).equals("1"));
         }
 
         if(jsonAd.has(JsonFields.TRACKING_HTML)) {
-            ad.setTrackingHtml(jsonAd.getString(JsonFields.TRACKING_HTML));
+            builder.setTrackingHtml(jsonAd.getString(JsonFields.TRACKING_HTML));
         }
 
-        return ad;
+        return builder.build();
     }
 
     private AdAction parseAdAction(final String actionTypeCode,
@@ -135,6 +136,16 @@ public class JsonAdBuilder implements AdBuilder {
                 final String actionPath = jsonAd.getString(JsonFields.ACTION_PATH);
 
                 return parseAdContent(payloadObject, actionPath);
+            }
+            catch(JSONException ex) {
+                logJsonParseError(jsonAd.toString(), ex);
+            }
+        }
+        else if(actionTypeCode.equalsIgnoreCase(AdAction.LINK)) {
+            try {
+                final String actionPath = jsonAd.getString(JsonFields.ACTION_PATH);
+
+                return parseAdLink(actionPath);
             }
             catch(JSONException ex) {
                 logJsonParseError(jsonAd.toString(), ex);
@@ -172,6 +183,13 @@ public class JsonAdBuilder implements AdBuilder {
         delegate.setActionPath(actionPath);
 
         return delegate;
+    }
+
+    private LinkAdAction parseAdLink(final String actionPath) {
+        final LinkAdAction link = new LinkAdAction();
+        link.setActionPath(actionPath);
+
+        return link;
     }
 
     private PopupAdAction parseAdPopup(final JSONObject popupJson,
