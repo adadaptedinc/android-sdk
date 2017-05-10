@@ -26,8 +26,8 @@ public class AaZoneView extends RelativeLayout
         implements AdInteractionListener, AaZoneViewControllerListener {
     private static final String LOGTAG = AaZoneView.class.getName();
 
-    private final Context mContext;
-    private final Handler mViewHandler;
+    //private Handler mViewHandler;
+    private Context mContext;
 
     private AaZoneViewController mViewController;
     private AaZoneViewProperties mZoneProperties;
@@ -36,28 +36,28 @@ public class AaZoneView extends RelativeLayout
 
     public AaZoneView(Context context) {
         super(context);
+
         mContext = context;
-        mViewHandler = new Handler(Looper.getMainLooper());
     }
 
     public AaZoneView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
         mContext = context;
-        mViewHandler = new Handler(Looper.getMainLooper());
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public AaZoneView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+
         mContext = context;
-        mViewHandler = new Handler(Looper.getMainLooper());
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public AaZoneView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+
         mContext = context;
-        mViewHandler = new Handler(Looper.getMainLooper());
     }
 
     public void init(final String zoneId) {
@@ -73,6 +73,7 @@ public class AaZoneView extends RelativeLayout
             color = mBackgroundColor.getColor();
         }
 
+        //mViewHandler = new Handler(Looper.getMainLooper());
         mZoneProperties = new AaZoneViewProperties(zoneId, layoutResourceId, color);
 
         setGravity(Gravity.CENTER);
@@ -86,7 +87,7 @@ public class AaZoneView extends RelativeLayout
         //Log.i(LOGTAG, "displayAdView called");
         if(view == null) { return; }
 
-        mViewHandler.post(new Runnable() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
                 //Log.i(LOGTAG, String.format("Pushing Ad display to Zone %s", mZoneProperties.getZoneId()));
@@ -154,13 +155,17 @@ public class AaZoneView extends RelativeLayout
             return;
         }
 
-        mViewController = AaZoneViewControllerFactory.getController(mContext, mZoneProperties);
+        if(mViewController == null && mContext != null) {
+            mViewController = AaZoneViewControllerFactory.getController(mContext, mZoneProperties);
+            mContext = null;
+        }
+
         if(mViewController != null) {
             mViewController.setListener(this);
         }
     }
 
-    public void onStart(AaSdkContentListener listener) {
+    public void onStart(final AaSdkContentListener listener) {
         onStart();
 
         SdkContentPublisherFactory.getContentPublisher().addListener(listener);
@@ -178,14 +183,14 @@ public class AaZoneView extends RelativeLayout
         }
     }
 
-    public void onStop(AaSdkContentListener listener) {
+    public void onStop(final AaSdkContentListener listener) {
         SdkContentPublisherFactory.getContentPublisher().removeListener(listener);
 
         onStop();
     }
 
     @Override
-    protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
+    protected void onVisibilityChanged(@NonNull final View changedView, final int visibility) {
         super.onVisibilityChanged(changedView, visibility);
 
         //final String zoneId = mZoneProperties != null ? mZoneProperties.getZoneId() : "None";
