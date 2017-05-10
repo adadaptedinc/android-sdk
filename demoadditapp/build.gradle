@@ -1,8 +1,9 @@
 apply plugin: 'com.android.application'
+apply plugin: 'newrelic'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "25.0.3"
 
     defaultConfig {
         applicationId "com.adadapted.demo.baskethandle"
@@ -22,15 +23,30 @@ android {
     }
 }
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "com.newrelic.agent.android:agent-gradle-plugin:5.10.0"
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile project(':addit_sdk')
-    compile 'com.android.support:appcompat-v7:25.2.0'
-    compile 'com.android.support:design:25.2.0'
-    compile 'com.google.android.gms:play-services-ads:10.2.0'
-    compile 'com.android.support:support-v4:25.2.0'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:design:25.3.1'
+    compile 'com.google.android.gms:play-services-ads:10.2.4'
+    compile 'com.android.support:support-v4:25.3.1'
+    compile 'com.newrelic.agent.android:android-agent:5.10.0'
     testCompile 'junit:junit:4.12'
 }
