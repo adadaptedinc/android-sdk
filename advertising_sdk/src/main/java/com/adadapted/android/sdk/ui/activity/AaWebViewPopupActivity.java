@@ -108,6 +108,12 @@ public class AaWebViewPopupActivity extends Activity {
             }
 
             @Override
+            public boolean shouldOverrideUrlLoading(final WebView view,
+                                                    final WebResourceRequest request) {
+                return false;
+            }
+
+            @Override
             public void onReceivedError(WebView view,
                                         WebResourceRequest request,
                                         WebResourceError error) {
