@@ -25,7 +25,8 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
 
     private final HttpAdImageLoader mImageLoader;
 
-    private final Context mContext;
+    //private final Context mContext;
+    private final Configuration mConfiguration;
     private final DeviceInfo mDeviceInfo;
     private final ImageView mView;
 
@@ -41,10 +42,11 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
 
     private final Listener mListener;
 
-    public ImageAdViewBuildingStrategy(final Context context,
-                                       final DeviceInfo deviceInfo,
-                                       final Listener listener) {
-        mContext = context;
+    ImageAdViewBuildingStrategy(final Context context,
+                                final DeviceInfo deviceInfo,
+                                final Listener listener) {
+        //mContext = context;
+        mConfiguration = context.getResources().getConfiguration();
         mDeviceInfo = deviceInfo;
         mListener = listener;
 
@@ -53,9 +55,7 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
     }
 
     private String getPresentOrientation() {
-        int orientation = mContext.getResources().getConfiguration().orientation;
-
-        if(orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if(mConfiguration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             return AdImage.LANDSCAPE;
         }
 
