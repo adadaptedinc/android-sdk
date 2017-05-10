@@ -43,12 +43,19 @@ public class CollectDeviceInfoInteractor implements Interactor {
         deviceInfo.setAppId(command.getAppId());
         deviceInfo.setProd(command.isProd());
 
-        final AdvertisingIdClient.Info info = getAdvertisingIdClientInfo(context);
-        if (info != null) {
-            deviceInfo.setUdid(info.getId());
-            deviceInfo.setAllowRetargeting(!info.isLimitAdTrackingEnabled());
+        try {
+            Class.forName("com.google.android.gms.ads.identifier.AdvertisingIdClient");
+
+            final AdvertisingIdClient.Info info = getAdvertisingIdClientInfo(context);
+            if (info != null) {
+                deviceInfo.setUdid(info.getId());
+                deviceInfo.setAllowRetargeting(!info.isLimitAdTrackingEnabled());
+            } else {
+                deviceInfo.setUdid(captureAndroidId(context));
+                deviceInfo.setAllowRetargeting(false);
+            }
         }
-        else {
+        catch(ClassNotFoundException e) {
             deviceInfo.setUdid(captureAndroidId(context));
             deviceInfo.setAllowRetargeting(false);
         }
