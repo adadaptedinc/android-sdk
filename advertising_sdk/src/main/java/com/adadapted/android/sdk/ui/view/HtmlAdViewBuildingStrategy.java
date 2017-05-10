@@ -3,6 +3,7 @@ package com.adadapted.android.sdk.ui.view;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
@@ -28,6 +29,12 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
             mWebView.setWebViewClient(new WebViewClient() {
                 @Override
                 public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                    return true;
+                }
+
+                @Override
+                public boolean shouldOverrideUrlLoading(final WebView view,
+                                                        final WebResourceRequest request) {
                     return true;
                 }
             });
