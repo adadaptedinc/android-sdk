@@ -124,7 +124,7 @@ public class JsonZoneBuilder implements ZoneBuilder {
         return zone;
     }
 
-    public int calculateDimensionValue(final String value) {
+    private int calculateDimensionValue(final String value) {
         return mDimensionConverter.convertDpToPx(Integer.parseInt(value));
     }
 }
