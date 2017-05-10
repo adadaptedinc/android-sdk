@@ -20,8 +20,6 @@ import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
 import com.adadapted.android.sdk.ext.management.SessionManager;
 import com.adadapted.android.sdk.ext.scheduler.AdZoneRefreshScheduler;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
-import com.android.volley.NetworkError;
-import com.android.volley.NoConnectionError;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,7 +35,8 @@ class AaZoneViewController
         AdViewBuilder.Listener {
     private static final String LOGTAG = AaZoneViewController.class.getName();
 
-    private final Context mContext;
+    //private final Context mContext;
+    private final Configuration mConfiguration;
     private final AaZoneViewProperties mZoneProperties;
 
     private final WebView mTrackingWebView;
@@ -52,8 +51,11 @@ class AaZoneViewController
     private ViewAdWrapper mCurrentAd;
     private final Set<String> mTimerRunning;
 
-    public AaZoneViewController(final Context context, final AaZoneViewProperties zoneProperties) {
-        mContext = context;
+    public AaZoneViewController(final Context context,
+                                final AaZoneViewProperties zoneProperties) {
+        //mContext = context;
+
+        mConfiguration = context.getResources().getConfiguration();
         mZoneProperties = zoneProperties;
 
         mTrackingWebView = new WebView(context);
@@ -89,7 +91,7 @@ class AaZoneViewController
         mCurrentAd = ViewAdWrapper.createEmptyCurrentAd(mSession);
         mTimerRunning = new HashSet<>();
 
-        Map<String, String> params = new HashMap<>();
+        final Map<String, String> params = new HashMap<>();
         params.put("zone_id", zoneId);
         AppEventTrackingManager.registerEvent(AppEventSource.SDK, "zone_loaded", params);
     }
@@ -163,9 +165,9 @@ class AaZoneViewController
     }
 
     private String getPresentOrientation() {
-        int orientation = mContext.getResources().getConfiguration().orientation;
+        //int orientation = mContext.getResources().getConfiguration().orientation;
 
-        if(orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if(mConfiguration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             return AdImage.LANDSCAPE;
         }
 
