@@ -20,15 +20,17 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
     private final Listener mListener;
     private WebView mWebView;
 
-    public HtmlAdViewBuildingStrategy(final Context context, final Listener listener) {
+    public HtmlAdViewBuildingStrategy(final Context context,
+                                      final Listener listener) {
         mListener = listener;
 
         try {
-            mWebView = new WebView(context);
+            mWebView = new WebView(context.getApplicationContext());
             mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
             mWebView.setWebViewClient(new WebViewClient() {
                 @Override
-                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                public boolean shouldOverrideUrlLoading(final WebView view,
+                                                        final String url) {
                     return true;
                 }
 

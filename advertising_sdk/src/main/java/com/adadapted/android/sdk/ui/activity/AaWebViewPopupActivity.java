@@ -31,7 +31,7 @@ public class AaWebViewPopupActivity extends Activity {
 
     public static Intent createActivity(final Context context,
                                         final ViewAdWrapper ad) {
-        Intent intent = new Intent(context, AaWebViewPopupActivity.class);
+        Intent intent = new Intent(context.getApplicationContext(), AaWebViewPopupActivity.class);
         intent.putExtra(AaWebViewPopupActivity.EXTRA_POPUP_AD, ad.getAd());
 
         return intent;

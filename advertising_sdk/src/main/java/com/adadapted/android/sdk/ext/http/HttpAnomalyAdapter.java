@@ -39,8 +39,7 @@ public class HttpAnomalyAdapter implements AnomalyAdapter {
                 mBatchUrl,
                 new Listener<String>() {
                     @Override
-                    public void onResponse(String s) {
-                    }
+                    public void onResponse(final String s) {}
                 }, new ErrorListener() {
 
             @Override

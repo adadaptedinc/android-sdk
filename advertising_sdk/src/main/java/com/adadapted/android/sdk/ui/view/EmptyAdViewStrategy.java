@@ -14,7 +14,7 @@ class EmptyAdViewStrategy implements AdViewBuildingStrategy {
 
     EmptyAdViewStrategy(final Context context, final Listener listener) {
         mListener = listener;
-        mView = new View(context);
+        mView = new View(context.getApplicationContext());
     }
 
     @Override

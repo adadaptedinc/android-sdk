@@ -10,10 +10,7 @@ import com.adadapted.android.sdk.ui.view.AaZoneView;
 public class AaFeedAdPlacement {
     private static final String LOGTAG = AaFeedAdPlacement.class.getName();
 
-    //private final Context mContext;
-    //private final String mZoneId;
     private final int mPlacement;
-    //private final int mResourceId;
 
     private final AaZoneView zoneView;
 
@@ -27,10 +24,7 @@ public class AaFeedAdPlacement {
                              final String zoneId,
                              final int placement,
                              final int resourceId) {
-
-        //mZoneId = zoneId;
         mPlacement = (placement <= 0) ? 0 : placement-1;
-        //mResourceId = resourceId;
 
         zoneView = new AaZoneView(context);
         zoneView.init(zoneId, resourceId);
@@ -66,9 +60,6 @@ public class AaFeedAdPlacement {
 
     public AaZoneView getView(int position) {
         if(position == mPlacement) {
-            //AaZoneView zoneView = new AaZoneView(mContext);
-            //zoneView.init(mZoneId, mResourceId);
-
             return zoneView;
         }
 

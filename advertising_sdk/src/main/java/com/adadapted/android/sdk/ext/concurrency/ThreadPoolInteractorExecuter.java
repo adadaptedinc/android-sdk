@@ -31,8 +31,6 @@ public class ThreadPoolInteractorExecuter implements InteractorExecuter {
         return instance;
     }
 
-    //private static final int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
-
     private final ThreadPoolExecutor pool;
     private final InteractorMainThread mainThread;
 

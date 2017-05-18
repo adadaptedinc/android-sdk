@@ -34,21 +34,10 @@ public class JsonSessionBuilder implements SessionBuilder {
         builder.setDeviceInfo(deviceInfo);
 
         try {
-            if(response.has(JsonFields.SESSIONID)) {
-                builder.setSessionId(response.getString(JsonFields.SESSIONID));
-            }
-
-            if(response.has(JsonFields.ACTIVECAMPAIGNS)) {
-                builder.setActiveCampaigns(response.getBoolean(JsonFields.ACTIVECAMPAIGNS));
-            }
-
-            if(response.has(JsonFields.SESSIONEXPIRESAT)) {
-                builder.setExpiresAt(response.getLong(JsonFields.SESSIONEXPIRESAT));
-            }
-
-            if(response.has(JsonFields.POLLINGINTERVALMS)) {
-                builder.setPollingInterval(response.getLong(JsonFields.POLLINGINTERVALMS));
-            }
+            builder.setSessionId(response.getString(JsonFields.SESSIONID));
+            builder.setActiveCampaigns(response.getBoolean(JsonFields.ACTIVECAMPAIGNS));
+            builder.setExpiresAt(response.getLong(JsonFields.SESSIONEXPIRESAT));
+            builder.setPollingInterval(response.getLong(JsonFields.POLLINGINTERVALMS));
 
             if(builder.hasActiveCampaigns()) {
                 if(response.has(JsonFields.ZONES) && (response.get(JsonFields.ZONES).getClass() == JSONObject.class)) {

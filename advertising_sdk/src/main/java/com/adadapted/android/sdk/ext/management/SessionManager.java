@@ -198,7 +198,7 @@ public class SessionManager
 
     private void notifyOnSessionAvailable(final Session session) {
         final Set<Callback> currentCallbacks = new HashSet<>(callbacks);
-        for(Callback c : currentCallbacks) {
+        for(final Callback c : currentCallbacks) {
             c.onSessionAvailable(session);
         }
     }
@@ -207,7 +207,7 @@ public class SessionManager
         sSession = session;
 
         Set<Callback> currentCallbacks = new HashSet<>(callbacks);
-        for(Callback c : currentCallbacks) {
+        for(final Callback c : currentCallbacks) {
             c.onNewAdsAvailable(session);
         }
     }

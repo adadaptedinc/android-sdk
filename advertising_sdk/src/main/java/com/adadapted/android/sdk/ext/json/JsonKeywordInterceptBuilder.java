@@ -21,24 +21,16 @@ public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
     private static final String TAG = JsonKeywordInterceptBuilder.class.getName();
 
     public KeywordIntercept build(final JSONObject json) {
-        String searchId = "";
-        long refreshTime = 0L;
-        int minMatchLength = 2;
+        if(json == null) { return null; }
 
         try {
-            if(json != null) {
-                if (json.has(JsonFields.SEARCHID)) {
-                    searchId = json.getString(JsonFields.SEARCHID);
-                }
+            final String searchId = json.has(JsonFields.SEARCHID) ? json.getString(JsonFields.SEARCHID) : "";
+            final long refreshTime = json.has(JsonFields.REFRESHTIME) ? Long.parseLong(json.getString(JsonFields.REFRESHTIME)) : 0L;
+            final int minMatchLength = json.has(JsonFields.MINMATCHLENGTH) ? Integer.parseInt(json.getString(JsonFields.MINMATCHLENGTH)) : 2;
 
-                if (json.has(JsonFields.REFRESHTIME)) {
-                    refreshTime = Long.parseLong(json.getString(JsonFields.REFRESHTIME));
-                }
+            final Map<String, AutoFill> interceptMap = parseAutofill(json);
 
-                if (json.has(JsonFields.MINMATCHLENGTH)) {
-                    minMatchLength = Integer.parseInt(json.getString(JsonFields.MINMATCHLENGTH));
-                }
-            }
+            return new KeywordIntercept(searchId, refreshTime, minMatchLength, interceptMap);
         }
         catch(JSONException ex) {
             Log.w(TAG, "Problem parsing JSON", ex);
@@ -52,57 +44,28 @@ public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
                     params);
         }
 
-        final Map<String, AutoFill> interceptMap = parseAutofill(json);
-
-        return new KeywordIntercept(searchId, refreshTime, minMatchLength, interceptMap);
+        return null;
     }
 
-    private Map<String, AutoFill> parseAutofill(final JSONObject json) {
+    private Map<String, AutoFill> parseAutofill(final JSONObject json) throws JSONException {
         final Map<String, AutoFill> interceptMap = new HashMap<>();
 
-        try {
-            if(json != null && json.has(JsonFields.AUTOFILL)) {
-                Object obj = json.get(JsonFields.AUTOFILL);
-                if(obj instanceof JSONObject) {
-                    final JSONObject autofillJson = (JSONObject)obj;
+        final Object obj = json.get(JsonFields.AUTOFILL);
+        if(obj instanceof JSONObject) {
+            final JSONObject autofillJson = (JSONObject)obj;
 
-                    for(final Iterator<String> z = autofillJson.keys(); z.hasNext();) {
-                        final String term = z.next();
-                        final JSONObject jsonTerm = autofillJson.getJSONObject(term);
+            for(final Iterator<String> z = autofillJson.keys(); z.hasNext();) {
+                final String term = z.next();
+                final JSONObject jsonTerm = autofillJson.getJSONObject(term);
 
-                        String replacement = "";
-                        String icon = "";
-                        String tagline = "";
+                final String replacement = jsonTerm.has(JsonFields.REPLACEMENT) ? jsonTerm.getString(JsonFields.REPLACEMENT) : "";
+                final String icon = jsonTerm.has(JsonFields.ICON) ? jsonTerm.getString(JsonFields.ICON) : "";
+                final String tagline = jsonTerm.has(JsonFields.TAGLINE) ? jsonTerm.getString(JsonFields.TAGLINE) : "";
 
-                        if (jsonTerm.has(JsonFields.REPLACEMENT)) {
-                            replacement = jsonTerm.getString(JsonFields.REPLACEMENT);
-                        }
+                final AutoFill autofill = new AutoFill(replacement, icon, tagline);
 
-                        if (jsonTerm.has(JsonFields.ICON)) {
-                            icon = jsonTerm.getString(JsonFields.ICON);
-                        }
-
-                        if (jsonTerm.has(JsonFields.TAGLINE)) {
-                            tagline = jsonTerm.getString(JsonFields.TAGLINE);
-                        }
-
-                        final AutoFill autofill = new AutoFill(replacement, icon, tagline);
-
-                        interceptMap.put(term, autofill);
-                    }
-                }
+                interceptMap.put(term, autofill);
             }
-        }
-        catch(JSONException ex) {
-            Log.w(TAG, "Problem parsing JSON", ex);
-
-            final Map<String, String> params = new HashMap<>();
-            params.put("exception", ex.getMessage());
-            params.put("bad_json", json.toString());
-            AppEventTrackingManager.registerEvent(
-                    "KI_PAYLOAD_PARSE_FAILED",
-                    "Failed to parse KI payload for processing.",
-                    params);
         }
 
         return interceptMap;

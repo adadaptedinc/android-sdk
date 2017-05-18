@@ -28,11 +28,11 @@ class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
     private View mView;
 
     public JsonAdViewBuildingStrategy(final Context context, final Listener listener) {
-        mContext = context;
+        mContext = context.getApplicationContext();
         mListener = listener;
         mImageLoader = new HttpAdImageLoader();
 
-        mView = new View(context);
+        mView = new View(mContext);
     }
 
     @Override

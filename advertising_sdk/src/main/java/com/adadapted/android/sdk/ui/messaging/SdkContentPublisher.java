@@ -9,9 +9,19 @@ import java.util.Set;
  * Created by chrisweeden on 8/18/15.
  */
 public class SdkContentPublisher {
+    private static SdkContentPublisher sSdkContentPublisher;
+
+    public static synchronized SdkContentPublisher getInstance() {
+        if(sSdkContentPublisher == null) {
+            sSdkContentPublisher = new SdkContentPublisher();
+        }
+
+        return sSdkContentPublisher;
+    }
+
     private final Set<AaSdkContentListener> mListeners;
 
-    public SdkContentPublisher() {
+    private SdkContentPublisher() {
         mListeners = new HashSet<>();
     }
 
@@ -29,7 +39,7 @@ public class SdkContentPublisher {
 
     public void publishContent(final String zoneId,
                                final AdContentPayload payload) {
-        for(AaSdkContentListener listener : mListeners) {
+        for(final AaSdkContentListener listener : mListeners) {
             listener.onContentAvailable(zoneId, payload);
         }
     }

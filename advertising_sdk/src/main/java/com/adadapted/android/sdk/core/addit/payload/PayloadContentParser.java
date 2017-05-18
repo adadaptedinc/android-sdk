@@ -24,7 +24,7 @@ public class PayloadContentParser {
 
         if(json != null) {
             try {
-                JSONArray payloads = json.getJSONArray(JsonFields.Payloads);
+                final JSONArray payloads = json.getJSONArray(JsonFields.Payloads);
                 for(int i = 0; i < payloads.length(); i++) {
                     content.add(parsePayload(payloads.getJSONObject(i)));
                 }

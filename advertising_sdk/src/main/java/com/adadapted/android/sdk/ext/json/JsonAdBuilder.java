@@ -41,17 +41,17 @@ public class JsonAdBuilder implements AdBuilder {
     public List<Ad> buildAds(final JSONArray jsonAds) {
         final List<Ad> ads = new ArrayList<>();
 
-        try {
-            int adCount = jsonAds.length();
-            for(int i = 0; i < adCount; i++) {
+        final int adCount = jsonAds.length();
+        for(int i = 0; i < adCount; i++) {
+            try {
                 final JSONObject jsonAd = jsonAds.getJSONObject(i);
                 final Ad ad  = buildAd(jsonAd);
 
                 ads.add(ad);
             }
-        }
-        catch(JSONException ex) {
-            logJsonParseError(jsonAds.toString(), ex);
+            catch(JSONException ex) {
+                logJsonParseError(jsonAds.toString(), ex);
+            }
         }
 
         return ads;
@@ -60,17 +60,9 @@ public class JsonAdBuilder implements AdBuilder {
     public Ad buildAd(final JSONObject jsonAd) throws JSONException {
         final Ad.Builder builder = new Ad.Builder();
 
-        if(jsonAd.has(JsonFields.ADID)) {
-            builder.setAdId(jsonAd.getString(JsonFields.ADID));
-        }
-
-        if(jsonAd.has(JsonFields.ZONE)) {
-            builder.setZoneId(jsonAd.getString(JsonFields.ZONE));
-        }
-
-        if(jsonAd.has(JsonFields.IMPRESSIONID)) {
-            builder.setBaseImpressionId(jsonAd.getString(JsonFields.IMPRESSIONID));
-        }
+        builder.setAdId(jsonAd.getString(JsonFields.ADID));
+        builder.setZoneId(jsonAd.getString(JsonFields.ZONE));
+        builder.setBaseImpressionId(jsonAd.getString(JsonFields.IMPRESSIONID));
 
         try {
             builder.setRefreshTime(Integer.parseInt(jsonAd.getString(JsonFields.REFRESH_TIME)));
@@ -84,95 +76,57 @@ public class JsonAdBuilder implements AdBuilder {
             builder.setRefreshTime(DEFAULT_REFRESH_TIME);
         }
 
-        if(jsonAd.has(JsonFields.AD_TYPE)) {
-            final String adTypeCode = jsonAd.getString(JsonFields.AD_TYPE);
-            final AdType adType = parseAdType(adTypeCode, jsonAd);
-            builder.setAdType(adType);
-        }
+        final String adTypeCode = jsonAd.getString(JsonFields.AD_TYPE);
+        final AdType adType = parseAdType(adTypeCode, jsonAd);
+        builder.setAdType(adType);
 
-        if(jsonAd.has(JsonFields.ACTION_TYPE)) {
-            final String actionTypeCode = jsonAd.getString(JsonFields.ACTION_TYPE);
-            final AdAction adAction = parseAdAction(actionTypeCode, jsonAd);
-            builder.setAdAction(adAction);
-        }
+        final String actionTypeCode = jsonAd.getString(JsonFields.ACTION_TYPE);
+        final AdAction adAction = parseAdAction(actionTypeCode, jsonAd);
+        builder.setAdAction(adAction);
 
-        if(jsonAd.has(JsonFields.HIDE_AFTER_INTERACTION)) {
-            builder.setHideAfterInteraction(jsonAd.getString(JsonFields.HIDE_AFTER_INTERACTION).equals("1"));
-        }
-
-        if(jsonAd.has(JsonFields.TRACKING_HTML)) {
-            builder.setTrackingHtml(jsonAd.getString(JsonFields.TRACKING_HTML));
-        }
+        builder.setHideAfterInteraction(jsonAd.getString(JsonFields.HIDE_AFTER_INTERACTION).equals("1"));
+        builder.setTrackingHtml(jsonAd.getString(JsonFields.TRACKING_HTML));
 
         return builder.build();
     }
 
-    private AdAction parseAdAction(final String actionTypeCode,
-                                   final JSONObject jsonAd) {
+    private AdAction parseAdAction(final String actionTypeCode, final JSONObject jsonAd) throws JSONException {
         if(actionTypeCode.equalsIgnoreCase(AdAction.POPUP)) {
-            try {
-                final JSONObject popupObject = jsonAd.getJSONObject(JsonFields.POPUP);
-                final String actionPath = jsonAd.getString(JsonFields.ACTION_PATH);
+            final JSONObject popupObject = jsonAd.getJSONObject(JsonFields.POPUP);
+            final String actionPath = jsonAd.getString(JsonFields.ACTION_PATH);
 
-                return parseAdPopup(popupObject, actionPath);
-            }
-            catch(JSONException ex) {
-                logJsonParseError(jsonAd.toString(), ex);
-            }
+            return parseAdPopup(popupObject, actionPath);
         }
         else if(actionTypeCode.equalsIgnoreCase(AdAction.DELEGATE)) {
-            try {
-                final String actionPath = jsonAd.getString(JsonFields.ACTION_PATH);
+            final String actionPath = jsonAd.getString(JsonFields.ACTION_PATH);
 
-                return parseAdDelegate(actionPath);
-            }
-            catch(JSONException ex) {
-                logJsonParseError(jsonAd.toString(), ex);
-            }
+            return parseAdDelegate(actionPath);
         }
         else if(actionTypeCode.equalsIgnoreCase(AdAction.CONTENT)) {
-            try {
-                final JSONObject payloadObject = jsonAd.getJSONObject(JsonFields.PAYLOAD);
-                final String actionPath = jsonAd.getString(JsonFields.ACTION_PATH);
+            final JSONObject payloadObject = jsonAd.getJSONObject(JsonFields.PAYLOAD);
+            final String actionPath = jsonAd.getString(JsonFields.ACTION_PATH);
 
-                return parseAdContent(payloadObject, actionPath);
-            }
-            catch(JSONException ex) {
-                logJsonParseError(jsonAd.toString(), ex);
-            }
+            return parseAdContent(payloadObject, actionPath);
         }
         else if(actionTypeCode.equalsIgnoreCase(AdAction.LINK)) {
-            try {
-                final String actionPath = jsonAd.getString(JsonFields.ACTION_PATH);
+            final String actionPath = jsonAd.getString(JsonFields.ACTION_PATH);
 
-                return parseAdLink(actionPath);
-            }
-            catch(JSONException ex) {
-                logJsonParseError(jsonAd.toString(), ex);
-            }
+            return parseAdLink(actionPath);
         }
 
         return new NullAdAction();
     }
 
-    private ContentAdAction parseAdContent(final JSONObject payloadObject,
-                                           final String actionPath) {
-        final ContentAdAction content = new ContentAdAction();
-        content.setActionPath(actionPath);
+    private ContentAdAction parseAdContent(final JSONObject payloadObject, final String actionPath) throws JSONException{
+        final JSONArray jsonItems = payloadObject.getJSONArray(JsonFields.CONTENT_LIST_ITEMS);
 
         final List<String> listItems = new ArrayList<>();
-
-        try {
-            final JSONArray jsonItems = payloadObject.getJSONArray(JsonFields.CONTENT_LIST_ITEMS);
-
-            for(int i = 0; i < jsonItems.length(); i++) {
-                listItems.add(jsonItems.getString(i));
-            }
-        }
-        catch(JSONException ex) {
-            logJsonParseError(payloadObject.toString(), ex);
+        for(int i = 0; i < jsonItems.length(); i++) {
+            listItems.add(jsonItems.getString(i));
         }
 
+        final ContentAdAction content = new ContentAdAction();
+        content.setActionPath(actionPath);
         content.setItems(listItems);
 
         return content;
@@ -192,52 +146,23 @@ public class JsonAdBuilder implements AdBuilder {
         return link;
     }
 
-    private PopupAdAction parseAdPopup(final JSONObject popupJson,
-                                       final String actionPath) {
+    private PopupAdAction parseAdPopup(final JSONObject popupJson, final String actionPath) throws JSONException {
         final PopupAdAction popup = new PopupAdAction();
+
         popup.setActionPath(actionPath);
-
-        try {
-            if(popupJson.has(JsonFields.POPUP_HIDE_BANNER)) {
-                popup.setHideBanner(Boolean.parseBoolean(popupJson.getString(JsonFields.POPUP_HIDE_BANNER)));
-            }
-
-            if(popupJson.has(JsonFields.POPUP_TITLE_TEXT)) {
-                popup.setTitle(popupJson.getString(JsonFields.POPUP_TITLE_TEXT));
-            }
-
-            if(popupJson.has(JsonFields.POPUP_BACKGROUND_COLOR)) {
-                popup.setBackgroundColor(popupJson.getString(JsonFields.POPUP_BACKGROUND_COLOR));
-            }
-
-            if(popupJson.has(JsonFields.POPUP_TEXT_COLOR)) {
-                popup.setTextColor(popupJson.getString(JsonFields.POPUP_TEXT_COLOR));
-            }
-
-            if(popupJson.has(JsonFields.POPUP_ALT_CLOSE_BTN)) {
-                popup.setAltCloseButton(popupJson.getString(JsonFields.POPUP_ALT_CLOSE_BTN));
-            }
-
-            if(popupJson.has(JsonFields.POPUP_TYPE)) {
-                popup.setType(popupJson.getString(JsonFields.POPUP_TYPE));
-            }
-
-            if(popupJson.has(JsonFields.POPUP_HIDE_CLOSE_BTN)) {
-                popup.setHideCloseButton(Boolean.parseBoolean(popupJson.getString(JsonFields.POPUP_HIDE_CLOSE_BTN)));
-            }
-
-            if(popupJson.has(JsonFields.POPUP_HIDE_BROWSER_NAV)) {
-                popup.setHideBrowserNavigation(Boolean.parseBoolean(popupJson.getString(JsonFields.POPUP_HIDE_BROWSER_NAV)));
-            }
-        }
-        catch(JSONException ex) {
-            logJsonParseError(popupJson.toString(), ex);
-        }
+        popup.setHideBanner(Boolean.parseBoolean(popupJson.getString(JsonFields.POPUP_HIDE_BANNER)));
+        popup.setTitle(popupJson.getString(JsonFields.POPUP_TITLE_TEXT));
+        popup.setBackgroundColor(popupJson.getString(JsonFields.POPUP_BACKGROUND_COLOR));
+        popup.setTextColor(popupJson.getString(JsonFields.POPUP_TEXT_COLOR));
+        popup.setAltCloseButton(popupJson.getString(JsonFields.POPUP_ALT_CLOSE_BTN));
+        popup.setType(popupJson.getString(JsonFields.POPUP_TYPE));
+        popup.setHideCloseButton(Boolean.parseBoolean(popupJson.getString(JsonFields.POPUP_HIDE_CLOSE_BTN)));
+        popup.setHideBrowserNavigation(Boolean.parseBoolean(popupJson.getString(JsonFields.POPUP_HIDE_BROWSER_NAV)));
 
         return popup;
     }
 
-    private AdType parseAdType(final String adTypeCode, final JSONObject jsonAd) {
+    private AdType parseAdType(final String adTypeCode, final JSONObject jsonAd) throws JSONException {
         if(adTypeCode.equalsIgnoreCase(AdType.HTML)) {
             return parseHtmlAd(jsonAd);
         }
@@ -253,121 +178,64 @@ public class JsonAdBuilder implements AdBuilder {
         return new NullAdType();
     }
 
-    private HtmlAdType parseHtmlAd(final JSONObject jsonAd) {
+    private HtmlAdType parseHtmlAd(final JSONObject jsonAd) throws JSONException {
         final HtmlAdType adType = new HtmlAdType();
-
-        try {
-            if(jsonAd.has(JsonFields.AD_URL)) {
-                adType.setAdUrl(jsonAd.getString(JsonFields.AD_URL));
-            }
-        }
-        catch(JSONException ex) {
-            logJsonParseError(jsonAd.toString(), ex);
-        }
+        adType.setAdUrl(jsonAd.getString(JsonFields.AD_URL));
 
         return adType;
     }
 
-    private ImageAdType parseImageAd(final JSONObject jsonAd) {
+    private ImageAdType parseImageAd(final JSONObject jsonAd) throws JSONException {
         final ImageAdType adType = new ImageAdType();
-        try {
-            final Map<String, AdImage> images = parseImages(jsonAd.getJSONObject(JsonFields.IMAGES));
-            adType.setImages(images);
-        }
-        catch(JSONException ex) {
-            logJsonParseError(jsonAd.toString(), ex);
-        }
+        final Map<String, AdImage> images = parseImages(jsonAd.getJSONObject(JsonFields.IMAGES));
+        adType.setImages(images);
 
         return adType;
     }
 
-    private JsonAdType parseJsonAd(JSONObject jsonAd) {
+    private JsonAdType parseJsonAd(JSONObject jsonAd) throws JSONException {
+        final JSONObject jsonComponents = jsonAd.getJSONObject(JsonFields.JSON);
+        final AdComponent adComponents = parseJsonAdComponents(jsonComponents);
+
         final JsonAdType adType = new JsonAdType();
-
-        try {
-            final JSONObject jsonComponents = jsonAd.getJSONObject(JsonFields.JSON);
-
-            final AdComponent adComponents = parseJsonAdComponents(jsonComponents);
-            adType.setComponents(adComponents);
-        }
-        catch(JSONException ex) {
-            logJsonParseError(jsonAd.toString(), ex);
-        }
+        adType.setComponents(adComponents);
 
         return adType;
     }
 
     private AdComponent parseJsonAdComponents(final JSONObject json) throws JSONException {
         final AdComponent adComponents = new AdComponent();
-
-        if(json.has(JsonFields.JSON_AD_CTA_1)) {
-            adComponents.setCta1(json.getString(JsonFields.JSON_AD_CTA_1));
-        }
-
-        if(json.has(JsonFields.JSON_AD_CTA_2)) {
-            adComponents.setCta2(json.getString(JsonFields.JSON_AD_CTA_2));
-        }
-
-        if(json.has(JsonFields.JSON_AD_CAMPAIGN_IMG)) {
-            adComponents.setCampaignImage(json.getString(JsonFields.JSON_AD_CAMPAIGN_IMG));
-        }
-
-        if(json.has(JsonFields.JSON_AD_SPONSOR_LOGO)) {
-            adComponents.setSponsorLogo(json.getString(JsonFields.JSON_AD_SPONSOR_LOGO));
-        }
-
-        if(json.has(JsonFields.JSON_AD_SPONSOR_NAME)) {
-            adComponents.setSponsorName(json.getString(JsonFields.JSON_AD_SPONSOR_NAME));
-        }
-
-        if(json.has(JsonFields.JSON_AD_TITLE)) {
-            adComponents.setTitle(json.getString(JsonFields.JSON_AD_TITLE));
-        }
-
-        if(json.has(JsonFields.JSON_AD_TAGLINE)) {
-            adComponents.setTagLine(json.getString(JsonFields.JSON_AD_TAGLINE));
-        }
-
-        if(json.has(JsonFields.JSON_AD_TEXT_LONG)) {
-            adComponents.setLongText(json.getString(JsonFields.JSON_AD_TEXT_LONG));
-        }
-
-        if(json.has(JsonFields.JSON_AD_SPONSOR_TEXT)) {
-            adComponents.setSponsorText(json.getString(JsonFields.JSON_AD_SPONSOR_TEXT));
-        }
-
-        if(json.has(JsonFields.JSON_AD_APP_ICON_1)) {
-            adComponents.setAppIcon1(json.getString(JsonFields.JSON_AD_APP_ICON_1));
-        }
-
-        if(json.has(JsonFields.JSON_AD_APP_ICON_2)) {
-            adComponents.setAppIcon2(json.getString(JsonFields.JSON_AD_APP_ICON_2));
-        }
+        adComponents.setCta1(json.getString(JsonFields.JSON_AD_CTA_1));
+        adComponents.setCta2(json.getString(JsonFields.JSON_AD_CTA_2));
+        adComponents.setCampaignImage(json.getString(JsonFields.JSON_AD_CAMPAIGN_IMG));
+        adComponents.setSponsorLogo(json.getString(JsonFields.JSON_AD_SPONSOR_LOGO));
+        adComponents.setSponsorName(json.getString(JsonFields.JSON_AD_SPONSOR_NAME));
+        adComponents.setTitle(json.getString(JsonFields.JSON_AD_TITLE));
+        adComponents.setTagLine(json.getString(JsonFields.JSON_AD_TAGLINE));
+        adComponents.setLongText(json.getString(JsonFields.JSON_AD_TEXT_LONG));
+        adComponents.setSponsorText(json.getString(JsonFields.JSON_AD_SPONSOR_TEXT));
+        adComponents.setAppIcon1(json.getString(JsonFields.JSON_AD_APP_ICON_1));
+        adComponents.setAppIcon2(json.getString(JsonFields.JSON_AD_APP_ICON_2));
 
         return adComponents;
     }
 
-    private Map<String, AdImage> parseImages(final JSONObject jsonImages) {
+    private Map<String, AdImage> parseImages(final JSONObject jsonImages) throws JSONException {
         final Map<String, AdImage> images = new HashMap<>();
 
-        try {
-            for(final Iterator<String> imgRes = jsonImages.keys(); imgRes.hasNext();)
-            {
-                final String resKey = imgRes.next();
-                final JSONArray orientation = jsonImages.getJSONArray(resKey);
+        for(final Iterator<String> imgRes = jsonImages.keys(); imgRes.hasNext();)
+        {
+            final String resKey = imgRes.next();
+            final JSONArray orientation = jsonImages.getJSONArray(resKey);
 
-                final AdImage image = new AdImage();
-                for(int i = 0; i < orientation.length(); i++) {
-                    final JSONObject orien = orientation.getJSONObject(i);
-                    image.addOrientation(orien.getString(JsonFields.IMAGE_ORIENTATION),
-                            orien.getString(JsonFields.IMAGE_URL));
-                }
-
-                images.put(resKey, image);
+            final AdImage image = new AdImage();
+            for(int i = 0; i < orientation.length(); i++) {
+                final JSONObject orien = orientation.getJSONObject(i);
+                image.addOrientation(orien.getString(JsonFields.IMAGE_ORIENTATION),
+                        orien.getString(JsonFields.IMAGE_URL));
             }
-        }
-        catch(JSONException ex) {
-            logJsonParseError(jsonImages.toString(), ex);
+
+            images.put(resKey, image);
         }
 
         return images;

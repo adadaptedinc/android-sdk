@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.adadapted.android.sdk.ui.messaging.AaSdkContentListener;
-import com.adadapted.android.sdk.ui.messaging.SdkContentPublisherFactory;
+import com.adadapted.android.sdk.ui.messaging.SdkContentPublisher;
 import com.adadapted.android.sdk.ui.view.AaZoneView;
 
 /**
@@ -24,7 +24,7 @@ public class AaFeedAdapter extends BaseAdapter {
                          final BaseAdapter adapter,
                          final String zoneId,
                          final int placement) {
-        this(context, adapter, zoneId, placement, 0);
+        this(context.getApplicationContext(), adapter, zoneId, placement, 0);
     }
 
     public AaFeedAdapter(final Context context,
@@ -33,7 +33,7 @@ public class AaFeedAdapter extends BaseAdapter {
                          final int placement,
                          final int resourceId) {
         mAdapter = adapter;
-        mPlacement = new AaFeedAdPlacement(context, zoneId, placement, resourceId);
+        mPlacement = new AaFeedAdPlacement(context.getApplicationContext(), zoneId, placement, resourceId);
     }
 
     @Override
@@ -110,7 +110,7 @@ public class AaFeedAdapter extends BaseAdapter {
             currentZoneView.onStart();
         }
 
-        SdkContentPublisherFactory.getContentPublisher().addListener(listener);
+        SdkContentPublisher.getInstance().addListener(listener);
     }
 
     public void onStop() {
@@ -124,6 +124,6 @@ public class AaFeedAdapter extends BaseAdapter {
             currentZoneView.onStop();
         }
 
-        SdkContentPublisherFactory.getContentPublisher().removeListener(listener);
+        SdkContentPublisher.getInstance().removeListener(listener);
     }
 }

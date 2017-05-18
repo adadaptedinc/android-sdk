@@ -91,7 +91,7 @@ public class AdAdapted {
     }
 
     public void start(final Context context) {
-        SessionManager.start(context, mAppId, mIsProd, new SessionManager.Callback() {
+        SessionManager.start(context.getApplicationContext(), mAppId, mIsProd, new SessionManager.Callback() {
             @Override
             public void onSessionAvailable(final Session session) {
                 if(!session.getDeviceInfo().isProd()) {

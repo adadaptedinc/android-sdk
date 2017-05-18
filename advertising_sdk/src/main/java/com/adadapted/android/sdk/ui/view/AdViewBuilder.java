@@ -21,8 +21,6 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
         void onViewLoadFailed();
     }
 
-    //private final Context mContext;
-
     private Listener mListener;
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
@@ -34,21 +32,19 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
     private AdViewBuildingStrategy mStrategy;
 
     AdViewBuilder(final Context context) {
-        //mContext = context;
-
         DeviceInfoManager.getInstance().getDeviceInfo(new DeviceInfoManager.Callback() {
             @Override
             public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
-                mAdImageView = new ImageAdViewBuildingStrategy(context, deviceInfo, AdViewBuilder.this);
+                mAdImageView = new ImageAdViewBuildingStrategy(context.getApplicationContext(), deviceInfo, AdViewBuilder.this);
             }
         });
 
-        mAdEmptyView = new EmptyAdViewStrategy(context, this);
-        mAdJsonView = new JsonAdViewBuildingStrategy(context, this);
+        mAdEmptyView = new EmptyAdViewStrategy(context.getApplicationContext(), this);
+        mAdJsonView = new JsonAdViewBuildingStrategy(context.getApplicationContext(), this);
 
         // For whatever reason the WebView has to be created ahead of time.
         // The App will likely crash if it is constructed on-demand.
-        mAdWebView = new HtmlAdViewBuildingStrategy(context, this);
+        mAdWebView = new HtmlAdViewBuildingStrategy(context.getApplicationContext(), this);
     }
 
     void buildView(final ViewAdWrapper currentAd,

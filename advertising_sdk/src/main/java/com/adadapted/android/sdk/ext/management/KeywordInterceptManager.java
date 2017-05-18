@@ -85,7 +85,7 @@ public class KeywordInterceptManager
     }
 
     @Override
-    public void onNewAdsAvailable(Session session) {}
+    public void onNewAdsAvailable(final Session session) {}
 
     @Override
     public void onKeywordInterceptSessionInitialized(final KeywordIntercept keywordIntercept) {
@@ -95,7 +95,7 @@ public class KeywordInterceptManager
 
     private void notifyOnKeywordInterceptInitSuccess(final KeywordIntercept keywordIntercept) {
         final Set<Callback> currentCallbacks = new HashSet<>(callbacks);
-        for(Callback c: currentCallbacks) {
+        for(final Callback c: currentCallbacks) {
             c.onKeywordInterceptInitSuccess(keywordIntercept);
         }
     }

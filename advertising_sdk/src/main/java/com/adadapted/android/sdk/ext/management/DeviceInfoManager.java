@@ -41,7 +41,11 @@ public class DeviceInfoManager implements CollectDeviceInfoInteractor.Callback {
         addCallback(callback);
 
         final Interactor interactor = new CollectDeviceInfoInteractor(
-            new CollectDeviceInfoCommand(context, appId, isProd, Config.SDK_VERSION),
+            new CollectDeviceInfoCommand(
+                    context.getApplicationContext(),
+                    appId,
+                    isProd,
+                    Config.SDK_VERSION),
             this
         );
 

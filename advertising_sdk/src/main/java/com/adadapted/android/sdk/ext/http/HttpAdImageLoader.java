@@ -52,7 +52,7 @@ public class HttpAdImageLoader implements AdImageLoader {
                 new Response.Listener<Bitmap>() {
 
                     @Override
-                    public void onResponse(Bitmap bitmap) {
+                    public void onResponse(final Bitmap bitmap) {
                         if (null == ImageCache.getInstance().getImage(url)) {
                             ImageCache.getInstance().putImage(url, bitmap);
                         }
@@ -65,7 +65,7 @@ public class HttpAdImageLoader implements AdImageLoader {
                 new Response.ErrorListener() {
 
                     @Override
-                    public void onErrorResponse(VolleyError error) {
+                    public void onErrorResponse(final VolleyError error) {
                         Log.w(LOGTAG, "Problem loading image URL: " + url);
 
                         if(error instanceof NoConnectionError || error instanceof NetworkError) {

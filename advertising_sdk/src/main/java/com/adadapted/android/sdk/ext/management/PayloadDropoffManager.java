@@ -43,7 +43,7 @@ public class PayloadDropoffManager implements DeviceInfoManager.Callback {
         final Set<TempEvent> events = new HashSet<>(tempEvents);
         tempEvents.clear();
         for(TempEvent e : events) {
-            performTrackDropoff(e.payloadId, e.result);
+            performTrackDropoff(e.getPayloadId(), e.getResult());
         }
     }
 
@@ -93,19 +93,19 @@ public class PayloadDropoffManager implements DeviceInfoManager.Callback {
     }
 
     private static class TempEvent {
-        final String payloadId;
-        final String result;
+        private final String payloadId;
+        private final String result;
 
         TempEvent(final String payloadId, final String result) {
             this.payloadId = payloadId;
             this.result = result;
         }
 
-        public String getPayloadId() {
+        String getPayloadId() {
             return payloadId;
         }
 
-        public String getResult() {
+        String getResult() {
             return result;
         }
     }
