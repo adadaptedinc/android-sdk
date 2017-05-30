@@ -78,13 +78,11 @@ public class AaZoneView extends RelativeLayout
     }
 
     protected void displayAdView(final View view) {
-        //Log.i(LOGTAG, "displayAdView called");
         if(view == null) { return; }
 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                //Log.i(LOGTAG, String.format("Pushing Ad display to Zone %s", mZoneProperties.getZoneId()));
                 final ViewGroup parent = ((ViewGroup) view.getParent());
                 if (parent != null) {
                     parent.removeView(view);
@@ -98,7 +96,6 @@ public class AaZoneView extends RelativeLayout
 
     @Override
     public void onViewReadyForDisplay(final View view) {
-        //Log.i(LOGTAG, "onViewReadyForDisplay called");
         if(view == null) { return; }
 
         if(view instanceof WebView) {
@@ -135,7 +132,6 @@ public class AaZoneView extends RelativeLayout
 
     @Override
     public void onResetDisplayView() {
-        //Log.i(LOGTAG, "onResetDisplayView called");
         this.post(new Runnable() {
             @Override
             public void run() {
@@ -145,8 +141,6 @@ public class AaZoneView extends RelativeLayout
     }
 
     public void onStart() {
-        //Log.i(LOGTAG, "onStart called");
-
         if(mZoneProperties == null) {
             return;
         }
@@ -168,8 +162,6 @@ public class AaZoneView extends RelativeLayout
     }
 
     public void onStop() {
-        //Log.i(LOGTAG, "onStop called");
-
         if(mViewController != null) {
             mViewController.removeListener();
         }
@@ -185,19 +177,13 @@ public class AaZoneView extends RelativeLayout
     protected void onVisibilityChanged(@NonNull final View changedView, final int visibility) {
         super.onVisibilityChanged(changedView, visibility);
 
-        //final String zoneId = mZoneProperties != null ? mZoneProperties.getZoneId() : "None";
-        //Log.i(LOGTAG, String.format("Zone %s visibility changed to %d", zoneId, visibility));
-        //Log.i(LOGTAG, String.format("Visibilities: %d - GONE, %d - INVISIBLE, %d - VISIBLE", View.GONE, View.INVISIBLE, View.VISIBLE));
-
         switch(visibility) {
             case View.GONE:
             case View.INVISIBLE:
-                //Log.i(LOGTAG, String.format("Ad Zone %s NOT viewable. NO ads will display", zoneId));
                 mVisible = false;
                 onStop();
                 break;
             case View.VISIBLE:
-                //Log.i(LOGTAG, String.format("Ad Zone %s viewable. Ads will display", zoneId));
                 onStart();
                 mVisible = true;
                 break;
