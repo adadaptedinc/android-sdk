@@ -54,6 +54,7 @@ class AaZoneViewController
     public interface Listener {
         void onViewReadyForDisplay(View v);
         void onResetDisplayView();
+        void onAdDisplayed();
         void onZoneEmpty();
     }
 
@@ -142,6 +143,10 @@ class AaZoneViewController
         if(!mTimerRunning.contains(mCurrentAd.getAdId())) {
             mCurrentAd.beginAdTracking(mTrackingWebView);
             setTimer();
+
+            if(mListener != null) {
+                mListener.onAdDisplayed();
+            }
         }
     }
 

@@ -133,10 +133,6 @@ public class AaZoneView extends RelativeLayout
             if(mViewController != null) {
                 mViewController.acknowledgeDisplay();
             }
-
-            if(mListener != null) {
-                mListener.onAdLoaded();
-            }
         }
     }
 
@@ -148,6 +144,13 @@ public class AaZoneView extends RelativeLayout
                 AaZoneView.this.removeAllViews();
             }
         });
+    }
+
+    @Override
+    public void onAdDisplayed() {
+        if(mListener != null) {
+            mListener.onAdLoaded();
+        }
     }
 
     @Override
