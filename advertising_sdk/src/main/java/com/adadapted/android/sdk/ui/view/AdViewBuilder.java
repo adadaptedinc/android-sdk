@@ -35,16 +35,16 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
         DeviceInfoManager.getInstance().getDeviceInfo(new DeviceInfoManager.Callback() {
             @Override
             public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
-                mAdImageView = new ImageAdViewBuildingStrategy(context.getApplicationContext(), deviceInfo, AdViewBuilder.this);
+                mAdImageView = new ImageAdViewBuildingStrategy(context.getApplicationContext(), deviceInfo);
             }
         });
 
-        mAdEmptyView = new EmptyAdViewStrategy(context.getApplicationContext(), this);
-        mAdJsonView = new JsonAdViewBuildingStrategy(context.getApplicationContext(), this);
+        mAdEmptyView = new EmptyAdViewStrategy(context.getApplicationContext());
+        mAdJsonView = new JsonAdViewBuildingStrategy(context.getApplicationContext());
 
         // For whatever reason the WebView has to be created ahead of time.
         // The App will likely crash if it is constructed on-demand.
-        mAdWebView = new HtmlAdViewBuildingStrategy(context.getApplicationContext(), this);
+        mAdWebView = new HtmlAdViewBuildingStrategy(context.getApplicationContext());
     }
 
     void buildView(final ViewAdWrapper currentAd,
@@ -73,6 +73,7 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
                 mStrategy = mAdEmptyView;
         }
 
+        mStrategy.setListener(this);
         loadView(mStrategy, currentAd, width, height, zoneProperties);
     }
 
@@ -116,11 +117,13 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
     }
 
     public void onStrategyViewLoaded() {
+        mStrategy.removeListener();
         notifyViewLoaded(mStrategy.getView());
     }
 
     @Override
     public void onStrategyViewLoadFailed() {
+        mStrategy.removeListener();
         notifyViewLoadFailed();
     }
 }
