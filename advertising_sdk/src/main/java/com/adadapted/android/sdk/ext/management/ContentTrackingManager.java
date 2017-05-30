@@ -13,7 +13,7 @@ import java.util.Map;
  */
 
 public class ContentTrackingManager {
-    public static void markContentAcknowledged(final Content content) {
+    public static synchronized void markContentAcknowledged(final Content content) {
         final List<AddToListItem> payload = content.getPayload();
         for (AddToListItem item : payload) {
             final Map<String, String> eventParams = new HashMap<>();
@@ -30,7 +30,7 @@ public class ContentTrackingManager {
         }
     }
 
-    public static void markContentDuplicate(final Content content) {
+    public static synchronized void markContentDuplicate(final Content content) {
         final Map<String, String> eventParams = new HashMap<>();
         eventParams.put("payload_id", content.getPayloadId());
 
@@ -41,7 +41,7 @@ public class ContentTrackingManager {
         }
     }
 
-    public static void markContentFailed(final Content content, final String message) {
+    public static synchronized void markContentFailed(final Content content, final String message) {
         final Map<String, String> eventParams = new HashMap<>();
         eventParams.put("payload_id", content.getPayloadId());
 

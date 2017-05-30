@@ -17,6 +17,30 @@ import java.util.Set;
 public class PayloadDropoffManager implements DeviceInfoManager.Callback {
     private static PayloadDropoffManager sInstance;
 
+    public static synchronized void trackDelivered(final String payloadId) {
+        if(payloadId == null) {
+            return;
+        }
+
+        if(getInstance().tracker == null) {
+            getInstance().tempEvents.add(new TempEvent(payloadId, "delivered"));
+        } else {
+            getInstance().performTrackDropoff(payloadId, "delivered");
+        }
+    }
+
+    public static synchronized void trackRejected(final String payloadId) {
+        if(payloadId == null) {
+            return;
+        }
+
+        if(getInstance().tracker == null) {
+            getInstance().tempEvents.add(new TempEvent(payloadId, "rejected"));
+        } else {
+            getInstance().performTrackDropoff(payloadId, "rejected");
+        }
+    }
+
     private PayloadEventTracker tracker;
     private final Set<TempEvent> tempEvents = new HashSet<>();
 
@@ -66,30 +90,6 @@ public class PayloadDropoffManager implements DeviceInfoManager.Callback {
                 ThreadPoolInteractorExecuter.getInstance().executeInBackground(interactor);
             }
         });
-    }
-
-    public synchronized static void trackDelivered(final String payloadId) {
-        if(payloadId == null) {
-            return;
-        }
-
-        if(getInstance().tracker == null) {
-            getInstance().tempEvents.add(new TempEvent(payloadId, "delivered"));
-        } else {
-            getInstance().performTrackDropoff(payloadId, "delivered");
-        }
-    }
-
-    public synchronized static void trackRejected(final String payloadId) {
-        if(payloadId == null) {
-            return;
-        }
-
-        if(getInstance().tracker == null) {
-            getInstance().tempEvents.add(new TempEvent(payloadId, "rejected"));
-        } else {
-            getInstance().performTrackDropoff(payloadId, "rejected");
-        }
     }
 
     private static class TempEvent {
