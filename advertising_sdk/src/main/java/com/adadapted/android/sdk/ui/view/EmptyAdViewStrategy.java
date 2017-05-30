@@ -9,11 +9,10 @@ import com.adadapted.android.sdk.core.ad.model.Ad;
  * Created by chrisweeden on 7/22/15
  */
 class EmptyAdViewStrategy implements AdViewBuildingStrategy {
-    private final Listener mListener;
+    private Listener mListener;
     private final View mView;
 
-    EmptyAdViewStrategy(final Context context, final Listener listener) {
-        mListener = listener;
+    EmptyAdViewStrategy(final Context context) {
         mView = new View(context.getApplicationContext());
     }
 
@@ -30,6 +29,14 @@ class EmptyAdViewStrategy implements AdViewBuildingStrategy {
         if(mListener != null) {
             mListener.onStrategyViewLoadFailed();
         }
+    }
+
+    public void setListener(final Listener listener) {
+        mListener = listener;
+    }
+
+    public void removeListener() {
+        mListener = null;
     }
 
     @Override

@@ -17,13 +17,10 @@ import com.adadapted.android.sdk.core.ad.model.HtmlAdType;
 class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
     private static final String LOGTAG = HtmlAdViewBuildingStrategy.class.getName();
 
-    private final Listener mListener;
+    private Listener mListener;
     private WebView mWebView;
 
-    public HtmlAdViewBuildingStrategy(final Context context,
-                                      final Listener listener) {
-        mListener = listener;
-
+    public HtmlAdViewBuildingStrategy(final Context context) {
         try {
             mWebView = new WebView(context.getApplicationContext());
             mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -82,6 +79,14 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
                 mListener.onStrategyViewLoadFailed();
             }
         }
+    }
+
+    public void setListener(final Listener listener) {
+        mListener = listener;
+    }
+
+    public void removeListener() {
+        mListener = null;
     }
 
     private void setDummyDocument(final int color) {

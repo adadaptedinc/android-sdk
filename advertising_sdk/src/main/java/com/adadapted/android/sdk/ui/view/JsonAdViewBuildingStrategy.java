@@ -21,15 +21,14 @@ import com.adadapted.android.sdk.ext.http.HttpAdImageLoader;
 class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
     private static final String LOGTAG = JsonAdViewBuildingStrategy.class.getName();
 
-    private final Listener mListener;
+    private Listener mListener;
     private final Context mContext;
     private final AdImageLoader mImageLoader;
 
     private View mView;
 
-    public JsonAdViewBuildingStrategy(final Context context, final Listener listener) {
+    public JsonAdViewBuildingStrategy(final Context context) {
         mContext = context.getApplicationContext();
-        mListener = listener;
         mImageLoader = new HttpAdImageLoader();
 
         mView = new View(mContext);
@@ -145,6 +144,14 @@ class JsonAdViewBuildingStrategy implements AdViewBuildingStrategy {
 
             }
         });
+    }
+
+    public void setListener(final Listener listener) {
+        mListener = listener;
+    }
+
+    public void removeListener() {
+        mListener = null;
     }
 
     @Override

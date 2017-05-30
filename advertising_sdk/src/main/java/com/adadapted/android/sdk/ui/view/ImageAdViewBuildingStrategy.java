@@ -23,7 +23,7 @@ import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
 class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
     private static final String LOGTAG = ImageAdViewBuildingStrategy.class.getName();
 
-    private final Configuration mConfiguration;
+    private final Context mContext;
     private final DeviceInfo mDeviceInfo;
     private final ImageView mView;
 
@@ -37,20 +37,19 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
 
     private final Handler buildAdHandler = new Handler(Looper.getMainLooper());
 
-    private final Listener mListener;
+    private Listener mListener;
 
     ImageAdViewBuildingStrategy(final Context context,
-                                final DeviceInfo deviceInfo,
-                                final Listener listener) {
-        mConfiguration = context.getResources().getConfiguration();
+                                final DeviceInfo deviceInfo) {
+        mContext = context.getApplicationContext();
         mDeviceInfo = deviceInfo;
-        mListener = listener;
 
         mView = new ImageView(context.getApplicationContext());
     }
 
     private String getPresentOrientation() {
-        if(mConfiguration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        final Configuration configuration = mContext.getResources().getConfiguration();
+        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             return AdImage.LANDSCAPE;
         }
 
@@ -98,6 +97,14 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
                 }
             }
         });
+    }
+
+    public void setListener(final Listener listener) {
+        mListener = listener;
+    }
+
+    public void removeListener() {
+        mListener = null;
     }
 
     @Override
