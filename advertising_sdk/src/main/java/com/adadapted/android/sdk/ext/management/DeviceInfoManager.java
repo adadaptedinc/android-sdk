@@ -19,7 +19,7 @@ import java.util.Set;
 public class DeviceInfoManager implements CollectDeviceInfoInteractor.Callback {
     private static DeviceInfoManager sInstance;
 
-    public static DeviceInfoManager getInstance() {
+    public static synchronized DeviceInfoManager getInstance() {
         if(sInstance == null) {
             sInstance = new DeviceInfoManager();
         }
