@@ -42,19 +42,28 @@ class AaZoneViewController
 
     private final AdViewBuilder mAdViewBuilder;
     private final AdActionHandler mAdActionHandler;
+    private final AdZoneRefreshScheduler mAdZoneRefreshScheduler;
 
-    private AaZoneViewControllerListener mListener;
+    private Listener mListener;
 
     private Session mSession;
     private Zone mZone;
     private ViewAdWrapper mCurrentAd;
     private final Set<String> mTimerRunning;
 
-    public AaZoneViewController(final Context context, final AaZoneViewProperties zoneProperties) {
-        mContext = context;
+    public interface Listener {
+        void onViewReadyForDisplay(View v);
+        void onResetDisplayView();
+        void onAdDisplayed();
+        void onZoneEmpty();
+    }
+
+    AaZoneViewController(final Context context,
+                         final AaZoneViewProperties zoneProperties) {
+        mContext = context.getApplicationContext();
         mZoneProperties = zoneProperties;
 
-        mTrackingWebView = new WebView(context);
+        mTrackingWebView = new WebView(context.getApplicationContext());
         mTrackingWebView.setWebChromeClient(new WebChromeClient());
         mTrackingWebView.setWebViewClient(new WebViewClient() {
             @Override
@@ -63,17 +72,21 @@ class AaZoneViewController
                                         WebResourceError error) {
                 super.onReceivedError(view, request, error);
 
+                final Map<String, String> params = new HashMap<>();
+                params.put("error", error.toString());
+
                 AppErrorTrackingManager.registerEvent(
                         "TRACKING_PIXEL_LOAD_ERROR",
                         "Problem loading tracking pixel for Ad: " + mCurrentAd.getAdId(),
-                        new HashMap<String, String>());
+                        params);
             }
         });
 
-        mAdViewBuilder = new AdViewBuilder(context);
+        mAdViewBuilder = new AdViewBuilder(context.getApplicationContext());
         mAdViewBuilder.setListener(this);
 
-        mAdActionHandler = new AdActionHandler(context);
+        mAdActionHandler = new AdActionHandler(context.getApplicationContext());
+        mAdZoneRefreshScheduler = new AdZoneRefreshScheduler();
 
         String zoneId = null;
         if(zoneProperties != null) {
@@ -84,7 +97,7 @@ class AaZoneViewController
         mCurrentAd = ViewAdWrapper.createEmptyCurrentAd(mSession);
         mTimerRunning = new HashSet<>();
 
-        Map<String, String> params = new HashMap<>();
+        final Map<String, String> params = new HashMap<>();
         params.put("zone_id", zoneId);
         AppEventTrackingManager.registerEvent(AppEventSource.SDK, "zone_loaded", params);
     }
@@ -92,7 +105,7 @@ class AaZoneViewController
     private void setNextAd() {
         completeCurrentAd();
 
-        Ad ad = mZone.getNextAd();
+        final Ad ad = mZone.getNextAd();
         if(ad != null) {
             mCurrentAd = new ViewAdWrapper(mSession, ad);
         }
@@ -114,22 +127,30 @@ class AaZoneViewController
     private void displayAd() {
         if(mCurrentAd.hasAd()) {
             mAdViewBuilder.buildView(mCurrentAd, mZoneProperties, getZoneWidth(), getZoneHeight());
+        } else {
+            if(mListener != null) {
+                mListener.onZoneEmpty();
+            }
         }
     }
 
-    public void setTimer() {
-        new AdZoneRefreshScheduler(this).schedule(mCurrentAd.getAd());
+    private void setTimer() {
+        mAdZoneRefreshScheduler.schedule(mCurrentAd.getAd());
         mTimerRunning.add(mCurrentAd.getAdId());
     }
 
-    public void acknowledgeDisplay() {
+    void acknowledgeDisplay() {
         if(!mTimerRunning.contains(mCurrentAd.getAdId())) {
             mCurrentAd.beginAdTracking(mTrackingWebView);
             setTimer();
+
+            if(mListener != null) {
+                mListener.onAdDisplayed();
+            }
         }
     }
 
-    public void handleAdAction() {
+    void handleAdAction() {
         if(mAdActionHandler.handleAction(mCurrentAd)){
             mCurrentAd.trackInteraction();
 
@@ -139,37 +160,39 @@ class AaZoneViewController
         }
     }
 
-    public int getZoneWidth() {
-        Dimension dim = mZone.getDimension(getPresentOrientation());
+    private int getZoneWidth() {
+        final Dimension dim = mZone.getDimension(getPresentOrientation());
         if(dim != null) {
             return dim.getWidth();
         }
 
+        // Match Parent
         return -1;
     }
 
-    public int getZoneHeight() {
-        Dimension dim = mZone.getDimension(getPresentOrientation());
+    private int getZoneHeight() {
+        final Dimension dim = mZone.getDimension(getPresentOrientation());
         if(dim != null) {
             return dim.getHeight();
         }
 
+        // Wrap Content
         return -2;
     }
 
     private String getPresentOrientation() {
-        int orientation = mContext.getResources().getConfiguration().orientation;
-
-        if(orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        final Configuration configuration = mContext.getResources().getConfiguration();
+        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             return AdImage.LANDSCAPE;
         }
 
         return AdImage.PORTRAIT;
     }
 
-    public void setListener(AaZoneViewControllerListener listener) {
+    public void setListener(final Listener listener) {
         mListener = listener;
         SessionManager.getSession(this);
+        mAdZoneRefreshScheduler.setListener(this);
     }
 
     public void removeListener() {
@@ -177,6 +200,7 @@ class AaZoneViewController
 
         mListener = null;
         SessionManager.removeCallback(this);
+        mAdZoneRefreshScheduler.removeListener();
     }
 
     private void notifyViewReadyForDisplay(final View v) {
@@ -192,7 +216,7 @@ class AaZoneViewController
     }
 
     @Override
-    public void onSessionAvailable(Session session) {
+    public void onSessionAvailable(final Session session) {
         if(mZoneProperties == null) {
             return;
         }
@@ -218,7 +242,7 @@ class AaZoneViewController
     }
 
     @Override
-    public void onAdZoneRefreshTimer(Ad ad) {
+    public void onAdZoneRefreshTimer(final Ad ad) {
         if(ad.getAdId().equals(mCurrentAd.getAdId())) {
             mTimerRunning.remove(ad.getAdId());
 
@@ -228,7 +252,7 @@ class AaZoneViewController
     }
 
     @Override
-    public void onViewLoaded(View v) {
+    public void onViewLoaded(final View v) {
         notifyViewReadyForDisplay(v);
     }
 

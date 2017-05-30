@@ -21,7 +21,7 @@ import java.util.Set;
 public class AppErrorTrackingManager implements DeviceInfoManager.Callback {
     private static AppErrorTrackingManager sInstance;
 
-    private static AppErrorTrackingManager getInstance() {
+    private static synchronized AppErrorTrackingManager getInstance() {
         if(sInstance == null) {
             sInstance = new AppErrorTrackingManager();
         }
@@ -29,7 +29,7 @@ public class AppErrorTrackingManager implements DeviceInfoManager.Callback {
         return sInstance;
     }
 
-    public static void registerEvent(final String errorCode,
+    public static synchronized void registerEvent(final String errorCode,
                                      final String errorMessge,
                                      final Map<String, String> errorParams) {
         if(getInstance().tracker == null) {

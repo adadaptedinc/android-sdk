@@ -1,6 +1,9 @@
 package com.adadapted.android.sdk.ui.messaging;
 
-import com.adadapted.android.sdk.core.addit.AdditContent;
+import com.adadapted.android.sdk.core.addit.Content;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by chrisweeden on 9/16/16.
@@ -16,9 +19,12 @@ public class AdditContentPublisher {
         return sInstance;
     }
 
+    private final Map<String, Content> publishedContent;
     private AaSdkAdditContentListener mListener;
 
-    private AdditContentPublisher() {}
+    private AdditContentPublisher() {
+        publishedContent = new HashMap<>();
+    }
 
     public void addListener(final AaSdkAdditContentListener listener) {
         if(listener != null) {
@@ -26,9 +32,19 @@ public class AdditContentPublisher {
         }
     }
 
-    public void publishContent(final AdditContent payload) {
-        if(mListener != null && payload != null) {
-            mListener.onContentAvailable(payload);
+    public void publishContent(final Content content) {
+        if(content == null) {
+            return;
+        }
+
+        if(publishedContent.containsKey(content.getPayloadId())) {
+            content.duplicate();
+            return;
+        }
+
+        if(mListener != null) {
+            publishedContent.put(content.getPayloadId(), content);
+            mListener.onContentAvailable(content);
         }
     }
 }

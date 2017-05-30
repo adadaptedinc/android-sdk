@@ -2,11 +2,12 @@ package com.adadapted.android.sdk.ui.view;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.model.AdAction;
 import com.adadapted.android.sdk.ui.activity.AaWebViewPopupActivity;
-import com.adadapted.android.sdk.ui.messaging.SdkContentPublisherFactory;
+import com.adadapted.android.sdk.ui.messaging.SdkContentPublisher;
 import com.adadapted.android.sdk.ui.model.AdContentPayload;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
@@ -19,7 +20,7 @@ class AdActionHandler {
     private final Context mContext;
 
     public AdActionHandler(final Context context) {
-        mContext = context;
+        mContext = context.getApplicationContext();
     }
 
     /**
@@ -31,13 +32,15 @@ class AdActionHandler {
         if(ad == null || !ad.hasAd()) { return false; }
 
         boolean result = true;
-        switch(ad.getAd().getAdAction().getActionType()) {
+        final String actionType = ad.getAd().getAdAction().getActionType();
+        switch(actionType) {
             case AdAction.CONTENT:
                 handleContentAction(ad);
                 break;
 
             case AdAction.DELEGATE:
-                handleDelegateAction(ad);
+                Log.w(LOGTAG, "Cannot handle Action type: " + actionType);
+                result = false;
                 break;
 
             case AdAction.LINK:
@@ -45,7 +48,7 @@ class AdActionHandler {
                 break;
 
             case AdAction.NULLACTION:
-                Log.w(LOGTAG, "Cannot handle Action type: " + ad.getAd().getAdAction().getActionType());
+                Log.w(LOGTAG, "Cannot handle Action type: " + actionType);
                 result = false;
                 break;
 
@@ -54,7 +57,7 @@ class AdActionHandler {
                 break;
 
             default:
-                Log.w(LOGTAG, "Cannot handle Action type: " + ad.getAd().getAdAction().getActionType());
+                Log.w(LOGTAG, "Cannot handle Action type: " + actionType);
                 result = false;
         }
 
@@ -65,16 +68,20 @@ class AdActionHandler {
         String zoneId = ad.getAd().getZoneId();
 
         AdContentPayload payload = AdContentPayload.createAddToListContent(ad);
-        SdkContentPublisherFactory.getContentPublisher().publishContent(zoneId, payload);
+        SdkContentPublisher.getInstance().publishContent(zoneId, payload);
     }
 
-    private void handleDelegateAction(final ViewAdWrapper ad) {}
+    private void handleLinkAction(final ViewAdWrapper ad) {
+        final Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(ad.getAd().getAdAction().getActionPath()));
 
-    private void handleLinkAction(final ViewAdWrapper ad) {}
+        mContext.startActivity(intent);
+    }
 
     private void handlePopupAction(final ViewAdWrapper ad) {
-        Intent intent = AaWebViewPopupActivity.createActivity(mContext, ad);
+        final Intent intent = AaWebViewPopupActivity.createActivity(mContext, ad);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
         mContext.startActivity(intent);
     }
 }

@@ -2,10 +2,11 @@ package com.adadapted.sdk.addit.ext.http;
 
 import android.util.Log;
 
+import com.adadapted.sdk.addit.core.content.Content;
 import com.adadapted.sdk.addit.core.payload.PayloadAdapter;
-import com.adadapted.sdk.addit.core.payload.PayloadContent;
 import com.adadapted.sdk.addit.core.payload.PayloadContentParser;
 import com.adadapted.sdk.addit.ext.management.AppErrorTrackingManager;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkError;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
@@ -43,7 +44,7 @@ public class HttpPayloadAdapter implements PayloadAdapter {
                 this.endpoint, json, new Response.Listener<JSONObject>(){
             @Override
             public void onResponse(JSONObject response) {
-                final List<PayloadContent> content = parser.parse(response);
+                final List<Content> content = parser.parse(response);
                 callback.onSuccess(content);
             }
         }, new Response.ErrorListener() {
@@ -51,21 +52,22 @@ public class HttpPayloadAdapter implements PayloadAdapter {
             public void onErrorResponse(VolleyError error) {
                 Log.e(LOGTAG, "Payload Pickup Request Failed.", error);
 
-                String errorType = "PAYLOAD_PICKUP_REQUEST_FAILED";
                 if(error instanceof NoConnectionError || error instanceof NetworkError) {
-                    errorType = "PAYLOAD_PICKUP_NO_NETWORK_CONNECTION";
+                    return;
                 }
 
                 final Map<String, String> errorParams = new HashMap<>();
                 errorParams.put("endpoint", endpoint);
                 AppErrorTrackingManager.registerEvent(
-                        errorType,
+                        "PAYLOAD_PICKUP_REQUEST_FAILED",
                         error.getMessage(),
                         errorParams);
 
                 callback.onFailure(error.getMessage());
             }
         });
+
+        request.setRetryPolicy(new DefaultRetryPolicy(1000 * 20, 2, 1.0f));
 
         HttpRequestManager.getQueue().add(request);
     }

@@ -5,8 +5,9 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.session.SessionAdapter;
 import com.adadapted.android.sdk.core.session.SessionBuilder;
 import com.adadapted.android.sdk.core.session.model.Session;
-import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
 import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -53,6 +54,10 @@ public class HttpSessionAdapter implements SessionAdapter {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.w(LOGTAG, "Session Init Request Failed.", error);
+
+                if(error instanceof NoConnectionError || error instanceof NetworkError) {
+                    return;
+                }
 
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", initUrl);

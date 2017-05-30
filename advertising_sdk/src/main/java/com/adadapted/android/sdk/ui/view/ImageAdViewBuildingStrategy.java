@@ -13,7 +13,6 @@ import com.adadapted.android.sdk.core.ad.AdImageLoader;
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.AdImage;
 import com.adadapted.android.sdk.core.ad.model.ImageAdType;
-import com.adadapted.android.sdk.core.anomaly.AnomalyAdapter;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.ext.http.HttpAdImageLoader;
 import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
@@ -23,8 +22,6 @@ import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
  */
 class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
     private static final String LOGTAG = ImageAdViewBuildingStrategy.class.getName();
-
-    private final HttpAdImageLoader mImageLoader;
 
     private final Context mContext;
     private final DeviceInfo mDeviceInfo;
@@ -40,23 +37,19 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
 
     private final Handler buildAdHandler = new Handler(Looper.getMainLooper());
 
-    private final Listener mListener;
+    private Listener mListener;
 
-    public ImageAdViewBuildingStrategy(final Context context,
-                                       final DeviceInfo deviceInfo,
-                                       final Listener listener) {
-        mContext = context;
+    ImageAdViewBuildingStrategy(final Context context,
+                                final DeviceInfo deviceInfo) {
+        mContext = context.getApplicationContext();
         mDeviceInfo = deviceInfo;
-        mListener = listener;
 
-        mImageLoader = new HttpAdImageLoader();
-        mView = new ImageView(context);
+        mView = new ImageView(context.getApplicationContext());
     }
 
     private String getPresentOrientation() {
-        int orientation = mContext.getResources().getConfiguration().orientation;
-
-        if(orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        final Configuration configuration = mContext.getResources().getConfiguration();
+        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             return AdImage.LANDSCAPE;
         }
 
@@ -80,7 +73,7 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
         final String imageResolution = mDeviceInfo.chooseImageSize();
 
         final String imageUrl = adType.getImageUrlFor(imageResolution, getPresentOrientation());
-        mImageLoader.getImage(imageUrl, new AdImageLoader.Callback() {
+        new HttpAdImageLoader().getImage(imageUrl, new AdImageLoader.Callback() {
             @Override
             public void adImageLoaded(final Bitmap bitmap) {
                 mAdImage = bitmap;
@@ -104,6 +97,14 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
                 }
             }
         });
+    }
+
+    public void setListener(final Listener listener) {
+        mListener = listener;
+    }
+
+    public void removeListener() {
+        mListener = null;
     }
 
     @Override

@@ -81,9 +81,6 @@ public class ViewAdWrapper {
         return hasAd() && mAd.isHiddenAfterInteraction();
     }
 
-    public Session getSession() {
-        return mSession;
-    }
 
     public void beginAdTracking(final WebView trackingWebView) {
         if(hasAd() && shouldBeginTracking()) {

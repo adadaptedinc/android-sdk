@@ -5,9 +5,10 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.adadapted.sdk.addit.core.app.AppEventSource;
-import com.adadapted.sdk.addit.core.deeplink.DeeplinkContent;
+import com.adadapted.sdk.addit.core.content.Content;
 import com.adadapted.sdk.addit.core.deeplink.DeeplinkContentParser;
 import com.adadapted.sdk.addit.ext.management.AppErrorTrackingManager;
 import com.adadapted.sdk.addit.ext.management.AppEventTrackingManager;
@@ -23,6 +24,8 @@ public class AdditInterceptActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.i(LOGTAG, "Addit Intercept Activity Launched.");
+
         PayloadPickupManager.deeplinkInProgress();
 
         AppEventTrackingManager.registerEvent(
@@ -35,11 +38,15 @@ public class AdditInterceptActivity extends AppCompatActivity {
             final Uri uri = additIntent.getData();
 
             final DeeplinkContentParser parser = new DeeplinkContentParser();
-            final DeeplinkContent content = parser.parse(uri);
+            final Content content = parser.parse(uri);
+
+            Log.i(LOGTAG, "Addit content dispactched to App.");
 
             AdditContentPublisher.getInstance().publishContent(content);
         }
         catch(Exception ex) {
+            Log.w(LOGTAG, "Problem dealing with Addit content. Recovering. " + ex.getMessage());
+
             final Map<String, String> errorParams = new HashMap<>();
             errorParams.put("exception_message", ex.getMessage());
             AppErrorTrackingManager.registerEvent(
@@ -54,5 +61,7 @@ public class AdditInterceptActivity extends AppCompatActivity {
         }
 
         PayloadPickupManager.deeplinkCompleted();
+
+        finish();
     }
 }

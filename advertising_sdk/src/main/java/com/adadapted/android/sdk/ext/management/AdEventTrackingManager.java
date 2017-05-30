@@ -1,7 +1,5 @@
 package com.adadapted.android.sdk.ext.management;
 
-import android.util.Log;
-
 import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.ad.AdEventTracker;
 import com.adadapted.android.sdk.core.ad.PublishAdEventsInteractor;
@@ -35,27 +33,27 @@ public class AdEventTrackingManager implements DeviceInfoManager.Callback {
         return sInstance;
     }
 
-    public static void trackImpressionBeginEvent(final Session session, final Ad ad) {
+    public static synchronized void trackImpressionBeginEvent(final Session session, final Ad ad) {
         registerAdEvent(session, ad, AdEvent.Types.IMPRESSION, "");
     }
 
-    public static void trackImpressionEndEvent(final Session session, final Ad ad) {
+    public static synchronized void trackImpressionEndEvent(final Session session, final Ad ad) {
         registerAdEvent(session, ad, AdEvent.Types.IMPRESSION_END, "");
     }
 
-    public static void trackInteractionEvent(final Session session, final Ad ad) {
+    public static synchronized void trackInteractionEvent(final Session session, final Ad ad) {
         registerAdEvent(session, ad, AdEvent.Types.INTERACTION, "");
     }
 
-    public static void trackPopupBeginEvent(final Session session, final Ad ad) {
+    public static synchronized void trackPopupBeginEvent(final Session session, final Ad ad) {
         registerAdEvent(session, ad, AdEvent.Types.POPUP_BEGIN, "");
     }
 
-    public static void trackPopupEndEvent(final Session session, final Ad ad) {
+    public static synchronized void trackPopupEndEvent(final Session session, final Ad ad) {
         registerAdEvent(session, ad, AdEvent.Types.POPUP_END, "");
     }
 
-    public static void trackCustomEvent(final Session session, final Ad ad, final String eventName) {
+    public static synchronized void trackCustomEvent(final Session session, final Ad ad, final String eventName) {
         registerAdEvent(session, ad, AdEvent.Types.CUSTOM, eventName);
     }
 

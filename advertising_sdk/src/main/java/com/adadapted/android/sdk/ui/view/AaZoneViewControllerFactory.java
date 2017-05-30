@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.ui.view;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,20 +19,17 @@ class AaZoneViewControllerFactory {
         mZoneControllers = new HashMap<>();
     }
 
-    public static AaZoneViewController getController(final Context context,
-                                                     final AaZoneViewProperties zoneProperties) {
+    static synchronized AaZoneViewController getController(final Context context,
+                                                           final AaZoneViewProperties zoneProperties) {
         if(sInstance == null) {
             sInstance = new AaZoneViewControllerFactory();
         }
 
-        String zoneId = "";
-        if(zoneProperties != null) {
-            zoneId = zoneProperties.getZoneId();
-        }
+        final String zoneId = zoneProperties == null ? "" : zoneProperties.getZoneId();
 
         if(!sInstance.mZoneControllers.containsKey(zoneId)) {
             //Log.d(LOGTAG, String.format("No controller found for Zone: %s. Creating one.", zoneId));
-            AaZoneViewController controller = new AaZoneViewController(context, zoneProperties);
+            final AaZoneViewController controller = new AaZoneViewController(context.getApplicationContext(), zoneProperties);
             sInstance.mZoneControllers.put(zoneId, controller);
         }
 

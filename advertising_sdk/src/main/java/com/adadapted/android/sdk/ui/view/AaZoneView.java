@@ -17,17 +17,22 @@ import android.webkit.WebView;
 import android.widget.RelativeLayout;
 
 import com.adadapted.android.sdk.ui.messaging.AaSdkContentListener;
-import com.adadapted.android.sdk.ui.messaging.SdkContentPublisherFactory;
+import com.adadapted.android.sdk.ui.messaging.SdkContentPublisher;
 
 /**
  * Created by chrisweeden on 3/30/15
  */
 public class AaZoneView extends RelativeLayout
-        implements AdInteractionListener, AaZoneViewControllerListener {
+        implements AdInteractionListener, AaZoneViewController.Listener {
     private static final String LOGTAG = AaZoneView.class.getName();
 
-    private final Context mContext;
-    private final Handler mViewHandler;
+    public interface Listener {
+        void onAdLoaded();
+        void onAdLoadFailed();
+    }
+
+    private Context mContext;
+    private Listener mListener;
 
     private AaZoneViewController mViewController;
     private AaZoneViewProperties mZoneProperties;
@@ -35,29 +40,29 @@ public class AaZoneView extends RelativeLayout
     private boolean mVisible = true;
 
     public AaZoneView(Context context) {
-        super(context);
-        mContext = context;
-        mViewHandler = new Handler(Looper.getMainLooper());
+        super(context.getApplicationContext());
+
+        mContext = context.getApplicationContext();
     }
 
     public AaZoneView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        mContext = context;
-        mViewHandler = new Handler(Looper.getMainLooper());
+        super(context.getApplicationContext(), attrs);
+
+        mContext = context.getApplicationContext();
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public AaZoneView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        mContext = context;
-        mViewHandler = new Handler(Looper.getMainLooper());
+        super(context.getApplicationContext(), attrs, defStyleAttr);
+
+        mContext = context.getApplicationContext();
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public AaZoneView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        mContext = context;
-        mViewHandler = new Handler(Looper.getMainLooper());
+        super(context.getApplicationContext(), attrs, defStyleAttr, defStyleRes);
+
+        mContext = context.getApplicationContext();
     }
 
     public void init(final String zoneId) {
@@ -66,12 +71,8 @@ public class AaZoneView extends RelativeLayout
 
     public void init(final String zoneId,
                      final int layoutResourceId) {
-        int color = Color.WHITE;
-
-        ColorDrawable mBackgroundColor = (ColorDrawable) getBackground();
-        if(mBackgroundColor != null) {
-            color = mBackgroundColor.getColor();
-        }
+        final ColorDrawable mBackgroundColor = (ColorDrawable) getBackground();
+        final int color = (mBackgroundColor != null) ?mBackgroundColor.getColor() : Color.WHITE;
 
         mZoneProperties = new AaZoneViewProperties(zoneId, layoutResourceId, color);
 
@@ -83,14 +84,12 @@ public class AaZoneView extends RelativeLayout
     }
 
     protected void displayAdView(final View view) {
-        //Log.i(LOGTAG, "displayAdView called");
         if(view == null) { return; }
 
-        mViewHandler.post(new Runnable() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                //Log.i(LOGTAG, String.format("Pushing Ad display to Zone %s", mZoneProperties.getZoneId()));
-                ViewGroup parent = ((ViewGroup) view.getParent());
+                final ViewGroup parent = ((ViewGroup) view.getParent());
                 if (parent != null) {
                     parent.removeView(view);
                 }
@@ -103,11 +102,12 @@ public class AaZoneView extends RelativeLayout
 
     @Override
     public void onViewReadyForDisplay(final View view) {
-        //Log.i(LOGTAG, "onViewReadyForDisplay called");
+        if(view == null) { return; }
+
         if(view instanceof WebView) {
             view.setOnTouchListener(new OnTouchListener() {
                 @Override
-                public boolean onTouch(View v, MotionEvent event) {
+                public boolean onTouch(final View v, final MotionEvent event) {
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
                             AaZoneView.this.onAdInteraction();
@@ -121,7 +121,7 @@ public class AaZoneView extends RelativeLayout
         else {
             setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(View v) {
+                public void onClick(final View v) {
                     AaZoneView.this.onAdInteraction();
                 }
             });
@@ -138,7 +138,6 @@ public class AaZoneView extends RelativeLayout
 
     @Override
     public void onResetDisplayView() {
-        //Log.i(LOGTAG, "onResetDisplayView called");
         this.post(new Runnable() {
             @Override
             public void run() {
@@ -147,61 +146,83 @@ public class AaZoneView extends RelativeLayout
         });
     }
 
-    public void onStart() {
-        //Log.i(LOGTAG, "onStart called");
+    @Override
+    public void onAdDisplayed() {
+        if(mListener != null) {
+            mListener.onAdLoaded();
+        }
+    }
 
+    @Override
+    public void onZoneEmpty() {
+        if(mListener != null) {
+            mListener.onAdLoadFailed();
+        }
+    }
+
+    public void onStart() {
         if(mZoneProperties == null) {
             return;
         }
 
-        mViewController = AaZoneViewControllerFactory.getController(mContext, mZoneProperties);
+        if(mViewController == null && mContext != null) {
+            mViewController = AaZoneViewControllerFactory.getController(mContext, mZoneProperties);
+            mContext = null;
+        }
+
         if(mViewController != null) {
             mViewController.setListener(this);
         }
     }
 
-    public void onStart(AaSdkContentListener listener) {
+    public void onStart(final Listener listener) {
         onStart();
 
-        SdkContentPublisherFactory.getContentPublisher().addListener(listener);
+        mListener = listener;
+    }
+
+    public void onStart(final Listener listener,
+                        final AaSdkContentListener contentListener) {
+        onStart();
+
+        mListener = listener;
+        SdkContentPublisher.getInstance().addListener(contentListener);
+    }
+
+    public void onStart(final AaSdkContentListener contentListener) {
+        onStart();
+
+        SdkContentPublisher.getInstance().addListener(contentListener);
     }
 
     public void onStop() {
-        //Log.i(LOGTAG, "onResetDisplayView called");
-
-        if(mZoneProperties == null) {
-            return;
-        }
-
         if(mViewController != null) {
             mViewController.removeListener();
         }
+
+        if(mListener != null) {
+            mListener = null;
+        }
     }
 
-    public void onStop(AaSdkContentListener listener) {
-        SdkContentPublisherFactory.getContentPublisher().removeListener(listener);
+    public void onStop(final AaSdkContentListener listener) {
+        SdkContentPublisher.getInstance().removeListener(listener);
 
         onStop();
     }
 
     @Override
-    protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
+    protected void onVisibilityChanged(@NonNull final View changedView,
+                                       final int visibility) {
         super.onVisibilityChanged(changedView, visibility);
-
-        //final String zoneId = mZoneProperties != null ? mZoneProperties.getZoneId() : "None";
-        //Log.i(LOGTAG, String.format("Zone %s visibility changed to %d", zoneId, visibility));
-        //Log.i(LOGTAG, String.format("Visibilities: %d - GONE, %d - INVISIBLE, %d - VISIBLE", View.GONE, View.INVISIBLE, View.VISIBLE));
 
         switch(visibility) {
             case View.GONE:
             case View.INVISIBLE:
-                //Log.i(LOGTAG, String.format("Ad Zone %s NOT viewable. NO ads will display", zoneId));
                 mVisible = false;
                 onStop();
                 break;
-
             case View.VISIBLE:
-                //Log.i(LOGTAG, String.format("Ad Zone %s viewable. Ads will display", zoneId));
                 onStart();
                 mVisible = true;
                 break;

@@ -6,17 +6,16 @@ import android.os.Parcelable;
 /**
  * Created by chrisweeden on 10/27/16.
  */
-
-public final class AdditAddToListItem implements Parcelable {
-    public static final Creator<AdditAddToListItem> CREATOR = new Creator<AdditAddToListItem>() {
+public final class AddToListItem implements Parcelable {
+    public static final Creator<AddToListItem> CREATOR = new Creator<AddToListItem>() {
         @Override
-        public AdditAddToListItem createFromParcel(Parcel in) {
-            return new AdditAddToListItem(in);
+        public AddToListItem createFromParcel(Parcel in) {
+            return new AddToListItem(in);
         }
 
         @Override
-        public AdditAddToListItem[] newArray(int size) {
-            return new AdditAddToListItem[size];
+        public AddToListItem[] newArray(int size) {
+            return new AddToListItem[size];
         }
     };
 
@@ -28,13 +27,13 @@ public final class AdditAddToListItem implements Parcelable {
     private final String discount;
     private final String productImage;
 
-    AdditAddToListItem(final String trackingId,
-                              final String title,
-                              final String brand,
-                              final String category,
-                              final String barCode,
-                              final String discount,
-                              final String productImage) {
+    public AddToListItem(final String trackingId,
+                         final String title,
+                         final String brand,
+                         final String category,
+                         final String barCode,
+                         final String discount,
+                         final String productImage) {
         this.trackingId = trackingId;
         this.title = title;
         this.brand = brand;
@@ -44,7 +43,7 @@ public final class AdditAddToListItem implements Parcelable {
         this.productImage = productImage;
     }
 
-    private AdditAddToListItem(Parcel in) {
+    private AddToListItem(Parcel in) {
         trackingId = in.readString();
         title = in.readString();
         brand = in.readString();
@@ -100,7 +99,7 @@ public final class AdditAddToListItem implements Parcelable {
 
     @Override
     public String toString() {
-        return "AdditAddToListItem{" +
+        return "AddToListItem{" +
                 "trackingId='" + trackingId + '\'' +
                 ", title='" + title + '\'' +
                 ", brand='" + brand + '\'' +

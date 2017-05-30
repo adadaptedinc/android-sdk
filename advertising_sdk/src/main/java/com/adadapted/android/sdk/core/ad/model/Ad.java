@@ -8,19 +8,35 @@ import java.io.Serializable;
 public class Ad implements Serializable {
     private static final long serialVersionUID = 42L;
 
-    private String adId = "";
-    private String zoneId = "";
-    private String baseImpressionId = "";
-    private boolean hideAfterInteraction = false;
-    private String trackingHtml = "";
-    private int refreshTime = 0;
-    private AdType adType = new NullAdType();
-    private AdAction adAction = new NullAdAction();
+    private final String adId;
+    private final String zoneId;
+    private final String baseImpressionId;
+    private final boolean hideAfterInteraction;
+    private final String trackingHtml;
+    private final int refreshTime;
+    private final AdType adType;
+    private final AdAction adAction;
 
     private boolean isHidden;
     private int impressionViews;
 
-    public Ad() {
+    private Ad(final String adId,
+               final String zoneId,
+               final String baseImpressionId,
+               final boolean hideAfterInteraction,
+               final String trackingHtml,
+               final int refreshTime,
+               final AdType adType,
+               final AdAction adAction) {
+        this.adId = adId;
+        this.zoneId = zoneId;
+        this.baseImpressionId = baseImpressionId;
+        this.hideAfterInteraction = hideAfterInteraction;
+        this.trackingHtml = trackingHtml;
+        this.refreshTime = refreshTime;
+        this.adType = adType;
+        this.adAction = adAction;
+
         isHidden = false;
         impressionViews = 0;
     }
@@ -29,24 +45,12 @@ public class Ad implements Serializable {
         return adId;
     }
 
-    public void setAdId(final String adId) {
-        this.adId = adId;
-    }
-
     public String getZoneId() {
         return zoneId;
     }
 
-    public void setZoneId(final String zoneId) {
-        this.zoneId = zoneId;
-    }
-
     public String getImpressionId() {
         return baseImpressionId + ":" + impressionViews;
-    }
-
-    public void setImpressionId(final String impressionId) {
-        this.baseImpressionId = impressionId;
     }
 
     public void incrementImpressionViews() {
@@ -57,16 +61,8 @@ public class Ad implements Serializable {
         return trackingHtml;
     }
 
-    public void setTrackingHtml(String trackingHtml) {
-        this.trackingHtml = trackingHtml;
-    }
-
     public int getRefreshTime() {
         return refreshTime;
-    }
-
-    public void setRefreshTime(final int refreshTime) {
-        this.refreshTime = refreshTime;
     }
 
     public long getRefreshTimeInMs() {
@@ -77,24 +73,12 @@ public class Ad implements Serializable {
         return adType;
     }
 
-    public void setAdType(final AdType adType) {
-        this.adType = adType;
-    }
-
     public AdAction getAdAction() {
         return adAction;
     }
 
-    public void setAdAction(final AdAction adAction) {
-        this.adAction = adAction;
-    }
-
     public boolean isHiddenAfterInteraction() {
         return hideAfterInteraction;
-    }
-
-    public void setHideAfterInteraction(final boolean hideAfterInteraction) {
-        this.hideAfterInteraction = hideAfterInteraction;
     }
 
     public void hideAd() {
@@ -109,5 +93,90 @@ public class Ad implements Serializable {
 
     public boolean isNotHidden() {
         return !isHidden();
+    }
+
+    public static class Builder {
+        private String adId;
+        private String zoneId;
+        private String baseImpressionId;
+        private boolean hideAfterInteraction;
+        private String trackingHtml;
+        private int refreshTime;
+        private AdType adType;
+        private AdAction adAction;
+
+        public Builder() {
+            adId = "";
+            zoneId = "";
+            baseImpressionId = "";
+            hideAfterInteraction = false;
+            trackingHtml = "";
+            refreshTime = 0;
+            adType = new NullAdType();
+            adAction = new NullAdAction();
+        }
+
+        public String getAdId() {
+            return adId;
+        }
+
+        public Builder setAdId(String adId) {
+            this.adId = adId;
+
+            return this;
+        }
+
+        public Builder setZoneId(String zoneId) {
+            this.zoneId = zoneId;
+
+            return this;
+        }
+
+        public Builder setBaseImpressionId(String baseImpressionId) {
+            this.baseImpressionId = baseImpressionId;
+
+            return this;
+        }
+
+        public Builder setHideAfterInteraction(boolean hideAfterInteraction) {
+            this.hideAfterInteraction = hideAfterInteraction;
+
+            return this;
+        }
+
+        public Builder setTrackingHtml(String trackingHtml) {
+            this.trackingHtml = trackingHtml;
+
+            return this;
+        }
+
+        public Builder setRefreshTime(int refreshTime) {
+            this.refreshTime = refreshTime;
+
+            return this;
+        }
+
+        public Builder setAdType(AdType adType) {
+            this.adType = adType;
+
+            return this;
+        }
+
+        public Builder setAdAction(AdAction adAction) {
+            this.adAction = adAction;
+
+            return this;
+        }
+
+        public Ad build() {
+            return new Ad(adId,
+                    zoneId,
+                    baseImpressionId,
+                    hideAfterInteraction,
+                    trackingHtml,
+                    refreshTime,
+                    adType,
+                    adAction);
+        }
     }
 }

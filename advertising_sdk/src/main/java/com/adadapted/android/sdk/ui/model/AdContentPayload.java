@@ -30,12 +30,16 @@ public class AdContentPayload implements ContentPayload {
     private final int mType;
     private final JSONObject mPayload;
 
+    private boolean mHandled;
+
     private AdContentPayload(final ViewAdWrapper ad,
                              final int type,
                              final JSONObject payload) {
         mAd = ad;
         mType = type;
         mPayload = payload;
+
+        mHandled = false;
     }
 
     public static AdContentPayload createAddToListContent(final ViewAdWrapper ad) {
@@ -56,7 +60,13 @@ public class AdContentPayload implements ContentPayload {
         return new AdContentPayload(ad, RECIPE_FAVORITE, new JSONObject());
     }
 
-    public void acknowledge() {
+    public synchronized void acknowledge() {
+        if(mHandled) {
+            Log.w(LOGTAG, "Content Payload acknowledged multiple times.");
+            return;
+        }
+
+        mHandled = true;
         Log.d(LOGTAG, "Content Payload acknowledged.");
 
         try {

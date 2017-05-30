@@ -24,7 +24,7 @@ public class AaAutoCompleteAdapter extends ArrayAdapter<String> {
     public AaAutoCompleteAdapter(final Context context,
                                  final int resource,
                                  final List<String> items) {
-        super(context, resource, items);
+        super(context.getApplicationContext(), resource, items);
 
         mMatcher = new AaKeywordInterceptMatcher();
         mAllItems = new ArrayList<>(items);

@@ -6,8 +6,6 @@ import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.keywordintercept.InitializeKeywordInterceptCommand;
 import com.adadapted.android.sdk.core.keywordintercept.InitializeKeywordInterceptInteractor;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptAdapter;
-import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptBuilder;
-import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptEventTracker;
 import com.adadapted.android.sdk.core.keywordintercept.model.KeywordIntercept;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.ext.concurrency.ThreadPoolInteractorExecuter;
@@ -15,9 +13,6 @@ import com.adadapted.android.sdk.ext.http.HttpKeywordInterceptAdapter;
 import com.adadapted.android.sdk.ext.json.JsonKeywordInterceptBuilder;
 import com.adadapted.android.sdk.ext.json.JsonKeywordInterceptRequestBuilder;
 
-import org.json.JSONObject;
-
-import java.security.Key;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -90,7 +85,7 @@ public class KeywordInterceptManager
     }
 
     @Override
-    public void onNewAdsAvailable(Session session) {}
+    public void onNewAdsAvailable(final Session session) {}
 
     @Override
     public void onKeywordInterceptSessionInitialized(final KeywordIntercept keywordIntercept) {
@@ -100,7 +95,7 @@ public class KeywordInterceptManager
 
     private void notifyOnKeywordInterceptInitSuccess(final KeywordIntercept keywordIntercept) {
         final Set<Callback> currentCallbacks = new HashSet<>(callbacks);
-        for(Callback c: currentCallbacks) {
+        for(final Callback c: currentCallbacks) {
             c.onKeywordInterceptInitSuccess(keywordIntercept);
         }
     }

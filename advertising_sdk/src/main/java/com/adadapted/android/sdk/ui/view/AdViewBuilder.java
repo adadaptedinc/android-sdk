@@ -7,6 +7,7 @@ import android.view.View;
 
 import com.adadapted.android.sdk.core.ad.model.AdType;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
+import com.adadapted.android.sdk.ext.management.DeviceInfoManager;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
 /**
@@ -20,26 +21,36 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
         void onViewLoadFailed();
     }
 
-    private final Context mContext;
-
     private Listener mListener;
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
+    private final EmptyAdViewStrategy mAdEmptyView;
+    private ImageAdViewBuildingStrategy mAdImageView;
+    private final JsonAdViewBuildingStrategy mAdJsonView;
     private final HtmlAdViewBuildingStrategy mAdWebView;
+
     private AdViewBuildingStrategy mStrategy;
 
-    public AdViewBuilder(final Context context) {
-        mContext = context;
+    AdViewBuilder(final Context context) {
+        DeviceInfoManager.getInstance().getDeviceInfo(new DeviceInfoManager.Callback() {
+            @Override
+            public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
+                mAdImageView = new ImageAdViewBuildingStrategy(context.getApplicationContext(), deviceInfo);
+            }
+        });
+
+        mAdEmptyView = new EmptyAdViewStrategy(context.getApplicationContext());
+        mAdJsonView = new JsonAdViewBuildingStrategy(context.getApplicationContext());
 
         // For whatever reason the WebView has to be created ahead of time.
         // The App will likely crash if it is constructed on-demand.
-        mAdWebView = new HtmlAdViewBuildingStrategy(context, this);
+        mAdWebView = new HtmlAdViewBuildingStrategy(context.getApplicationContext());
     }
 
-    public void buildView(final ViewAdWrapper currentAd,
-                          final AaZoneViewProperties zoneProperties,
-                          final int width,
-                          final int height) {
+    void buildView(final ViewAdWrapper currentAd,
+                   final AaZoneViewProperties zoneProperties,
+                   final int width,
+                   final int height) {
         if(currentAd == null || zoneProperties == null) {
             return;
         }
@@ -47,39 +58,23 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
         mStrategy = null;
         switch(currentAd.getAdType()) {
             case AdType.HTML:
-                mStrategy = getHtmlViewStrategy();
+                mStrategy = mAdWebView;
                 break;
 
             case AdType.IMAGE:
-                mStrategy = getImageViewStrategy(currentAd);
+                mStrategy = mAdImageView;
                 break;
 
             case AdType.JSON:
-                mStrategy = getJsonViewStrategy();
+                mStrategy = mAdJsonView;
                 break;
 
             default:
-                mStrategy = getEmptyViewStrategy();
+                mStrategy = mAdEmptyView;
         }
 
+        mStrategy.setListener(this);
         loadView(mStrategy, currentAd, width, height, zoneProperties);
-    }
-
-    private AdViewBuildingStrategy getHtmlViewStrategy() {
-        return mAdWebView;
-    }
-
-    private AdViewBuildingStrategy getImageViewStrategy(final ViewAdWrapper currentAd) {
-        DeviceInfo deviceInfo = currentAd.getSession().getDeviceInfo();
-        return new ImageAdViewBuildingStrategy(mContext, deviceInfo, this);
-    }
-
-    private AdViewBuildingStrategy getJsonViewStrategy() {
-        return new JsonAdViewBuildingStrategy(mContext, this);
-    }
-
-    private AdViewBuildingStrategy getEmptyViewStrategy() {
-        return new EmptyAdViewStrategy(mContext, this);
     }
 
     private void loadView(final AdViewBuildingStrategy strategy,
@@ -90,7 +85,11 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                strategy.buildView(currentAd.getAd(), width, height, zoneProperties);
+                if(strategy != null) {
+                    strategy.buildView(currentAd.getAd(), width, height, zoneProperties);
+                } else {
+                    notifyViewLoadFailed();
+                }
             }
         });
     }
@@ -118,11 +117,13 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
     }
 
     public void onStrategyViewLoaded() {
+        mStrategy.removeListener();
         notifyViewLoaded(mStrategy.getView());
     }
 
     @Override
     public void onStrategyViewLoadFailed() {
+        mStrategy.removeListener();
         notifyViewLoadFailed();
     }
 }

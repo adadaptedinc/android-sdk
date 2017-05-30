@@ -30,7 +30,7 @@ public class AppEventTrackingManager implements SessionManager.Callback {
         return sInstance;
     }
 
-    public static void registerEvent(final String eventSource,
+    public static synchronized void registerEvent(final String eventSource,
                                      final String eventName,
                                      final Map<String, String> eventParams) {
         if(getInstance().tracker == null) {
@@ -99,8 +99,8 @@ public class AppEventTrackingManager implements SessionManager.Callback {
         private final Map<String, String> eventParams;
 
         TempEventItem(final String eventSource,
-                             final String eventName,
-                             final Map<String, String> eventParams) {
+                      final String eventName,
+                      final Map<String, String> eventParams) {
             this.eventSource = eventSource == null ? "unknown" : eventSource;
             this.eventName = eventName == null ? "unknown" : eventName;
             this.eventParams = eventParams == null ? new HashMap<String, String>() : eventParams;

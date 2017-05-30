@@ -19,7 +19,7 @@ public class AdditContentPublisher {
         return sInstance;
     }
 
-    private Map<String, Content> publishedContent;
+    private final Map<String, Content> publishedContent;
     private AdditContentListener mListener;
 
     private AdditContentPublisher() {

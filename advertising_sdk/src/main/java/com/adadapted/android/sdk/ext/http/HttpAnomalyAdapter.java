@@ -4,6 +4,8 @@ import android.util.Log;
 
 import com.adadapted.android.sdk.core.anomaly.AnomalyAdapter;
 import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
@@ -37,13 +39,16 @@ public class HttpAnomalyAdapter implements AnomalyAdapter {
                 mBatchUrl,
                 new Listener<String>() {
                     @Override
-                    public void onResponse(String s) {
-                    }
+                    public void onResponse(final String s) {}
                 }, new ErrorListener() {
 
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(LOGTAG, "Anomaly Track Request Failed.", error);
+
+                if(error instanceof NoConnectionError || error instanceof NetworkError) {
+                    return;
+                }
 
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", mBatchUrl);

@@ -15,4 +15,7 @@ interface AdViewBuildingStrategy {
 
     void buildView(Ad ad, int width, int height, AaZoneViewProperties zoneProperties);
     View getView();
+
+    void setListener(final Listener listener);
+    void removeListener();
 }

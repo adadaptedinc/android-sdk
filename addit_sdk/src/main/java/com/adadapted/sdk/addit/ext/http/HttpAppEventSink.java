@@ -45,17 +45,16 @@ public class HttpAppEventSink implements AppEventSink {
             public void onErrorResponse(final VolleyError error) {
                 Log.e(LOGTAG, "App Event Request Failed.", error);
 
+                if(error instanceof NoConnectionError || error instanceof NetworkError) {
+                    return;
+                }
+
                 final Map<String, String> errorParams = new HashMap<>();
                 errorParams.put("endpoint", endpoint);
                 errorParams.put("exception", error.getClass().getName());
 
-                String errorType = "APP_EVENT_REQUEST_FAILED";
-                if(error instanceof NoConnectionError || error instanceof NetworkError) {
-                    errorType = "APP_EVENT_NO_NETWORK_CONNECTION";
-                }
-
                 AppErrorTrackingManager.registerEvent(
-                        errorType,
+                        "APP_EVENT_REQUEST_FAILED",
                         error.getMessage(),
                         errorParams);
             }

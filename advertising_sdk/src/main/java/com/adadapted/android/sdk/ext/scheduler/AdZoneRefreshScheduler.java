@@ -11,15 +11,14 @@ import java.util.TimerTask;
 public class AdZoneRefreshScheduler extends Timer {
     private static final String LOGTAG = AdZoneRefreshScheduler.class.getName();
 
-    private final Listener mListener;
+    private Listener mListener;
+    private Ad nextAd;
 
     public interface Listener {
         void onAdZoneRefreshTimer(final Ad ad);
     }
 
-    public AdZoneRefreshScheduler(final Listener listener) {
-        mListener = listener;
-    }
+    public AdZoneRefreshScheduler() {}
 
     public void schedule(final Ad ad) {
         if(ad == null || ad.getRefreshTimeInMs() <= 0) { return; }
@@ -36,7 +35,26 @@ public class AdZoneRefreshScheduler extends Timer {
         }, interval);
     }
 
+    public void setListener(final Listener listener) {
+        mListener = listener;
+
+        if(nextAd != null) {
+            notifyAdZoneRefreshTimer(nextAd);
+            nextAd = null;
+        }
+    }
+
+    public void removeListener() {
+        mListener = null;
+    }
+
     private void notifyAdZoneRefreshTimer(final Ad ad) {
-        mListener.onAdZoneRefreshTimer(ad);
+        if(mListener != null) {
+            nextAd = null;
+            mListener.onAdZoneRefreshTimer(ad);
+        }
+        else {
+            nextAd = ad;
+        }
     }
 }

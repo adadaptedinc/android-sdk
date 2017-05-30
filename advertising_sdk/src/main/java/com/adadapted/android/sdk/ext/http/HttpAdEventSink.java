@@ -3,8 +3,9 @@ package com.adadapted.android.sdk.ext.http;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.AdEventSink;
-import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
 import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -45,6 +46,10 @@ public class HttpAdEventSink implements AdEventSink {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.i(LOGTAG, "Ad Event Batch Request Failed.", error);
+
+                if(error instanceof NoConnectionError || error instanceof NetworkError) {
+                    return;
+                }
 
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", mBatchUrl);

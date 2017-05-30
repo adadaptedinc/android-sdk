@@ -3,6 +3,7 @@ package com.adadapted.android.sdk.ui.view;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
@@ -16,18 +17,23 @@ import com.adadapted.android.sdk.core.ad.model.HtmlAdType;
 class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
     private static final String LOGTAG = HtmlAdViewBuildingStrategy.class.getName();
 
-    private final Listener mListener;
+    private Listener mListener;
     private WebView mWebView;
 
-    public HtmlAdViewBuildingStrategy(final Context context, final Listener listener) {
-        mListener = listener;
-
+    public HtmlAdViewBuildingStrategy(final Context context) {
         try {
-            mWebView = new WebView(context);
+            mWebView = new WebView(context.getApplicationContext());
             mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
             mWebView.setWebViewClient(new WebViewClient() {
                 @Override
-                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                public boolean shouldOverrideUrlLoading(final WebView view,
+                                                        final String url) {
+                    return true;
+                }
+
+                @Override
+                public boolean shouldOverrideUrlLoading(final WebView view,
+                                                        final WebResourceRequest request) {
                     return true;
                 }
             });
@@ -73,6 +79,14 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
                 mListener.onStrategyViewLoadFailed();
             }
         }
+    }
+
+    public void setListener(final Listener listener) {
+        mListener = listener;
+    }
+
+    public void removeListener() {
+        mListener = null;
     }
 
     private void setDummyDocument(final int color) {

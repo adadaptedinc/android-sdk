@@ -38,7 +38,7 @@ public class AaSuggestionTracker {
         KeywordInterceptEventTrackingManager.trackMatched(session, lcTerm, lcUserInput);
     }
 
-    public void suggestionPresented(String term) {
+    public void suggestionPresented(final String term) {
         final String lcTerm = convertToLowerCase(term);
 
         if(mItems.containsKey(lcTerm)) {
@@ -46,7 +46,7 @@ public class AaSuggestionTracker {
         }
     }
 
-    public boolean suggestionSelected(String replacement) {
+    public boolean suggestionSelected(final String replacement) {
         final String lcReplacement = convertToLowerCase(replacement);
 
         if(mReplacements.containsKey(lcReplacement)) {

@@ -5,8 +5,9 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.ad.AdRefreshAdapter;
 import com.adadapted.android.sdk.core.zone.model.Zone;
 import com.adadapted.android.sdk.ext.json.JsonAdRefreshBuilder;
-import com.adadapted.android.sdk.ext.management.AdAnomalyTrackingManager;
 import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -50,6 +51,10 @@ public class HttpAdRefreshAdapter implements AdRefreshAdapter {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.i(LOGTAG, "Ad Get Request Failed.");
+
+                        if(error instanceof NoConnectionError || error instanceof NetworkError) {
+                            return;
+                        }
 
                         final Map<String, String> params = new HashMap<>();
                         params.put("url", endpoint);

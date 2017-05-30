@@ -8,6 +8,7 @@ import com.adadapted.android.sdk.core.event.model.AppEventSource;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
 import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
+import com.adadapted.android.sdk.ext.management.PayloadPickupManager;
 import com.adadapted.android.sdk.ext.management.SessionManager;
 import com.adadapted.android.sdk.ext.scheduler.EventFlushScheduler;
 import com.adadapted.android.sdk.ui.messaging.AaSdkAdditContentListener;
@@ -90,7 +91,7 @@ public class AdAdapted {
     }
 
     public void start(final Context context) {
-        SessionManager.start(context, mAppId, mIsProd, new SessionManager.Callback() {
+        SessionManager.start(context.getApplicationContext(), mAppId, mIsProd, new SessionManager.Callback() {
             @Override
             public void onSessionAvailable(final Session session) {
                 if(!session.getDeviceInfo().isProd()) {
@@ -103,6 +104,8 @@ public class AdAdapted {
                 if(sessionListener != null) {
                     sessionListener.onHasAdsToServe(session.hasActiveCampaigns());
                 }
+
+                PayloadPickupManager.pickupPayloads(session.getDeviceInfo());
             }
 
             @Override
@@ -119,7 +122,7 @@ public class AdAdapted {
                 new HashMap<String, String>());
 
         new EventFlushScheduler().start(Config.DEFAULT_EVENT_POLLING);
-        Log.i(LOGTAG, String.format("Addit Android Advertising SDK v%s initialized.", Config.SDK_VERSION));
+        Log.i(LOGTAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", Config.SDK_VERSION));
     }
 
     public static synchronized void hasAdsToServe() {

@@ -5,6 +5,7 @@ import android.util.Base64;
 
 import com.adadapted.sdk.addit.core.app.AppEventSource;
 import com.adadapted.sdk.addit.core.content.AddToListItem;
+import com.adadapted.sdk.addit.core.content.Content;
 import com.adadapted.sdk.addit.core.content.ContentTypes;
 import com.adadapted.sdk.addit.core.content.JsonFields;
 import com.adadapted.sdk.addit.ext.management.AppErrorTrackingManager;
@@ -25,7 +26,7 @@ import java.util.Map;
 public class DeeplinkContentParser {
     private static final String LOGTAG = DeeplinkContentParser.class.getName();
 
-    public DeeplinkContent parse(final Uri uri) throws Exception {
+    public Content parse(final Uri uri) throws Exception {
         if(uri == null) {
             AppErrorTrackingManager.registerEvent(
                     "ADDIT_NO_DEEPLINK_RECEIVED",
@@ -62,14 +63,14 @@ public class DeeplinkContentParser {
                     payload.add(parseItem(item));
                 }
 
-                return new DeeplinkContent(payloadId, message, image, ContentTypes.ADD_TO_LIST_ITEMS, payload);
+                return Content.createDeeplinkContent(payloadId, message, image, ContentTypes.ADD_TO_LIST_ITEMS, payload);
             }
             else if (uri.getPath().endsWith("addit_add_list_item")) {
                 final JSONObject detailListItem = jsonObject.getJSONObject(JsonFields.DetailedListItem);
 
                 payload.add(parseItem(detailListItem));
 
-                return new DeeplinkContent(payloadId, message, image, ContentTypes.ADD_TO_LIST_ITEM, payload);
+                return Content.createDeeplinkContent(payloadId, message, image, ContentTypes.ADD_TO_LIST_ITEM, payload);
             }
 
             final Map<String, String> errorParams = new HashMap<>();
