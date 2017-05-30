@@ -35,13 +35,14 @@ class AaZoneViewController
         AdViewBuilder.Listener {
     private static final String LOGTAG = AaZoneViewController.class.getName();
 
-    private final Configuration mConfiguration;
+    private final Context mContext;
     private final AaZoneViewProperties mZoneProperties;
 
     private final WebView mTrackingWebView;
 
     private final AdViewBuilder mAdViewBuilder;
     private final AdActionHandler mAdActionHandler;
+    private final AdZoneRefreshScheduler mAdZoneRefreshScheduler;
 
     private Listener mListener;
 
@@ -57,7 +58,7 @@ class AaZoneViewController
 
     AaZoneViewController(final Context context,
                          final AaZoneViewProperties zoneProperties) {
-        mConfiguration = context.getResources().getConfiguration();
+        mContext = context.getApplicationContext();
         mZoneProperties = zoneProperties;
 
         mTrackingWebView = new WebView(context.getApplicationContext());
@@ -83,6 +84,7 @@ class AaZoneViewController
         mAdViewBuilder.setListener(this);
 
         mAdActionHandler = new AdActionHandler(context.getApplicationContext());
+        mAdZoneRefreshScheduler = new AdZoneRefreshScheduler();
 
         String zoneId = null;
         if(zoneProperties != null) {
@@ -127,7 +129,7 @@ class AaZoneViewController
     }
 
     private void setTimer() {
-        new AdZoneRefreshScheduler(this).schedule(mCurrentAd.getAd());
+        mAdZoneRefreshScheduler.schedule(mCurrentAd.getAd());
         mTimerRunning.add(mCurrentAd.getAdId());
     }
 
@@ -169,7 +171,8 @@ class AaZoneViewController
     }
 
     private String getPresentOrientation() {
-        if(mConfiguration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        final Configuration configuration = mContext.getResources().getConfiguration();
+        if(configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             return AdImage.LANDSCAPE;
         }
 
@@ -179,6 +182,7 @@ class AaZoneViewController
     public void setListener(final Listener listener) {
         mListener = listener;
         SessionManager.getSession(this);
+        mAdZoneRefreshScheduler.setListener(this);
     }
 
     public void removeListener() {
@@ -186,6 +190,7 @@ class AaZoneViewController
 
         mListener = null;
         SessionManager.removeCallback(this);
+        mAdZoneRefreshScheduler.removeListener();
     }
 
     private void notifyViewReadyForDisplay(final View v) {
