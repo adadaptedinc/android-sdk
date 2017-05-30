@@ -12,6 +12,7 @@ public class AdZoneRefreshScheduler extends Timer {
     private static final String LOGTAG = AdZoneRefreshScheduler.class.getName();
 
     private Listener mListener;
+    private Ad nextAd;
 
     public interface Listener {
         void onAdZoneRefreshTimer(final Ad ad);
@@ -36,6 +37,11 @@ public class AdZoneRefreshScheduler extends Timer {
 
     public void setListener(final Listener listener) {
         mListener = listener;
+
+        if(nextAd != null) {
+            notifyAdZoneRefreshTimer(nextAd);
+            nextAd = null;
+        }
     }
 
     public void removeListener() {
@@ -44,7 +50,11 @@ public class AdZoneRefreshScheduler extends Timer {
 
     private void notifyAdZoneRefreshTimer(final Ad ad) {
         if(mListener != null) {
+            nextAd = null;
             mListener.onAdZoneRefreshTimer(ad);
+        }
+        else {
+            nextAd = ad;
         }
     }
 }
