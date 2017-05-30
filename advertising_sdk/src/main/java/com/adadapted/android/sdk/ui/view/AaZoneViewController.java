@@ -54,6 +54,7 @@ class AaZoneViewController
     public interface Listener {
         void onViewReadyForDisplay(View v);
         void onResetDisplayView();
+        void onZoneEmpty();
     }
 
     AaZoneViewController(final Context context,
@@ -125,6 +126,10 @@ class AaZoneViewController
     private void displayAd() {
         if(mCurrentAd.hasAd()) {
             mAdViewBuilder.buildView(mCurrentAd, mZoneProperties, getZoneWidth(), getZoneHeight());
+        } else {
+            if(mListener != null) {
+                mListener.onZoneEmpty();
+            }
         }
     }
 

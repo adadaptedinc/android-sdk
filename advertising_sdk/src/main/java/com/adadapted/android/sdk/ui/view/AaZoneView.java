@@ -26,7 +26,13 @@ public class AaZoneView extends RelativeLayout
         implements AdInteractionListener, AaZoneViewController.Listener {
     private static final String LOGTAG = AaZoneView.class.getName();
 
+    public interface Listener {
+        void onAdLoaded();
+        void onAdLoadFailed();
+    }
+
     private Context mContext;
+    private Listener mListener;
 
     private AaZoneViewController mViewController;
     private AaZoneViewProperties mZoneProperties;
@@ -127,6 +133,10 @@ public class AaZoneView extends RelativeLayout
             if(mViewController != null) {
                 mViewController.acknowledgeDisplay();
             }
+
+            if(mListener != null) {
+                mListener.onAdLoaded();
+            }
         }
     }
 
@@ -138,6 +148,13 @@ public class AaZoneView extends RelativeLayout
                 AaZoneView.this.removeAllViews();
             }
         });
+    }
+
+    @Override
+    public void onZoneEmpty() {
+        if(mListener != null) {
+            mListener.onAdLoadFailed();
+        }
     }
 
     public void onStart() {
@@ -155,15 +172,33 @@ public class AaZoneView extends RelativeLayout
         }
     }
 
-    public void onStart(final AaSdkContentListener listener) {
+    public void onStart(final Listener listener) {
         onStart();
 
-        SdkContentPublisher.getInstance().addListener(listener);
+        mListener = listener;
+    }
+
+    public void onStart(final Listener listener,
+                        final AaSdkContentListener contentListener) {
+        onStart();
+
+        mListener = listener;
+        SdkContentPublisher.getInstance().addListener(contentListener);
+    }
+
+    public void onStart(final AaSdkContentListener contentListener) {
+        onStart();
+
+        SdkContentPublisher.getInstance().addListener(contentListener);
     }
 
     public void onStop() {
         if(mViewController != null) {
             mViewController.removeListener();
+        }
+
+        if(mListener != null) {
+            mListener = null;
         }
     }
 
@@ -174,7 +209,8 @@ public class AaZoneView extends RelativeLayout
     }
 
     @Override
-    protected void onVisibilityChanged(@NonNull final View changedView, final int visibility) {
+    protected void onVisibilityChanged(@NonNull final View changedView,
+                                       final int visibility) {
         super.onVisibilityChanged(changedView, visibility);
 
         switch(visibility) {
