@@ -85,9 +85,14 @@ public class DeviceInfoManager implements CollectDeviceInfoInteractor.Callback {
     public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
         this.deviceInfo = deviceInfo;
 
-        final Set<Callback> currentCallbacks = new HashSet<>(callbacks);
-        for(final Callback callback : currentCallbacks) {
-            callback.onDeviceInfoCollected(deviceInfo);
+        lock.lock();
+        try {
+            final Set<Callback> currentCallbacks = new HashSet<>(callbacks);
+            for(final Callback callback : currentCallbacks) {
+                callback.onDeviceInfoCollected(deviceInfo);
+            }
+        } finally {
+            lock.unlock();
         }
     }
 

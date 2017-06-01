@@ -79,13 +79,24 @@ public class AdEventTrackingManager implements DeviceInfoManager.Callback {
     }
 
     private static final Set<Callback> callbacks = new HashSet<>();
+    private static final Lock cbLock = new ReentrantLock();
 
     public static synchronized void addCallback(final Callback callback) {
-        callbacks.add(callback);
+        cbLock.lock();
+        try {
+            callbacks.add(callback);
+        } finally {
+            cbLock.unlock();
+        }
     }
 
     public static synchronized void removeCallback(final Callback callback) {
-        callbacks.remove(callback);
+        cbLock.lock();
+        try {
+            callbacks.remove(callback);
+        } finally {
+            cbLock.unlock();
+        }
     }
 
     private AdEventTracker tracker;
@@ -162,9 +173,14 @@ public class AdEventTrackingManager implements DeviceInfoManager.Callback {
     }
 
     private void notifyOnAdEventTracked(final TempAdEvent event) {
-        final Set<Callback> currentCallbacks = new HashSet<>(callbacks);
-        for(final Callback c : currentCallbacks) {
-            c.onAdEventTracked(new AdEvent(event.getEventType(), event.getAd().getZoneId()));
+        cbLock.lock();
+        try {
+            final Set<Callback> currentCallbacks = new HashSet<>(callbacks);
+            for (final Callback c : currentCallbacks) {
+                c.onAdEventTracked(new AdEvent(event.getEventType(), event.getAd().getZoneId()));
+            }
+        } finally {
+            cbLock.unlock();
         }
     }
 

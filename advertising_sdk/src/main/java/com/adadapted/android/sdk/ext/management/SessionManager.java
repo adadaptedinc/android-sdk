@@ -215,18 +215,28 @@ public class SessionManager
     }
 
     private void notifyOnSessionAvailable(final Session session) {
-        final Set<Callback> currentCallbacks = new HashSet<>(callbacks);
-        for(final Callback c : currentCallbacks) {
-            c.onSessionAvailable(session);
+        lock.lock();
+        try {
+            final Set<Callback> currentCallbacks = new HashSet<>(callbacks);
+            for(final Callback c : currentCallbacks) {
+                c.onSessionAvailable(session);
+            }
+        } finally {
+            lock.unlock();
         }
     }
 
     private void notifyOnNewAdsAvailable(final Session session) {
         sSession = session;
 
-        Set<Callback> currentCallbacks = new HashSet<>(callbacks);
-        for(final Callback c : currentCallbacks) {
-            c.onNewAdsAvailable(session);
+        lock.lock();
+        try {
+            final Set<Callback> currentCallbacks = new HashSet<>(callbacks);
+            for(final Callback c : currentCallbacks) {
+                c.onSessionAvailable(session);
+            }
+        } finally {
+            lock.unlock();
         }
     }
 }
