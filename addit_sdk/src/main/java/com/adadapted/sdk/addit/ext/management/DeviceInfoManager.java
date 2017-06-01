@@ -11,6 +11,8 @@ import com.adadapted.sdk.addit.ext.concurrency.ThreadPoolInteractorExecuter;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by chrisweeden on 9/26/16.
@@ -28,6 +30,7 @@ public class DeviceInfoManager implements CollectDeviceInfoInteractor.Callback {
 
     private DeviceInfo deviceInfo;
     final private Set<Callback> callbacks;
+    private final Lock lock = new ReentrantLock();
 
     private DeviceInfoManager() {
         callbacks = new HashSet<>();
@@ -52,20 +55,38 @@ public class DeviceInfoManager implements CollectDeviceInfoInteractor.Callback {
     }
 
     private void addCallback(final Callback callback) {
-        callbacks.add(callback);
+        lock.lock();
+        try {
+            callbacks.add(callback);
+        } finally {
+            lock.unlock();
+        }
 
         if(deviceInfo != null) {
             callback.onDeviceInfoCollected(deviceInfo);
         }
     }
 
+    void removeCallback(final Callback callback) {
+        lock.lock();
+        try {
+            callbacks.remove(callback);
+        } finally {
+            lock.unlock();
+        }
+    }
     @Override
     public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
-        this.deviceInfo = deviceInfo;
+        lock.lock();
+        try {
+            this.deviceInfo = deviceInfo;
 
-        final Set<Callback> currentCallbacks = new HashSet<>(callbacks);
-        for(Callback callback : currentCallbacks) {
-            callback.onDeviceInfoCollected(deviceInfo);
+            final Set<Callback> currentCallbacks = new HashSet<>(callbacks);
+            for(final Callback callback : currentCallbacks) {
+                callback.onDeviceInfoCollected(deviceInfo);
+            }
+        } finally {
+            lock.unlock();
         }
     }
 

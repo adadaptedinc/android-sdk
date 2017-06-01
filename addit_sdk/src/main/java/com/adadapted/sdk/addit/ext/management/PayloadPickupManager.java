@@ -23,6 +23,32 @@ public class PayloadPickupManager implements PickupPayloadInteractor.Callback {
     private static boolean blocked = false;
     private static Interactor queuedInteractor = null;
 
+    public synchronized static void deeplinkInProgress() {
+        blocked = true;
+    }
+
+    public synchronized static void deeplinkCompleted() {
+        blocked = false;
+
+        if(queuedInteractor != null) {
+            ThreadPoolInteractorExecuter.getInstance().executeInBackground(queuedInteractor);
+            queuedInteractor = null;
+        }
+    }
+
+    public synchronized static void pickupPayloads() {
+        DeviceInfoManager.getInstance().getDeviceInfo(new DeviceInfoManager.Callback() {
+            @Override
+            public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
+                getInstance().performPickupPayloads(deviceInfo);
+            }
+        });
+    }
+
+    public synchronized static void pickupPayloads(final DeviceInfo deviceInfo) {
+        getInstance().performPickupPayloads(deviceInfo);
+    }
+
     private PayloadAdapter adapter;
 
     private PayloadPickupManager() {}
@@ -75,31 +101,5 @@ public class PayloadPickupManager implements PickupPayloadInteractor.Callback {
         }
 
         return sInstance;
-    }
-
-    public synchronized static void deeplinkInProgress() {
-        blocked = true;
-    }
-
-    public synchronized static void deeplinkCompleted() {
-        blocked = false;
-
-        if(queuedInteractor != null) {
-            ThreadPoolInteractorExecuter.getInstance().executeInBackground(queuedInteractor);
-            queuedInteractor = null;
-        }
-    }
-
-    public synchronized static void pickupPayloads() {
-        DeviceInfoManager.getInstance().getDeviceInfo(new DeviceInfoManager.Callback() {
-            @Override
-            public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
-                getInstance().performPickupPayloads(deviceInfo);
-            }
-        });
-    }
-
-    public synchronized static void pickupPayloads(final DeviceInfo deviceInfo) {
-        getInstance().performPickupPayloads(deviceInfo);
     }
 }

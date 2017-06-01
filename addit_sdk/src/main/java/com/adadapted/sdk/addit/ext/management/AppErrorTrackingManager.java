@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by chrisweeden on 9/29/16.
@@ -32,7 +34,7 @@ public class AppErrorTrackingManager implements DeviceInfoManager.Callback {
                                      final String errorMessge,
                                      final Map<String, String> errorParams) {
         if(getInstance().tracker == null) {
-            getInstance().tempErrorItems.add(new AppErrorTrackingManager.TempErrorItem(errorCode, errorMessge, errorParams));
+            getInstance().addTempErrorItem(new AppErrorTrackingManager.TempErrorItem(errorCode, errorMessge, errorParams));
         }
         else {
             final TempErrorItem item = new TempErrorItem(errorCode, errorMessge, errorParams);
@@ -41,6 +43,7 @@ public class AppErrorTrackingManager implements DeviceInfoManager.Callback {
     }
 
     private final Set<TempErrorItem> tempErrorItems = new HashSet<>();
+    private final Lock lock = new ReentrantLock();
 
     private AppErrorTracker tracker;
 
@@ -60,18 +63,39 @@ public class AppErrorTrackingManager implements DeviceInfoManager.Callback {
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(interactor);
     }
 
+    private void addTempErrorItem(final TempErrorItem item) {
+        lock.lock();
+        try {
+            tempErrorItems.add(item);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private void trackTempErrorItems() {
+        lock.lock();
+        try {
+            final Set<TempErrorItem> errorItems = new HashSet<>(tempErrorItems);
+            tempErrorItems.clear();
+
+            for(final TempErrorItem i : errorItems) {
+                trackEvent(i);
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
     @Override
     public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
+        DeviceInfoManager.getInstance().removeCallback(this);
+
         final String endpoint = determineEndpoint(deviceInfo);
         final AppErrorSink sink = new HttpAppErrorSink(endpoint);
 
         tracker = new AppErrorTracker(deviceInfo, sink);
 
-        Set<TempErrorItem> errorItems = new HashSet<>(tempErrorItems);
-        tempErrorItems.clear();
-        for(TempErrorItem i : errorItems) {
-            trackEvent(i);
-        }
+        trackTempErrorItems();
     }
 
     private String determineEndpoint(final DeviceInfo deviceInfo) {
@@ -95,15 +119,15 @@ public class AppErrorTrackingManager implements DeviceInfoManager.Callback {
             this.errorParams = errorParams == null ? new HashMap<String, String>() : errorParams;
         }
 
-        public String getErrorCode() {
+        String getErrorCode() {
             return errorCode;
         }
 
-        public String getErrorMessage() {
+        String getErrorMessage() {
             return errorMessage;
         }
 
-        public Map<String, String> getErrorParams() {
+        Map<String, String> getErrorParams() {
             return errorParams;
         }
     }
