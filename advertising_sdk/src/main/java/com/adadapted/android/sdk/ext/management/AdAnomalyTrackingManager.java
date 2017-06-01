@@ -12,6 +12,8 @@ import com.adadapted.android.sdk.ext.json.JsonAnomalyBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by chrisweeden on 9/23/16.
@@ -34,7 +36,7 @@ public class AdAnomalyTrackingManager implements SessionManager.Callback {
                                                     final String message) {
         final AnomalyHolder anomalyHolder = new AnomalyHolder(adId, eventPath, code, message);
         if(getsInstance().tracker == null) {
-            tempAnomalies.add(anomalyHolder);
+            getsInstance().addTempAnomaly(anomalyHolder);
         }
         else {
             sInstance.trackAnomaly(anomalyHolder);
@@ -44,35 +46,33 @@ public class AdAnomalyTrackingManager implements SessionManager.Callback {
     private AdAnomalyTracker tracker;
     private Session session;
 
-    private static final Set<AnomalyHolder> tempAnomalies = new HashSet<>();
+    private final Set<AnomalyHolder> tempAnomalies = new HashSet<>();
+    private final Lock lock = new ReentrantLock();
 
     private AdAnomalyTrackingManager() {
         SessionManager.getSession(this);
     }
 
-    @Override
-    public void onSessionAvailable(final Session session) {
-        this.session = session;
-        this.tracker = new AdAnomalyTracker(
-                new HttpAnomalyAdapter(determineEndpoint(session)),
-                new JsonAnomalyBuilder());
-
-        clearTempAnomalies();
+    private void addTempAnomaly(final AnomalyHolder anomalyHolder) {
+        lock.lock();
+        try {
+            tempAnomalies.add(anomalyHolder);
+        } finally {
+            lock.unlock();
+        }
     }
 
-    @Override
-    public void onNewAdsAvailable(Session session) {}
+    private void trackTempAnomalies() {
+        lock.lock();
+        try {
+            final Set<AnomalyHolder> currentAnomalies = new HashSet<>(tempAnomalies);
+            tempAnomalies.clear();
 
-    private void clearTempAnomalies() {
-        if(tempAnomalies.size() == 0) {
-            return;
-        }
-
-        Set<AnomalyHolder> currentAnomalies = new HashSet<>(tempAnomalies);
-        tempAnomalies.clear();
-
-        for(final AnomalyHolder a : currentAnomalies) {
-            trackAnomaly(a);
+            for(final AnomalyHolder a : currentAnomalies) {
+                trackAnomaly(a);
+            }
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -91,6 +91,21 @@ public class AdAnomalyTrackingManager implements SessionManager.Callback {
 
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(interactor);
     }
+
+    @Override
+    public void onSessionAvailable(final Session session) {
+        SessionManager.removeCallback(this);
+
+        this.session = session;
+        this.tracker = new AdAnomalyTracker(
+                new HttpAnomalyAdapter(determineEndpoint(session)),
+                new JsonAnomalyBuilder());
+
+        trackTempAnomalies();
+    }
+
+    @Override
+    public void onNewAdsAvailable(Session session) {}
 
     private String determineEndpoint(final Session session) {
         if(session.getDeviceInfo().isProd()) {

@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by chrisweeden on 9/30/16.
@@ -42,6 +44,11 @@ public class SessionManager
 
     private static SessionManager sInstance;
     private static Session sSession;
+
+    public interface Callback {
+        void onSessionAvailable(Session session);
+        void onNewAdsAvailable(Session session);
+    }
 
     public static synchronized void start(final Context context,
                                           final String appId,
@@ -59,6 +66,10 @@ public class SessionManager
         else {
             Log.w(LOGTAG, "Session Manager has not been started.");
         }
+    }
+
+    public static synchronized Session getCurrentSession() {
+        return sSession;
     }
 
     public static synchronized void refreshAds() {
@@ -88,7 +99,12 @@ public class SessionManager
 
     public static synchronized void removeCallback(final Callback callback) {
         if(sInstance != null) {
-            sInstance.callbacks.remove(callback);
+            sInstance.lock.lock();
+            try {
+                sInstance.callbacks.remove(callback);
+            } finally {
+                sInstance.lock.unlock();
+            }
         }
         else {
             Log.w(LOGTAG, "Session Manager has not been started.");
@@ -96,6 +112,7 @@ public class SessionManager
     }
 
     private final Set<Callback> callbacks = new HashSet<>();
+    private final Lock lock = new ReentrantLock();
 
     private SessionAdapter sessionAdapter;
     private AdRefreshAdapter adRefreshAdapter;
@@ -109,10 +126,6 @@ public class SessionManager
         ImageCache.getInstance().purgeCache();
         HttpRequestManager.createQueue(context);
         DeviceInfoManager.getInstance().collectDeviceInfo(context, appId, isProd, this);
-    }
-
-    public static synchronized Session getCurrentSession() {
-        return sSession;
     }
 
     @Override
@@ -154,7 +167,12 @@ public class SessionManager
     }
 
     private void addCallback(final Callback callback) {
-        callbacks.add(callback);
+        lock.lock();
+        try {
+            callbacks.add(callback);
+        } finally {
+            lock.unlock();
+        }
 
         if(sSession != null) {
             callback.onSessionAvailable(sSession);
@@ -181,7 +199,7 @@ public class SessionManager
     }
 
     @Override
-    public void onAdRefreshSuccess(Map<String, Zone> zones) {
+    public void onAdRefreshSuccess(final Map<String, Zone> zones) {
         final Session session = sSession.updateZones(zones);
         new AdRefreshScheduler().schedule(session);
 
@@ -210,10 +228,5 @@ public class SessionManager
         for(final Callback c : currentCallbacks) {
             c.onNewAdsAvailable(session);
         }
-    }
-
-    public interface Callback {
-        void onSessionAvailable(Session session);
-        void onNewAdsAvailable(Session session);
     }
 }
