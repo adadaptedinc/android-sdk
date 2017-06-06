@@ -53,9 +53,10 @@ public class SessionManager
     public static synchronized void start(final Context context,
                                           final String appId,
                                           final boolean isProd,
+                                          final Map<String, String> params,
                                           final Callback callback) {
         if(sInstance == null) {
-            sInstance = new SessionManager(context, appId, isProd, callback);
+            sInstance = new SessionManager(context, appId, isProd, params, callback);
         }
     }
 
@@ -120,12 +121,13 @@ public class SessionManager
     private SessionManager(final Context context,
                            final String appId,
                            final boolean isProd,
+                           final Map<String, String> params,
                            final Callback callback) {
         addCallback(callback);
 
         ImageCache.getInstance().purgeCache();
         HttpRequestManager.createQueue(context);
-        DeviceInfoManager.getInstance().collectDeviceInfo(context, appId, isProd, this);
+        DeviceInfoManager.getInstance().collectDeviceInfo(context, appId, isProd, params, this);
     }
 
     @Override

@@ -40,6 +40,8 @@ public class HttpSessionAdapter implements SessionAdapter {
             return;
         }
 
+        Log.i(LOGTAG, json.toString());
+
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
                 initUrl, json, new Response.Listener<JSONObject>(){
 

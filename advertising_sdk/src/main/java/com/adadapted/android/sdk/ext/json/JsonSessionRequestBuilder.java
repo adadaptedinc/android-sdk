@@ -37,6 +37,7 @@ public class JsonSessionRequestBuilder implements SessionRequestBuilder {
             json.put(JsonFields.DATETIME, new Date().getTime());
             json.put(JsonFields.ALLOWRETARGETING, deviceInfo.isAllowRetargetingEnabled() ? 1 : 0);
             json.put(JsonFields.SDKVERSION, deviceInfo.getSdkVersion());
+            json.put(JsonFields.PARAMS, new JSONObject(deviceInfo.getParams()));
         }
         catch(JSONException ex) {
             Log.d(LOGTAG, "Problem converting to JSON.", ex);

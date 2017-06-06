@@ -10,6 +10,7 @@ import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.ext.concurrency.ThreadPoolInteractorExecuter;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -40,6 +41,7 @@ public class DeviceInfoManager implements CollectDeviceInfoInteractor.Callback {
     public void collectDeviceInfo(final Context context,
                                   final String appId,
                                   final boolean isProd,
+                                  final Map<String, String> params,
                                   final Callback callback) {
         addCallback(callback);
 
@@ -48,6 +50,7 @@ public class DeviceInfoManager implements CollectDeviceInfoInteractor.Callback {
                     context.getApplicationContext(),
                     appId,
                     isProd,
+                    params,
                     Config.SDK_VERSION),
             this
         );
