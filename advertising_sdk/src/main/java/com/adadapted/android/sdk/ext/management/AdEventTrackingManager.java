@@ -16,6 +16,8 @@ import com.adadapted.android.sdk.ext.json.JsonAdEventRequestBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by chrisweeden on 5/26/15.
@@ -63,7 +65,7 @@ public class AdEventTrackingManager implements DeviceInfoManager.Callback {
                                                      final String eventName) {
         final TempAdEvent tempAdEvent = new TempAdEvent(session, ad, eventType, eventName);
         if(getInstance().tracker == null) {
-            getInstance().tempAdEvents.add(tempAdEvent);
+            getInstance().addTempEvent(tempAdEvent);
         }
         else {
             getInstance().trackAdEvent(tempAdEvent);
@@ -77,17 +79,29 @@ public class AdEventTrackingManager implements DeviceInfoManager.Callback {
     }
 
     private static final Set<Callback> callbacks = new HashSet<>();
+    private static final Lock cbLock = new ReentrantLock();
 
     public static synchronized void addCallback(final Callback callback) {
-        callbacks.add(callback);
+        cbLock.lock();
+        try {
+            callbacks.add(callback);
+        } finally {
+            cbLock.unlock();
+        }
     }
 
     public static synchronized void removeCallback(final Callback callback) {
-        callbacks.remove(callback);
+        cbLock.lock();
+        try {
+            callbacks.remove(callback);
+        } finally {
+            cbLock.unlock();
+        }
     }
 
     private AdEventTracker tracker;
     private final Set<TempAdEvent> tempAdEvents = new HashSet<>();
+    private final Lock lock = new ReentrantLock();
 
     private AdEventTrackingManager() {
         DeviceInfoManager.getInstance().getDeviceInfo(this);
@@ -108,30 +122,46 @@ public class AdEventTrackingManager implements DeviceInfoManager.Callback {
     }
 
     private void publishAdEvents() {
-        clearTempEvents();
+        trackTempEvents();
 
         final Interactor interactor = new PublishAdEventsInteractor(tracker);
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(interactor);
     }
 
-    private void clearTempEvents() {
-        final Set<TempAdEvent> currentAdEvents = new HashSet<>(tempAdEvents);
-        tempAdEvents.clear();
+    private void addTempEvent(final TempAdEvent tempAdEvent) {
+        lock.lock();
+        try {
+            tempAdEvents.add(tempAdEvent);
+        } finally {
+            lock.unlock();
+        }
+    }
 
-        for(final TempAdEvent e : currentAdEvents) {
-            trackAdEvent(e);
+    private void trackTempEvents() {
+        lock.lock();
+        try {
+            final Set<TempAdEvent> currentAdEvents = new HashSet<>(tempAdEvents);
+            tempAdEvents.clear();
+
+            for(final TempAdEvent e : currentAdEvents) {
+                trackAdEvent(e);
+            }
+        } finally {
+            lock.unlock();
         }
     }
 
     @Override
     public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
+        DeviceInfoManager.getInstance().removeCallback(this);
+
         final String endpoint = determineEndpoint(deviceInfo);
 
         tracker = new AdEventTracker(
                 new HttpAdEventSink(endpoint),
                 new JsonAdEventRequestBuilder());
 
-        clearTempEvents();
+        trackTempEvents();
     }
 
     private String determineEndpoint(final DeviceInfo deviceInfo) {
@@ -142,10 +172,15 @@ public class AdEventTrackingManager implements DeviceInfoManager.Callback {
         return Config.Sand.URL_EVENT_BATCH;
     }
 
-    private void notifyOnAdEventTracked(TempAdEvent event) {
-        final Set<Callback> currentCallbacks = new HashSet<>(callbacks);
-        for(Callback c : currentCallbacks) {
-            c.onAdEventTracked(new AdEvent(event.getEventType(), event.getAd().getZoneId()));
+    private void notifyOnAdEventTracked(final TempAdEvent event) {
+        cbLock.lock();
+        try {
+            final Set<Callback> currentCallbacks = new HashSet<>(callbacks);
+            for (final Callback c : currentCallbacks) {
+                c.onAdEventTracked(new AdEvent(event.getEventType(), event.getAd().getZoneId()));
+            }
+        } finally {
+            cbLock.unlock();
         }
     }
 

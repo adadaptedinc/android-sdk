@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by chrisweeden on 9/26/16.
@@ -21,7 +23,7 @@ import java.util.Set;
 public class AppEventTrackingManager implements DeviceInfoManager.Callback {
     private static AppEventTrackingManager sInstance;
 
-    private static AppEventTrackingManager getInstance() {
+    private synchronized static AppEventTrackingManager getInstance() {
         if(sInstance == null) {
             sInstance = new AppEventTrackingManager();
         }
@@ -29,11 +31,11 @@ public class AppEventTrackingManager implements DeviceInfoManager.Callback {
         return sInstance;
     }
 
-    public static void registerEvent(final String eventSource,
+    public static synchronized void registerEvent(final String eventSource,
                                      final String eventName,
                                      final Map<String, String> eventParams) {
         if(getInstance().tracker == null) {
-            getInstance().tempEventItems.add(new TempEventItem(eventSource, eventName, eventParams));
+            getInstance().addTempEventItem(new TempEventItem(eventSource, eventName, eventParams));
         }
         else {
             final TempEventItem item = new TempEventItem(eventSource, eventName, eventParams);
@@ -42,6 +44,7 @@ public class AppEventTrackingManager implements DeviceInfoManager.Callback {
     }
 
     private final Set<TempEventItem> tempEventItems = new HashSet<>();
+    private final Lock lock = new ReentrantLock();
 
     private AppEventTracker tracker;
 
@@ -61,18 +64,39 @@ public class AppEventTrackingManager implements DeviceInfoManager.Callback {
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(interactor);
     }
 
+    private synchronized void addTempEventItem(final TempEventItem item) {
+        lock.lock();
+        try {
+            tempEventItems.add(item);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private synchronized void trackTempEventItems() {
+        lock.lock();
+        try {
+            final Set<TempEventItem> eventItems = new HashSet<>(tempEventItems);
+            tempEventItems.clear();
+
+            for(final TempEventItem i : eventItems) {
+                trackEvent(i);
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
     @Override
     public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
+        DeviceInfoManager.getInstance().removeCallback(this);
+
         final String endpoint = determineEndpoint(deviceInfo);
         final AppEventSink sink = new HttpAppEventSink(endpoint);
 
         tracker = new AppEventTracker(deviceInfo, sink);
 
-        Set<TempEventItem> eventItems = new HashSet<>(tempEventItems);
-        tempEventItems.clear();
-        for(TempEventItem i : eventItems) {
-            trackEvent(i);
-        }
+        trackTempEventItems();
     }
 
     private String determineEndpoint(final DeviceInfo deviceInfo) {

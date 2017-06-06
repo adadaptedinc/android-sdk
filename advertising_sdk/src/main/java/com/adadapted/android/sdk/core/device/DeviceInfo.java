@@ -2,6 +2,8 @@ package com.adadapted.android.sdk.core.device;
 
 import com.adadapted.android.sdk.core.ad.model.ImageAdType;
 
+import java.util.Map;
+
 /**
  * Created by chrisweeden on 9/26/16.
  */
@@ -27,6 +29,7 @@ public class DeviceInfo {
     private ScreenDensity density;
     private boolean allowRetargeting;
     private String sdkVersion;
+    private Map<String, String> params;
 
     public String getAppId() {
         return appId;
@@ -170,6 +173,14 @@ public class DeviceInfo {
 
     void setSdkVersion(String sdkVersion) {
         this.sdkVersion = sdkVersion;
+    }
+
+    public Map<String, String> getParams() {
+        return params;
+    }
+
+    public void setParams(Map<String, String> params) {
+        this.params = params;
     }
 
     public String chooseImageSize() {

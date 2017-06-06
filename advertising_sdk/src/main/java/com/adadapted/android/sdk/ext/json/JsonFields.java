@@ -100,4 +100,5 @@ class JsonFields {
     static final String APP_ERRORMESSAGE = "error_message";
     static final String APP_ERRORTIMESTAMP = "error_timestamp";
     static final String APP_ERRORPARAMS = "error_params";
+    static final String PARAMS = "init_params";
 }

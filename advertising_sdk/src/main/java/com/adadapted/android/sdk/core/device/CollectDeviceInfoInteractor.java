@@ -92,6 +92,7 @@ public class CollectDeviceInfoInteractor implements Interactor {
         }
 
         deviceInfo.setSdkVersion(command.getSdkVersion());
+        deviceInfo.setParams(command.getParams());
 
         callback.onDeviceInfoCollected(deviceInfo);
     }

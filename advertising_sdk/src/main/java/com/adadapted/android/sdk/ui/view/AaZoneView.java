@@ -158,6 +158,8 @@ public class AaZoneView extends RelativeLayout
         if(mListener != null) {
             mListener.onAdLoadFailed();
         }
+
+        shutdown();
     }
 
     public void onStart() {

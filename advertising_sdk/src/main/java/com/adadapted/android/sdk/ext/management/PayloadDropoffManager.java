@@ -10,6 +10,8 @@ import com.adadapted.android.sdk.ext.http.HttpPayloadEventSink;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by chrisweeden on 2/10/17.
@@ -35,7 +37,7 @@ public class PayloadDropoffManager implements DeviceInfoManager.Callback {
         }
 
         if(getInstance().tracker == null) {
-            getInstance().tempEvents.add(new TempEvent(payloadId, "rejected"));
+            getInstance().addTempEvent(new TempEvent(payloadId, "rejected"));
         } else {
             getInstance().performTrackDropoff(payloadId, "rejected");
         }
@@ -43,6 +45,7 @@ public class PayloadDropoffManager implements DeviceInfoManager.Callback {
 
     private PayloadEventTracker tracker;
     private final Set<TempEvent> tempEvents = new HashSet<>();
+    private final Lock lock = new ReentrantLock();
 
     private PayloadDropoffManager() {
         DeviceInfoManager.getInstance().getDeviceInfo(this);
@@ -56,19 +59,40 @@ public class PayloadDropoffManager implements DeviceInfoManager.Callback {
         return sInstance;
     }
 
+    private synchronized void addTempEvent(final TempEvent event) {
+        lock.lock();
+        try {
+            tempEvents.add(event);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private synchronized void trackTempEvents() {
+        lock.lock();
+        try {
+            final Set<TempEvent> events = new HashSet<>(tempEvents);
+            tempEvents.clear();
+
+            for(final TempEvent e : events) {
+                performTrackDropoff(e.getPayloadId(), e.getResult());
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
     @Override
     public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
+        DeviceInfoManager.getInstance().removeCallback(this);
+
         if(deviceInfo == null) {
             return;
         }
 
         this.tracker = new PayloadEventTracker(deviceInfo, new HttpPayloadEventSink(determineEndpoint(deviceInfo)));
 
-        final Set<TempEvent> events = new HashSet<>(tempEvents);
-        tempEvents.clear();
-        for(TempEvent e : events) {
-            performTrackDropoff(e.getPayloadId(), e.getResult());
-        }
+        trackTempEvents();
     }
 
     private String determineEndpoint(final DeviceInfo deviceInfo) {

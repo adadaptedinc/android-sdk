@@ -10,6 +10,8 @@ import com.adadapted.sdk.addit.ext.http.HttpPayloadEventSink;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by chrisweeden on 2/10/17.
@@ -17,64 +19,13 @@ import java.util.Set;
 public class PayloadDropoffManager implements DeviceInfoManager.Callback {
     private static PayloadDropoffManager sInstance;
 
-    private PayloadEventTracker tracker;
-    private final Set<TempEvent> tempEvents = new HashSet<>();
-
-    private PayloadDropoffManager() {
-        DeviceInfoManager.getInstance().getDeviceInfo(this);
-    }
-
-    private static PayloadDropoffManager getInstance() {
-        if(sInstance == null) {
-            sInstance = new PayloadDropoffManager();
-        }
-
-        return sInstance;
-    }
-
-    @Override
-    public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
-        if(deviceInfo == null) {
-            return;
-        }
-
-        this.tracker = new PayloadEventTracker(deviceInfo, new HttpPayloadEventSink(determineEndpoint(deviceInfo)));
-
-        final Set<TempEvent> events = new HashSet<>(tempEvents);
-        tempEvents.clear();
-        for(TempEvent e : events) {
-            performTrackDropoff(e.payloadId, e.result);
-        }
-    }
-
-    private String determineEndpoint(final DeviceInfo deviceInfo) {
-        if(deviceInfo.isProd()) {
-            return Config.Prod.URL_APP_PAYLOAD_TRACK;
-        }
-
-        return Config.Dev.URL_APP_PAYLOAD_TRACK;
-    }
-
-    private void performTrackDropoff(final String payloadId,
-                                     final String result) {
-        DeviceInfoManager.getInstance().getDeviceInfo(new DeviceInfoManager.Callback() {
-            @Override
-            public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
-                final TrackPayloadDeliveryCommand command = new TrackPayloadDeliveryCommand(payloadId, result);
-                final TrackPayloadDeliveryInteractor interactor = new TrackPayloadDeliveryInteractor(command, tracker);
-
-                ThreadPoolInteractorExecuter.getInstance().executeInBackground(interactor);
-            }
-        });
-    }
-
     public synchronized static void trackDelivered(final String payloadId) {
         if(payloadId == null) {
             return;
         }
 
         if(getInstance().tracker == null) {
-            getInstance().tempEvents.add(new TempEvent(payloadId, "delivered"));
+            getInstance().addTempEvent(new TempEvent(payloadId, "delivered"));
         } else {
             getInstance().performTrackDropoff(payloadId, "delivered");
         }
@@ -92,6 +43,79 @@ public class PayloadDropoffManager implements DeviceInfoManager.Callback {
         }
     }
 
+    private PayloadEventTracker tracker;
+    private final Set<TempEvent> tempEvents = new HashSet<>();
+    private final Lock lock = new ReentrantLock();
+
+    private PayloadDropoffManager() {
+        DeviceInfoManager.getInstance().getDeviceInfo(this);
+    }
+
+    private static PayloadDropoffManager getInstance() {
+        if(sInstance == null) {
+            sInstance = new PayloadDropoffManager();
+        }
+
+        return sInstance;
+    }
+
+    private void performTrackDropoff(final String payloadId,
+                                     final String result) {
+        DeviceInfoManager.getInstance().getDeviceInfo(new DeviceInfoManager.Callback() {
+            @Override
+            public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
+                final TrackPayloadDeliveryCommand command = new TrackPayloadDeliveryCommand(payloadId, result);
+                final TrackPayloadDeliveryInteractor interactor = new TrackPayloadDeliveryInteractor(command, tracker);
+
+                ThreadPoolInteractorExecuter.getInstance().executeInBackground(interactor);
+            }
+        });
+    }
+
+    private synchronized void addTempEvent(final TempEvent event) {
+        lock.lock();
+        try {
+            tempEvents.add(event);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private synchronized void trackTempEvents() {
+        lock.lock();
+        try {
+            final Set<TempEvent> events = new HashSet<>(tempEvents);
+            tempEvents.clear();
+
+            for(final TempEvent e : events) {
+                performTrackDropoff(e.getPayloadId(), e.getResult());
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
+        DeviceInfoManager.getInstance().removeCallback(this);
+
+        if(deviceInfo == null) {
+            return;
+        }
+
+        this.tracker = new PayloadEventTracker(deviceInfo, new HttpPayloadEventSink(determineEndpoint(deviceInfo)));
+
+        trackTempEvents();
+    }
+
+    private String determineEndpoint(final DeviceInfo deviceInfo) {
+        if(deviceInfo.isProd()) {
+            return Config.Prod.URL_APP_PAYLOAD_TRACK;
+        }
+
+        return Config.Dev.URL_APP_PAYLOAD_TRACK;
+    }
+
     private static class TempEvent {
         final String payloadId;
         final String result;
@@ -101,11 +125,11 @@ public class PayloadDropoffManager implements DeviceInfoManager.Callback {
             this.result = result;
         }
 
-        public String getPayloadId() {
+        String getPayloadId() {
             return payloadId;
         }
 
-        public String getResult() {
+        String getResult() {
             return result;
         }
     }

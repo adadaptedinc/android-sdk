@@ -38,9 +38,12 @@ public class AdAdapted {
 
     private String mAppId;
     private boolean mIsProd;
+    private Map<String, String> mParams;
     private AaSdkSessionListener sessionListener;
 
-    private AdAdapted() {}
+    private AdAdapted() {
+        mParams = new HashMap<>();
+    }
 
     private synchronized static AdAdapted getsInstance() {
         if(sInstance == null) {
@@ -90,8 +93,16 @@ public class AdAdapted {
         return this;
     }
 
+    public AdAdapted withParams(final Map<String, String> params) {
+        mParams = params;
+
+        return this;
+    }
+
     public void start(final Context context) {
-        SessionManager.start(context.getApplicationContext(), mAppId, mIsProd, new SessionManager.Callback() {
+        SessionManager.start(context.getApplicationContext(),
+                mAppId, mIsProd, mParams,
+                new SessionManager.Callback() {
             @Override
             public void onSessionAvailable(final Session session) {
                 if(!session.getDeviceInfo().isProd()) {

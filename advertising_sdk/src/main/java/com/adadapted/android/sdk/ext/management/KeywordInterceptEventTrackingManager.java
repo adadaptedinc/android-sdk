@@ -16,6 +16,8 @@ import com.adadapted.android.sdk.ext.json.JsonKeywordInterceptEventBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by chrisweeden on 9/30/16.
@@ -59,7 +61,7 @@ public class KeywordInterceptEventTrackingManager implements SessionManager.Call
 
         final TempKIEvent tempEvent = new TempKIEvent(session, term, userInput, eventType);
         if(getInstance().tracker == null) {
-            tempKIEvents.add(tempEvent);
+            getInstance().addTempEvent(tempEvent);
         }
         else {
             getInstance().trackEvent(tempEvent);
@@ -72,8 +74,9 @@ public class KeywordInterceptEventTrackingManager implements SessionManager.Call
         }
     }
 
-    private static final Set<TempKIEvent> tempKIEvents = new HashSet<>();
     private KeywordInterceptEventTracker tracker;
+    private static final Set<TempKIEvent> tempKIEvents = new HashSet<>();
+    private final Lock lock = new ReentrantLock();
 
     private KeywordInterceptEventTrackingManager() {
         SessionManager.getSession(this);
@@ -88,7 +91,7 @@ public class KeywordInterceptEventTrackingManager implements SessionManager.Call
     }
 
     private void publishEvents() {
-        clearTempEvents();
+        trackTempEvents();
 
         final Interactor interactor = new PublishKeywordInterceptEventsInteractor(tracker);
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(interactor);
@@ -108,19 +111,36 @@ public class KeywordInterceptEventTrackingManager implements SessionManager.Call
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(interactor);
     }
 
-    private void clearTempEvents() {
-        final Set<TempKIEvent> currentEvents = new HashSet<>(tempKIEvents);
-        tempKIEvents.clear();
+    private void addTempEvent(final TempKIEvent event) {
+        lock.lock();
+        try {
+            tempKIEvents.add(event);
+        } finally {
+            lock.unlock();
+        }
+    }
 
-        for(final TempKIEvent e : currentEvents) {
-            trackEvent(e);
+    private void trackTempEvents() {
+        lock.lock();
+        try {
+            final Set<TempKIEvent> currentEvents = new HashSet<>(tempKIEvents);
+            tempKIEvents.clear();
+
+            for(final TempKIEvent e : currentEvents) {
+                trackEvent(e);
+            }
+        } finally {
+            lock.unlock();
         }
     }
 
     @Override
     public void onSessionAvailable(final Session session) {
+        SessionManager.removeCallback(this);
+
         final String endpoint = determineTrackEndpoint(session.getDeviceInfo());
         final KeywordInterceptEventSink sink = new HttpKeywordInterceptEventSink(endpoint);
+
         tracker = new KeywordInterceptEventTracker(sink, new JsonKeywordInterceptEventBuilder());
     }
 

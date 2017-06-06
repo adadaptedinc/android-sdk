@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by chrisweeden on 9/26/16.
@@ -34,7 +36,7 @@ public class AppEventTrackingManager implements SessionManager.Callback {
                                      final String eventName,
                                      final Map<String, String> eventParams) {
         if(getInstance().tracker == null) {
-            getInstance().tempEventItems.add(new TempEventItem(eventSource, eventName, eventParams));
+            getInstance().addTempEventItem(new TempEventItem(eventSource, eventName, eventParams));
         }
         else {
             final TempEventItem item = new TempEventItem(eventSource, eventName, eventParams);
@@ -43,6 +45,7 @@ public class AppEventTrackingManager implements SessionManager.Callback {
     }
 
     private final Set<TempEventItem> tempEventItems = new HashSet<>();
+    private final Lock lock = new ReentrantLock();
 
     private AppEventTracker tracker;
 
@@ -50,7 +53,30 @@ public class AppEventTrackingManager implements SessionManager.Callback {
         SessionManager.getSession(this);
     }
 
-    private void trackEvent(final TempEventItem item) {
+    private synchronized void addTempEventItem(final TempEventItem item) {
+        lock.lock();
+        try {
+            tempEventItems.add(item);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private synchronized void trackTempEventItems() {
+        lock.lock();
+        try {
+            final Set<TempEventItem> eventItems = new HashSet<>(tempEventItems);
+            tempEventItems.clear();
+
+            for(final TempEventItem i : eventItems) {
+                trackEvent(i);
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private synchronized void trackEvent(final TempEventItem item) {
         final RegisterAppEventCommand command = new RegisterAppEventCommand(
                 item.getEventSource(),
                 item.getEventName(),
@@ -62,7 +88,7 @@ public class AppEventTrackingManager implements SessionManager.Callback {
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(interactor);
     }
 
-    private String determineEndpoint(final DeviceInfo deviceInfo) {
+    private synchronized String determineEndpoint(final DeviceInfo deviceInfo) {
         if(deviceInfo.isProd()) {
             return Config.Prod.URL_APP_EVENT_TRACK;
         }
@@ -72,22 +98,14 @@ public class AppEventTrackingManager implements SessionManager.Callback {
 
     @Override
     public void onSessionAvailable(final Session session) {
-        if(tracker != null) {
-            return;
-        }
+        SessionManager.removeCallback(this);
 
         final String endpoint = determineEndpoint(session.getDeviceInfo());
         final AppEventSink sink = new HttpAppEventSink(endpoint);
 
         tracker = new AppEventTracker(session, sink, new JsonAppEventBuilder());
 
-        final Set<TempEventItem> eventItems = new HashSet<>(tempEventItems);
-        tempEventItems.clear();
-        for(final TempEventItem i : eventItems) {
-            trackEvent(i);
-        }
-
-        SessionManager.removeCallback(this);
+        trackTempEventItems();
     }
 
     @Override

@@ -15,6 +15,8 @@ import com.adadapted.android.sdk.ext.json.JsonKeywordInterceptRequestBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by chrisweeden on 6/23/15.
@@ -48,9 +50,9 @@ public class KeywordInterceptManager
         sKeywordIntercept = keywordIntercept;
     }
 
-
-    private final Set<Callback> callbacks = new HashSet<>();
     private KeywordInterceptAdapter adapter;
+    private final Set<Callback> callbacks = new HashSet<>();
+    private final Lock lock = new ReentrantLock();
 
     private KeywordInterceptManager() {
         DeviceInfoManager.getInstance().getDeviceInfo(this);
@@ -66,7 +68,13 @@ public class KeywordInterceptManager
 
     private void init(final Callback callback) {
         if(sKeywordIntercept == null) {
-            callbacks.add(callback);
+            lock.lock();
+            try {
+                callbacks.add(callback);
+            } finally {
+                lock.unlock();
+            }
+
             SessionManager.getSession(this);
         }
         else {
@@ -94,14 +102,22 @@ public class KeywordInterceptManager
     }
 
     private void notifyOnKeywordInterceptInitSuccess(final KeywordIntercept keywordIntercept) {
-        final Set<Callback> currentCallbacks = new HashSet<>(callbacks);
-        for(final Callback c: currentCallbacks) {
-            c.onKeywordInterceptInitSuccess(keywordIntercept);
+        lock.lock();
+        try {
+            final Set<Callback> currentCallbacks = new HashSet<>(callbacks);
+
+            for(final Callback c: currentCallbacks) {
+                c.onKeywordInterceptInitSuccess(keywordIntercept);
+            }
+        } finally {
+            lock.unlock();
         }
     }
 
     @Override
     public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
+        DeviceInfoManager.getInstance().removeCallback(this);
+
         final String endpoint = determineInitEndpoint(deviceInfo);
         adapter = new HttpKeywordInterceptAdapter(endpoint, new JsonKeywordInterceptBuilder());
     }
