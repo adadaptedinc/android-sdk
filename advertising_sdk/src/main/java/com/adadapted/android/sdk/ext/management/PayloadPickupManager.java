@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.ext.management;
 
+import android.util.Log;
 
 import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.addit.Content;
@@ -17,12 +18,20 @@ import java.util.List;
 /**
  * Created by chrisweeden on 2/9/17.
  */
-public class PayloadPickupManager implements PickupPayloadInteractor.Callback {
+public class PayloadPickupManager implements DeviceInfoManager.Callback, PickupPayloadInteractor.Callback {
     private static final String LOGTAG = PayloadPickupManager.class.getName();
 
     private static PayloadPickupManager sInstance;
     private static boolean blocked = false;
     private static Interactor queuedInteractor = null;
+
+    private static PayloadPickupManager getInstance() {
+        if(sInstance == null) {
+            sInstance = new PayloadPickupManager();
+        }
+
+        return sInstance;
+    }
 
     public static synchronized void deeplinkInProgress() {
         blocked = true;
@@ -38,16 +47,7 @@ public class PayloadPickupManager implements PickupPayloadInteractor.Callback {
     }
 
     public static synchronized void pickupPayloads() {
-        DeviceInfoManager.getInstance().getDeviceInfo(new DeviceInfoManager.Callback() {
-            @Override
-            public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
-                getInstance().performPickupPayloads(deviceInfo);
-            }
-        });
-    }
-
-    public static synchronized void pickupPayloads(final DeviceInfo deviceInfo) {
-        getInstance().performPickupPayloads(deviceInfo);
+        DeviceInfoManager.getInstance().getDeviceInfo(getInstance());
     }
 
     private PayloadAdapter adapter;
@@ -75,6 +75,12 @@ public class PayloadPickupManager implements PickupPayloadInteractor.Callback {
     }
 
     @Override
+    public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
+        DeviceInfoManager.getInstance().removeCallback(this);
+        performPickupPayloads(deviceInfo);
+    }
+
+    @Override
     public void onPayloadAvailable(final List<Content> content) {
         if(content == null) {
             return;
@@ -94,13 +100,5 @@ public class PayloadPickupManager implements PickupPayloadInteractor.Callback {
         }
 
         return Config.Sand.URL_APP_PAYLOAD_PICKUP;
-    }
-
-    private static PayloadPickupManager getInstance() {
-        if(sInstance == null) {
-            sInstance = new PayloadPickupManager();
-        }
-
-        return sInstance;
     }
 }
