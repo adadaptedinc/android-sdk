@@ -239,6 +239,12 @@ class AaZoneViewController
         }
 
         mZone = session.getZone(mZoneProperties.getZoneId());
+        if(mTimerRunning.size() == 0) {
+            setNextAd();
+        }
+        else {
+            displayAd();
+        }
     }
 
     @Override
