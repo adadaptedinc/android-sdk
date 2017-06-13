@@ -91,6 +91,14 @@ public class AppErrorTrackingManager implements DeviceInfoManager.Callback {
     public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
         DeviceInfoManager.getInstance().removeCallback(this);
 
+        if(!deviceInfo.isProd()) {
+            AppErrorTrackingManager.registerEvent(
+                "NOT_AN_ERROR",
+                "Error Collection Test Message. This message is only sent from the Dev environment.",
+                new HashMap<String, String>()
+            );
+        }
+
         final String endpoint = determineEndpoint(deviceInfo);
         final AppErrorSink sink = new HttpAppErrorSink(endpoint);
 
