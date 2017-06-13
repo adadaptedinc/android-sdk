@@ -33,6 +33,11 @@ public class AppEventTrackingManager implements SessionManager.Callback {
     }
 
     public static synchronized void registerEvent(final String eventSource,
+                                                  final String eventName) {
+        registerEvent(eventSource, eventName, new HashMap<String, String>());
+    }
+
+    public static synchronized void registerEvent(final String eventSource,
                                      final String eventName,
                                      final Map<String, String> eventParams) {
         if(getInstance().tracker == null) {
