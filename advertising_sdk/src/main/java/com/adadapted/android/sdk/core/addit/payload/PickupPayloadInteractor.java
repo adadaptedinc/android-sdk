@@ -39,10 +39,7 @@ public class PickupPayloadInteractor implements Interactor {
             return;
         }
 
-        AppEventTrackingManager.registerEvent(
-                AppEventSource.SDK,
-                "payload_pickup_attempt",
-                new HashMap<String, String>());
+        AppEventTrackingManager.registerEvent(AppEventSource.SDK, "payload_pickup_attempt");
 
         final DeviceInfo di = command.getDeviceInfo();
 
