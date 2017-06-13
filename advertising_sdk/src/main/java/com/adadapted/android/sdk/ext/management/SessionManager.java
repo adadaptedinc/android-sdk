@@ -60,6 +60,18 @@ public class SessionManager
         }
     }
 
+    public static synchronized void restart(final Context context,
+                                            final String appId,
+                                            final boolean isProd,
+                                            final Map<String, String> params) {
+        if(sInstance != null) {
+            DeviceInfoManager.getInstance().collectDeviceInfo(context, appId, isProd, params, sInstance);
+        }
+        else {
+            Log.w(LOGTAG, "Session Manager has not been started.");
+        }
+    }
+
     public static synchronized void getSession(final Callback callback) {
         if(sInstance != null) {
             sInstance.addCallback(callback);
@@ -99,6 +111,10 @@ public class SessionManager
     }
 
     public static synchronized void removeCallback(final Callback callback) {
+        if(callback == null) {
+            return;
+        }
+
         if(sInstance != null) {
             sInstance.lock.lock();
             try {
@@ -125,20 +141,20 @@ public class SessionManager
                            final Callback callback) {
         addCallback(callback);
 
-        ImageCache.getInstance().purgeCache();
-        HttpRequestManager.createQueue(context);
         DeviceInfoManager.getInstance().collectDeviceInfo(context, appId, isProd, params, this);
     }
 
     @Override
     public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
-        this.sessionAdapter = new HttpSessionAdapter(
-                determineSessionEndpoint(deviceInfo),
-                new JsonSessionBuilder(deviceInfo));
+        sessionAdapter = new HttpSessionAdapter(
+            determineSessionEndpoint(deviceInfo),
+            new JsonSessionBuilder(deviceInfo)
+        );
 
         adRefreshAdapter = new HttpAdRefreshAdapter(
-                determineAdEndpoint(deviceInfo),
-                new JsonAdRefreshBuilder(new JsonZoneBuilder(deviceInfo.getScale())));
+            determineAdEndpoint(deviceInfo),
+            new JsonAdRefreshBuilder(new JsonZoneBuilder(deviceInfo.getScale()))
+        );
 
         initializeSession(deviceInfo);
     }
@@ -169,6 +185,10 @@ public class SessionManager
     }
 
     private void addCallback(final Callback callback) {
+        if(callback == null) {
+            return;
+        }
+
         lock.lock();
         try {
             callbacks.add(callback);
