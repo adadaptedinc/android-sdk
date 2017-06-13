@@ -20,6 +20,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 
 public class DeviceInfoManager implements CollectDeviceInfoInteractor.Callback {
+    private static final String LOGTAG = DeviceInfoManager.class.getName();
+
     private static DeviceInfoManager sInstance;
 
     public static synchronized DeviceInfoManager getInstance() {
@@ -63,6 +65,10 @@ public class DeviceInfoManager implements CollectDeviceInfoInteractor.Callback {
     }
 
     private void addCallback(final Callback callback) {
+        if(callback == null) {
+            return;
+        }
+
         lock.lock();
         try {
             callbacks.add(callback);
@@ -76,6 +82,10 @@ public class DeviceInfoManager implements CollectDeviceInfoInteractor.Callback {
     }
 
     void removeCallback(final Callback callback) {
+        if(callback == null) {
+            return;
+        }
+
         lock.lock();
         try {
             callbacks.remove(callback);
