@@ -6,7 +6,8 @@ import android.util.Log;
 import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.event.model.AppEventSource;
 import com.adadapted.android.sdk.core.session.model.Session;
-import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
+import com.adadapted.android.sdk.ext.cache.ImageCache;
+import com.adadapted.android.sdk.ext.http.HttpRequestManager;
 import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
 import com.adadapted.android.sdk.ext.management.PayloadPickupManager;
 import com.adadapted.android.sdk.ext.management.SessionManager;
@@ -100,23 +101,16 @@ public class AdAdapted {
     }
 
     public void start(final Context context) {
-        SessionManager.start(context.getApplicationContext(),
-                mAppId, mIsProd, mParams,
-                new SessionManager.Callback() {
+        ImageCache.getInstance().purgeCache();
+        HttpRequestManager.createQueue(context.getApplicationContext());
+        PayloadPickupManager.pickupPayloads();
+
+        final SessionManager.Callback startCallback = new SessionManager.Callback() {
             @Override
             public void onSessionAvailable(final Session session) {
-                if(!session.getDeviceInfo().isProd()) {
-                    AppErrorTrackingManager.registerEvent(
-                            "NOT_AN_ERROR",
-                            "Error Collection Test Message. This message is only sent from the Dev environment.",
-                            new HashMap<String, String>());
-                }
-
                 if(sessionListener != null) {
                     sessionListener.onHasAdsToServe(session.hasActiveCampaigns());
                 }
-
-                PayloadPickupManager.pickupPayloads(session.getDeviceInfo());
             }
 
             @Override
@@ -125,15 +119,40 @@ public class AdAdapted {
                     sessionListener.onHasAdsToServe(session.hasActiveCampaigns());
                 }
             }
-        });
+        };
 
-        AppEventTrackingManager.registerEvent(
-                AppEventSource.SDK,
-                "app_opened",
-                new HashMap<String, String>());
+        SessionManager.start(
+            context.getApplicationContext(),
+            mAppId,
+            mIsProd,
+            mParams,
+            startCallback);
+
+        AppEventTrackingManager.registerEvent(AppEventSource.SDK, "app_opened");
 
         new EventFlushScheduler().start(Config.DEFAULT_EVENT_POLLING);
         Log.i(LOGTAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", Config.SDK_VERSION));
+    }
+
+    public static synchronized void restart(final Context context) {
+        restart(context, new HashMap<String, String>());
+    }
+
+    public static synchronized void restart(final Context context,
+                                            final Map<String, String> params) {
+        SessionManager.restart(
+            context.getApplicationContext(),
+            getsInstance().mAppId,
+            getsInstance().mIsProd,
+            params
+        );
+
+        AppEventTrackingManager.registerEvent(
+            AppEventSource.SDK,
+            "session_restarted",
+            params);
+
+        Log.i(LOGTAG, String.format("AdAdapted Android Advertising SDK v%s reinitialized.", Config.SDK_VERSION));
     }
 
     public static synchronized void hasAdsToServe() {
