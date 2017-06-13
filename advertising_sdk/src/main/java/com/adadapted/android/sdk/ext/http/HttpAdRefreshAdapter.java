@@ -59,9 +59,10 @@ public class HttpAdRefreshAdapter implements AdRefreshAdapter {
                         final Map<String, String> params = new HashMap<>();
                         params.put("url", endpoint);
                         AppErrorTrackingManager.registerEvent(
-                                "AD_GET_REQUEST_FAILED",
-                                error.getMessage(),
-                                params);
+                            "AD_GET_REQUEST_FAILED",
+                            error.getMessage(),
+                            params
+                        );
 
                         callback.onFailure();
                     }

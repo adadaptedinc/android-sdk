@@ -44,9 +44,10 @@ public class JsonAdRefreshBuilder implements AdRefreshBuilder {
             errorParams.put("exception", ex.getMessage());
 
             AppErrorTrackingManager.registerEvent(
-                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                    "Failed to parse Ad payload for processing.",
-                    errorParams);
+                "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                "Failed to parse Ad payload for processing.",
+                errorParams
+            );
         }
 
         return new HashMap<>();

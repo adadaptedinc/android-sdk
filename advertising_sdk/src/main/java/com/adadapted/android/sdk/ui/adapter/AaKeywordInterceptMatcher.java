@@ -39,10 +39,11 @@ public class AaKeywordInterceptMatcher implements SessionManager.Callback, Keywo
                         suggestions.add(autofill.getReplacement());
 
                         mSuggestionTracker.suggestionMatched(
-                                mSession,
-                                item,
-                                autofill.getReplacement(),
-                                constraint.toString());
+                            mSession,
+                            item,
+                            autofill.getReplacement(),
+                            constraint.toString()
+                        );
                     }
                 }
             }

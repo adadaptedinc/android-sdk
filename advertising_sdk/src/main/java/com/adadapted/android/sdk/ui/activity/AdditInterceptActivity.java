@@ -30,9 +30,9 @@ public class AdditInterceptActivity extends AppCompatActivity {
         PayloadPickupManager.deeplinkInProgress();
 
         AppEventTrackingManager.registerEvent(
-                AppEventSource.SDK,
-                "addit_app_opened",
-                new HashMap<String, String>());
+            AppEventSource.SDK,
+            "addit_app_opened"
+        );
 
         try {
             final Intent additIntent = getIntent();
@@ -51,9 +51,10 @@ public class AdditInterceptActivity extends AppCompatActivity {
             final Map<String, String> errorParams = new HashMap<>();
             errorParams.put("exception_message", ex.getMessage());
             AppErrorTrackingManager.registerEvent(
-                    "ADDIT_DEEPLINK_HANDLING_ERROR",
-                    "Problem handling deeplink",
-                    errorParams);
+                "ADDIT_DEEPLINK_HANDLING_ERROR",
+                "Problem handling deeplink",
+                errorParams
+            );
 
             final PackageManager pm = getPackageManager();
             final Intent mainActivityIntent = pm.getLaunchIntentForPackage(getPackageName());

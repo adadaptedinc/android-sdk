@@ -58,9 +58,10 @@ public class HttpPayloadAdapter implements PayloadAdapter {
                 final Map<String, String> errorParams = new HashMap<>();
                 errorParams.put("endpoint", endpoint);
                 AppErrorTrackingManager.registerEvent(
-                        "PAYLOAD_PICKUP_REQUEST_FAILED",
-                        error.getMessage(),
-                        errorParams);
+                    "PAYLOAD_PICKUP_REQUEST_FAILED",
+                    error.getMessage(),
+                    errorParams
+                );
 
                 callback.onFailure(error.getMessage());
             }

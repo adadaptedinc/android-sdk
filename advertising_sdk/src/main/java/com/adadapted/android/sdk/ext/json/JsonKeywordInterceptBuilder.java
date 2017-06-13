@@ -39,9 +39,10 @@ public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
             params.put("error", ex.getMessage());
             params.put("payload", json.toString());
             AppEventTrackingManager.registerEvent(
-                    "KI_PAYLOAD_PARSE_FAILED",
-                    "Failed to parse KI payload for processing.",
-                    params);
+                "KI_PAYLOAD_PARSE_FAILED",
+                "Failed to parse KI payload for processing.",
+                params
+            );
         }
 
         return null;

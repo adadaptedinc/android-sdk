@@ -43,8 +43,8 @@ public class AdContentPayload implements ContentPayload {
     }
 
     public static AdContentPayload createAddToListContent(final ViewAdWrapper ad) {
-        List items = ((ContentAdAction)ad.getAd().getAdAction()).getItems();
-        JSONObject json = new JSONObject();
+        final List items = ((ContentAdAction)ad.getAd().getAdAction()).getItems();
+        final JSONObject json = new JSONObject();
 
         try {
             json.put(FIELD_ADD_TO_LIST_ITEMS, new JSONArray(items));

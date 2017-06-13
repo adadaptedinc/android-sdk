@@ -52,9 +52,10 @@ public class HttpAppEventSink implements AppEventSink {
                 final Map<String, String> errorParams = new HashMap<>();
                 errorParams.put("endpoint", endpoint);
                 AppErrorTrackingManager.registerEvent(
-                        "APP_EVENT_REQUEST_FAILED",
-                        error.getMessage(),
-                        errorParams);
+                    "APP_EVENT_REQUEST_FAILED",
+                    error.getMessage(),
+                    errorParams
+                );
             }
         });
 

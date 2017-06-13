@@ -51,9 +51,10 @@ public class JsonZoneBuilder implements ZoneBuilder {
             errorParams.put("exception", ex.getMessage());
 
             AppErrorTrackingManager.registerEvent(
-                    "SESSION_ZONE_PAYLOAD_PARSE_FAILED",
-                    "Failed to parse Session Zone payload for processing.",
-                    errorParams);
+                "SESSION_ZONE_PAYLOAD_PARSE_FAILED",
+                "Failed to parse Session Zone payload for processing.",
+                errorParams
+            );
         }
 
         return zones;

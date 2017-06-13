@@ -57,9 +57,10 @@ public class JsonSessionBuilder implements SessionBuilder {
             params.put("exception", ex.getMessage());
             params.put("bad_json", response.toString());
             AppEventTrackingManager.registerEvent(
-                    "SESSION_PAYLOAD_PARSE_FAILED",
-                    "Failed to parse Session payload for processing.",
-                    params);
+                "SESSION_PAYLOAD_PARSE_FAILED",
+                "Failed to parse Session payload for processing.",
+                params
+            );
         }
 
         return builder.build();

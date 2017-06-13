@@ -62,9 +62,10 @@ public class HttpSessionAdapter implements SessionAdapter {
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", initUrl);
                 AppErrorTrackingManager.registerEvent(
-                        "SESSION_REQUEST_FAILED",
-                        error.getMessage(),
-                        params);
+                    "SESSION_REQUEST_FAILED",
+                    error.getMessage(),
+                    params
+                );
 
                 listener.onFailure();
             }

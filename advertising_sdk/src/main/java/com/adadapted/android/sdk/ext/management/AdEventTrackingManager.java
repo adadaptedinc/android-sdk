@@ -157,9 +157,7 @@ public class AdEventTrackingManager implements DeviceInfoManager.Callback {
 
         final String endpoint = determineEndpoint(deviceInfo);
 
-        tracker = new AdEventTracker(
-                new HttpAdEventSink(endpoint),
-                new JsonAdEventRequestBuilder());
+        tracker = new AdEventTracker(new HttpAdEventSink(endpoint), new JsonAdEventRequestBuilder());
 
         trackTempEvents();
     }

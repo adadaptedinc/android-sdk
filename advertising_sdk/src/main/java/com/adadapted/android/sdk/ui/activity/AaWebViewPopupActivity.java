@@ -123,9 +123,10 @@ public class AaWebViewPopupActivity extends Activity {
                 params.put("url", url);
                 params.put("error", error.toString());
                 AppErrorTrackingManager.registerEvent(
-                        "POPUP_URL_LOAD_FAILED",
-                        "Problem loading popup url",
-                        params);
+                    "POPUP_URL_LOAD_FAILED",
+                    "Problem loading popup url",
+                    params
+                );
             }
 
             @Override
@@ -138,9 +139,10 @@ public class AaWebViewPopupActivity extends Activity {
                 params.put("url", url);
                 params.put("error", errorResponse.toString());
                 AppErrorTrackingManager.registerEvent(
-                        "POPUP_URL_LOAD_FAILED",
-                        "Problem loading popup url",
-                        params);
+                    "POPUP_URL_LOAD_FAILED",
+                    "Problem loading popup url",
+                    params
+                );
             }
         });
         popupWebView.loadUrl(url);

@@ -29,9 +29,9 @@ public class DeeplinkContentParser {
     public Content parse(final Uri uri) throws Exception {
         if(uri == null) {
             AppErrorTrackingManager.registerEvent(
-                    "ADDIT_NO_DEEPLINK_RECEIVED",
-                    "Did not receive a deeplink url.",
-                    new HashMap<String, String>());
+                "ADDIT_NO_DEEPLINK_RECEIVED",
+                "Did not receive a deeplink url."
+            );
 
             throw new Exception("Did not receive a deeplink url.");
         }
@@ -39,9 +39,10 @@ public class DeeplinkContentParser {
         final Map<String, String> params = new HashMap<>();
         params.put("url", uri.toString());
         AppEventTrackingManager.registerEvent(
-                AppEventSource.SDK,
-                "deeplink_url_received",
-                params);
+            AppEventSource.SDK,
+            "deeplink_url_received",
+            params
+        );
 
         final String data = uri.getQueryParameter("data");
         final byte[] decodedData = Base64.decode(data, Base64.DEFAULT);
@@ -76,9 +77,10 @@ public class DeeplinkContentParser {
             final Map<String, String> errorParams = new HashMap<>();
             errorParams.put("url", uri.toString());
             AppErrorTrackingManager.registerEvent(
-                    "ADDIT_UNKNOWN_PAYLOAD_TYPE",
-                    "Unknown payload type: " + uri.getPath(),
-                    errorParams);
+                "ADDIT_UNKNOWN_PAYLOAD_TYPE",
+                "Unknown payload type: " + uri.getPath(),
+                errorParams
+            );
 
             throw new Exception("Unknown payload type");
         }
@@ -87,9 +89,10 @@ public class DeeplinkContentParser {
             errorParams.put("payload", "{\"raw\":\""+data+"\", \"parsed\":\""+jsonString+"\"}");
             errorParams.put("exception_message", ex.getMessage());
             AppErrorTrackingManager.registerEvent(
-                    "ADDIT_PAYLOAD_PARSE_FAILED",
-                    "Problem parsing Addit JSON input",
-                    errorParams);
+                "ADDIT_PAYLOAD_PARSE_FAILED",
+                "Problem parsing Addit JSON input",
+                errorParams
+            );
 
             throw new Exception("Problem parsing content payload");
         }
@@ -116,9 +119,10 @@ public class DeeplinkContentParser {
             errorParams.put("exception_message", ex.getMessage());
             errorParams.put("field_name", fieldName);
             AppErrorTrackingManager.registerEvent(
-                    "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
-                    "Problem parsing Addit JSON input field " + fieldName,
-                    errorParams);
+                "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
+                "Problem parsing Addit JSON input field " + fieldName,
+                errorParams
+            );
 
             return "";
         }

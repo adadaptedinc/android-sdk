@@ -90,10 +90,11 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
                     mListener.onStrategyViewLoadFailed();
 
                     AdAnomalyTrackingManager.registerAnomaly(
-                            ad.getAdId(),
-                            imageUrl,
-                            "AD_IMAGE_LOAD_FAILED",
-                            "Ad image failed to load.");
+                        ad.getAdId(),
+                        imageUrl,
+                        "AD_IMAGE_LOAD_FAILED",
+                        "Ad image failed to load."
+                    );
                 }
             }
         });

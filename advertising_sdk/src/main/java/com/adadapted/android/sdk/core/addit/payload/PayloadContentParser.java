@@ -32,9 +32,10 @@ public class PayloadContentParser {
                 final Map<String, String> errorParams = new HashMap<>();
                 errorParams.put("exception_message", ex.getMessage());
                 AppErrorTrackingManager.registerEvent(
-                        "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
-                        "Problem parsing Addit JSON paylaod",
-                        errorParams);
+                    "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
+                    "Problem parsing Addit JSON paylaod",
+                    errorParams
+                );
             }
         }
 
@@ -59,9 +60,10 @@ public class PayloadContentParser {
             final Map<String, String> errorParams = new HashMap<>();
             errorParams.put("payload_id", payloadId);
             AppErrorTrackingManager.registerEvent(
-                    "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
-                    "Missing Detailed List Items.",
-                    errorParams);
+                "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
+                "Missing Detailed List Items.",
+                errorParams
+            );
         }
 
         return Content.createPayloadContent(payloadId, message, image, ContentTypes.ADD_TO_LIST_ITEMS, payload);
@@ -88,9 +90,10 @@ public class PayloadContentParser {
             errorParams.put("exception_message", ex.getMessage());
             errorParams.put("field_name", fieldName);
             AppErrorTrackingManager.registerEvent(
-                    "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
-                    "Problem parsing Addit JSON input field " + fieldName,
-                    errorParams);
+                "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
+                "Problem parsing Addit JSON input field " + fieldName,
+                errorParams
+            );
 
             return "";
         }

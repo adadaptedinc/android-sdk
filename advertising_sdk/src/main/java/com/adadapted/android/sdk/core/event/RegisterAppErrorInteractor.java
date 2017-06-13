@@ -19,9 +19,6 @@ public class RegisterAppErrorInteractor implements Interactor {
 
     @Override
     public void execute() {
-        tracker.trackError(
-                command.getErrorCode(),
-                command.getErrorMessage(),
-                command.getErrorParams());
+        tracker.trackError(command.getErrorCode(), command.getErrorMessage(), command.getErrorParams());
     }
 }
