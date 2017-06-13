@@ -8,6 +8,7 @@ import com.adadapted.android.sdk.core.event.model.AppEventSource;
 import com.adadapted.android.sdk.core.session.model.Session;
 import com.adadapted.android.sdk.ext.cache.ImageCache;
 import com.adadapted.android.sdk.ext.http.HttpRequestManager;
+import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
 import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
 import com.adadapted.android.sdk.ext.management.PayloadPickupManager;
 import com.adadapted.android.sdk.ext.management.SessionManager;
@@ -129,6 +130,13 @@ public class AdAdapted {
             startCallback);
 
         AppEventTrackingManager.registerEvent(AppEventSource.SDK, "app_opened");
+
+        if(!mIsProd) {
+            AppErrorTrackingManager.registerEvent(
+                "NOT_AN_ERROR",
+                "Error Collection Test Message. This message is only sent from the Dev environment."
+            );
+        }
 
         new EventFlushScheduler().start(Config.DEFAULT_EVENT_POLLING);
         Log.i(LOGTAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", Config.SDK_VERSION));

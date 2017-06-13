@@ -32,15 +32,15 @@ public class AppErrorTrackingManager implements DeviceInfoManager.Callback {
     }
 
     public static synchronized void registerEvent(final String errorCode,
-                                     final String errorMessge,
-                                     final Map<String, String> errorParams) {
-        if(getInstance().tracker == null) {
-            getInstance().addTempErrorItem(new TempErrorItem(errorCode, errorMessge, errorParams));
-        }
-        else {
-            final TempErrorItem item = new TempErrorItem(errorCode, errorMessge, errorParams);
-            getInstance().trackEvent(item);
-        }
+                                                  final String errorMessage) {
+        registerEvent(errorCode, errorMessage, new HashMap<String, String>());
+    }
+
+    public static synchronized void registerEvent(final String errorCode,
+                                                  final String errorMessage,
+                                                  final Map<String, String> errorParams) {
+        final TempErrorItem item = new TempErrorItem(errorCode, errorMessage, errorParams);
+        getInstance().trackEvent(item);
     }
 
     private final Set<TempErrorItem> tempErrorItems = new HashSet<>();
@@ -76,10 +76,17 @@ public class AppErrorTrackingManager implements DeviceInfoManager.Callback {
     }
 
     private void trackEvent(final TempErrorItem item) {
+        if(tracker == null) {
+            addTempErrorItem(item);
+            return;
+        }
+
         final RegisterAppErrorCommand command = new RegisterAppErrorCommand(
-                item.getErrorCode(),
-                item.getErrorMessage(),
-                item.getErrorParams());
+            item.getErrorCode(),
+            item.getErrorMessage(),
+            item.getErrorParams()
+        );
+
         final RegisterAppErrorInteractor interactor = new RegisterAppErrorInteractor(
                 command,
                 tracker);
@@ -90,14 +97,6 @@ public class AppErrorTrackingManager implements DeviceInfoManager.Callback {
     @Override
     public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
         DeviceInfoManager.getInstance().removeCallback(this);
-
-        if(!deviceInfo.isProd()) {
-            AppErrorTrackingManager.registerEvent(
-                "NOT_AN_ERROR",
-                "Error Collection Test Message. This message is only sent from the Dev environment.",
-                new HashMap<String, String>()
-            );
-        }
 
         final String endpoint = determineEndpoint(deviceInfo);
         final AppErrorSink sink = new HttpAppErrorSink(endpoint);
