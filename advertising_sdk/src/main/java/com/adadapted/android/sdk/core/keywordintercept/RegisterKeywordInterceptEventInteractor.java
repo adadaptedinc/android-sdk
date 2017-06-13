@@ -18,10 +18,12 @@ public class RegisterKeywordInterceptEventInteractor implements Interactor {
 
     @Override
     public void execute() {
-        this.tracker.trackEvent(command.getSession(),
-                command.getSearchId(),
-                command.getTerm(),
-                command.getUserInput(),
-                command.getEventType());
+        this.tracker.trackEvent(
+            command.getSession(),
+            command.getSearchId(),
+            command.getTerm(),
+            command.getUserInput(),
+            command.getEventType()
+        );
     }
 }

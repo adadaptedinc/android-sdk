@@ -25,10 +25,13 @@ public class HttpAdImageLoader implements AdImageLoader {
         if(url == null || !url.toLowerCase().startsWith("http")) {
             Log.w(LOGTAG, "No URL has been provided.");
             AdAnomalyTrackingManager.registerAnomaly("",
-                    url,
-                    "AD_IMAGE_REQUEST_FAILED",
-                    "No URL has been provided.");
+                url,
+                "AD_IMAGE_REQUEST_FAILED",
+                "No URL has been provided."
+            );
+
             callback.adImageLoadFailed();
+
             return;
         }
 
@@ -73,9 +76,11 @@ public class HttpAdImageLoader implements AdImageLoader {
                         }
 
                         AdAnomalyTrackingManager.registerAnomaly("",
-                                url,
-                                "AD_IMAGE_REQUEST_FAILED",
-                                error.getMessage());
+                            url,
+                            "AD_IMAGE_REQUEST_FAILED",
+                            error.getMessage()
+                        );
+
                         callback.adImageLoadFailed();
                     }
                 }

@@ -69,10 +69,12 @@ public class JsonAdBuilder implements AdBuilder {
         }
         catch(NumberFormatException ex) {
             AdAnomalyTrackingManager.registerAnomaly(
-                    builder.getAdId(),
-                    jsonAd.toString(),
-                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                    "Ad " + builder.getAdId() + " has an improperly set refresh_time.");
+                builder.getAdId(),
+                jsonAd.toString(),
+                "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                "Ad " + builder.getAdId() + " has an improperly set refresh_time."
+            );
+
             builder.setRefreshTime(DEFAULT_REFRESH_TIME);
         }
 
@@ -169,9 +171,11 @@ public class JsonAdBuilder implements AdBuilder {
         else if(adTypeCode.equalsIgnoreCase(AdType.IMAGE)) {
             return parseImageAd(jsonAd);
         }
+        /*
         else if(adTypeCode.equalsIgnoreCase(AdType.JSON)) {
             return parseJsonAd(jsonAd);
         }
+        */
 
         Log.w(LOGTAG, "Unsupported Ad Type: " + adTypeCode);
 
@@ -193,6 +197,7 @@ public class JsonAdBuilder implements AdBuilder {
         return adType;
     }
 
+    /*
     private JsonAdType parseJsonAd(JSONObject jsonAd) throws JSONException {
         final JSONObject jsonComponents = jsonAd.getJSONObject(JsonFields.JSON);
         final AdComponent adComponents = parseJsonAdComponents(jsonComponents);
@@ -219,6 +224,7 @@ public class JsonAdBuilder implements AdBuilder {
 
         return adComponents;
     }
+    */
 
     private Map<String, AdImage> parseImages(final JSONObject jsonImages) throws JSONException {
         final Map<String, AdImage> images = new HashMap<>();

@@ -49,9 +49,10 @@ public class HttpPayloadEventSink implements PayloadEventSink {
                 errorParams.put("exception", error.getClass().getName());
 
                 AppErrorTrackingManager.registerEvent(
-                        "PAYLOAD_EVENT_REQUEST_FAILED",
-                        error.getMessage(),
-                        errorParams);
+                    "PAYLOAD_EVENT_REQUEST_FAILED",
+                    error.getMessage(),
+                    errorParams
+                );
             }
         });
 

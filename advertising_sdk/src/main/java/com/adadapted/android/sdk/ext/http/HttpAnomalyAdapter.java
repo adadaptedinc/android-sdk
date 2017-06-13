@@ -53,9 +53,10 @@ public class HttpAnomalyAdapter implements AnomalyAdapter {
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", mBatchUrl);
                 AppErrorTrackingManager.registerEvent(
-                        "ANOMALY_TRACK_REQUEST_FAILED",
-                        error.getMessage(),
-                        params);
+                    "ANOMALY_TRACK_REQUEST_FAILED",
+                    error.getMessage(),
+                    params
+                );
             }
         }){
             @Override

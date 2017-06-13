@@ -26,7 +26,7 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
 
     private final EmptyAdViewStrategy mAdEmptyView;
     private ImageAdViewBuildingStrategy mAdImageView;
-    private final JsonAdViewBuildingStrategy mAdJsonView;
+    //private final JsonAdViewBuildingStrategy mAdJsonView;
     private final HtmlAdViewBuildingStrategy mAdWebView;
 
     private AdViewBuildingStrategy mStrategy;
@@ -40,7 +40,7 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
         });
 
         mAdEmptyView = new EmptyAdViewStrategy(context.getApplicationContext());
-        mAdJsonView = new JsonAdViewBuildingStrategy(context.getApplicationContext());
+        //mAdJsonView = new JsonAdViewBuildingStrategy(context.getApplicationContext());
 
         // For whatever reason the WebView has to be created ahead of time.
         // The App will likely crash if it is constructed on-demand.
@@ -65,9 +65,11 @@ class AdViewBuilder implements AdViewBuildingStrategy.Listener {
                 mStrategy = mAdImageView;
                 break;
 
+            /*
             case AdType.JSON:
                 mStrategy = mAdJsonView;
                 break;
+            */
 
             default:
                 mStrategy = mAdEmptyView;

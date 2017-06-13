@@ -51,9 +51,10 @@ public class HttpKeywordInterceptEventSink implements KeywordInterceptEventSink 
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", endpoint);
                 AppErrorTrackingManager.registerEvent(
-                        "KI_EVENT_REQUEST_FAILED",
-                        error.getMessage(),
-                        params);
+                    "KI_EVENT_REQUEST_FAILED",
+                    error.getMessage(),
+                    params
+                );
             }
         });
 

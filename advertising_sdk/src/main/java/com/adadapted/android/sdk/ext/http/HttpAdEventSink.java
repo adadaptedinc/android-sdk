@@ -54,9 +54,10 @@ public class HttpAdEventSink implements AdEventSink {
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", mBatchUrl);
                 AppErrorTrackingManager.registerEvent(
-                        "AD_EVENT_TRACK_REQUEST_FAILED",
-                        error.getMessage(),
-                        params);
+                    "AD_EVENT_TRACK_REQUEST_FAILED",
+                    error.getMessage(),
+                    params
+                );
             }
 
         });

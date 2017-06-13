@@ -29,7 +29,7 @@ public class AdEventTracker {
                            final Ad ad,
                            final String eventType,
                            final String eventName) {
-        JSONObject adEvent = builder.build(session, ad, eventType, eventName);
+        final JSONObject adEvent = builder.build(session, ad, eventType, eventName);
         if(adEvent != null) {
             currentEvents.add(adEvent);
         }

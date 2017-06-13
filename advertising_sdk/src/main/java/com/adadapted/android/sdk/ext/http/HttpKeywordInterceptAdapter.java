@@ -59,9 +59,10 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", endpoint);
                 AppErrorTrackingManager.registerEvent(
-                        "KI_SESSION_REQUEST_FAILED",
-                        error.getMessage(),
-                        params);
+                    "KI_SESSION_REQUEST_FAILED",
+                    error.getMessage(),
+                    params
+                );
 
                 callback.onFailure();
             }

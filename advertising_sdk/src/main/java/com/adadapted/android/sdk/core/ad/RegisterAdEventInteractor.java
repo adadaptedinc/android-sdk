@@ -19,9 +19,10 @@ public class RegisterAdEventInteractor implements Interactor {
     @Override
     public void execute() {
         tracker.trackEvent(
-                command.getSession(),
-                command.getAd(),
-                command.getEventType(),
-                command.getEventName());
+            command.getSession(),
+            command.getAd(),
+            command.getEventType(),
+            command.getEventName()
+        );
     }
 }

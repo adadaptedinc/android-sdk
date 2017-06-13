@@ -19,9 +19,6 @@ public class RegisterAppEventInteractor implements Interactor {
 
     @Override
     public void execute() {
-        tracker.trackEvent(
-                command.getEventSource(),
-                command.getEventName(),
-                command.getEventParams());
+        tracker.trackEvent(command.getEventSource(), command.getEventName(), command.getEventParams());
     }
 }

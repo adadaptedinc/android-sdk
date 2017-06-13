@@ -58,8 +58,7 @@ class AaZoneViewController
         void onZoneEmpty();
     }
 
-    AaZoneViewController(final Context context,
-                         final AaZoneViewProperties zoneProperties) {
+    AaZoneViewController(final Context context, final AaZoneViewProperties zoneProperties) {
         mContext = context.getApplicationContext();
         mZoneProperties = zoneProperties;
 
@@ -74,11 +73,11 @@ class AaZoneViewController
 
                 final Map<String, String> params = new HashMap<>();
                 params.put("error", error.toString());
-
                 AppErrorTrackingManager.registerEvent(
-                        "TRACKING_PIXEL_LOAD_ERROR",
-                        "Problem loading tracking pixel for Ad: " + mCurrentAd.getAdId(),
-                        params);
+                    "TRACKING_PIXEL_LOAD_ERROR",
+                    "Problem loading tracking pixel for Ad: " + mCurrentAd.getAdId(),
+                    params
+                );
             }
         });
 

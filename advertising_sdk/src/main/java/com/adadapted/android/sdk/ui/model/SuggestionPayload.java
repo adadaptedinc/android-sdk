@@ -21,13 +21,13 @@ public class SuggestionPayload {
         return mSuggestions;
     }
 
-    public void presented(String term) {
+    public void presented(final String term) {
         if(mSuggestionTracker != null) {
             mSuggestionTracker.suggestionPresented(term);
         }
     }
 
-    public void selected(String term) {
+    public void selected(final String term) {
         if(mSuggestionTracker != null) {
             mSuggestionTracker.suggestionSelected(term);
         }
