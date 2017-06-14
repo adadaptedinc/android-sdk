@@ -120,19 +120,19 @@ public class Ad implements Serializable {
             return adId;
         }
 
-        public Builder setAdId(String adId) {
+        public Builder setAdId(final String adId) {
             this.adId = adId;
 
             return this;
         }
 
-        public Builder setZoneId(String zoneId) {
+        public Builder setZoneId(final String zoneId) {
             this.zoneId = zoneId;
 
             return this;
         }
 
-        public Builder setBaseImpressionId(String baseImpressionId) {
+        public Builder setBaseImpressionId(final String baseImpressionId) {
             this.baseImpressionId = baseImpressionId;
 
             return this;
@@ -144,7 +144,7 @@ public class Ad implements Serializable {
             return this;
         }
 
-        public Builder setTrackingHtml(String trackingHtml) {
+        public Builder setTrackingHtml(final String trackingHtml) {
             this.trackingHtml = trackingHtml;
 
             return this;
@@ -156,13 +156,13 @@ public class Ad implements Serializable {
             return this;
         }
 
-        public Builder setAdType(AdType adType) {
+        public Builder setAdType(final AdType adType) {
             this.adType = adType;
 
             return this;
         }
 
-        public Builder setAdAction(AdAction adAction) {
+        public Builder setAdAction(final AdAction adAction) {
             this.adAction = adAction;
 
             return this;
