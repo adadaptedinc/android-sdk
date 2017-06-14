@@ -69,12 +69,13 @@ public class AaZoneView extends RelativeLayout
         init(zoneId, 0);
     }
 
+    @Deprecated
     public void init(final String zoneId,
                      final int layoutResourceId) {
         final ColorDrawable mBackgroundColor = (ColorDrawable) getBackground();
         final int color = (mBackgroundColor != null) ?mBackgroundColor.getColor() : Color.WHITE;
 
-        mZoneProperties = new AaZoneViewProperties(zoneId, layoutResourceId, color);
+        mZoneProperties = new AaZoneViewProperties(zoneId, color);
 
         setGravity(Gravity.CENTER);
     }

@@ -28,7 +28,6 @@ class AaZoneViewControllerFactory {
         final String zoneId = (zoneProperties == null) ? "" : zoneProperties.getZoneId();
 
         if(!sInstance.mZoneControllers.containsKey(zoneId)) {
-            //Log.d(LOGTAG, String.format("No controller found for Zone: %s. Creating one.", zoneId));
             final AaZoneViewController controller = new AaZoneViewController(context.getApplicationContext(), zoneProperties);
             sInstance.mZoneControllers.put(zoneId, controller);
         }
