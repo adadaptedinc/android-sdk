@@ -5,14 +5,12 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.ad.AdBuilder;
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.ad.model.AdAction;
-import com.adadapted.android.sdk.core.ad.model.AdComponent;
 import com.adadapted.android.sdk.core.ad.model.AdImage;
 import com.adadapted.android.sdk.core.ad.model.AdType;
 import com.adadapted.android.sdk.core.ad.model.ContentAdAction;
 import com.adadapted.android.sdk.core.ad.model.DelegateAdAction;
 import com.adadapted.android.sdk.core.ad.model.HtmlAdType;
 import com.adadapted.android.sdk.core.ad.model.ImageAdType;
-import com.adadapted.android.sdk.core.ad.model.JsonAdType;
 import com.adadapted.android.sdk.core.ad.model.LinkAdAction;
 import com.adadapted.android.sdk.core.ad.model.NullAdAction;
 import com.adadapted.android.sdk.core.ad.model.NullAdType;
@@ -171,11 +169,6 @@ public class JsonAdBuilder implements AdBuilder {
         else if(adTypeCode.equalsIgnoreCase(AdType.IMAGE)) {
             return parseImageAd(jsonAd);
         }
-        /*
-        else if(adTypeCode.equalsIgnoreCase(AdType.JSON)) {
-            return parseJsonAd(jsonAd);
-        }
-        */
 
         Log.w(LOGTAG, "Unsupported Ad Type: " + adTypeCode);
 
@@ -196,35 +189,6 @@ public class JsonAdBuilder implements AdBuilder {
 
         return adType;
     }
-
-    /*
-    private JsonAdType parseJsonAd(JSONObject jsonAd) throws JSONException {
-        final JSONObject jsonComponents = jsonAd.getJSONObject(JsonFields.JSON);
-        final AdComponent adComponents = parseJsonAdComponents(jsonComponents);
-
-        final JsonAdType adType = new JsonAdType();
-        adType.setComponents(adComponents);
-
-        return adType;
-    }
-
-    private AdComponent parseJsonAdComponents(final JSONObject json) throws JSONException {
-        final AdComponent adComponents = new AdComponent();
-        adComponents.setCta1(json.getString(JsonFields.JSON_AD_CTA_1));
-        adComponents.setCta2(json.getString(JsonFields.JSON_AD_CTA_2));
-        adComponents.setCampaignImage(json.getString(JsonFields.JSON_AD_CAMPAIGN_IMG));
-        adComponents.setSponsorLogo(json.getString(JsonFields.JSON_AD_SPONSOR_LOGO));
-        adComponents.setSponsorName(json.getString(JsonFields.JSON_AD_SPONSOR_NAME));
-        adComponents.setTitle(json.getString(JsonFields.JSON_AD_TITLE));
-        adComponents.setTagLine(json.getString(JsonFields.JSON_AD_TAGLINE));
-        adComponents.setLongText(json.getString(JsonFields.JSON_AD_TEXT_LONG));
-        adComponents.setSponsorText(json.getString(JsonFields.JSON_AD_SPONSOR_TEXT));
-        adComponents.setAppIcon1(json.getString(JsonFields.JSON_AD_APP_ICON_1));
-        adComponents.setAppIcon2(json.getString(JsonFields.JSON_AD_APP_ICON_2));
-
-        return adComponents;
-    }
-    */
 
     private Map<String, AdImage> parseImages(final JSONObject jsonImages) throws JSONException {
         final Map<String, AdImage> images = new HashMap<>();
