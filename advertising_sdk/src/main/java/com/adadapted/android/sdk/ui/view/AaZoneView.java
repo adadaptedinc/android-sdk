@@ -66,22 +66,27 @@ public class AaZoneView extends RelativeLayout
     }
 
     public void init(final String zoneId) {
-        init(zoneId, 0);
-    }
-
-    @Deprecated
-    public void init(final String zoneId,
-                     final int layoutResourceId) {
         final ColorDrawable mBackgroundColor = (ColorDrawable) getBackground();
-        final int color = (mBackgroundColor != null) ?mBackgroundColor.getColor() : Color.WHITE;
+        final int color = (mBackgroundColor != null) ? mBackgroundColor.getColor() : Color.WHITE;
 
         mZoneProperties = new AaZoneViewProperties(zoneId, color);
 
         setGravity(Gravity.CENTER);
     }
 
+    @Deprecated
+    public void init(final String zoneId,
+                     final int layoutResourceId) {
+        init(zoneId);
+    }
+
     public void shutdown() {
-        this.setVisibility(View.GONE);
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                AaZoneView.this.setVisibility(View.GONE);
+            }
+        });
     }
 
     protected void displayAdView(final View view) {
@@ -103,7 +108,7 @@ public class AaZoneView extends RelativeLayout
 
     @Override
     public void onViewReadyForDisplay(final View view) {
-        if(view == null) { return; }
+        if(view == null || !mVisible) { return; }
 
         if(view instanceof WebView) {
             view.setOnTouchListener(new OnTouchListener() {
@@ -128,12 +133,10 @@ public class AaZoneView extends RelativeLayout
             });
         }
 
-        if(mVisible) {
-            displayAdView(view);
+        displayAdView(view);
 
-            if(mViewController != null) {
-                mViewController.acknowledgeDisplay();
-            }
+        if(mViewController != null) {
+            mViewController.acknowledgeDisplay();
         }
     }
 
@@ -159,8 +162,6 @@ public class AaZoneView extends RelativeLayout
         if(mListener != null) {
             mListener.onAdLoadFailed();
         }
-
-        //shutdown();
     }
 
     public void onStart() {
@@ -203,9 +204,7 @@ public class AaZoneView extends RelativeLayout
             mViewController.removeListener();
         }
 
-        if(mListener != null) {
-            mListener = null;
-        }
+        mListener = null;
     }
 
     public void onStop(final AaSdkContentListener listener) {
