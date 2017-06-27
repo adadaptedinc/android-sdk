@@ -70,7 +70,6 @@ public class CollectDeviceInfoInteractor implements Interactor {
 
         deviceInfo.setDevice(Build.MANUFACTURER + " " + Build.MODEL);
         deviceInfo.setDeviceUdid(captureAndroidId(context));
-        //deviceInfo.setOs("Android");
         deviceInfo.setOsv(Integer.toString(Build.VERSION.SDK_INT));
 
         deviceInfo.setTimezone(TimeZone.getDefault().getID());
