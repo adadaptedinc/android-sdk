@@ -1,8 +1,6 @@
 package com.adadapted.android.sdk.core.addit.payload;
 
-import com.adadapted.android.sdk.core.common.Command;
-
-public class TrackPayloadDeliveryCommand extends Command {
+public class TrackPayloadDeliveryCommand {
     private final String payloadId;
     private final String result;
 

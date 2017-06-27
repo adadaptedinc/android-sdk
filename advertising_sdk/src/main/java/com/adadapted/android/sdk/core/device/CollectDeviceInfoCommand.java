@@ -2,11 +2,9 @@ package com.adadapted.android.sdk.core.device;
 
 import android.content.Context;
 
-import com.adadapted.android.sdk.core.common.Command;
-
 import java.util.Map;
 
-public class CollectDeviceInfoCommand extends Command {
+public class CollectDeviceInfoCommand {
     private final Context context;
     private final String appId;
     private final boolean isProd;

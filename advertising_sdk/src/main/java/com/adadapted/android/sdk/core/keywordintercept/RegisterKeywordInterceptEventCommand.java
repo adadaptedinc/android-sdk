@@ -1,9 +1,8 @@
 package com.adadapted.android.sdk.core.keywordintercept;
 
-import com.adadapted.android.sdk.core.common.Command;
 import com.adadapted.android.sdk.core.session.model.Session;
 
-public class RegisterKeywordInterceptEventCommand extends Command {
+public class RegisterKeywordInterceptEventCommand {
     private final Session session;
     private final String searchId;
     private final String term;

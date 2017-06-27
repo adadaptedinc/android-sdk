@@ -1,9 +1,8 @@
 package com.adadapted.android.sdk.core.ad;
 
-import com.adadapted.android.sdk.core.common.Command;
 import com.adadapted.android.sdk.core.session.model.Session;
 
-public class RefreshAdsCommand extends Command {
+public class RefreshAdsCommand {
     private final Session session;
 
     public RefreshAdsCommand(final Session session) {

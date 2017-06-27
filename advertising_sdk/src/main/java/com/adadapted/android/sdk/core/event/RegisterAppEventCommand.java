@@ -1,10 +1,8 @@
 package com.adadapted.android.sdk.core.event;
 
-import com.adadapted.android.sdk.core.common.Command;
-
 import java.util.Map;
 
-public class RegisterAppEventCommand extends Command {
+public class RegisterAppEventCommand {
     private final String eventSource;
     private final String eventName;
     private final Map<String, String> eventParams;

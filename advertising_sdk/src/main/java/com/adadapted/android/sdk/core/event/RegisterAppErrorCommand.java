@@ -1,10 +1,8 @@
 package com.adadapted.android.sdk.core.event;
 
-import com.adadapted.android.sdk.core.common.Command;
-
 import java.util.Map;
 
-public class RegisterAppErrorCommand extends Command {
+public class RegisterAppErrorCommand {
     private final String errorCode;
     private final String errorMessage;
     private final Map<String, String> errorParams;
