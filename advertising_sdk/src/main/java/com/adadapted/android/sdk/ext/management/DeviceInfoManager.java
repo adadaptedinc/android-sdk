@@ -49,8 +49,7 @@ public class DeviceInfoManager implements CollectDeviceInfoInteractor.Callback {
                     context.getApplicationContext(),
                     appId,
                     isProd,
-                    params,
-                    Config.SDK_VERSION),
+                    params),
             this
         );
 

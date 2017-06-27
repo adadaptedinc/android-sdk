@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.core.device;
 
+import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.ad.model.ImageAdType;
 
 import java.util.Map;
@@ -26,6 +27,11 @@ public class DeviceInfo {
     private boolean allowRetargeting;
     private String sdkVersion;
     private Map<String, String> params;
+
+    public DeviceInfo() {
+        this.os = "Android";
+        this.sdkVersion = Config.SDK_VERSION;
+    }
 
     public String getAppId() {
         return appId;

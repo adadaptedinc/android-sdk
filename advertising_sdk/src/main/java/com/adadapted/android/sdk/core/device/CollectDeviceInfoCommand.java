@@ -9,18 +9,15 @@ public class CollectDeviceInfoCommand {
     private final String appId;
     private final boolean isProd;
     private final Map<String, String> params;
-    private final String sdkVersion;
 
     public CollectDeviceInfoCommand(final Context context,
                                     final String appId,
                                     final boolean isProd,
-                                    final Map<String, String> params,
-                                    final String sdkVersion) {
+                                    final Map<String, String> params) {
         this.context = context;
         this.appId = appId;
         this.isProd = isProd;
         this.params = params;
-        this.sdkVersion = sdkVersion;
     }
 
     public Context getContext() {
@@ -37,9 +34,5 @@ public class CollectDeviceInfoCommand {
 
     public Map<String, String> getParams() {
         return params;
-    }
-
-    public String getSdkVersion() {
-        return sdkVersion;
     }
 }

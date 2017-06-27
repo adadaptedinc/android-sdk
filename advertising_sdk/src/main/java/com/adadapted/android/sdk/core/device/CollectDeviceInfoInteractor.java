@@ -38,6 +38,7 @@ public class CollectDeviceInfoInteractor implements Interactor {
 
         deviceInfo.setAppId(command.getAppId());
         deviceInfo.setProd(command.isProd());
+        deviceInfo.setParams(command.getParams());
 
         try {
             Class.forName("com.google.android.gms.ads.identifier.AdvertisingIdClient");
@@ -69,7 +70,7 @@ public class CollectDeviceInfoInteractor implements Interactor {
 
         deviceInfo.setDevice(Build.MANUFACTURER + " " + Build.MODEL);
         deviceInfo.setDeviceUdid(captureAndroidId(context));
-        deviceInfo.setOs("Android");
+        //deviceInfo.setOs("Android");
         deviceInfo.setOsv(Integer.toString(Build.VERSION.SDK_INT));
 
         deviceInfo.setTimezone(TimeZone.getDefault().getID());
@@ -87,10 +88,9 @@ public class CollectDeviceInfoInteractor implements Interactor {
             deviceInfo.setDensity(determineScreenDensity(metrics));
         }
 
-        deviceInfo.setSdkVersion(command.getSdkVersion());
-        deviceInfo.setParams(command.getParams());
-
-        callback.onDeviceInfoCollected(deviceInfo);
+        if(callback != null) {
+            callback.onDeviceInfoCollected(deviceInfo);
+        }
     }
 
     private AdvertisingIdClient.Info getAdvertisingIdClientInfo(final Context context) {
