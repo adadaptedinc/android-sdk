@@ -9,9 +9,6 @@ import com.adadapted.android.sdk.ui.messaging.AaSdkContentListener;
 import com.adadapted.android.sdk.ui.messaging.SdkContentPublisher;
 import com.adadapted.android.sdk.ui.view.AaZoneView;
 
-/**
- * Created by chrisweeden on 5/27/15
- */
 public class AaFeedAdapter extends BaseAdapter {
     private static final String LOGTAG = AaFeedAdapter.class.getName();
 

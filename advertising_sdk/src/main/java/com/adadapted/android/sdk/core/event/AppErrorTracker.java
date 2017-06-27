@@ -8,10 +8,6 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 9/29/16.
- */
-
 public class AppErrorTracker {
     private static final String LOGTAG = AppErrorTracker.class.getName();
 

@@ -4,10 +4,6 @@ import com.adadapted.android.sdk.core.common.Command;
 
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 9/26/16.
- */
-
 public class RegisterAppEventCommand extends Command {
     private final String eventSource;
     private final String eventName;

@@ -3,9 +3,6 @@ package com.adadapted.android.sdk.core.ad.model;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 4/15/15.
- */
 public class ImageAdType extends AdType {
     private Map<String, AdImage> images;
 

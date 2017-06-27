@@ -2,9 +2,6 @@ package com.adadapted.android.sdk.core.keywordintercept.model;
 
 import java.util.Date;
 
-/**
- * Created by chrisweeden on 6/29/15.
- */
 public class KeywordInterceptEvent {
     public static final String MATCHED  = "matched";
     public static final String PRESENTED  = "presented";
@@ -80,20 +77,5 @@ public class KeywordInterceptEvent {
                 event.equals(e.getEvent()) &&
                 term.equals(e.getTerm()) &&
                 userInput.contains(e.getUserInput());
-    }
-
-    @Override
-    public String toString() {
-        return "KeywordInterceptEvent{" +
-                "appId='" + appId + '\'' +
-                ", sessionId='" + sessionId + '\'' +
-                ", udid='" + udid + '\'' +
-                ", searchId='" + searchId + '\'' +
-                ", datetime=" + datetime +
-                ", event='" + event + '\'' +
-                ", userInput='" + userInput + '\'' +
-                ", term='" + term + '\'' +
-                ", sdkVersion='" + sdkVersion + '\'' +
-                '}';
     }
 }

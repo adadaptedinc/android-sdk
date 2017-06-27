@@ -12,9 +12,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 
-/**
- * Created by chrisweeden on 3/30/15.
- */
 public class HttpAdImageLoader implements AdImageLoader {
     private static final String LOGTAG = HttpAdImageLoader.class.getName();
 

@@ -11,9 +11,6 @@ import com.adadapted.android.sdk.ui.messaging.SdkContentPublisher;
 import com.adadapted.android.sdk.ui.model.AdContentPayload;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
-/**
- * Created by chrisweeden on 7/1/15
- */
 class AdActionHandler {
     private static final String LOGTAG = AdActionHandler.class.getName();
 

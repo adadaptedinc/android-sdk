@@ -19,9 +19,6 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Created by chrisweeden on 9/30/16.
- */
 public class KeywordInterceptEventTrackingManager implements SessionManager.Callback {
     private static KeywordInterceptEventTrackingManager sInstance;
 

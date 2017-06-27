@@ -18,9 +18,6 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Created by chrisweeden on 9/26/16.
- */
 public class AppEventTrackingManager implements SessionManager.Callback {
     private static AppEventTrackingManager sInstance;
 

@@ -11,9 +11,6 @@ import org.json.JSONObject;
 
 import java.util.Date;
 
-/**
- * Created by chrisweeden on 6/23/15.
- */
 public class JsonKeywordInterceptRequestBuilder implements KeywordInterceptRequestBuilder {
     private static final String TAG = JsonKeywordInterceptRequestBuilder.class.getName();
 

@@ -1,8 +1,5 @@
 package com.adadapted.android.sdk.core.ad.model;
 
-/**
- * Created by chrisweeden on 4/9/15.
- */
 public class PopupAdAction extends AdAction {
     private String  title = "Unknown";
     private String  backgroundColor = "Unknown";

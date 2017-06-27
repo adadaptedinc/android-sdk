@@ -7,9 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 3/23/15.
- */
 public class Session {
     private final DeviceInfo deviceInfo;
     private final String sessionId;

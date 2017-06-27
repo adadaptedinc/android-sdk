@@ -17,9 +17,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 6/29/15.
- */
 public class JsonZoneBuilder implements ZoneBuilder {
     private static final String LOGTAG = JsonZoneBuilder.class.getName();
 

@@ -8,9 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 3/26/15.
- */
 public class Zone {
     private static final String TAG = Zone.class.getName();
 

@@ -17,9 +17,6 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Created by chrisweeden on 9/29/16.
- */
 public class AppErrorTrackingManager implements DeviceInfoManager.Callback {
     private static AppErrorTrackingManager sInstance;
 

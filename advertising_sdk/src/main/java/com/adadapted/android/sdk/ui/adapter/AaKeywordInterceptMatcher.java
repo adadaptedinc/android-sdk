@@ -10,9 +10,6 @@ import com.adadapted.android.sdk.ui.model.SuggestionPayload;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by chrisweeden on 6/25/15
- */
 public class AaKeywordInterceptMatcher implements SessionManager.Callback, KeywordInterceptManager.Callback {
     private static final String LOGTAG = AaKeywordInterceptMatcher.class.getName();
 

@@ -17,9 +17,6 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 4/1/15.
- */
 public class HttpAdRefreshAdapter implements AdRefreshAdapter {
     private static final String LOGTAG = HttpAdRefreshAdapter.class.getName();
 

@@ -3,9 +3,6 @@ package com.adadapted.android.sdk.core.addit;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * Created by chrisweeden on 10/27/16.
- */
 public final class AddToListItem implements Parcelable {
     public static final Creator<AddToListItem> CREATOR = new Creator<AddToListItem>() {
         @Override

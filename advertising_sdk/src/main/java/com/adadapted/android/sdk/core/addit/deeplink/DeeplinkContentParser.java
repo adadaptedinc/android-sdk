@@ -20,9 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 10/26/16.
- */
 public class DeeplinkContentParser {
     private static final String LOGTAG = DeeplinkContentParser.class.getName();
 

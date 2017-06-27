@@ -15,9 +15,6 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Created by chrisweeden on 9/26/16.
- */
 public class DeviceInfoManager implements CollectDeviceInfoInteractor.Callback {
     private static final String LOGTAG = DeviceInfoManager.class.getName();
 

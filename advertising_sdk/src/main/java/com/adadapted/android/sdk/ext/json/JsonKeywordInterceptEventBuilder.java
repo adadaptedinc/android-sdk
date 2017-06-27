@@ -11,9 +11,6 @@ import org.json.JSONObject;
 
 import java.util.Set;
 
-/**
- * Created by chrisweeden on 10/3/16.
- */
 public class JsonKeywordInterceptEventBuilder implements KeywordInterceptEventBuilder {
     private static final String LOGTAG = JSONException.class.getName();
 

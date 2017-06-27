@@ -7,9 +7,6 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 9/29/16.
- */
 public class RefreshAdsInteractor implements Interactor {
     private final RefreshAdsCommand command;
     private final AdRefreshAdapter adapter;

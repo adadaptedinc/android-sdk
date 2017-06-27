@@ -10,9 +10,6 @@ import org.json.JSONObject;
 
 import java.util.Date;
 
-/**
- * Created by chrisweeden on 2/10/17.
- */
 public class PayloadEventTracker {
     private final static String LOGTAG = PayloadEventTracker.class.getName();
 

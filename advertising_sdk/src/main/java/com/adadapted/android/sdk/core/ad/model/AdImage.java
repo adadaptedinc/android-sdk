@@ -4,9 +4,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 3/30/15.
- */
 public class AdImage implements Serializable {
     private static final long serialVersionUID = 42L;
 

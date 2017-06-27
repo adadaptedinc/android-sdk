@@ -13,9 +13,6 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 8/19/15.
- */
 public class JsonAdRefreshBuilder implements AdRefreshBuilder {
     private static final String LOGTAG = JsonAdRefreshBuilder.class.getName();
 

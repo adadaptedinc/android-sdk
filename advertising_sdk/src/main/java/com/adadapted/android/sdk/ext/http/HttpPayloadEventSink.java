@@ -17,9 +17,6 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 2/9/17.
- */
 public class HttpPayloadEventSink implements PayloadEventSink {
     private static final String LOGTAG = HttpPayloadEventSink.class.getName();
 

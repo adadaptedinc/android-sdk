@@ -12,9 +12,6 @@ import org.json.JSONObject;
 import java.util.Date;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 9/16/16.
- */
 public class JsonAppEventBuilder implements AppEventBuilder {
     private static final String LOGTAG = JsonAppEventBuilder.class.getName();
 

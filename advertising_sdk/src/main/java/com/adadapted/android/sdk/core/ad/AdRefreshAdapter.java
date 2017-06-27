@@ -7,9 +7,6 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 4/1/15.
- */
 public interface AdRefreshAdapter {
     void getAds(JSONObject json, Callback callback);
 

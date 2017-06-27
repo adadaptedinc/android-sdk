@@ -12,9 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Created by chrisweeden on 6/18/15
- */
 public class AaAutoCompleteAdapter extends ArrayAdapter<String> {
     private static final String LOGTAG = AaAutoCompleteAdapter.class.getName();
 

@@ -2,10 +2,6 @@ package com.adadapted.android.sdk.core.keywordintercept;
 
 import com.adadapted.android.sdk.core.common.Interactor;
 
-/**
- * Created by chrisweeden on 9/29/16.
- */
-
 public class RegisterKeywordInterceptEventInteractor implements Interactor {
     private final RegisterKeywordInterceptEventCommand command;
     private final KeywordInterceptEventTracker tracker;

@@ -14,9 +14,6 @@ import org.json.JSONObject;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by chrisweeden on 2/9/17.
- */
 public class PickupPayloadInteractor implements Interactor {
     private static final String LOGTAG = PickupPayloadInteractor.class.getName();
 

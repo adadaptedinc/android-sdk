@@ -18,9 +18,6 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Created by chrisweeden on 6/23/15.
- */
 public class KeywordInterceptManager
         implements DeviceInfoManager.Callback,
         SessionManager.Callback,

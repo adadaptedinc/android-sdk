@@ -10,9 +10,6 @@ import org.json.JSONObject;
 
 import java.util.Date;
 
-/**
- * Created by chrisweeden on 4/28/15.
- */
 public class JsonSessionRequestBuilder implements SessionRequestBuilder {
     private static final String LOGTAG = JsonSessionRequestBuilder.class.getName();
 

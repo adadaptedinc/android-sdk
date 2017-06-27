@@ -3,10 +3,6 @@ package com.adadapted.android.sdk.core.event;
 
 import com.adadapted.android.sdk.core.common.Interactor;
 
-/**
- * Created by chrisweeden on 9/29/16.
- */
-
 public class RegisterAppErrorInteractor implements Interactor {
     private final RegisterAppErrorCommand command;
     private final AppErrorTracker tracker;

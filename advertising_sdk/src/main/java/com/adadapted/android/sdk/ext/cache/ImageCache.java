@@ -5,9 +5,6 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.support.v4.util.LruCache;
 
-/**
- * Created by chrisweeden on 3/23/15.
- */
 public class ImageCache {
     private static final String LOGTAG = ImageCache.class.getName();
 

@@ -5,9 +5,6 @@ import com.adadapted.android.sdk.core.ad.model.Ad;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/**
- * Created by chrisweeden on 3/23/15.
- */
 public class AdZoneRefreshScheduler extends Timer {
     private static final String LOGTAG = AdZoneRefreshScheduler.class.getName();
 

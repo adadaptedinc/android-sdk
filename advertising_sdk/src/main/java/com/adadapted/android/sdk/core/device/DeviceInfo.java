@@ -4,10 +4,6 @@ import com.adadapted.android.sdk.core.ad.model.ImageAdType;
 
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 9/26/16.
- */
-
 public class DeviceInfo {
     static final String UNKNOWN_VALUE = "Unknown";
 

@@ -8,9 +8,6 @@ import org.json.JSONArray;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by chrisweeden on 9/30/16.
- */
 public class KeywordInterceptEventTracker {
     private final KeywordInterceptEventSink sink;
     private final KeywordInterceptEventBuilder builder;

@@ -1,8 +1,5 @@
 package com.adadapted.android.sdk.core.keywordintercept.model;
 
-/**
- * Created by chrisweeden on 7/16/15.
- */
 public class AutoFill {
     private final String replacement;
     private final String icon;
@@ -26,14 +23,5 @@ public class AutoFill {
 
     public String getTagLine() {
         return tagLine;
-    }
-
-    @Override
-    public String toString() {
-        return "AutoFill{" +
-                "replacement='" + replacement + '\'' +
-                ", icon='" + icon + '\'' +
-                ", tagLine='" + tagLine + '\'' +
-                '}';
     }
 }

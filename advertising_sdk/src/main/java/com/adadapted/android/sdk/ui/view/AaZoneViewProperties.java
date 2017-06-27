@@ -1,8 +1,5 @@
 package com.adadapted.android.sdk.ui.view;
 
-/**
- * Created by chrisweeden on 4/28/16.
- */
 public class AaZoneViewProperties {
     private final String zoneId;
     private final int backgroundColor;

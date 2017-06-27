@@ -4,9 +4,6 @@ import com.adadapted.android.sdk.ui.adapter.AaSuggestionTracker;
 
 import java.util.Set;
 
-/**
- * Created by chrisweeden on 7/17/15.
- */
 public class SuggestionPayload {
     private final AaSuggestionTracker mSuggestionTracker;
     private final Set<String> mSuggestions;

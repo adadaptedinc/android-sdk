@@ -2,10 +2,6 @@ package com.adadapted.android.sdk.core.ad;
 
 import com.adadapted.android.sdk.core.common.Interactor;
 
-/**
- * Created by chrisweeden on 9/29/16.
- */
-
 public class RegisterAdEventInteractor implements Interactor {
     private final RegisterAdEventCommand command;
     private final AdEventTracker tracker;

@@ -16,9 +16,6 @@ import org.json.JSONArray;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 9/30/16.
- */
 public class HttpKeywordInterceptEventSink implements KeywordInterceptEventSink {
     private static final String LOGTAG = HttpKeywordInterceptEventSink.class.getName();
 

@@ -16,10 +16,6 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 9/26/16.
- */
-
 public class HttpAppEventSink implements AppEventSink {
     private static final String LOGTAG = HttpAppEventSink.class.getName();
 

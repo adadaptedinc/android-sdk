@@ -10,9 +10,6 @@ import com.adadapted.android.sdk.ext.management.AdEventTrackingManager;
 
 import java.util.Date;
 
-/**
- * Created by chrisweeden on 5/26/15.
- */
 public class ViewAdWrapper {
     private static final String LOGTAG = ViewAdWrapper.class.getName();
 

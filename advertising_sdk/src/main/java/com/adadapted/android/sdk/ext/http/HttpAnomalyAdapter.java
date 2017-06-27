@@ -17,9 +17,6 @@ import org.json.JSONArray;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 9/23/16.
- */
 public class HttpAnomalyAdapter implements AnomalyAdapter {
     private static final String LOGTAG = HttpAnomalyAdapter.class.getName();
 

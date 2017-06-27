@@ -7,9 +7,6 @@ import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.ext.management.AdEventTrackingManager;
 import com.adadapted.android.sdk.ext.management.KeywordInterceptEventTrackingManager;
 
-/**
- * Created by chrisweeden on 7/16/15.
- */
 public class EventFlushScheduler {
     private static final String LOGTAG = EventFlushScheduler.class.getName();
 

@@ -19,9 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 2/9/17.
- */
 public class HttpPayloadAdapter implements PayloadAdapter {
     private static final String LOGTAG = HttpPayloadAdapter.class.getName();
 

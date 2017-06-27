@@ -2,10 +2,6 @@ package com.adadapted.android.sdk.core.anomaly;
 
 import com.adadapted.android.sdk.core.common.Interactor;
 
-/**
- * Created by chrisweeden on 9/29/16.
- */
-
 public class RegisterAdAnomalyInteractor implements Interactor {
     private final RegisterAdAnomalyCommand command;
     private final AdAnomalyTracker tracker;

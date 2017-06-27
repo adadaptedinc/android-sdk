@@ -5,9 +5,6 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.common.Interactor;
 import com.adadapted.android.sdk.core.keywordintercept.model.KeywordIntercept;
 
-/**
- * Created by chrisweeden on 9/29/16.
- */
 public class InitializeKeywordInterceptInteractor implements Interactor {
     private static final String LOGTAG = InitializeKeywordInterceptInteractor.class.getName();
 

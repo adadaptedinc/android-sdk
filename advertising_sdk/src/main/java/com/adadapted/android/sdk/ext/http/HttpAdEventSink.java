@@ -16,9 +16,6 @@ import org.json.JSONArray;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 3/23/15.
- */
 public class HttpAdEventSink implements AdEventSink {
     private static final String LOGTAG = HttpAdEventSink.class.getName();
 

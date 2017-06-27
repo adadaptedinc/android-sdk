@@ -13,9 +13,6 @@ import com.adadapted.android.sdk.ui.messaging.AdditContentPublisher;
 
 import java.util.List;
 
-/**
- * Created by chrisweeden on 2/9/17.
- */
 public class PayloadPickupManager implements DeviceInfoManager.Callback, PickupPayloadInteractor.Callback {
     private static final String LOGTAG = PayloadPickupManager.class.getName();
 

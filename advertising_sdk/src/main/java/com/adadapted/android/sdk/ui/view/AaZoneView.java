@@ -19,9 +19,6 @@ import android.widget.RelativeLayout;
 import com.adadapted.android.sdk.ui.messaging.AaSdkContentListener;
 import com.adadapted.android.sdk.ui.messaging.SdkContentPublisher;
 
-/**
- * Created by chrisweeden on 3/30/15
- */
 public class AaZoneView extends RelativeLayout
         implements AdInteractionListener, AaZoneViewController.Listener {
     private static final String LOGTAG = AaZoneView.class.getName();

@@ -5,9 +5,6 @@ import com.adadapted.android.sdk.core.session.model.Session;
 
 import org.json.JSONObject;
 
-/**
- * Created by chrisweeden on 9/29/16.
- */
 public class InitializeSessionInteractor implements Interactor {
     private final InitializeSessionCommand command;
     private final SessionAdapter adapter;

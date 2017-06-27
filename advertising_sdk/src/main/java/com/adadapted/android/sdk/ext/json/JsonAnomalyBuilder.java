@@ -10,9 +10,6 @@ import org.json.JSONObject;
 
 import java.util.Date;
 
-/**
- * Created by chrisweeden on 9/23/16.
- */
 public class JsonAnomalyBuilder implements AnomalyBuilder {
     private static final String LOGTAG = JsonAnomalyBuilder.class.getName();
 

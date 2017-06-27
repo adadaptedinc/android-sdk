@@ -28,9 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 6/29/15.
- */
 public class JsonAdBuilder implements AdBuilder {
     private static final String LOGTAG = JsonAdBuilder.class.getName();
 

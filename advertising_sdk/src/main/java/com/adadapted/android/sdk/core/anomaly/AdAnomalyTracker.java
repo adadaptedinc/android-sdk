@@ -8,9 +8,6 @@ import org.json.JSONObject;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by chrisweeden on 9/23/16.
- */
 public class AdAnomalyTracker {
     private final Set<JSONObject> mQueuedEvents;
 

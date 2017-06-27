@@ -15,9 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 2/10/17.
- */
 public class PayloadContentParser {
     public List<Content> parse(JSONObject json) {
         final List<Content> content = new ArrayList<>();

@@ -12,10 +12,6 @@ import org.json.JSONObject;
 import java.util.Date;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 10/3/16.
- */
-
 public class JsonAppErrorBuilder implements AppErrorBuilder {
     private static final String LOGTAG = JsonAppErrorBuilder.class.getName();
 

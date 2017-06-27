@@ -3,9 +3,6 @@ package com.adadapted.android.sdk.core.keywordintercept;
 import com.adadapted.android.sdk.core.common.Command;
 import com.adadapted.android.sdk.core.session.model.Session;
 
-/**
- * Created by chrisweeden on 9/29/16.
- */
 public class RegisterKeywordInterceptEventCommand extends Command {
     private final Session session;
     private final String searchId;

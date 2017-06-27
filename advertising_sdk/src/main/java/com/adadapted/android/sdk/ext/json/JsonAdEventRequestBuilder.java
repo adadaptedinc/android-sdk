@@ -12,9 +12,6 @@ import org.json.JSONObject;
 
 import java.util.Date;
 
-/**
- * Created by chrisweeden on 4/28/15.
- */
 public class JsonAdEventRequestBuilder implements AdEventRequestBuilder {
     private static final String LOGTAG = JsonAdEventRequestBuilder.class.getName();
 

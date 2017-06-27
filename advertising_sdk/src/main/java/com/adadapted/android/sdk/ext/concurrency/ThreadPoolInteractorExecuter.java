@@ -15,9 +15,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by chrisweeden on 9/26/16.
- */
 public class ThreadPoolInteractorExecuter implements InteractorExecuter {
     private static final String LOGTAG = ThreadPoolInteractorExecuter.class.getName();
 

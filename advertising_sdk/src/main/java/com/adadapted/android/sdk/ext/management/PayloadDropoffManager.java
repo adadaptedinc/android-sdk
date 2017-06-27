@@ -13,9 +13,6 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Created by chrisweeden on 2/10/17.
- */
 public class PayloadDropoffManager implements DeviceInfoManager.Callback {
     private static PayloadDropoffManager sInstance;
 

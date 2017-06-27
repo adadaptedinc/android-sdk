@@ -4,10 +4,6 @@ import com.adadapted.android.sdk.core.common.Command;
 
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 9/29/16.
- */
-
 public class RegisterAppErrorCommand extends Command {
     private final String errorCode;
     private final String errorMessage;

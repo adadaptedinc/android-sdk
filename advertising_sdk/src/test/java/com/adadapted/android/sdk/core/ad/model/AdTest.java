@@ -5,9 +5,6 @@ import org.junit.Before;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by chrisweeden on 5/9/17.
- */
 public class AdTest {
     @Before
     public void setUp() throws Exception {

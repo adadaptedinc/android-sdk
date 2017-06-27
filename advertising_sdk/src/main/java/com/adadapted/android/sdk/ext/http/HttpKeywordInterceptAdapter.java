@@ -18,9 +18,6 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 6/23/15.
- */
 public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
     private static final String LOGTAG = HttpKeywordInterceptAdapter.class.getName();
 

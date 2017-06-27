@@ -5,9 +5,6 @@ import android.content.Context;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 6/25/15
- */
 class AaZoneViewControllerFactory {
     private static final String LOGTAG = AaZoneViewControllerFactory.class.getName();
 

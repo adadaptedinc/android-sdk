@@ -4,9 +4,6 @@ import com.adadapted.android.sdk.core.keywordintercept.model.KeywordIntercept;
 
 import org.json.JSONObject;
 
-/**
- * Created by chrisweeden on 6/23/15.
- */
 public interface KeywordInterceptAdapter {
     void init(JSONObject request, Callback callback);
 

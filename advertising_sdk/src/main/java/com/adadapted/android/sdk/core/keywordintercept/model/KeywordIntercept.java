@@ -2,9 +2,6 @@ package com.adadapted.android.sdk.core.keywordintercept.model;
 
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 6/23/15.
- */
 public class KeywordIntercept {
     private final String searchId;
     private final long refreshTime;

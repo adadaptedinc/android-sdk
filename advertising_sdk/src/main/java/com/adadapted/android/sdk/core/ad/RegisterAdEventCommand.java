@@ -3,10 +3,6 @@ package com.adadapted.android.sdk.core.ad;
 import com.adadapted.android.sdk.core.ad.model.Ad;
 import com.adadapted.android.sdk.core.session.model.Session;
 
-/**
- * Created by chrisweeden on 9/29/16.
- */
-
 public class RegisterAdEventCommand {
     private final Session session;
     private final Ad ad;

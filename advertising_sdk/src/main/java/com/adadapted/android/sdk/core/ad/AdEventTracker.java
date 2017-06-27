@@ -9,9 +9,6 @@ import org.json.JSONObject;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by chrisweeden on 9/29/16.
- */
 public class AdEventTracker {
     private final AdEventSink sink;
     private final AdEventRequestBuilder builder;

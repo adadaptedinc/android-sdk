@@ -11,9 +11,6 @@ import org.json.JSONObject;
 
 import java.util.Date;
 
-/**
- * Created by chrisweeden on 4/16/15.
- */
 public class JsonAdRequestBuilder implements AdRequestBuilder {
     private static final String LOGTAG = JsonAdRequestBuilder.class.getName();
 

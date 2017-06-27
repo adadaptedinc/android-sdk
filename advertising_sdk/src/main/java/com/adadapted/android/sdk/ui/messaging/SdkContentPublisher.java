@@ -5,9 +5,6 @@ import com.adadapted.android.sdk.ui.model.AdContentPayload;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by chrisweeden on 8/18/15.
- */
 public class SdkContentPublisher {
     private static SdkContentPublisher sSdkContentPublisher;
 

@@ -1,8 +1,5 @@
 package com.adadapted.android.sdk.core.event.model;
 
-/**
- * Created by chrisweeden on 8/18/15.
- */
 public class AdEvent {
     public static class Types {
         public static final String IMPRESSION = "impression";

@@ -4,9 +4,6 @@ import android.view.View;
 
 import com.adadapted.android.sdk.core.ad.model.Ad;
 
-/**
- * Created by chrisweeden on 7/7/15
- */
 interface AdViewBuildingStrategy {
     interface Listener {
         void onStrategyViewLoaded();

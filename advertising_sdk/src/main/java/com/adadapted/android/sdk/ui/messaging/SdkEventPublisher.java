@@ -3,9 +3,6 @@ package com.adadapted.android.sdk.ui.messaging;
 import com.adadapted.android.sdk.core.event.model.AdEvent;
 import com.adadapted.android.sdk.ext.management.AdEventTrackingManager;
 
-/**
- * Created by chrisweeden on 8/18/15.
- */
 public class SdkEventPublisher implements AdEventTrackingManager.Callback {
     private static final String LOGTAG = SdkEventPublisher.class.getName();
 

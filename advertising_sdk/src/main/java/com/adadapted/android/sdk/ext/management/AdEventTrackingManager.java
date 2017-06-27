@@ -19,9 +19,6 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Created by chrisweeden on 5/26/15.
- */
 public class AdEventTrackingManager implements DeviceInfoManager.Callback {
     private static final String LOGTAG = AdEventTrackingManager.class.getName();
 

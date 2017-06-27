@@ -1,9 +1,5 @@
 package com.adadapted.android.sdk.core.addit;
 
-/**
- * Created by chrisweeden on 2/14/17.
- */
-
 public class JsonFields {
     public static final String Payloads = "payloads";
 

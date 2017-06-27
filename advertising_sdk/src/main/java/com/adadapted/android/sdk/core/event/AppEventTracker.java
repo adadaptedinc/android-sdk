@@ -8,9 +8,6 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 9/26/16.
- */
 public class AppEventTracker {
     private static final String LOGTAG = AppEventTracker.class.getName();
 

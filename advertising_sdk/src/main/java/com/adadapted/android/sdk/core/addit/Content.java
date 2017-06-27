@@ -7,9 +7,6 @@ import com.adadapted.android.sdk.ext.management.ContentTrackingManager;
 
 import java.util.List;
 
-/**
- * Created by chrisweeden on 9/26/16.
- */
 public class Content implements Parcelable {
     public static final Creator<Content> CREATOR = new Creator<Content>() {
         @Override

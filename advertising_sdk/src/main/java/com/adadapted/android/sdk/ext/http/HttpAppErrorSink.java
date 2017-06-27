@@ -10,10 +10,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
 
-/**
- * Created by chrisweeden on 9/29/16.
- */
-
 public class HttpAppErrorSink implements AppErrorSink {
     private static final String LOGTAG = HttpAppErrorSink.class.getName();
 

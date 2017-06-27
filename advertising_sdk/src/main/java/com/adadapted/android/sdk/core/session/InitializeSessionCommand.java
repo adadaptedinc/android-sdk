@@ -4,10 +4,6 @@ import com.adadapted.android.sdk.core.device.DeviceInfo;
 
 import org.json.JSONObject;
 
-/**
- * Created by chrisweeden on 9/29/16.
- */
-
 public class InitializeSessionCommand {
     private final DeviceInfo deviceInfo;
     private final SessionRequestBuilder builder;

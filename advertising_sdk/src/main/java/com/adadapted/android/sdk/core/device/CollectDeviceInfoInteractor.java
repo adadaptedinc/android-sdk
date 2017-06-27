@@ -21,10 +21,6 @@ import java.util.TimeZone;
 
 import static com.google.ads.AdRequest.LOGTAG;
 
-/**
- * Created by chrisweeden on 9/26/16.
- */
-
 public class CollectDeviceInfoInteractor implements Interactor {
     private final CollectDeviceInfoCommand command;
     private final Callback callback;

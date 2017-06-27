@@ -22,9 +22,6 @@ import com.adadapted.android.sdk.ui.messaging.SdkEventPublisher;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- *
- */
 public class AdAdapted {
     private static final String LOGTAG = AdAdapted.class.getName();
 

@@ -26,9 +26,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by chrisweeden on 7/1/15
- */
 class AaZoneViewController
         implements SessionManager.Callback,
         AdZoneRefreshScheduler.Listener,

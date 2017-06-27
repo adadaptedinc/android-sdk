@@ -6,10 +6,6 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 10/3/16.
- */
-
 public interface AppErrorBuilder {
     JSONObject buildWrapper(DeviceInfo deviceInfo);
     JSONObject buildItem(JSONObject errorWrapper,

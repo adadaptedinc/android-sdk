@@ -15,9 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 6/5/15.
- */
 public class AdContentPayload implements ContentPayload {
     private static final String LOGTAG = AdContentPayload.class.getName();
 

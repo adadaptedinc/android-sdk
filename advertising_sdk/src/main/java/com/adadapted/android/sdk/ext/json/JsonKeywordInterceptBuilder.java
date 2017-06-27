@@ -14,9 +14,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 6/25/15.
- */
 public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
     private static final String TAG = JsonKeywordInterceptBuilder.class.getName();
 

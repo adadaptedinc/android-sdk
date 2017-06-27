@@ -8,9 +8,6 @@ import com.adadapted.android.sdk.ext.management.SessionManager;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/**
- * Created by chrisweeden on 4/15/15.
- */
 public class AdRefreshScheduler extends Timer {
     private static final String LOGTAG = AdRefreshScheduler.class.getName();
 

@@ -2,9 +2,6 @@ package com.adadapted.android.sdk.core.addit.payload;
 
 import com.adadapted.android.sdk.core.common.Interactor;
 
-/**
- * Created by chrisweeden on 2/9/17.
- */
 public class TrackPayloadDeliveryInteractor implements Interactor {
     private final TrackPayloadDeliveryCommand command;
     private final PayloadEventTracker tracker;

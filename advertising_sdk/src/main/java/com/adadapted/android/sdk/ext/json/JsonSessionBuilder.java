@@ -15,9 +15,6 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 6/5/15.
- */
 public class JsonSessionBuilder implements SessionBuilder {
     private static final String LOGTAG = JsonSessionBuilder.class.getName();
 

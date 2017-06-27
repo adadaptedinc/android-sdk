@@ -2,10 +2,6 @@ package com.adadapted.android.sdk.core.anomaly;
 
 import com.adadapted.android.sdk.core.session.model.Session;
 
-/**
- * Created by chrisweeden on 9/29/16.
- */
-
 public class RegisterAdAnomalyCommand {
     private final Session mSession;
     private final String adId;

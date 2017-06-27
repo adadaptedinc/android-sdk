@@ -8,10 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 3/3/17.
- */
-
 public class ContentTrackingManager {
     public static synchronized void markContentAcknowledged(final Content content) {
         final List<AddToListItem> payload = content.getPayload();

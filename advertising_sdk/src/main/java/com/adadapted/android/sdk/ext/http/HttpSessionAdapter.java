@@ -18,9 +18,6 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 3/23/15.
- */
 public class HttpSessionAdapter implements SessionAdapter {
     private static final String LOGTAG = HttpSessionAdapter.class.getName();
 
