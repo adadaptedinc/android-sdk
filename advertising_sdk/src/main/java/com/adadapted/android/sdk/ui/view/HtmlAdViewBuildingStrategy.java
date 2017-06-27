@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.ui.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
@@ -20,7 +21,8 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
     private Listener mListener;
     private WebView mWebView;
 
-    public HtmlAdViewBuildingStrategy(final Context context) {
+    @SuppressLint("SetJavaScriptEnabled")
+    HtmlAdViewBuildingStrategy(final Context context) {
         try {
             mWebView = new WebView(context.getApplicationContext());
             mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -37,6 +39,7 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
                     return true;
                 }
             });
+            mWebView.getSettings().setJavaScriptEnabled(true);
         }
         catch(Throwable ex) {
             Log.e(LOGTAG, "Problem initializing HTML Ad WebView");
@@ -94,10 +97,5 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
         final String dummyDocument = "<html><head><meta name=\"viewport\" content=\"width=device-width, user-scalable=no\" /><style>body{background-color:"+hexColor+";width:100px;height100px;}</style></head><body></body></html>";
 
         mWebView.loadData(dummyDocument, "text/html", null);
-    }
-
-    @Override
-    public String toString() {
-        return "HtmlAdViewBuildingStrategy{}";
     }
 }
