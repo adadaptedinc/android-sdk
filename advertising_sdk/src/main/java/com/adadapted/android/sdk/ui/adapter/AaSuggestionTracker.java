@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AaSuggestionTracker {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = AaSuggestionTracker.class.getName();
 
     // Here the key is the Term Text

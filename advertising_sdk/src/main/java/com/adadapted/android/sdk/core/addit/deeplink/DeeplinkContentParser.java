@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 public class DeeplinkContentParser {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = DeeplinkContentParser.class.getName();
 
     public Content parse(final Uri uri) throws Exception {

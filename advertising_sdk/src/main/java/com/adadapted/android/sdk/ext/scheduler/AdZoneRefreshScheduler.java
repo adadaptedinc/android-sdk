@@ -6,6 +6,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class AdZoneRefreshScheduler extends Timer {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = AdZoneRefreshScheduler.class.getName();
 
     private Listener mListener;

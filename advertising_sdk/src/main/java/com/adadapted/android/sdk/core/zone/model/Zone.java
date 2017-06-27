@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Zone {
-    private static final String TAG = Zone.class.getName();
+    @SuppressWarnings("unused")
+    private static final String LOGTAG = Zone.class.getName();
 
     private final String zoneId;
     private List<Ad> ads;

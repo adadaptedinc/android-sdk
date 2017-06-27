@@ -16,6 +16,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DeviceInfoManager implements CollectDeviceInfoInteractor.Callback {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = DeviceInfoManager.class.getName();
 
     private static DeviceInfoManager sInstance;

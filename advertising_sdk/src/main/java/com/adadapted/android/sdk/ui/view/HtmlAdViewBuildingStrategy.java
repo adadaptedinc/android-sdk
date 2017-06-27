@@ -26,12 +26,6 @@ class HtmlAdViewBuildingStrategy implements AdViewBuildingStrategy {
             mWebView.setWebViewClient(new WebViewClient() {
                 @Override
                 public boolean shouldOverrideUrlLoading(final WebView view,
-                                                        final String url) {
-                    return true;
-                }
-
-                @Override
-                public boolean shouldOverrideUrlLoading(final WebView view,
                                                         final WebResourceRequest request) {
                     return true;
                 }

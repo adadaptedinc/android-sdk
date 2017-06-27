@@ -6,6 +6,7 @@ import android.os.Build;
 import android.support.v4.util.LruCache;
 
 public class ImageCache {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = ImageCache.class.getName();
 
     private static ImageCache instance;

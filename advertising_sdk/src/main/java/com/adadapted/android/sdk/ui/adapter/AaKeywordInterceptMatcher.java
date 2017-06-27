@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class AaKeywordInterceptMatcher implements SessionManager.Callback, KeywordInterceptManager.Callback {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = AaKeywordInterceptMatcher.class.getName();
 
     private final AaSuggestionTracker mSuggestionTracker;

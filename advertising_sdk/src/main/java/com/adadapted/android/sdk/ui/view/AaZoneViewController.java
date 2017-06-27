@@ -30,6 +30,7 @@ class AaZoneViewController
         implements SessionManager.Callback,
         AdZoneRefreshScheduler.Listener,
         AdViewBuilder.Listener {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = AaZoneViewController.class.getName();
 
     private final Context mContext;

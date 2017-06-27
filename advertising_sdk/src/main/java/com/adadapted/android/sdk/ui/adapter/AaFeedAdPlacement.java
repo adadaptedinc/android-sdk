@@ -24,7 +24,7 @@ public class AaFeedAdPlacement {
         mPlacement = (placement <= 0) ? 0 : placement-1;
 
         zoneView = new AaZoneView(context);
-        zoneView.init(zoneId, resourceId);
+        zoneView.init(zoneId);
     }
 
     public AaFeedItem getItem(final int position) {

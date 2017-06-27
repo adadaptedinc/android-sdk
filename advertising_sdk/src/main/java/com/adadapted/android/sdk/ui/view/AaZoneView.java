@@ -21,6 +21,7 @@ import com.adadapted.android.sdk.ui.messaging.SdkContentPublisher;
 
 public class AaZoneView extends RelativeLayout
         implements AdInteractionListener, AaZoneViewController.Listener {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = AaZoneView.class.getName();
 
     public interface Listener {

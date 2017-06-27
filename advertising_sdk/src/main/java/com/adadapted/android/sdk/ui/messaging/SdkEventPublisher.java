@@ -4,6 +4,7 @@ import com.adadapted.android.sdk.core.event.model.AdEvent;
 import com.adadapted.android.sdk.ext.management.AdEventTrackingManager;
 
 public class SdkEventPublisher implements AdEventTrackingManager.Callback {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = SdkEventPublisher.class.getName();
 
     private static SdkEventPublisher sPublisherManager;

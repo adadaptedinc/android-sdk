@@ -20,6 +20,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class AdEventTrackingManager implements DeviceInfoManager.Callback {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = AdEventTrackingManager.class.getName();
 
     private static AdEventTrackingManager sInstance;

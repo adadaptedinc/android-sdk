@@ -15,7 +15,7 @@ public class RegisterAdAnomalyInteractor implements Interactor {
     @Override
     public void execute() {
         tracker.registerAnomaly(
-                command.getmSession(),
+                command.getSession(),
                 command.getAdId(),
                 command.getEventPath(),
                 command.getCode(),

@@ -7,7 +7,6 @@ public abstract class AdType implements Serializable {
 
     public static final String HTML = "html";
     public static final String IMAGE = "image";
-    public static final String JSON = "json";
     public static final String NULL = "null";
 
     private String adType = NULL;

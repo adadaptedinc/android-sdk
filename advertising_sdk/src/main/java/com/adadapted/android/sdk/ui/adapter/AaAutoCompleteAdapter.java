@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 public class AaAutoCompleteAdapter extends ArrayAdapter<String> {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = AaAutoCompleteAdapter.class.getName();
 
     private final AaKeywordInterceptMatcher mMatcher;

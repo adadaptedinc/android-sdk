@@ -10,6 +10,7 @@ import com.adadapted.android.sdk.ui.messaging.SdkContentPublisher;
 import com.adadapted.android.sdk.ui.view.AaZoneView;
 
 public class AaFeedAdapter extends BaseAdapter {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = AaFeedAdapter.class.getName();
 
     private final BaseAdapter mAdapter;

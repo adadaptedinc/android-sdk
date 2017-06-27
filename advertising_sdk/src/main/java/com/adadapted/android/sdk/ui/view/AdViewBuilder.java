@@ -11,6 +11,7 @@ import com.adadapted.android.sdk.ext.management.DeviceInfoManager;
 import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
 
 class AdViewBuilder implements AdViewBuildingStrategy.Listener {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = AdViewBuilder.class.getName();
 
     public interface Listener {

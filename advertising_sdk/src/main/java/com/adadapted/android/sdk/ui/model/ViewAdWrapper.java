@@ -11,6 +11,7 @@ import com.adadapted.android.sdk.ext.management.AdEventTrackingManager;
 import java.util.Date;
 
 public class ViewAdWrapper {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = ViewAdWrapper.class.getName();
 
     private final Session mSession;

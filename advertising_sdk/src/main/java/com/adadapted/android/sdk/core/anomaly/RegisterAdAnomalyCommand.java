@@ -21,7 +21,7 @@ public class RegisterAdAnomalyCommand {
         this.message = message;
     }
 
-    public Session getmSession() {
+    public Session getSession() {
         return mSession;
     }
 

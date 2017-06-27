@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AaWebViewPopupActivity extends Activity {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = AaWebViewPopupActivity.class.getName();
 
     public static final String EXTRA_POPUP_AD = AaWebViewPopupActivity.class.getName() + ".EXTRA_POPUP_AD";
@@ -101,12 +102,6 @@ public class AaWebViewPopupActivity extends Activity {
 
         popupWebView.getSettings().setJavaScriptEnabled(true);
         popupWebView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(final WebView view,
-                                                    final String url) {
-                return false;
-            }
-
             @Override
             public boolean shouldOverrideUrlLoading(final WebView view,
                                                     final WebResourceRequest request) {

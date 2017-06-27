@@ -30,7 +30,7 @@ public class PayloadContentParser {
                 errorParams.put("exception_message", ex.getMessage());
                 AppErrorTrackingManager.registerEvent(
                     "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
-                    "Problem parsing Addit JSON paylaod",
+                    "Problem parsing Addit JSON payload",
                     errorParams
                 );
             }

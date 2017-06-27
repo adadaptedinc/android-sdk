@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 class AaZoneViewControllerFactory {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = AaZoneViewControllerFactory.class.getName();
 
     private static AaZoneViewControllerFactory sInstance;
