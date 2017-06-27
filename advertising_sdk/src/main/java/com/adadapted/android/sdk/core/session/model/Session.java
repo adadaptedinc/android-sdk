@@ -86,11 +86,6 @@ public class Session {
         );
     }
 
-    @Override
-    public String toString() {
-        return "Session{}";
-    }
-
     public static class Builder {
         private DeviceInfo deviceInfo;
         private String sessionId;

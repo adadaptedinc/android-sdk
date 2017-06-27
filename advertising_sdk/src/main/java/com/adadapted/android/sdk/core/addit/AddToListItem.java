@@ -93,17 +93,4 @@ public final class AddToListItem implements Parcelable {
     public String getProductImage() {
         return productImage;
     }
-
-    @Override
-    public String toString() {
-        return "AddToListItem{" +
-                "trackingId='" + trackingId + '\'' +
-                ", title='" + title + '\'' +
-                ", brand='" + brand + '\'' +
-                ", category='" + category + '\'' +
-                ", barCode='" + barCode + '\'' +
-                ", discount='" + discount + '\'' +
-                ", productImage='" + productImage + '\'' +
-                '}';
-    }
 }

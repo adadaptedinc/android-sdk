@@ -104,9 +104,4 @@ class ImageAdViewBuildingStrategy implements AdViewBuildingStrategy {
     public void removeListener() {
         mListener = null;
     }
-
-    @Override
-    public String toString() {
-        return "ImageAdViewBuildingStrategy{}";
-    }
 }

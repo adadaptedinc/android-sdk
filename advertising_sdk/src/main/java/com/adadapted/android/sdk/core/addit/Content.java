@@ -129,16 +129,4 @@ public class Content implements Parcelable {
     public List<AddToListItem> getPayload() {
         return payload;
     }
-
-    @Override
-    public String toString() {
-        return "Content{" +
-                "payloadId='" + payloadId + '\'' +
-                ", message='" + message + '\'' +
-                ", image='" + image + '\'' +
-                ", type=" + type +
-                ", source='" + source + '\'' +
-                ", payload=" + payload +
-                '}';
-    }
 }
