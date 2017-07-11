@@ -84,9 +84,21 @@ public class Ad implements Serializable {
         private String url;
         private String actionType;
         private String actionPath;
-        private JSONObject payload;
+        private JSONObject payload = new JSONObject();
         private long refreshTime;
         private String trackingHtml;
+
+        public Builder() {
+            adId = "";
+            zoneId = "";
+            impressionId = "";
+            url = "";
+            actionType = "";
+            actionPath = "";
+            payload = new JSONObject();
+            refreshTime = 90;
+            trackingHtml = "";
+        }
 
         public String getAdId() {
             return adId;
