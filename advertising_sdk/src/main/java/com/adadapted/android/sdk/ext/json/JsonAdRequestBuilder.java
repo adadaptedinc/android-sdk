@@ -2,16 +2,15 @@ package com.adadapted.android.sdk.ext.json;
 
 import android.util.Log;
 
-import com.adadapted.android.sdk.core.ad.AdRequestBuilder;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
-import com.adadapted.android.sdk.core.session.model.Session;
+import com.adadapted.android.sdk.core.session.Session;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
 
-public class JsonAdRequestBuilder implements AdRequestBuilder {
+public class JsonAdRequestBuilder {
     private static final String LOGTAG = JsonAdRequestBuilder.class.getName();
 
     public JSONObject buildAdRequest(final Session session) {
@@ -21,7 +20,7 @@ public class JsonAdRequestBuilder implements AdRequestBuilder {
         try {
             json.put(JsonFields.APPID, deviceInfo.getAppId());
             json.put(JsonFields.UDID, deviceInfo.getUdid());
-            json.put(JsonFields.SESSIONID, session.getSessionId());
+            json.put(JsonFields.SESSIONID, session.getId());
             json.put(JsonFields.DATETIME, new Date().getTime());
             json.put(JsonFields.SDKVERSION, deviceInfo.getSdkVersion());
         }

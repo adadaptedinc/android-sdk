@@ -3,14 +3,13 @@ package com.adadapted.android.sdk.ext.json;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.device.DeviceInfo;
-import com.adadapted.android.sdk.core.session.SessionRequestBuilder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
 
-public class JsonSessionRequestBuilder implements SessionRequestBuilder {
+public class JsonSessionRequestBuilder {
     private static final String LOGTAG = JsonSessionRequestBuilder.class.getName();
 
     public JSONObject buildSessionInitRequest(final DeviceInfo deviceInfo) {

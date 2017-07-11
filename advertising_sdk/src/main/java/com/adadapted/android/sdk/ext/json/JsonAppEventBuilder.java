@@ -2,8 +2,7 @@ package com.adadapted.android.sdk.ext.json;
 
 import android.util.Log;
 
-import com.adadapted.android.sdk.core.event.AppEventBuilder;
-import com.adadapted.android.sdk.core.session.model.Session;
+import com.adadapted.android.sdk.core.session.Session;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,15 +11,14 @@ import org.json.JSONObject;
 import java.util.Date;
 import java.util.Map;
 
-public class JsonAppEventBuilder implements AppEventBuilder {
+public class JsonAppEventBuilder {
     private static final String LOGTAG = JsonAppEventBuilder.class.getName();
 
-    @Override
     public JSONObject buildWrapper(final Session session) {
         JSONObject item = new JSONObject();
 
         try {
-            item.put(JsonFields.SESSIONID, session.getSessionId());
+            item.put(JsonFields.SESSIONID, session.getId());
             item.put(JsonFields.APPID, session.getDeviceInfo().getAppId());
             item.put(JsonFields.UDID, session.getDeviceInfo().getUdid());
             item.put(JsonFields.DEVICEUDID, session.getDeviceInfo().getDeviceUdid());
@@ -33,7 +31,7 @@ public class JsonAppEventBuilder implements AppEventBuilder {
             item.put(JsonFields.CARRIER, session.getDeviceInfo().getCarrier());
             item.put(JsonFields.DW, session.getDeviceInfo().getDw());
             item.put(JsonFields.DH, session.getDeviceInfo().getDh());
-            item.put(JsonFields.DENSITY, session.getDeviceInfo().getDensity().toString());
+            item.put(JsonFields.DENSITY, session.getDeviceInfo().getDensity());
             item.put(JsonFields.TIMEZONE, session.getDeviceInfo().getTimezone());
             item.put(JsonFields.LOCALE, session.getDeviceInfo().getLocale());
             item.put(JsonFields.SDKVERSION, session.getDeviceInfo().getSdkVersion());
@@ -45,7 +43,6 @@ public class JsonAppEventBuilder implements AppEventBuilder {
         return item;
     }
 
-    @Override
     public JSONObject buildItem(final JSONObject eventWrapper,
                                 final String eventSource,
                                 final String eventName,

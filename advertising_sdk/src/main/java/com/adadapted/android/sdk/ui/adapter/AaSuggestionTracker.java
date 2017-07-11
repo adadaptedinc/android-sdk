@@ -1,7 +1,7 @@
 package com.adadapted.android.sdk.ui.adapter;
 
-import com.adadapted.android.sdk.core.session.model.Session;
-import com.adadapted.android.sdk.ext.management.KeywordInterceptEventTrackingManager;
+import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptClient;
+import com.adadapted.android.sdk.core.session.Session;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,14 +33,14 @@ public class AaSuggestionTracker {
         mItems.put(lcTerm, lcUserInput);
         mReplacements.put(lcReplacement, lcTerm);
 
-        KeywordInterceptEventTrackingManager.trackMatched(session, lcTerm, lcUserInput);
+        KeywordInterceptClient.trackMatched(mSession, lcTerm, lcUserInput);
     }
 
     public void suggestionPresented(final String term) {
         final String lcTerm = convertToLowerCase(term);
 
         if(mItems.containsKey(lcTerm)) {
-            KeywordInterceptEventTrackingManager.trackPresented(mSession, lcTerm, mItems.get(lcTerm));
+            KeywordInterceptClient.trackPresented(mSession, lcTerm, mItems.get(lcTerm));
         }
     }
 
@@ -51,7 +51,7 @@ public class AaSuggestionTracker {
             final String term = mReplacements.get(lcReplacement);
             final String userInput = mItems.get(term);
 
-            KeywordInterceptEventTrackingManager.trackSelected(mSession, term, userInput);
+            KeywordInterceptClient.trackSelected(mSession, term, userInput);
 
             return true;
         }

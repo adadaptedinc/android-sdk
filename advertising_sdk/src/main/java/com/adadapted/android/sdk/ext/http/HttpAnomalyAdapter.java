@@ -2,8 +2,10 @@ package com.adadapted.android.sdk.ext.http;
 
 import android.util.Log;
 
-import com.adadapted.android.sdk.core.anomaly.AnomalyAdapter;
-import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
+import com.adadapted.android.sdk.core.ad.AdAnomalySink;
+import com.adadapted.android.sdk.core.event.AppEventClient;
+import com.adadapted.android.sdk.core.session.Session;
+import com.adadapted.android.sdk.ext.json.JsonAnomalyBuilder;
 import com.android.volley.NetworkError;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
@@ -12,12 +14,12 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
-import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpAnomalyAdapter implements AnomalyAdapter {
+public class HttpAnomalyAdapter implements AdAnomalySink {
     private static final String LOGTAG = HttpAnomalyAdapter.class.getName();
 
     private final String mBatchUrl;
@@ -27,10 +29,14 @@ public class HttpAnomalyAdapter implements AnomalyAdapter {
     }
 
     @Override
-    public void sendBatch(final JSONArray json) {
-        if(json == null) {
-            return;
-        }
+    public void sendBatch(final Session session,
+                          final String adId,
+                          final String eventPath,
+                          final String code,
+                          final String message) {
+        final JsonAnomalyBuilder builder = new JsonAnomalyBuilder();
+        final JSONObject json = builder.build(session, adId, eventPath, code, message);
+
         final StringRequest stringRequest = new StringRequest(
                 Request.Method.POST,
                 mBatchUrl,
@@ -49,7 +55,7 @@ public class HttpAnomalyAdapter implements AnomalyAdapter {
 
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", mBatchUrl);
-                AppErrorTrackingManager.registerEvent(
+                AppEventClient.trackError(
                     "ANOMALY_TRACK_REQUEST_FAILED",
                     error.getMessage(),
                     params

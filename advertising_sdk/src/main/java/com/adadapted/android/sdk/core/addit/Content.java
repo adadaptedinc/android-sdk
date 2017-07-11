@@ -3,8 +3,6 @@ package com.adadapted.android.sdk.core.addit;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.adadapted.android.sdk.ext.management.ContentTrackingManager;
-
 import java.util.List;
 
 public class Content implements Parcelable {
@@ -87,15 +85,15 @@ public class Content implements Parcelable {
     }
 
     public void acknowledge() {
-        ContentTrackingManager.markContentAcknowledged(this);
+        PayloadClient.markContentAcknowledged(this);
     }
 
     public void duplicate() {
-        ContentTrackingManager.markContentDuplicate(this);
+        PayloadClient.markContentDuplicate(this);
     }
 
     public void failed(String message) {
-        ContentTrackingManager.markContentFailed(this, message);
+        PayloadClient.markContentFailed(this, message);
     }
 
     public String getPayloadId() {

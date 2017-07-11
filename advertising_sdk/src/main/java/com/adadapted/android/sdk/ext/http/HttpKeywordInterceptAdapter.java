@@ -2,10 +2,12 @@ package com.adadapted.android.sdk.ext.http;
 
 import android.util.Log;
 
+import com.adadapted.android.sdk.core.event.AppEventClient;
+import com.adadapted.android.sdk.core.keywordintercept.KeywordIntercept;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptAdapter;
-import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptBuilder;
-import com.adadapted.android.sdk.core.keywordintercept.model.KeywordIntercept;
-import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
+import com.adadapted.android.sdk.core.session.Session;
+import com.adadapted.android.sdk.ext.json.JsonKeywordInterceptBuilder;
+import com.adadapted.android.sdk.ext.json.JsonKeywordInterceptRequestBuilder;
 import com.android.volley.NetworkError;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
@@ -22,20 +24,19 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
     private static final String LOGTAG = HttpKeywordInterceptAdapter.class.getName();
 
     private final String endpoint;
-    private final KeywordInterceptBuilder builder;
+    private final JsonKeywordInterceptRequestBuilder requestBuilder;
+    private final JsonKeywordInterceptBuilder builder;
 
-    public HttpKeywordInterceptAdapter(final String endpoint,
-                                       final KeywordInterceptBuilder builder) {
+    public HttpKeywordInterceptAdapter(final String endpoint) {
         this.endpoint = endpoint == null ? "" : endpoint;
-        this.builder = builder;
+
+        this.requestBuilder = new JsonKeywordInterceptRequestBuilder();
+        this.builder = new JsonKeywordInterceptBuilder();
     }
 
     @Override
-    public void init(final JSONObject json,
-                     final KeywordInterceptAdapter.Callback callback) {
-        if(json == null || callback == null) {
-            return;
-        }
+    public void init(final Session session, final Callback callback) {
+        final JSONObject json = requestBuilder.buildInitRequest(session);
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
                 endpoint, json, new Response.Listener<JSONObject>(){
@@ -55,7 +56,7 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
 
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", endpoint);
-                AppErrorTrackingManager.registerEvent(
+                AppEventClient.trackError(
                     "KI_SESSION_REQUEST_FAILED",
                     error.getMessage(),
                     params

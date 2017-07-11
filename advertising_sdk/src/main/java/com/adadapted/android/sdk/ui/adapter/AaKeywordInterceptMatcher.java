@@ -1,16 +1,16 @@
 package com.adadapted.android.sdk.ui.adapter;
 
-import com.adadapted.android.sdk.ext.management.KeywordInterceptManager;
-import com.adadapted.android.sdk.core.keywordintercept.model.AutoFill;
-import com.adadapted.android.sdk.core.keywordintercept.model.KeywordIntercept;
-import com.adadapted.android.sdk.core.session.model.Session;
-import com.adadapted.android.sdk.ext.management.SessionManager;
+import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptClient;
+import com.adadapted.android.sdk.core.session.Session;
+import com.adadapted.android.sdk.core.session.SessionClient;
+import com.adadapted.android.sdk.core.keywordintercept.AutoFill;
+import com.adadapted.android.sdk.core.keywordintercept.KeywordIntercept;
 import com.adadapted.android.sdk.ui.model.SuggestionPayload;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class AaKeywordInterceptMatcher implements SessionManager.Callback, KeywordInterceptManager.Callback {
+public class AaKeywordInterceptMatcher implements SessionClient.Listener, KeywordInterceptClient.Listener {
     @SuppressWarnings("unused")
     private static final String LOGTAG = AaKeywordInterceptMatcher.class.getName();
 
@@ -23,7 +23,7 @@ public class AaKeywordInterceptMatcher implements SessionManager.Callback, Keywo
     public AaKeywordInterceptMatcher() {
         mSuggestionTracker = new AaSuggestionTracker();
 
-        SessionManager.getSession(this);
+        SessionClient.getSession(this);
     }
 
     public SuggestionPayload match(final CharSequence constraint) {
@@ -59,7 +59,7 @@ public class AaKeywordInterceptMatcher implements SessionManager.Callback, Keywo
     }
 
     @Override
-    public void onKeywordInterceptInitSuccess(final KeywordIntercept keywordIntercept) {
+    public void onKeywordInterceptInitialized(final KeywordIntercept keywordIntercept) {
         mKeywordIntercept = keywordIntercept;
         mLoaded = true;
     }
@@ -67,9 +67,16 @@ public class AaKeywordInterceptMatcher implements SessionManager.Callback, Keywo
     @Override
     public void onSessionAvailable(final Session session) {
         mSession = session;
-        KeywordInterceptManager.initialize(this);
+        KeywordInterceptClient.initialize(session, this);
     }
 
     @Override
-    public void onNewAdsAvailable(final Session session) {}
+    public void onAdsAvailable(Session session) {
+
+    }
+
+    @Override
+    public void onSessionInitFailed() {
+
+    }
 }

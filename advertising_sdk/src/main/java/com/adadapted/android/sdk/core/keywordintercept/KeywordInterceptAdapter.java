@@ -1,11 +1,9 @@
 package com.adadapted.android.sdk.core.keywordintercept;
 
-import com.adadapted.android.sdk.core.keywordintercept.model.KeywordIntercept;
-
-import org.json.JSONObject;
+import com.adadapted.android.sdk.core.session.Session;
 
 public interface KeywordInterceptAdapter {
-    void init(JSONObject request, Callback callback);
+    void init(final Session session, Callback callback);
 
 
     interface Callback {

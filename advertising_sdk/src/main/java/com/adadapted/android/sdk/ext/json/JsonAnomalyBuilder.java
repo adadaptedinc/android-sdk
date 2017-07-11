@@ -2,18 +2,16 @@ package com.adadapted.android.sdk.ext.json;
 
 import android.util.Log;
 
-import com.adadapted.android.sdk.core.anomaly.AnomalyBuilder;
-import com.adadapted.android.sdk.core.session.model.Session;
+import com.adadapted.android.sdk.core.session.Session;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
 
-public class JsonAnomalyBuilder implements AnomalyBuilder {
+public class JsonAnomalyBuilder {
     private static final String LOGTAG = JsonAnomalyBuilder.class.getName();
 
-    @Override
     public JSONObject build(final Session session,
                             final String adId,
                             final String eventPath,
@@ -32,7 +30,7 @@ public class JsonAnomalyBuilder implements AnomalyBuilder {
 
             json.put("datetime", new Date().getTime());
             json.put("app_id", session.getDeviceInfo().getAppId());
-            json.put("session_id", session.getSessionId());
+            json.put("session_id", session.getId());
             json.put("bundle_id", session.getDeviceInfo().getBundleId());
             json.put("bundle_version", session.getDeviceInfo().getBundleVersion());
             json.put("udid", session.getDeviceInfo().getUdid());

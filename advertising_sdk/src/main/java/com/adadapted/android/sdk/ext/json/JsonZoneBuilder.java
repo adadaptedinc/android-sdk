@@ -2,12 +2,10 @@ package com.adadapted.android.sdk.ext.json;
 
 import android.util.Log;
 
-import com.adadapted.android.sdk.core.ad.AdBuilder;
 import com.adadapted.android.sdk.core.common.Dimension;
 import com.adadapted.android.sdk.core.common.DimensionConverter;
-import com.adadapted.android.sdk.core.zone.ZoneBuilder;
-import com.adadapted.android.sdk.core.zone.model.Zone;
-import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
+import com.adadapted.android.sdk.core.event.AppEventClient;
+import com.adadapted.android.sdk.core.zone.Zone;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,10 +15,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class JsonZoneBuilder implements ZoneBuilder {
+public class JsonZoneBuilder {
     private static final String LOGTAG = JsonZoneBuilder.class.getName();
 
-    private final AdBuilder mAdBuilder;
+    private final JsonAdBuilder mAdBuilder;
     private final DimensionConverter mDimensionConverter;
 
     public JsonZoneBuilder(final float deviceScale) {
@@ -47,7 +45,7 @@ public class JsonZoneBuilder implements ZoneBuilder {
             errorParams.put("bad_json", jsonZones.toString());
             errorParams.put("exception", ex.getMessage());
 
-            AppErrorTrackingManager.registerEvent(
+            AppEventClient.trackError(
                 "SESSION_ZONE_PAYLOAD_PARSE_FAILED",
                 "Failed to parse Session Zone payload for processing.",
                 errorParams
@@ -57,8 +55,10 @@ public class JsonZoneBuilder implements ZoneBuilder {
         return zones;
     }
 
-    private Zone buildZone(final String zoneId, final JSONObject jsonZone) throws JSONException{
-        final Zone zone = new Zone(zoneId);
+    private Zone buildZone(final String zoneId,
+                           final JSONObject jsonZone) throws JSONException{
+        final Zone.Builder builder = new Zone.Builder();
+        builder.setZoneId(zoneId);
 
         if(jsonZone.has(JsonFields.PORTZONEHEIGHT) && jsonZone.has(JsonFields.PORTZONEWIDTH)) {
             final Dimension portDimension = new Dimension();
@@ -77,7 +77,7 @@ public class JsonZoneBuilder implements ZoneBuilder {
                 portDimension.setWidth(Dimension.MATCH_PARENT);
             }
 
-            zone.getDimensions().put(Dimension.ORIEN.PORT, portDimension);
+            builder.getDimensions().put(Dimension.ORIEN.PORT, portDimension);
         }
 
         if(jsonZone.has(JsonFields.LANDZONEHEIGHT) && jsonZone.has(JsonFields.LANDZONEWIDTH)) {
@@ -97,13 +97,13 @@ public class JsonZoneBuilder implements ZoneBuilder {
                 landDimension.setWidth(Dimension.MATCH_PARENT);
             }
 
-            zone.getDimensions().put(Dimension.ORIEN.LAND, landDimension);
+            builder.getDimensions().put(Dimension.ORIEN.LAND, landDimension);
         }
 
         final JSONArray jsonAds = jsonZone.getJSONArray(JsonFields.ADS);
-        zone.setAds(mAdBuilder.buildAds(jsonAds));
+        builder.setAds(mAdBuilder.buildAds(jsonAds));
 
-        return zone;
+        return builder.build();
     }
 
     private int calculateDimensionValue(final String value) {

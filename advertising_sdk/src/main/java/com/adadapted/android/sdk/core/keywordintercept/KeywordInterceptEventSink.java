@@ -1,7 +1,7 @@
 package com.adadapted.android.sdk.core.keywordintercept;
 
-import org.json.JSONArray;
+import java.util.Set;
 
 public interface KeywordInterceptEventSink {
-    void sendBatch(JSONArray json);
+    void sendBatch(final Set<KeywordInterceptEvent> events);
 }

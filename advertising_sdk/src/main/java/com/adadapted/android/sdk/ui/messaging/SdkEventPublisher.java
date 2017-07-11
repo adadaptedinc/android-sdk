@@ -1,9 +1,9 @@
 package com.adadapted.android.sdk.ui.messaging;
 
-import com.adadapted.android.sdk.core.event.model.AdEvent;
-import com.adadapted.android.sdk.ext.management.AdEventTrackingManager;
+import com.adadapted.android.sdk.core.ad.AdEvent;
+import com.adadapted.android.sdk.core.ad.AdEventClient;
 
-public class SdkEventPublisher implements AdEventTrackingManager.Callback {
+public class SdkEventPublisher implements AdEventClient.Listener {
     @SuppressWarnings("unused")
     private static final String LOGTAG = SdkEventPublisher.class.getName();
 
@@ -25,7 +25,7 @@ public class SdkEventPublisher implements AdEventTrackingManager.Callback {
     private AaSdkEventListener mListener;
 
     private SdkEventPublisher() {
-        AdEventTrackingManager.addCallback(this);
+        AdEventClient.addListener(this);
     }
 
     @Override

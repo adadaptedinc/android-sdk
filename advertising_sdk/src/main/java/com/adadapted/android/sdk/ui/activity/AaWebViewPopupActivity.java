@@ -13,13 +13,9 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 
-import com.adadapted.android.sdk.core.ad.model.Ad;
-import com.adadapted.android.sdk.core.ad.model.PopupAdAction;
-import com.adadapted.android.sdk.core.session.model.Session;
-import com.adadapted.android.sdk.ext.management.AdEventTrackingManager;
-import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
-import com.adadapted.android.sdk.ext.management.SessionManager;
-import com.adadapted.android.sdk.ui.model.ViewAdWrapper;
+import com.adadapted.android.sdk.core.ad.Ad;
+import com.adadapted.android.sdk.core.ad.AdEventClient;
+import com.adadapted.android.sdk.core.event.AppEventClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,16 +27,15 @@ public class AaWebViewPopupActivity extends Activity {
     public static final String EXTRA_POPUP_AD = AaWebViewPopupActivity.class.getName() + ".EXTRA_POPUP_AD";
 
     public static Intent createActivity(final Context context,
-                                        final ViewAdWrapper ad) {
+                                        final Ad ad) {
         Intent intent = new Intent(context.getApplicationContext(), AaWebViewPopupActivity.class);
-        intent.putExtra(AaWebViewPopupActivity.EXTRA_POPUP_AD, ad.getAd());
+        intent.putExtra(AaWebViewPopupActivity.EXTRA_POPUP_AD, ad);
 
         return intent;
     }
 
     private WebView popupWebView;
     private Ad ad;
-    private Session mSession;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -61,26 +56,18 @@ public class AaWebViewPopupActivity extends Activity {
         final Intent intent = getIntent();
         ad = (Ad)intent.getSerializableExtra(EXTRA_POPUP_AD);
 
-        mSession = SessionManager.getCurrentSession();
-        if(mSession == null) {
-            mSession = new Session();
-        }
-
-        final PopupAdAction action = (PopupAdAction)ad.getAdAction();
-
-        loadPopup(action.getActionPath());
-        setTitle(action.getTitle());
+        loadPopup(ad.getActionPath());
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        AdEventTrackingManager.trackPopupBeginEvent(mSession, ad);
+        AdEventClient.trackPopupBegin(ad);
     }
 
     public void onPause() {
         super.onPause();
-        AdEventTrackingManager.trackPopupEndEvent(mSession, ad);
+        AdEventClient.trackPopupEnd(ad);
     }
 
     @Override
@@ -117,7 +104,7 @@ public class AaWebViewPopupActivity extends Activity {
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", url);
                 params.put("error", error.toString());
-                AppErrorTrackingManager.registerEvent(
+                AppEventClient.trackError(
                     "POPUP_URL_LOAD_FAILED",
                     "Problem loading popup url",
                     params
@@ -133,7 +120,7 @@ public class AaWebViewPopupActivity extends Activity {
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", url);
                 params.put("error", errorResponse.toString());
-                AppErrorTrackingManager.registerEvent(
+                AppEventClient.trackError(
                     "POPUP_URL_LOAD_FAILED",
                     "Problem loading popup url",
                     params
