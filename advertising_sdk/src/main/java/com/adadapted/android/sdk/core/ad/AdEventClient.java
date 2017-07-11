@@ -35,6 +35,10 @@ public class AdEventClient implements SessionClient.Listener {
     }
 
     public static synchronized void trackImpression(final Ad ad) {
+        if(instance == null) {
+            return;
+        }
+
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
             public void run() {
@@ -43,12 +47,20 @@ public class AdEventClient implements SessionClient.Listener {
         });
     }
 
-    public static void addListener(final Listener listener) {
+    public static synchronized void addListener(final Listener listener) {
+        if(instance == null) {
+            return;
+        }
 
+        getInstance().performAddListener(listener);
     }
 
-    public static void removeListener(final Listener listener) {
+    public static synchronized void removeListener(final Listener listener) {
+        if(instance == null) {
+            return;
+        }
 
+        getInstance().performRemoveListener(listener);
     }
 
     public static synchronized void trackImpressionEnd(final Ad ad) {
@@ -106,9 +118,10 @@ public class AdEventClient implements SessionClient.Listener {
     private final AdEventSink adEventSink;
 
     private final Set<Listener> listeners;
+    private final Lock listenerLock = new ReentrantLock();
 
     private final Set<AdEvent> events;
-    private final Lock lock = new ReentrantLock();
+    private final Lock eventLock = new ReentrantLock();
 
     private Session session;
 
@@ -132,7 +145,7 @@ public class AdEventClient implements SessionClient.Listener {
     }
 
     private void fileEvent(final Ad ad, final String eventType) {
-        lock.lock();
+        eventLock.lock();
         try {
             final AdEvent event = new AdEvent(
                 session.getDeviceInfo().getAppId(),
@@ -148,7 +161,7 @@ public class AdEventClient implements SessionClient.Listener {
             notifyAdEventTracked(event);
         }
         finally {
-            lock.unlock();
+            eventLock.unlock();
         }
     }
 
@@ -159,7 +172,7 @@ public class AdEventClient implements SessionClient.Listener {
 
         final Set<AdEvent> currentEvents = new HashSet<>();
 
-        lock.lock();
+        eventLock.lock();
         try {
             Log.i(LOGTAG, "Publishing " + events.size() + " events");
             currentEvents.addAll(events);
@@ -168,36 +181,62 @@ public class AdEventClient implements SessionClient.Listener {
             adEventSink.sendBatch(currentEvents);
         }
         finally {
-            lock.unlock();
+            eventLock.unlock();
+        }
+    }
+
+    private void performAddListener(final Listener listener) {
+        listenerLock.lock();
+        try {
+            listeners.add(listener);
+        }
+        finally {
+            listenerLock.unlock();
+        }
+    }
+
+    private void performRemoveListener(final Listener listener) {
+        listenerLock.lock();
+        try {
+            listeners.remove(listener);
+        }
+        finally {
+            listenerLock.unlock();
         }
     }
 
     private void notifyAdEventTracked(final AdEvent event) {
-        for(Listener l : listeners) {
-            l.onAdEventTracked(event);
+        listenerLock.lock();
+        try {
+            for(Listener l : listeners) {
+                l.onAdEventTracked(event);
+            }
+        }
+        finally {
+            listenerLock.unlock();
         }
     }
 
     @Override
     public void onSessionAvailable(Session session) {
-        lock.lock();
+        eventLock.lock();
         try {
             this.session = session;
             startPublishTimer();
         }
         finally {
-            lock.unlock();
+            eventLock.unlock();
         }
     }
 
     @Override
     public void onAdsAvailable(Session session) {
-        lock.lock();
+        eventLock.lock();
         try {
             this.session = session;
         }
         finally {
-            lock.unlock();
+            eventLock.unlock();
         }
     }
 

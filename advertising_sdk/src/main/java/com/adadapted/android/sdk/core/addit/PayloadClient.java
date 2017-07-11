@@ -30,7 +30,7 @@ public class PayloadClient {
         return instance;
     }
 
-    public static synchronized PayloadClient getInstance() {
+    private static synchronized PayloadClient getInstance() {
         return instance;
     }
 

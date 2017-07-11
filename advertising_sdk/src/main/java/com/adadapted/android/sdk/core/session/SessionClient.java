@@ -19,7 +19,27 @@ import java.util.concurrent.locks.ReentrantLock;
 public class SessionClient implements SessionAdapter.Listener {
     private static final String LOGTAG = SessionClient.class.getName();
 
-    public static void start(final Context context,
+    public interface Listener {
+        void onSessionAvailable(Session session);
+        void onAdsAvailable(Session session);
+        void onSessionInitFailed();
+    }
+
+    private static SessionClient instance;
+
+    public static SessionClient createInstance(final SessionAdapter adapter) {
+        if(instance == null) {
+            instance = new SessionClient(adapter);
+        }
+
+        return instance;
+    }
+
+    private static SessionClient getInstance() {
+        return instance;
+    }
+
+    public static synchronized void start(final Context context,
                              final String appId,
                              final boolean isProd,
                              final Map<String, String> params,
@@ -48,27 +68,7 @@ public class SessionClient implements SessionAdapter.Listener {
         });
     }
 
-    public interface Listener {
-        void onSessionAvailable(Session session);
-        void onAdsAvailable(Session session);
-        void onSessionInitFailed();
-    }
-
-    private static SessionClient instance;
-
-    public static SessionClient createInstance(final SessionAdapter adapter) {
-        if(instance == null) {
-            instance = new SessionClient(adapter);
-        }
-
-        return instance;
-    }
-
-    private static SessionClient getInstance() {
-        return instance;
-    }
-
-    private static void initialize(final DeviceInfo deviceInfo) {
+    private static synchronized void initialize(final DeviceInfo deviceInfo) {
         if(instance == null) {
             return;
         }
@@ -81,7 +81,7 @@ public class SessionClient implements SessionAdapter.Listener {
         });
     }
 
-    public static Session getCurrentSession() {
+    public static synchronized Session getCurrentSession() {
         if(instance == null) {
             return null;
         }
@@ -89,11 +89,11 @@ public class SessionClient implements SessionAdapter.Listener {
         return getInstance().currentSession;
     }
 
-    public static void getSession(final Listener listener) {
+    public static synchronized void getSession(final Listener listener) {
         addListener(listener);
     }
 
-    public static void addListener(Listener listener) {
+    public static synchronized void addListener(Listener listener) {
         if(instance == null) {
             return;
         }
@@ -101,7 +101,7 @@ public class SessionClient implements SessionAdapter.Listener {
         getInstance().performAddListener(listener);
     }
 
-    public static void removeListener(Listener listener) {
+    public static synchronized void removeListener(Listener listener) {
         if(instance == null) {
             return;
         }
@@ -259,7 +259,9 @@ public class SessionClient implements SessionAdapter.Listener {
     }
 
     @Override
-    public void onSessionInitializeFailed() {}
+    public void onSessionInitializeFailed() {
+        notifySessionInitFailed();
+    }
 
     @Override
     public void onNewAdsLoaded(final Map<String, Zone> zones) {

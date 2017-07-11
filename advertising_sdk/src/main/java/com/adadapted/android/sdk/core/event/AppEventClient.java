@@ -1,7 +1,5 @@
 package com.adadapted.android.sdk.core.event;
 
-import android.util.Log;
-
 import com.adadapted.android.sdk.core.concurrency.ThreadPoolInteractorExecuter;
 
 import java.util.HashMap;
@@ -31,8 +29,6 @@ public class AppEventClient {
 
     public static synchronized void trackAppEvent(final String name,
                                                   final Map<String, String> params) {
-        Log.d(LOGTAG, "trackEvent called");
-
         if(instance == null) {
             return;
         }
@@ -46,15 +42,11 @@ public class AppEventClient {
     }
 
     public static synchronized void trackAppEvent(final String name) {
-        Log.d(LOGTAG, "trackEvent called");
-
         trackAppEvent(name, new HashMap<String, String>());
     }
 
     public static synchronized void trackSdkEvent(final String name,
                                                   final Map<String, String> params) {
-        Log.d(LOGTAG, "trackEvent called");
-
         if(instance == null) {
             return;
         }
@@ -68,16 +60,12 @@ public class AppEventClient {
     }
 
     public static synchronized void trackSdkEvent(final String name) {
-        Log.d(LOGTAG, "trackEvent called");
-
         trackSdkEvent(name, new HashMap<String, String>());
     }
 
     public static synchronized void trackError(final String code,
                                                   final String message,
                                                   final Map<String, String> params) {
-        Log.d(LOGTAG, "trackError called");
-
         if(instance == null) {
             return;
         }

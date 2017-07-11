@@ -44,6 +44,10 @@ public class DeviceInfoClient {
                                   final boolean isProd,
                                   final Map<String, String> params,
                                   final Callback callback) {
+        if(instance == null) {
+            return;
+        }
+
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
             public void run() {
@@ -53,6 +57,10 @@ public class DeviceInfoClient {
     }
 
     public static synchronized void getDeviceInfo(final Callback callback) {
+        if(instance == null) {
+            return;
+        }
+
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
             public void run() {

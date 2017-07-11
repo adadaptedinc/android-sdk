@@ -56,11 +56,11 @@ public class KeywordInterceptClient {
         trackEvent(session, "", term, userInput, "selected");
     }
 
-    public static synchronized void trackEvent(final Session session,
-                                               final String searchId,
-                                               final String term,
-                                               final String userInput,
-                                               final String eventType) {
+    private static synchronized void trackEvent(final Session session,
+                                                final String searchId,
+                                                final String term,
+                                                final String userInput,
+                                                final String eventType) {
         if(instance == null) {
             return;
         }
