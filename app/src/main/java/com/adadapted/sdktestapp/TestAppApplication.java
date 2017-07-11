@@ -6,8 +6,8 @@ import android.util.Log;
 
 import com.adadapted.android.sdk.AdAdapted;
 
-import com.adadapted.android.sdk.core.addit.AdditAddToListItem;
-import com.adadapted.android.sdk.core.addit.AdditContent;
+import com.adadapted.android.sdk.core.addit.AddToListItem;
+import com.adadapted.android.sdk.core.addit.Content;
 import com.adadapted.android.sdk.ui.messaging.AaSdkAdditContentListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener;
@@ -16,10 +16,6 @@ import com.adadapted.sdktestapp.core.todo.TodoListManager;
 import com.adadapted.sdktestapp.ui.todo.activity.TodoListsActivity;
 import com.flurry.android.FlurryAgent;
 import com.newrelic.agent.android.NewRelic;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.List;
 
@@ -61,13 +57,13 @@ public class TestAppApplication extends Application {
             })
             .setSdkAdditContentListener(new AaSdkAdditContentListener() {
                 @Override
-                public void onContentAvailable(AdditContent payload) {
+                public void onContentAvailable(Content payload) {
                     try {
-                        List<AdditAddToListItem> listItems = payload.getPayload();
+                        List<AddToListItem> listItems = payload.getPayload();
 
                         TodoList list = TodoListManager.getInstance(TestAppApplication.this).getDefaultList();
 
-                        for (AdditAddToListItem item : listItems) {
+                        for (AddToListItem item : listItems) {
                             TodoListManager
                                     .getInstance(TestAppApplication.this)
                                     .addItemToList(list.getId(), item.getTitle());
@@ -75,10 +71,9 @@ public class TestAppApplication extends Application {
 
                         payload.acknowledge();
 
-                        final Intent intent = new Intent(payload.getActivity(), TodoListsActivity.class);
+                        final Intent intent = new Intent(getApplicationContext(), TodoListsActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                        payload.getActivity().finish();
                         startActivity(intent);
                     }
                     catch(Exception ex) {
