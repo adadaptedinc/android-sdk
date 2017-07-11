@@ -22,29 +22,14 @@ public class AdEventClient implements SessionClient.Listener {
 
     private static AdEventClient instance;
 
-    public static AdEventClient createInstance(final AdEventSink adEventSink) {
+    public static void createInstance(final AdEventSink adEventSink) {
         if(instance == null) {
             instance = new AdEventClient(adEventSink);
         }
-
-        return instance;
     }
 
     private static AdEventClient getInstance() {
         return instance;
-    }
-
-    public static synchronized void trackImpression(final Ad ad) {
-        if(instance == null) {
-            return;
-        }
-
-        ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
-            @Override
-            public void run() {
-                getInstance().fileEvent(ad, AdEvent.Types.IMPRESSION);
-            }
-        });
     }
 
     public static synchronized void addListener(final Listener listener) {
@@ -61,6 +46,19 @@ public class AdEventClient implements SessionClient.Listener {
         }
 
         getInstance().performRemoveListener(listener);
+    }
+
+    public static synchronized void trackImpression(final Ad ad) {
+        if(instance == null) {
+            return;
+        }
+
+        ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
+            @Override
+            public void run() {
+                getInstance().fileEvent(ad, AdEvent.Types.IMPRESSION);
+            }
+        });
     }
 
     public static synchronized void trackImpressionEnd(final Ad ad) {
