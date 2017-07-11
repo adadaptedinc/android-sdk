@@ -19,13 +19,13 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpAnomalyAdapter implements AdAnomalySink {
-    private static final String LOGTAG = HttpAnomalyAdapter.class.getName();
+public class HttpAnomalySink implements AdAnomalySink {
+    private static final String LOGTAG = HttpAnomalySink.class.getName();
 
-    private final String mBatchUrl;
+    private final String batchUrl;
 
-    public HttpAnomalyAdapter(String batchUrl) {
-        this.mBatchUrl = batchUrl;
+    public HttpAnomalySink(String batchUrl) {
+        this.batchUrl = batchUrl;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class HttpAnomalyAdapter implements AdAnomalySink {
 
         final StringRequest stringRequest = new StringRequest(
                 Request.Method.POST,
-                mBatchUrl,
+                batchUrl,
                 new Listener<String>() {
                     @Override
                     public void onResponse(final String s) {}
@@ -54,7 +54,7 @@ public class HttpAnomalyAdapter implements AdAnomalySink {
                 }
 
                 final Map<String, String> params = new HashMap<>();
-                params.put("url", mBatchUrl);
+                params.put("url", batchUrl);
                 AppEventClient.trackError(
                     "ANOMALY_TRACK_REQUEST_FAILED",
                     error.getMessage(),

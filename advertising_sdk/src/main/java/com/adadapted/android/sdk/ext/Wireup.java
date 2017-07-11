@@ -8,7 +8,7 @@ import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptClient;
 import com.adadapted.android.sdk.core.session.SessionClient;
 import com.adadapted.android.sdk.ext.http.HttpAdEventSink;
-import com.adadapted.android.sdk.ext.http.HttpAnomalyAdapter;
+import com.adadapted.android.sdk.ext.http.HttpAnomalySink;
 import com.adadapted.android.sdk.ext.http.HttpAppEventSink;
 import com.adadapted.android.sdk.ext.http.HttpKeywordInterceptAdapter;
 import com.adadapted.android.sdk.ext.http.HttpKeywordInterceptEventSink;
@@ -31,7 +31,7 @@ public class Wireup {
             isProd ? Config.Prod.URL_EVENT_BATCH : Config.Sand.URL_EVENT_BATCH
         ));
 
-        AdAnomalyClient.createInstance(new HttpAnomalyAdapter(
+        AdAnomalyClient.createInstance(new HttpAnomalySink(
             isProd ? Config.Prod.URL_ANOMALY_BATCH : Config.Sand.URL_ANOMALY_BATCH
         ));
 

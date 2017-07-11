@@ -22,11 +22,11 @@ import java.util.Set;
 public class HttpAdEventSink implements AdEventSink {
     private static final String LOGTAG = HttpAdEventSink.class.getName();
 
-    private final String mBatchUrl;
+    private final String batchUrl;
     private final JsonAdEventBuilder builder;
 
     public HttpAdEventSink(final String batchUrl) {
-        mBatchUrl = batchUrl == null ? "" : batchUrl;
+        this.batchUrl = batchUrl == null ? "" : batchUrl;
         builder = new JsonAdEventBuilder();
     }
 
@@ -35,7 +35,7 @@ public class HttpAdEventSink implements AdEventSink {
         final JSONArray json = builder.buildEvents(events);
 
         final JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST,
-                mBatchUrl, json, new Response.Listener<JSONArray>(){
+                batchUrl, json, new Response.Listener<JSONArray>(){
 
             @Override
             public void onResponse(JSONArray response) {
@@ -52,7 +52,7 @@ public class HttpAdEventSink implements AdEventSink {
                 }
 
                 final Map<String, String> params = new HashMap<>();
-                params.put("url", mBatchUrl);
+                params.put("url", batchUrl);
                 AppEventClient.trackError(
                     "AD_EVENT_TRACK_REQUEST_FAILED",
                     error.getMessage(),

@@ -24,20 +24,20 @@ public class AdContentPayload implements ContentPayload {
 
     public static final String FIELD_ADD_TO_LIST_ITEMS = "add_to_list_items";
 
-    private final Ad mAd;
-    private final int mType;
-    private final JSONObject mPayload;
+    private final Ad ad;
+    private final int type;
+    private final JSONObject payload;
 
-    private boolean mHandled;
+    private boolean handled;
 
     private AdContentPayload(final Ad ad,
                              final int type,
                              final JSONObject payload) {
-        mAd = ad;
-        mType = type;
-        mPayload = payload;
+        this.ad = ad;
+        this.type = type;
+        this.payload = payload;
 
-        mHandled = false;
+        handled = false;
     }
 
     public static AdContentPayload createAddToListContent(final Ad ad) {
@@ -59,25 +59,25 @@ public class AdContentPayload implements ContentPayload {
     }
 
     public synchronized void acknowledge() {
-        if(mHandled) {
+        if(handled) {
             Log.w(LOGTAG, "Content Payload acknowledged multiple times.");
             return;
         }
 
-        mHandled = true;
+        handled = true;
         Log.d(LOGTAG, "Content Payload acknowledged.");
 
         try {
             final JSONArray array = getPayload().getJSONArray("add_to_list_items");
             for (int i = 0; i < array.length(); i++) {
-                trackItem(mAd.getId(), array.getString(i));
+                trackItem(ad.getId(), array.getString(i));
             }
         }
         catch(JSONException ex) {
             Log.w(LOGTAG, "Problem parsing JSON");
         }
 
-        AdEventClient.trackInteraction(mAd);
+        AdEventClient.trackInteraction(ad);
     }
 
     private void trackItem(final String adId, final String itemName) {
@@ -89,15 +89,15 @@ public class AdContentPayload implements ContentPayload {
     }
 
     public String getZoneId() {
-        return mAd.getZoneId();
+        return ad.getZoneId();
     }
 
     public int getType() {
-        return mType;
+        return type;
     }
 
     public JSONObject getPayload() {
-        return mPayload;
+        return payload;
     }
 
     @Override

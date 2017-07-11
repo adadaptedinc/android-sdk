@@ -14,14 +14,14 @@ public class AaKeywordInterceptMatcher implements SessionClient.Listener, Keywor
     @SuppressWarnings("unused")
     private static final String LOGTAG = AaKeywordInterceptMatcher.class.getName();
 
-    private final AaSuggestionTracker mSuggestionTracker;
+    private final AaSuggestionTracker suggestionTracker;
 
-    private KeywordIntercept mKeywordIntercept;
+    private KeywordIntercept keywordIntercept;
     private boolean mLoaded = false;
     private Session mSession;
 
     public AaKeywordInterceptMatcher() {
-        mSuggestionTracker = new AaSuggestionTracker();
+        suggestionTracker = new AaSuggestionTracker();
 
         SessionClient.getSession(this);
     }
@@ -29,14 +29,14 @@ public class AaKeywordInterceptMatcher implements SessionClient.Listener, Keywor
     public SuggestionPayload match(final CharSequence constraint) {
         final Set<String> suggestions = new HashSet<>();
 
-        if((isLoaded() && constraint != null && constraint.length() >= mKeywordIntercept.getMinMatchLength())) {
-            for (final String item : mKeywordIntercept.getAutoFill().keySet()) {
+        if((isLoaded() && constraint != null && constraint.length() >= keywordIntercept.getMinMatchLength())) {
+            for (final String item : keywordIntercept.getAutoFill().keySet()) {
                 if (item != null && item.toLowerCase().contains(constraint.toString().toLowerCase())) {
-                    final AutoFill autofill = mKeywordIntercept.getAutoFill().get(item);
+                    final AutoFill autofill = keywordIntercept.getAutoFill().get(item);
                     if(autofill != null) {
                         suggestions.add(autofill.getReplacement());
 
-                        mSuggestionTracker.suggestionMatched(
+                        suggestionTracker.suggestionMatched(
                             mSession,
                             item,
                             autofill.getReplacement(),
@@ -47,11 +47,11 @@ public class AaKeywordInterceptMatcher implements SessionClient.Listener, Keywor
             }
         }
 
-        return new SuggestionPayload(mSuggestionTracker, suggestions);
+        return new SuggestionPayload(suggestionTracker, suggestions);
     }
 
     public boolean suggestionSelected(final String suggestion) {
-        return mSuggestionTracker.suggestionSelected(suggestion);
+        return suggestionTracker.suggestionSelected(suggestion);
     }
 
     private boolean isLoaded() {
@@ -60,7 +60,7 @@ public class AaKeywordInterceptMatcher implements SessionClient.Listener, Keywor
 
     @Override
     public void onKeywordInterceptInitialized(final KeywordIntercept keywordIntercept) {
-        mKeywordIntercept = keywordIntercept;
+        this.keywordIntercept = keywordIntercept;
         mLoaded = true;
     }
 

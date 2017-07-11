@@ -21,16 +21,16 @@ import java.util.Map;
 public class HttpAppEventSink implements AppEventSink {
     private static final String LOGTAG = HttpAppEventSink.class.getName();
 
-    private final String eventEndpoint;
-    private final String errorEndpoint;
+    private final String eventUrl;
+    private final String errorUrl;
 
     private final JsonAppEventBuilder eventBuilder;
     private final JsonAppErrorBuilder errorBuilder;
 
-    public HttpAppEventSink(final String eventEndpoint,
-                            final String errorEndpoint) {
-        this.eventEndpoint = eventEndpoint;
-        this.errorEndpoint = errorEndpoint;
+    public HttpAppEventSink(final String eventUrl,
+                            final String errorUrl) {
+        this.eventUrl = eventUrl;
+        this.errorUrl = errorUrl;
 
         eventBuilder = new JsonAppEventBuilder();
         errorBuilder = new JsonAppErrorBuilder();
@@ -43,7 +43,7 @@ public class HttpAppEventSink implements AppEventSink {
         final JSONObject json = eventBuilder.buildItem(new JSONObject(), type, name, params);
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
-                eventEndpoint, json, new Response.Listener<JSONObject>(){
+                eventUrl, json, new Response.Listener<JSONObject>(){
             @Override
             public void onResponse(JSONObject response) {}
 
@@ -57,7 +57,7 @@ public class HttpAppEventSink implements AppEventSink {
                 }
 
                 final Map<String, String> errorParams = new HashMap<>();
-                errorParams.put("endpoint", eventEndpoint);
+                errorParams.put("endpoint", eventUrl);
                 AppEventClient.trackError(
                     "APP_EVENT_REQUEST_FAILED",
                     error.getMessage(),
@@ -76,7 +76,7 @@ public class HttpAppEventSink implements AppEventSink {
         final JSONObject json = errorBuilder.buildItem(new JSONObject(), code, message, params);
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
-                errorEndpoint, json, new Response.Listener<JSONObject>(){
+                errorUrl, json, new Response.Listener<JSONObject>(){
             @Override
             public void onResponse(JSONObject response) {}
 

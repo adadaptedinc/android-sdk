@@ -14,17 +14,17 @@ import java.util.Map;
 public class JsonAdRefreshBuilder {
     private static final String LOGTAG = JsonAdRefreshBuilder.class.getName();
 
-    private final JsonZoneBuilder mZoneBuilder;
+    private final JsonZoneBuilder zoneBuilder;
 
     public JsonAdRefreshBuilder(final JsonZoneBuilder zoneBuilder) {
-        mZoneBuilder = zoneBuilder;
+        this.zoneBuilder = zoneBuilder;
     }
 
     public Map<String, Zone> buildRefreshedAds(final JSONObject adJson) {
         Map<String, Zone> zones = new HashMap<>();
         try {
             if(adJson.has(JsonFields.ZONES) && (adJson.get(JsonFields.ZONES).getClass() == JSONObject.class)) {
-                zones = mZoneBuilder.buildZones(adJson.getJSONObject(JsonFields.ZONES));
+                zones = zoneBuilder.buildZones(adJson.getJSONObject(JsonFields.ZONES));
             } else {
                 Log.i(LOGTAG, "No ads returned. Not parsing JSONArray.");
             }

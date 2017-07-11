@@ -13,10 +13,10 @@ import com.adadapted.android.sdk.ui.model.AdContentPayload;
 class AdActionHandler {
     private static final String LOGTAG = AdActionHandler.class.getName();
 
-    private final Context mContext;
+    private final Context context;
 
     public AdActionHandler(final Context context) {
-        mContext = context.getApplicationContext();
+        this.context = context.getApplicationContext();
     }
 
     /**
@@ -61,13 +61,13 @@ class AdActionHandler {
         final Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(ad.getActionPath()));
 
-        mContext.startActivity(intent);
+        context.startActivity(intent);
     }
 
     private void handlePopupAction(final Ad ad) {
-        final Intent intent = AaWebViewPopupActivity.createActivity(mContext, ad);
+        final Intent intent = AaWebViewPopupActivity.createActivity(context, ad);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        mContext.startActivity(intent);
+        context.startActivity(intent);
     }
 }

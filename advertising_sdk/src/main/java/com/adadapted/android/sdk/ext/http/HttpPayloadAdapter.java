@@ -23,13 +23,13 @@ import java.util.Map;
 public class HttpPayloadAdapter implements PayloadAdapter {
     private static final String LOGTAG = HttpPayloadAdapter.class.getName();
 
-    private final String pickupEndpoint;
-    private final String trackEndpoint;
+    private final String pickupUrl;
+    private final String trackUrl;
     private final PayloadContentParser parser;
 
-    public HttpPayloadAdapter(final String pickupEndpoint, final String trackEndpoint) {
-        this.pickupEndpoint = pickupEndpoint;
-        this.trackEndpoint = trackEndpoint;
+    public HttpPayloadAdapter(final String pickupUrl, final String trackUrl) {
+        this.pickupUrl = pickupUrl;
+        this.trackUrl = trackUrl;
 
         this.parser = new PayloadContentParser();
     }
@@ -41,7 +41,7 @@ public class HttpPayloadAdapter implements PayloadAdapter {
         }
 
         final JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
-                this.pickupEndpoint, json, new Response.Listener<JSONObject>(){
+                this.pickupUrl, json, new Response.Listener<JSONObject>(){
             @Override
             public void onResponse(JSONObject response) {
                 final List<Content> content = parser.parse(response);
@@ -57,7 +57,7 @@ public class HttpPayloadAdapter implements PayloadAdapter {
                 }
 
                 final Map<String, String> errorParams = new HashMap<>();
-                errorParams.put("endpoint", pickupEndpoint);
+                errorParams.put("endpoint", pickupUrl);
                 AppEventClient.trackError(
                     "PAYLOAD_PICKUP_REQUEST_FAILED",
                     error.getMessage(),
@@ -73,7 +73,7 @@ public class HttpPayloadAdapter implements PayloadAdapter {
 
     @Override
     public void publishEvent(JSONObject payloadEvent) {
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, trackEndpoint, payloadEvent, new Response.Listener<JSONObject>() {
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, trackUrl, payloadEvent, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {}
 
@@ -87,7 +87,7 @@ public class HttpPayloadAdapter implements PayloadAdapter {
                 }
 
                 final Map<String, String> errorParams = new HashMap<>();
-                errorParams.put("endpoint", trackEndpoint);
+                errorParams.put("endpoint", trackUrl);
                 errorParams.put("exception", error.getClass().getName());
 
                 AppEventClient.trackError(

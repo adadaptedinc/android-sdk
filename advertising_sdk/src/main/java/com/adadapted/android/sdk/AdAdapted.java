@@ -29,13 +29,13 @@ public class AdAdapted {
 
     private static AdAdapted sInstance;
 
-    private String mAppId;
-    private boolean mIsProd;
-    private Map<String, String> mParams;
+    private String appId;
+    private boolean isProd;
+    private Map<String, String> params;
     private AaSdkSessionListener sessionListener;
 
     private AdAdapted() {
-        mParams = new HashMap<>();
+        params = new HashMap<>();
     }
 
     private synchronized static AdAdapted getsInstance() {
@@ -53,17 +53,17 @@ public class AdAdapted {
     public AdAdapted withAppId(final String appId) {
         if(appId == null) {
             Log.e(LOGTAG, "The Application Id cannot be Null.");
-            mAppId = "";
+            this.appId = "";
         }
         else {
-            mAppId = appId;
+            this.appId = appId;
         }
 
         return this;
     }
 
     public AdAdapted inEnv(final boolean environment) {
-        mIsProd = environment;
+        isProd = environment;
 
         return this;
     }
@@ -87,14 +87,14 @@ public class AdAdapted {
     }
 
     public AdAdapted withParams(final Map<String, String> params) {
-        mParams = params;
+        this.params = params;
 
         return this;
     }
 
     public void start(final Context context) {
         HttpRequestManager.createQueue(context.getApplicationContext());
-        Wireup.run(mIsProd);
+        Wireup.run(isProd);
 
         PayloadClient.pickupPayloads();
 
@@ -121,14 +121,14 @@ public class AdAdapted {
 
         SessionClient.start(
             context.getApplicationContext(),
-            mAppId,
-            mIsProd,
-            mParams,
+                appId,
+                isProd,
+                params,
             startListener);
 
         AppEventClient.trackSdkEvent("app_opened");
 
-        if(!mIsProd) {
+        if(!isProd) {
             AppEventClient.trackError(
                 "NOT_AN_ERROR",
                 "Error Collection Test Message. This message is only sent from the Dev environment."
@@ -147,8 +147,8 @@ public class AdAdapted {
                                             final Map<String, String> params) {
         SessionClient.restart(
             context.getApplicationContext(),
-            getsInstance().mAppId,
-            getsInstance().mIsProd,
+            getsInstance().appId,
+            getsInstance().isProd,
             params
         );
 
