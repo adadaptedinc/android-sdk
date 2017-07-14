@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.core.device;
 
 import com.adadapted.android.sdk.config.Config;
-import com.adadapted.android.sdk.core.ad.model.ImageAdType;
 
 import java.util.Map;
 
@@ -23,7 +22,7 @@ public class DeviceInfo {
     private String carrier;
     private int dw;
     private int dh;
-    private ScreenDensity density;
+    private int density;
     private boolean allowRetargeting;
     private String sdkVersion;
     private Map<String, String> params;
@@ -153,11 +152,11 @@ public class DeviceInfo {
         this.dh = dh;
     }
 
-    public ScreenDensity getDensity() {
+    public int getDensity() {
         return density;
     }
 
-    void setDensity(ScreenDensity density) {
+    void setDensity(int density) {
         this.density = density;
     }
 
@@ -183,13 +182,5 @@ public class DeviceInfo {
 
     public void setParams(Map<String, String> params) {
         this.params = params;
-    }
-
-    public String chooseImageSize() {
-        if(density == ScreenDensity.MDPI || density == ScreenDensity.HDPI) {
-            return ImageAdType.STANDARD_IMAGE;
-        }
-
-        return ImageAdType.RETINA_IMAGE;
     }
 }

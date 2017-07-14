@@ -3,24 +3,22 @@ package com.adadapted.android.sdk.ext.json;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.device.DeviceInfo;
-import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptRequestBuilder;
-import com.adadapted.android.sdk.core.session.model.Session;
+import com.adadapted.android.sdk.core.session.Session;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
 
-public class JsonKeywordInterceptRequestBuilder implements KeywordInterceptRequestBuilder {
+public class JsonKeywordInterceptRequestBuilder {
     private static final String TAG = JsonKeywordInterceptRequestBuilder.class.getName();
 
-    @Override
     public JSONObject buildInitRequest(final Session session) {
         final JSONObject json = new JSONObject();
         final DeviceInfo deviceInfo = session.getDeviceInfo();
 
         try {
-            json.put(JsonFields.SESSIONID, session.getSessionId());
+            json.put(JsonFields.SESSIONID, session.getId());
             json.put(JsonFields.APPID, deviceInfo.getAppId());
             json.put(JsonFields.UDID, deviceInfo.getUdid());
             json.put(JsonFields.DATETIME, new Date().getTime());

@@ -1,20 +1,25 @@
 package com.adadapted.android.sdk.ui.messaging;
 
-import com.adadapted.android.sdk.core.event.model.AdEvent;
-import com.adadapted.android.sdk.ext.management.AdEventTrackingManager;
+import android.util.Log;
 
-public class SdkEventPublisher implements AdEventTrackingManager.Callback {
+import com.adadapted.android.sdk.core.ad.AdEvent;
+import com.adadapted.android.sdk.core.ad.AdEventClient;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class SdkEventPublisher implements AdEventClient.Listener {
     @SuppressWarnings("unused")
     private static final String LOGTAG = SdkEventPublisher.class.getName();
 
-    private static SdkEventPublisher sPublisherManager;
+    private static SdkEventPublisher instance;
 
     public static SdkEventPublisher getInstance() {
-        if(sPublisherManager == null) {
-            sPublisherManager = new SdkEventPublisher();
+        if(instance == null) {
+            instance = new SdkEventPublisher();
         }
 
-        return sPublisherManager;
+        return instance;
     }
 
     private static class EventTypes {
@@ -22,35 +27,51 @@ public class SdkEventPublisher implements AdEventTrackingManager.Callback {
         static final String CLICK = "click";
     }
 
-    private AaSdkEventListener mListener;
+    private AaSdkEventListener listener;
+    private final Lock lock = new ReentrantLock();
 
     private SdkEventPublisher() {
-        AdEventTrackingManager.addCallback(this);
+        AdEventClient.addListener(this);
+    }
+
+    public void setListener(final AaSdkEventListener listener) {
+        lock.lock();
+        try {
+            this.listener = listener;
+        }
+        finally {
+            lock.unlock();
+        }
+    }
+
+    public void unsetListener() {
+        lock.lock();
+        try {
+            listener = null;
+        }
+        finally {
+            lock.unlock();
+        }
     }
 
     @Override
     public void onAdEventTracked(final AdEvent event) {
-        publishAdEvent(event);
-    }
-
-    public void setListener(final AaSdkEventListener listener) {
-        mListener = listener;
-    }
-
-    public void unsetListener() {
-        mListener = null;
-    }
-
-    private void publishAdEvent(final AdEvent event) {
-        if(mListener == null || event == null) {
+        if(listener == null || event == null) {
+            Log.w(LOGTAG, "NULL AaSdkEventListener listener");
             return;
         }
 
-        if(event.getEventType().equals(AdEvent.Types.IMPRESSION)) {
-            mListener.onNextAdEvent(event.getZoneId(), EventTypes.IMPRESSION);
+        lock.lock();
+        try {
+            if(event.getEventType().equals(AdEvent.Types.IMPRESSION)) {
+                listener.onNextAdEvent(event.getZoneId(), EventTypes.IMPRESSION);
+            }
+            else if(event.getEventType().equals(AdEvent.Types.INTERACTION)) {
+                listener.onNextAdEvent(event.getZoneId(), EventTypes.CLICK);
+            }
         }
-        else if(event.getEventType().equals(AdEvent.Types.INTERACTION)) {
-            mListener.onNextAdEvent(event.getZoneId(), EventTypes.CLICK);
+        finally {
+            lock.unlock();
         }
     }
 }

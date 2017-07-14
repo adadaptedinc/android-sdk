@@ -1,26 +1,23 @@
 package com.adadapted.android.sdk.ui.view;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
-import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.RelativeLayout;
 
+import com.adadapted.android.sdk.core.ad.Ad;
+import com.adadapted.android.sdk.core.common.Dimension;
+import com.adadapted.android.sdk.core.zone.Zone;
 import com.adadapted.android.sdk.ui.messaging.AaSdkContentListener;
 import com.adadapted.android.sdk.ui.messaging.SdkContentPublisher;
 
-public class AaZoneView extends RelativeLayout
-        implements AdInteractionListener, AaZoneViewController.Listener {
+public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listener, AdWebView.Listener {
     @SuppressWarnings("unused")
     private static final String LOGTAG = AaZoneView.class.getName();
 
@@ -29,49 +26,54 @@ public class AaZoneView extends RelativeLayout
         void onAdLoadFailed();
     }
 
-    private Context mContext;
-    private Listener mListener;
+    private AdWebView webView;
+    private AdZonePresenter presenter;
 
-    private AaZoneViewController mViewController;
-    private AaZoneViewProperties mZoneProperties;
+    private boolean isVisible = true;
 
-    private boolean mVisible = true;
+    private int width;
+    private int height;
+
+    private Listener listener;
 
     public AaZoneView(Context context) {
         super(context.getApplicationContext());
 
-        mContext = context.getApplicationContext();
+        setup(context);
     }
 
     public AaZoneView(Context context, AttributeSet attrs) {
         super(context.getApplicationContext(), attrs);
 
-        mContext = context.getApplicationContext();
+        setup(context);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public AaZoneView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context.getApplicationContext(), attrs, defStyleAttr);
 
-        mContext = context.getApplicationContext();
+        setup(context);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public AaZoneView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context.getApplicationContext(), attrs, defStyleAttr, defStyleRes);
 
-        mContext = context.getApplicationContext();
+        setup(context);
+    }
+
+    private void setup(final Context context) {
+        this.presenter  = new AdZonePresenter(context.getApplicationContext());
+
+        this.webView = new AdWebView(context.getApplicationContext(), this);
+        addView(webView);
     }
 
     public void init(final String zoneId) {
-        final ColorDrawable mBackgroundColor = (ColorDrawable) getBackground();
-        final int color = (mBackgroundColor != null) ? mBackgroundColor.getColor() : Color.WHITE;
-
-        mZoneProperties = new AaZoneViewProperties(zoneId, color);
-
-        setGravity(Gravity.CENTER);
+        presenter.init(zoneId);
     }
 
+    @SuppressWarnings("UnusedParameters")
     @Deprecated
     public void init(final String zoneId,
                      final int layoutResourceId) {
@@ -87,107 +89,23 @@ public class AaZoneView extends RelativeLayout
         });
     }
 
-    protected void displayAdView(final View view) {
-        if(view == null) { return; }
-
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                final ViewGroup parent = ((ViewGroup) view.getParent());
-                if (parent != null) {
-                    parent.removeView(view);
-                }
-
-                AaZoneView.this.removeAllViews();
-                AaZoneView.this.addView(view);
-            }
-        });
-    }
-
-    @Override
-    public void onViewReadyForDisplay(final View view) {
-        if(view == null || !mVisible) { return; }
-
-        if(view instanceof WebView) {
-            view.setOnTouchListener(new OnTouchListener() {
-                @Override
-                public boolean onTouch(final View v, final MotionEvent event) {
-                    switch (event.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            AaZoneView.this.onAdInteraction();
-                            return true;
-                    }
-
-                    return false;
-                }
-            });
-        }
-        else {
-            setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(final View v) {
-                    AaZoneView.this.onAdInteraction();
-                }
-            });
-        }
-
-        displayAdView(view);
-
-        if(mViewController != null) {
-            mViewController.acknowledgeDisplay();
-        }
-    }
-
-    @Override
-    public void onResetDisplayView() {
-        this.post(new Runnable() {
-            @Override
-            public void run() {
-                AaZoneView.this.removeAllViews();
-            }
-        });
-    }
-
-    @Override
-    public void onAdDisplayed() {
-        if(mListener != null) {
-            mListener.onAdLoaded();
-        }
-    }
-
-    @Override
-    public void onZoneEmpty() {
-        if(mListener != null) {
-            mListener.onAdLoadFailed();
-        }
-    }
-
     public void onStart() {
-        if(mZoneProperties == null) {
-            return;
-        }
-
-        if(mViewController == null && mContext != null) {
-            mViewController = AaZoneViewControllerFactory.getController(mContext, mZoneProperties);
-            mContext = null;
-        }
-
-        if(mViewController != null) {
-            mViewController.setListener(this);
+        if(presenter != null) {
+            presenter.onAttach(this);
         }
     }
 
     public void onStart(final Listener listener) {
         onStart();
 
-        mListener = listener;
+        this.listener = listener;
     }
 
     public void onStart(final Listener listener,
                         final AaSdkContentListener contentListener) {
         onStart();
 
-        mListener = listener;
+        this.listener = listener;
         SdkContentPublisher.getInstance().addListener(contentListener);
     }
 
@@ -198,11 +116,11 @@ public class AaZoneView extends RelativeLayout
     }
 
     public void onStop() {
-        if(mViewController != null) {
-            mViewController.removeListener();
+        if(presenter != null) {
+            presenter.onDetach();
         }
 
-        mListener = null;
+        listener = null;
     }
 
     public void onStop(final AaSdkContentListener listener) {
@@ -211,28 +129,116 @@ public class AaZoneView extends RelativeLayout
         onStop();
     }
 
-    @Override
-    protected void onVisibilityChanged(@NonNull final View changedView,
-                                       final int visibility) {
-        super.onVisibilityChanged(changedView, visibility);
+    private void notifyAdLoaded() {
+        if(listener != null) {
+            listener.onAdLoaded();
+        }
+    }
 
-        switch(visibility) {
-            case View.GONE:
-            case View.INVISIBLE:
-                mVisible = false;
-                onStop();
-                break;
-            case View.VISIBLE:
-                onStart();
-                mVisible = true;
-                break;
+    private void notifyAdLoadFailed() {
+        if(listener != null) {
+            listener.onAdLoadFailed();
+        }
+    }
+
+    /*
+     * Overrides from AdZonePresenter.Listener
+     */
+
+    @Override
+    public void onZoneAvailable(final Zone zone) {
+        if(width == 0 || height == 0) {
+            final Dimension dimension = zone.getDimensions().get(Dimension.ORIEN.PORT);
+            width = (dimension == null) ? LayoutParams.MATCH_PARENT : dimension.getWidth();
+            height = (dimension == null) ? LayoutParams.MATCH_PARENT : dimension.getHeight();
+        }
+
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                webView.setLayoutParams(new LayoutParams(width, height));
+            }
+        });
+    }
+
+    @Override
+    public void onAdAvailable(final Ad ad) {
+        if(isVisible) {
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    webView.loadAd(ad);
+                }
+            });
         }
     }
 
     @Override
-    public void onAdInteraction() {
-        if (mViewController != null) {
-            mViewController.handleAdAction();
+    public void onNoAdAvailable() {
+        notifyAdLoadFailed();
+
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                webView.loadBlank();
+            }
+        });
+    }
+
+    /*
+     * Overrides from AdWebView.Listener
+     */
+
+    @Override
+    public void onAdLoaded(final Ad ad) {
+        notifyAdLoaded();
+
+        if(presenter != null) {
+            presenter.onAdDisplayed(ad);
+        }
+    }
+
+    @Override
+    public void onAdLoadFailed(final Ad ad) {
+        notifyAdLoadFailed();
+    }
+
+    @Override
+    public void onAdClicked(final Ad ad) {
+        if(presenter != null) {
+            presenter.onAdClicked(ad);
+        }
+    }
+
+    @SuppressLint("SwitchIntDef")
+    @Override
+    protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+
+        switch (visibility) {
+            case View.GONE:
+                setInvisible();
+                break;
+            case View.INVISIBLE:
+                setInvisible();
+                break;
+            case View.VISIBLE:
+                setVisible();
+                break;
+        }
+    }
+
+    private void setVisible() {
+        isVisible = true;
+        if(presenter != null) {
+            presenter.onAttach(this);
+        }
+    }
+
+    private void setInvisible() {
+        isVisible = false;
+        if(presenter != null) {
+            presenter.onDetach();
         }
     }
 }

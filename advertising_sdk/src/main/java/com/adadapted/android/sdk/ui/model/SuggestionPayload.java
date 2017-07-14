@@ -5,28 +5,28 @@ import com.adadapted.android.sdk.ui.adapter.AaSuggestionTracker;
 import java.util.Set;
 
 public class SuggestionPayload {
-    private final AaSuggestionTracker mSuggestionTracker;
-    private final Set<String> mSuggestions;
+    private final AaSuggestionTracker suggestionTracker;
+    private final Set<String> suggestions;
 
     public SuggestionPayload(final AaSuggestionTracker suggestionTracker,
                              final Set<String> suggestions) {
-        mSuggestionTracker = suggestionTracker;
-        mSuggestions = suggestions;
+        this.suggestionTracker = suggestionTracker;
+        this.suggestions = suggestions;
     }
 
     public Set<String> getSuggestions() {
-        return mSuggestions;
+        return suggestions;
     }
 
     public void presented(final String term) {
-        if(mSuggestionTracker != null) {
-            mSuggestionTracker.suggestionPresented(term);
+        if(suggestionTracker != null) {
+            suggestionTracker.suggestionPresented(term);
         }
     }
 
     public void selected(final String term) {
-        if(mSuggestionTracker != null) {
-            mSuggestionTracker.suggestionSelected(term);
+        if(suggestionTracker != null) {
+            suggestionTracker.suggestionSelected(term);
         }
     }
 }

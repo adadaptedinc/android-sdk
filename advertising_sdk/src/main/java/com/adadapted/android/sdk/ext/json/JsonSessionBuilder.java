@@ -3,11 +3,9 @@ package com.adadapted.android.sdk.ext.json;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.device.DeviceInfo;
-import com.adadapted.android.sdk.core.session.SessionBuilder;
-import com.adadapted.android.sdk.core.session.model.Session;
-import com.adadapted.android.sdk.core.zone.ZoneBuilder;
-import com.adadapted.android.sdk.core.zone.model.Zone;
-import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
+import com.adadapted.android.sdk.core.event.AppEventClient;
+import com.adadapted.android.sdk.core.session.Session;
+import com.adadapted.android.sdk.core.zone.Zone;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,11 +13,11 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JsonSessionBuilder implements SessionBuilder {
+public class JsonSessionBuilder {
     private static final String LOGTAG = JsonSessionBuilder.class.getName();
 
     private final DeviceInfo deviceInfo;
-    private final ZoneBuilder zoneBuilder;
+    private final JsonZoneBuilder zoneBuilder;
 
     public JsonSessionBuilder(final DeviceInfo deviceInfo) {
         this.deviceInfo = deviceInfo;
@@ -53,7 +51,7 @@ public class JsonSessionBuilder implements SessionBuilder {
             final Map<String, String> params = new HashMap<>();
             params.put("exception", ex.getMessage());
             params.put("bad_json", response.toString());
-            AppEventTrackingManager.registerEvent(
+            AppEventClient.trackError(
                 "SESSION_PAYLOAD_PARSE_FAILED",
                 "Failed to parse Session payload for processing.",
                 params

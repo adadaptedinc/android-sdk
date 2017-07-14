@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.adadapted.android.sdk.ui.adapter.AaFeedAdapter;
 import com.adadapted.android.sdk.ui.messaging.AaSdkContentListener;
 import com.adadapted.android.sdk.ui.model.AdContentPayload;
 import com.adadapted.sdktestapp.R;
@@ -28,14 +27,6 @@ import org.json.JSONException;
 
 import java.util.UUID;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link TodoListDetailFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class TodoListDetailFragment extends ListFragment implements AaSdkContentListener {
     private static final String TAG = TodoListDetailFragment.class.getName();
 
@@ -45,7 +36,6 @@ public class TodoListDetailFragment extends ListFragment implements AaSdkContent
     private TodoList list;
 
     private TodoListItemAdapter adapter;
-    private AaFeedAdapter feedAdapter;
     private DialogFragment dialog;
 
     private OnFragmentInteractionListener mListener;
@@ -94,8 +84,6 @@ public class TodoListDetailFragment extends ListFragment implements AaSdkContent
         View view = inflater.inflate(R.layout.fragment_todo_list_detail, container, false);
 
         adapter = new TodoListItemAdapter(getActivity(), list.getItems());
-        feedAdapter = new AaFeedAdapter(getActivity(), adapter, "100682", 3, R.layout.aa_default_json_ad_zone);
-        setListAdapter(feedAdapter);
 
         return view;
     }
@@ -103,15 +91,11 @@ public class TodoListDetailFragment extends ListFragment implements AaSdkContent
     @Override
     public void onResume() {
         super.onResume();
-
-        feedAdapter.onStart(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-
-        feedAdapter.onStop(this);
     }
 
     @Override
@@ -135,9 +119,6 @@ public class TodoListDetailFragment extends ListFragment implements AaSdkContent
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-
-        Object item = feedAdapter.getItem(position);
-        Log.d(TAG, "Feed Item Clicked: " + item);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

@@ -1,15 +1,15 @@
 package com.adadapted.android.sdk.core.keywordintercept;
 
-import com.adadapted.android.sdk.core.keywordintercept.model.KeywordIntercept;
+import com.adadapted.android.sdk.core.session.Session;
 
-import org.json.JSONObject;
+import java.util.Set;
 
 public interface KeywordInterceptAdapter {
-    void init(JSONObject request, Callback callback);
+    void init(final Session session, Callback callback);
+    void sendBatch(final Set<KeywordInterceptEvent> events);
 
 
     interface Callback {
         void onSuccess(KeywordIntercept keywordIntercept);
-        void onFailure();
     }
 }

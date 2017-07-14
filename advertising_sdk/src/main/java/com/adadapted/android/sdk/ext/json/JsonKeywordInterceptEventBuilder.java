@@ -2,8 +2,7 @@ package com.adadapted.android.sdk.ext.json;
 
 import android.util.Log;
 
-import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptEventBuilder;
-import com.adadapted.android.sdk.core.keywordintercept.model.KeywordInterceptEvent;
+import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptEvent;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -11,10 +10,9 @@ import org.json.JSONObject;
 
 import java.util.Set;
 
-public class JsonKeywordInterceptEventBuilder implements KeywordInterceptEventBuilder {
+public class JsonKeywordInterceptEventBuilder {
     private static final String LOGTAG = JSONException.class.getName();
 
-    @Override
     public JSONArray buildEvents(final Set<KeywordInterceptEvent> events) {
         final JSONArray jsonArray = new JSONArray();
 
