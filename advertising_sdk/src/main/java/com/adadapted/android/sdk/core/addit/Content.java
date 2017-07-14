@@ -53,19 +53,19 @@ public class Content implements Parcelable {
         payload = in.createTypedArrayList(AddToListItem.CREATOR);
     }
 
-    public static Content createDeeplinkContent(final String payloadId,
-                                                final String message,
-                                                final String image,
-                                                final int type,
-                                                final List<AddToListItem> payload) {
+    static Content createDeeplinkContent(final String payloadId,
+                                         final String message,
+                                         final String image,
+                                         final int type,
+                                         final List<AddToListItem> payload) {
         return new Content(payloadId, message, image, type, Sources.DEEPLINK, payload);
     }
 
-    public static Content createPayloadContent(final String payloadId,
-                                               final String message,
-                                               final String image,
-                                               final int type,
-                                               final List<AddToListItem> payload) {
+    static Content createPayloadContent(final String payloadId,
+                                        final String message,
+                                        final String image,
+                                        final int type,
+                                        final List<AddToListItem> payload) {
         return new Content(payloadId, message, image, type, Sources.PAYLOAD, payload);
     }
 

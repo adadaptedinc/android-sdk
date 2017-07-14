@@ -12,21 +12,21 @@ public class Session {
     private final String id;
     private final boolean hasAds;
     private final long refreshTime;
-    private final long expiresAt;
+    private final Date expiresAt;
     private final Map<String, Zone> zones;
 
     public Session(final DeviceInfo deviceInfo,
                    final String id,
                    final boolean hasAds,
                    final long refreshTime,
-                   final long expiresAt,
+                   final Date expiresAt,
                    final Map<String, Zone> zones) {
         this.deviceInfo = deviceInfo;
         this.id = id;
         this.hasAds = hasAds;
         this.refreshTime = refreshTime;
         this.expiresAt = expiresAt;
-        this.zones = zones;
+        this.zones = (zones != null) ? zones : new HashMap<String, Zone>();
     }
 
     public Session(final Session session,
@@ -36,7 +36,7 @@ public class Session {
         this.hasAds = session.hasActiveCampaigns();
         this.refreshTime = session.getRefreshTime();
         this.expiresAt = session.getExpiresAt();
-        this.zones = zones;
+        this.zones = (zones != null) ? zones : new HashMap<String, Zone>();
     }
 
     public DeviceInfo getDeviceInfo() {
@@ -55,12 +55,12 @@ public class Session {
         return refreshTime;
     }
 
-    public long getExpiresAt() {
+    public Date getExpiresAt() {
         return expiresAt;
     }
 
     public boolean hasExpired() {
-        return (new Date().getTime()) >= getExpiresAt();
+        return getExpiresAt().before(new Date());
     }
 
     public Map<String, Zone> getZones() {
@@ -76,7 +76,7 @@ public class Session {
     }
 
     public static Session emptySession() {
-        return new Session(null, "", false, 0L, 0L, new HashMap<String, Zone>());
+        return new Session(null, "", false, 0L, new Date(), new HashMap<String, Zone>());
     }
 
     public static class Builder {
@@ -84,8 +84,16 @@ public class Session {
         private String sessionId;
         private boolean hasAds;
         private long refreshTime;
-        private long expiresAt;
+        private Date expiresAt;
         private Map<String, Zone> zones;
+
+        public Builder() {
+            sessionId = "";
+            hasAds = false;
+            refreshTime = 0L;
+            expiresAt = new Date();
+            zones = new HashMap<>();
+        }
 
         public DeviceInfo getDeviceInfo() {
             return deviceInfo;
@@ -119,12 +127,12 @@ public class Session {
             this.refreshTime = refreshTime;
         }
 
-        public long getExpiresAt() {
+        public Date getExpiresAt() {
             return expiresAt;
         }
 
         public void setExpiresAt(long expiresAt) {
-            this.expiresAt = expiresAt;
+            this.expiresAt = new Date(expiresAt * 1000);
         }
 
         public Map<String, Zone> getZones() {

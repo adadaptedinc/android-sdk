@@ -1,10 +1,54 @@
 package com.adadapted.android.sdk.core.ad;
 
-import org.json.JSONObject;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Ad implements Serializable {
+public class Ad implements Parcelable {
+    protected Ad(Parcel in) {
+        id = in.readString();
+        zoneId = in.readString();
+        impressionId = in.readString();
+        url = in.readString();
+        actionType = in.readString();
+        actionPath = in.readString();
+        payload = in.createStringArrayList();
+        refreshTime = in.readLong();
+        trackingHtml = in.readString();
+    }
+
+    public static final Creator<Ad> CREATOR = new Creator<Ad>() {
+        @Override
+        public Ad createFromParcel(Parcel in) {
+            return new Ad(in);
+        }
+
+        @Override
+        public Ad[] newArray(int size) {
+            return new Ad[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(id);
+        parcel.writeString(zoneId);
+        parcel.writeString(impressionId);
+        parcel.writeString(url);
+        parcel.writeString(actionType);
+        parcel.writeString(actionPath);
+        parcel.writeStringList(payload);
+        parcel.writeLong(refreshTime);
+        parcel.writeString(trackingHtml);
+    }
+
     public static class ActionTypes {
         public static final String CONTENT = "c";
         public static final String LINK = "l";
@@ -17,7 +61,7 @@ public class Ad implements Serializable {
     private final String url;
     private final String actionType;
     private final String actionPath;
-    private final JSONObject payload;
+    private final List<String> payload;
     private final long refreshTime;
     private final String trackingHtml;
 
@@ -27,7 +71,7 @@ public class Ad implements Serializable {
               final String url,
               final String actionType,
               final String actionPath,
-              final JSONObject payload,
+              final List<String> payload,
               final long refreshTime,
               final String trackingHtml) {
         this.id = id;
@@ -39,6 +83,10 @@ public class Ad implements Serializable {
         this.payload = payload;
         this.refreshTime = refreshTime;
         this.trackingHtml = trackingHtml;
+    }
+
+    public static Ad emptyAd() {
+        return new Builder().build();
     }
 
     public String getId() {
@@ -65,7 +113,7 @@ public class Ad implements Serializable {
         return actionPath;
     }
 
-    public JSONObject getPayload() {
+    public List<String> getPayload() {
         return payload;
     }
 
@@ -84,7 +132,7 @@ public class Ad implements Serializable {
         private String url;
         private String actionType;
         private String actionPath;
-        private JSONObject payload = new JSONObject();
+        private List<String> payload;
         private long refreshTime;
         private String trackingHtml;
 
@@ -95,7 +143,7 @@ public class Ad implements Serializable {
             url = "";
             actionType = "";
             actionPath = "";
-            payload = new JSONObject();
+            payload = new ArrayList<>();
             refreshTime = 90;
             trackingHtml = "";
         }
@@ -104,7 +152,7 @@ public class Ad implements Serializable {
             return adId;
         }
 
-        public void setAdId(String id) {
+        public void setAdId(final String id) {
             this.adId = id;
         }
 
@@ -112,7 +160,7 @@ public class Ad implements Serializable {
             return zoneId;
         }
 
-        public void setZoneId(String zoneId) {
+        public void setZoneId(final String zoneId) {
             this.zoneId = zoneId;
         }
 
@@ -120,7 +168,7 @@ public class Ad implements Serializable {
             return impressionId;
         }
 
-        public void setImpressionId(String impressionId) {
+        public void setImpressionId(final String impressionId) {
             this.impressionId = impressionId;
         }
 
@@ -128,7 +176,7 @@ public class Ad implements Serializable {
             return url;
         }
 
-        public void setUrl(String url) {
+        public void setUrl(final String url) {
             this.url = url;
         }
 
@@ -136,7 +184,7 @@ public class Ad implements Serializable {
             return actionType;
         }
 
-        public void setActionType(String actionType) {
+        public void setActionType(final String actionType) {
             this.actionType = actionType;
         }
 
@@ -144,15 +192,15 @@ public class Ad implements Serializable {
             return actionPath;
         }
 
-        public void setActionPath(String actionPath) {
+        public void setActionPath(final String actionPath) {
             this.actionPath = actionPath;
         }
 
-        public JSONObject getPayload() {
+        public List<String> getPayload() {
             return payload;
         }
 
-        public void setPayload(JSONObject payload) {
+        public void setPayload(final List<String> payload) {
             this.payload = payload;
         }
 
@@ -160,7 +208,7 @@ public class Ad implements Serializable {
             return refreshTime;
         }
 
-        public void setRefreshTime(long refreshTime) {
+        public void setRefreshTime(final long refreshTime) {
             this.refreshTime = refreshTime;
         }
 
@@ -168,7 +216,7 @@ public class Ad implements Serializable {
             return trackingHtml;
         }
 
-        public void setTrackingHtml(String trackingHtml) {
+        public void setTrackingHtml(final String trackingHtml) {
             this.trackingHtml = trackingHtml;
         }
 

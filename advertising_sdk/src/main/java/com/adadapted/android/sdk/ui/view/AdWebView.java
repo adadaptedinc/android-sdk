@@ -10,25 +10,31 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.adadapted.android.sdk.core.ad.Ad;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+@SuppressLint("ViewConstructor")
 class AdWebView extends WebView {
     private static final String LOGTAG = AdWebView.class.getName();
 
     interface Listener {
-        void onAdLoaded();
-        void onAdLoadFailed();
-        void onAdClicked();
+        void onAdLoaded(Ad ad);
+        void onAdLoadFailed(Ad ad);
+        void onAdClicked(Ad ad);
     }
 
     private Listener listener;
 
-    public AdWebView(Context context, Listener listener) {
-        super(context);
-        this.listener = listener;
-    }
+    private Ad currentAd;
+    private final Lock adLock = new ReentrantLock();
 
     @SuppressLint("SetJavaScriptEnabled")
-    public AdWebView(Context context) {
-        super(context);
+    public AdWebView(final Context context,
+                     final Listener listener) {
+        super(context.getApplicationContext());
+        this.listener = listener;
 
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         setOnTouchListener(new OnTouchListener() {
@@ -36,8 +42,10 @@ class AdWebView extends WebView {
             public boolean onTouch(final View v, final MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        Log.i(LOGTAG, "Ad has been clicked!");
-                        notifyAdClicked();
+                        if(!currentAd.getId().isEmpty()) {
+                            Log.i(LOGTAG, "Ad has been clicked!");
+                            notifyAdClicked();
+                        }
                         return true;
                 }
 
@@ -55,9 +63,16 @@ class AdWebView extends WebView {
             public void onPageFinished(WebView view,
                                        String url) {
                 super.onPageFinished(view, url);
-                Log.i(LOGTAG, "Displayed Ad URL: " + url);
 
-                notifyAdLoaded();
+                adLock.lock();
+                try {
+                    if(!currentAd.getId().isEmpty()) {
+                        notifyAdLoaded();
+                    }
+                }
+                finally {
+                    adLock.unlock();
+                }
             }
 
             @Override
@@ -65,28 +80,72 @@ class AdWebView extends WebView {
                                         WebResourceRequest request,
                                         WebResourceError error) {
                 super.onReceivedError(view, request, error);
-                Log.e(LOGTAG, "Problem displaying Ad: " + error.toString());
-                notifyAdLoadFailed();
+
+                if(!currentAd.getId().isEmpty()) {
+                    notifyAdLoadFailed();
+                }
             }
         });
         getSettings().setJavaScriptEnabled(true);
     }
 
+    void loadAd(final Ad ad) {
+        adLock.lock();
+        try {
+            currentAd = ad;
+            loadUrl(currentAd.getUrl());
+        }
+        finally {
+            adLock.unlock();
+        }
+    }
+
+    void loadBlank() {
+        adLock.lock();
+        try {
+            currentAd = Ad.emptyAd();
+
+            final String dummyDocument = "<html><head><meta name=\"viewport\" content=\"width=device-width, user-scalable=no\" /><style>body{width:100px;height100px;}</style></head><body></body></html>";
+            loadData(dummyDocument, "text/html", null);
+        }
+        finally {
+            adLock.unlock();
+        }
+    }
+
     void notifyAdLoaded() {
-        if(listener != null) {
-            listener.onAdLoaded();
+        adLock.lock();
+        try {
+            if(listener != null) {
+                listener.onAdLoaded(currentAd);
+            }
+        }
+        finally {
+            adLock.unlock();
         }
     }
 
     void notifyAdLoadFailed() {
-        if(listener != null) {
-            listener.onAdLoadFailed();
+        adLock.lock();
+        try {
+            if(listener != null) {
+                listener.onAdLoadFailed(currentAd);
+            }
+        }
+        finally {
+            adLock.unlock();
         }
     }
 
     void notifyAdClicked() {
-        if(listener != null) {
-            listener.onAdClicked();
+        adLock.lock();
+        try {
+            if(listener != null) {
+                listener.onAdClicked(currentAd);
+            }
+        }
+        finally {
+            adLock.unlock();
         }
     }
 }

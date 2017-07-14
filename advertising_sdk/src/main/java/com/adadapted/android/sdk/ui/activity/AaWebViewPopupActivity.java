@@ -4,7 +4,10 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -54,9 +57,17 @@ public class AaWebViewPopupActivity extends Activity {
         setContentView(popupLayout);
 
         final Intent intent = getIntent();
-        ad = (Ad)intent.getSerializableExtra(EXTRA_POPUP_AD);
+        ad = intent.getParcelableExtra(EXTRA_POPUP_AD);
 
-        loadPopup(ad.getActionPath());
+        final String url = ad.getActionPath();
+        if(url.startsWith("http")) {
+            loadPopup(ad.getActionPath());
+        } else {
+            AppEventClient.trackError(
+                "POPUP_URL_MALFORMED",
+                "Incorrect Action Path URL supplied for Ad: " + ad.getId()
+            );
+        }
     }
 
     @Override
@@ -101,6 +112,8 @@ public class AaWebViewPopupActivity extends Activity {
                                         WebResourceError error) {
                 super.onReceivedError(view, request, error);
 
+                Log.w(LOGTAG, "onReceivedError: " + error.toString());
+
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", url);
                 params.put("error", error.toString());
@@ -111,11 +124,14 @@ public class AaWebViewPopupActivity extends Activity {
                 );
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onReceivedHttpError(WebView view,
                                             WebResourceRequest request,
                                             WebResourceResponse errorResponse) {
                 super.onReceivedHttpError(view, request, errorResponse);
+
+                Log.w(LOGTAG, "onReceivedHttpError: " + errorResponse.getStatusCode() + " " + errorResponse.getReasonPhrase());
 
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", url);

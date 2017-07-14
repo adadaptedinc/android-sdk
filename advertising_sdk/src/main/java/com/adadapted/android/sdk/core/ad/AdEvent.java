@@ -16,6 +16,7 @@ public class AdEvent {
     private final String udid;
     private final String sessionId;
     private final String adId;
+    private final String zoneId;
     private final String impressionId;
     private final String eventType;
     private final long datetime;
@@ -25,6 +26,7 @@ public class AdEvent {
             final String udid,
             final String sessionId,
             final String adId,
+            final String zoneId,
             final String impressionId,
             final String eventType,
             final String sdkVersion) {
@@ -32,6 +34,7 @@ public class AdEvent {
         this.udid = udid;
         this.sessionId = sessionId;
         this.adId = adId;
+        this.zoneId = zoneId;
         this.impressionId = impressionId;
         this.eventType = eventType;
         this.datetime = (new Date()).getTime();
@@ -59,7 +62,7 @@ public class AdEvent {
     }
 
     public String getZoneId() {
-        return "";
+        return zoneId;
     }
 
     public String getEventType() {

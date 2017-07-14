@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.ext.json;
 
 import com.adadapted.android.sdk.core.ad.Ad;
-import com.adadapted.android.sdk.core.ad.AdAnomalyClient;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 
 import org.json.JSONArray;
@@ -26,9 +25,16 @@ public class JsonAdBuilder {
         for(int i = 0; i < adCount; i++) {
             try {
                 final JSONObject jsonAd = jsonAds.getJSONObject(i);
-                final Ad ad  = buildAd(jsonAd);
-
-                ads.add(ad);
+                if(jsonAd.getString(JsonFields.AD_TYPE).equals("html")) {
+                    final Ad ad  = buildAd(jsonAd);
+                    ads.add(ad);
+                }
+                else {
+                    AppEventClient.trackError(
+                        "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                        "Ad " + jsonAd.getString(JsonFields.ADID) + " has unsupported ad_type: " + jsonAd.getString(JsonFields.AD_TYPE)
+                    );
+                }
             }
             catch(JSONException ex) {
                 final Map<String, String> errorParams = new HashMap<>();
@@ -49,15 +55,14 @@ public class JsonAdBuilder {
         final Ad.Builder builder = new Ad.Builder();
 
         builder.setAdId(jsonAd.getString(JsonFields.ADID));
+        builder.setZoneId(jsonAd.getString(JsonFields.ZONE));
         builder.setImpressionId(jsonAd.getString(JsonFields.IMPRESSIONID));
 
         try {
             builder.setRefreshTime(Integer.parseInt(jsonAd.getString(JsonFields.REFRESH_TIME)));
         }
         catch(NumberFormatException ex) {
-            AdAnomalyClient.trackAnomaly(
-                builder.getAdId(),
-                jsonAd.toString(),
+            AppEventClient.trackError(
                 "SESSION_AD_PAYLOAD_PARSE_FAILED",
                 "Ad " + builder.getAdId() + " has an improperly set refresh_time."
             );
@@ -65,25 +70,29 @@ public class JsonAdBuilder {
             builder.setRefreshTime(DEFAULT_REFRESH_TIME);
         }
 
-        final String adTypeCode = jsonAd.getString(JsonFields.AD_TYPE);
-        if(adTypeCode.equals("html")) {
-            builder.setUrl(jsonAd.getString(JsonFields.AD_URL));
-        }
-        else {
-            AdAnomalyClient.trackAnomaly(
-                builder.getAdId(),
-                jsonAd.toString(),
-                "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                "Ad " + builder.getAdId() + " has unsupported ad_type: " + adTypeCode
-            );
-        }
+        builder.setUrl(jsonAd.getString(JsonFields.AD_URL));
 
         builder.setActionType(jsonAd.getString(JsonFields.ACTION_TYPE));
         builder.setActionPath(jsonAd.getString(JsonFields.ACTION_PATH));
-        builder.setPayload(jsonAd.getJSONObject(JsonFields.PAYLOAD));
+
+        if(builder.getActionType().equals(Ad.ActionTypes.CONTENT)) {
+            builder.setPayload(parseAdContent(jsonAd));
+        }
 
         builder.setTrackingHtml(jsonAd.getString(JsonFields.TRACKING_HTML));
 
         return builder.build();
+    }
+
+    private List<String> parseAdContent(final JSONObject jsonAd) throws JSONException{
+        final JSONObject payloadObject = jsonAd.getJSONObject(JsonFields.PAYLOAD);
+        final JSONArray jsonItems = payloadObject.getJSONArray(JsonFields.CONTENT_LIST_ITEMS);
+
+        final List<String> listItems = new ArrayList<>();
+        for(int i = 0; i < jsonItems.length(); i++) {
+            listItems.add(jsonItems.getString(i));
+        }
+
+        return listItems;
     }
 }

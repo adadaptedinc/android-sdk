@@ -2,12 +2,13 @@ package com.adadapted.android.sdk.ext.http;
 
 import android.util.Log;
 
+import com.adadapted.android.sdk.core.device.DeviceInfo;
+import com.adadapted.android.sdk.core.event.AppError;
+import com.adadapted.android.sdk.core.event.AppEvent;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.event.AppEventSink;
 import com.adadapted.android.sdk.ext.json.JsonAppErrorBuilder;
 import com.adadapted.android.sdk.ext.json.JsonAppEventBuilder;
-import com.android.volley.NetworkError;
-import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -17,6 +18,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class HttpAppEventSink implements AppEventSink {
     private static final String LOGTAG = HttpAppEventSink.class.getName();
@@ -26,6 +28,9 @@ public class HttpAppEventSink implements AppEventSink {
 
     private final JsonAppEventBuilder eventBuilder;
     private final JsonAppErrorBuilder errorBuilder;
+
+    private JSONObject eventWrapper;
+    private JSONObject errorWrapper;
 
     public HttpAppEventSink(final String eventUrl,
                             final String errorUrl) {
@@ -37,10 +42,21 @@ public class HttpAppEventSink implements AppEventSink {
     }
 
     @Override
-    public void publishEvent(final String type,
-                             final String name,
-                             final Map<String, String> params) {
-        final JSONObject json = eventBuilder.buildItem(new JSONObject(), type, name, params);
+    public void generateWrappers(final DeviceInfo deviceInfo) {
+        eventWrapper = eventBuilder.buildWrapper(deviceInfo);
+        errorWrapper = errorBuilder.buildWrapper(deviceInfo);
+    }
+
+    @Override
+    public void publishEvent(final Set<AppEvent> events) {
+        if(eventWrapper == null) {
+            Log.w(LOGTAG, "No event wrapper");
+            return;
+        }
+
+        final JSONObject json = eventBuilder.buildItem(eventWrapper, events);
+
+        //Log.d(LOGTAG, json.toString());
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
                 eventUrl, json, new Response.Listener<JSONObject>(){
@@ -50,17 +66,21 @@ public class HttpAppEventSink implements AppEventSink {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(LOGTAG, "App Event Request Failed.", error);
+                String reason = "";
+                if(error != null && error.networkResponse != null) {
+                    final int statusCode = error.networkResponse.statusCode;
+                    final String data = new String(error.networkResponse.data);
 
-                if(error instanceof NoConnectionError || error instanceof NetworkError) {
-                    return;
+                    reason = statusCode + " - " + data;
+
+                    Log.e(LOGTAG, "App Event Request Failed: " + reason, error);
                 }
 
                 final Map<String, String> errorParams = new HashMap<>();
                 errorParams.put("endpoint", eventUrl);
                 AppEventClient.trackError(
                     "APP_EVENT_REQUEST_FAILED",
-                    error.getMessage(),
+                    reason,
                     errorParams
                 );
             }
@@ -70,10 +90,15 @@ public class HttpAppEventSink implements AppEventSink {
     }
 
     @Override
-    public void publishError(final String code,
-                             final String message,
-                             final Map<String, String> params) {
-        final JSONObject json = errorBuilder.buildItem(new JSONObject(), code, message, params);
+    public void publishError(final Set<AppError> errors) {
+        if(errorWrapper == null) {
+            Log.w(LOGTAG, "No error wrapper");
+            return;
+        }
+
+        final JSONObject json = errorBuilder.buildItem(errorWrapper, errors);
+
+        //Log.d(LOGTAG, json.toString());
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
                 errorUrl, json, new Response.Listener<JSONObject>(){
@@ -83,7 +108,12 @@ public class HttpAppEventSink implements AppEventSink {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(LOGTAG, "App Error Request Failed.", error);
+                if(error != null && error.networkResponse != null) {
+                    final int statusCode = error.networkResponse.statusCode;
+                    final String data = new String(error.networkResponse.data);
+
+                    Log.e(LOGTAG, "App Error Request Failed: " + statusCode + " - " + data, error);
+                }
             }
         });
 

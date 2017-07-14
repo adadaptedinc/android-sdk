@@ -1,13 +1,9 @@
 package com.adadapted.android.sdk.ext.http;
 
-import android.util.Log;
-
 import com.adadapted.android.sdk.core.ad.AdEvent;
 import com.adadapted.android.sdk.core.ad.AdEventSink;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.ext.json.JsonAdEventBuilder;
-import com.android.volley.NetworkError;
-import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -34,28 +30,35 @@ public class HttpAdEventSink implements AdEventSink {
     public void sendBatch(final Set<AdEvent> events) {
         final JSONArray json = builder.buildEvents(events);
 
+        //Log.d(LOGTAG, json.toString());
+
         final JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST,
                 batchUrl, json, new Response.Listener<JSONArray>(){
 
             @Override
             public void onResponse(JSONArray response) {
+                //Log.d(LOGTAG, response.toString());
             }
 
         }, new Response.ErrorListener() {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.i(LOGTAG, "Ad Event Batch Request Failed.", error);
+                String reason = "";
+                if(error != null && error.networkResponse != null) {
+                    final int statusCode = error.networkResponse.statusCode;
+                    final String data = new String(error.networkResponse.data);
 
-                if(error instanceof NoConnectionError || error instanceof NetworkError) {
-                    return;
+                    reason = statusCode + " - " + data;
+
+                    //Log.e(LOGTAG, "Ad Batch Request Failed: " + reason, error);
                 }
 
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", batchUrl);
                 AppEventClient.trackError(
                     "AD_EVENT_TRACK_REQUEST_FAILED",
-                    error.getMessage(),
+                    reason,
                     params
                 );
             }

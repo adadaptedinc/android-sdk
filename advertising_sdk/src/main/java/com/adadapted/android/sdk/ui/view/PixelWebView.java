@@ -17,13 +17,6 @@ class PixelWebView extends WebView {
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         setWebViewClient(new WebViewClient() {
             @Override
-            public void onPageFinished(WebView view,
-                                       String url) {
-                super.onPageFinished(view, url);
-                Log.i(LOGTAG, "Loaded Tracking HTML");
-            }
-
-            @Override
             public void onReceivedError(WebView view,
                                         WebResourceRequest request,
                                         WebResourceError error) {

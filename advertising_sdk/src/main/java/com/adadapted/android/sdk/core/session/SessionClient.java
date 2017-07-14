@@ -1,12 +1,16 @@
 package com.adadapted.android.sdk.core.session;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
+import com.adadapted.android.sdk.config.Config;
+import com.adadapted.android.sdk.core.ad.AdEventClient;
 import com.adadapted.android.sdk.core.concurrency.ThreadPoolInteractorExecuter;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.device.DeviceInfoClient;
-import com.adadapted.android.sdk.core.zone.Zone;
+import com.adadapted.android.sdk.core.event.AppEventClient;
+import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptClient;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -27,12 +31,10 @@ public class SessionClient implements SessionAdapter.Listener {
 
     private static SessionClient instance;
 
-    public static SessionClient createInstance(final SessionAdapter adapter) {
+    public static void createInstance(final SessionAdapter adapter) {
         if(instance == null) {
             instance = new SessionClient(adapter);
         }
-
-        return instance;
     }
 
     private static SessionClient getInstance() {
@@ -40,10 +42,10 @@ public class SessionClient implements SessionAdapter.Listener {
     }
 
     public static synchronized void start(final Context context,
-                             final String appId,
-                             final boolean isProd,
-                             final Map<String, String> params,
-                             final Listener listener) {
+                                          final String appId,
+                                          final boolean isProd,
+                                          final Map<String, String> params,
+                                          final Listener listener) {
         if(listener != null) {
             addListener(listener);
         }
@@ -120,11 +122,15 @@ public class SessionClient implements SessionAdapter.Listener {
     private Session currentSession;
     private final Lock sessionLock = new ReentrantLock();
 
-    private boolean pollingTimerRunning = false;
+    private boolean pollingTimerRunning;
+    private boolean eventTimerRunning;
 
     private SessionClient(final SessionAdapter adapter) {
         this.adapter = adapter;
         this.listeners = new HashSet<>();
+
+        this.pollingTimerRunning = false;
+        this.eventTimerRunning = false;
     }
 
     private void performAddListener(final Listener listener) {
@@ -178,42 +184,76 @@ public class SessionClient implements SessionAdapter.Listener {
         sessionLock.lock();
         try {
             currentSession = session;
-            startPollingTimer();
+            startPublishTimer();
         }
         finally {
             sessionLock.unlock();
         }
+
+        startPollingTimer();
     }
 
-    private void updateCurrentZones(final Map<String, Zone> zones) {
+    private void updateCurrentZones(final Session session) {
         sessionLock.lock();
         try {
-            currentSession = new Session(currentSession, zones);
-            startPollingTimer();
+            currentSession = session;
         }
         finally {
             sessionLock.unlock();
         }
+
+        startPollingTimer();
     }
 
     private void startPollingTimer() {
-        if(pollingTimerRunning) {
+        if(pollingTimerRunning || currentSession.getRefreshTime() == 0L) {
             return;
         }
 
         pollingTimerRunning = true;
-        new Timer().schedule(new TimerTask() {
+
+        sessionLock.lock();
+        try {
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    pollingTimerRunning = false;
+                    if (currentSession.hasExpired()) {
+                        Log.i(LOGTAG, "Session has expired. Expired at: " + currentSession.getExpiresAt());
+                        AppEventClient.trackSdkEvent("session_expired");
+
+                        performInitialize(deviceInfo);
+                    } else {
+                        perfrmRefreshAds();
+                    }
+                }
+            }, currentSession.getRefreshTime());
+        }
+        finally {
+            sessionLock.unlock();
+        }
+    }
+
+    private void startPublishTimer() {
+        if(eventTimerRunning) {
+            return;
+        }
+
+        Log.i(LOGTAG, "Starting up the Event Publisher.");
+
+        eventTimerRunning = true;
+
+        final Handler handler = new Handler();
+        final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                pollingTimerRunning = false;
-                if(currentSession.hasExpired()) {
-                    Log.i(LOGTAG, "Session has expired. Expired at: " + currentSession.getExpiresAt());
-                    performInitialize(deviceInfo);
-                } else {
-                    perfrmRefreshAds();
-                }
+                AdEventClient.publishEvents();
+                AppEventClient.publishEvents();
+
+                handler.postDelayed(this, Config.DEFAULT_EVENT_POLLING);
             }
-        }, currentSession.getRefreshTime());
+        };
+        runnable.run();
     }
 
     private void notifySessionAvailable() {
@@ -260,15 +300,18 @@ public class SessionClient implements SessionAdapter.Listener {
 
     @Override
     public void onSessionInitializeFailed() {
+        updateCurrentSession(Session.emptySession());
         notifySessionInitFailed();
     }
 
     @Override
-    public void onNewAdsLoaded(final Map<String, Zone> zones) {
-        updateCurrentZones(zones);
+    public void onNewAdsLoaded(final Session session) {
+        updateCurrentZones(session);
         notifyAdsAvailable();
     }
 
     @Override
-    public void onNewAdsLoadFailed() {}
+    public void onNewAdsLoadFailed() {
+        updateCurrentZones(Session.emptySession());
+    }
 }

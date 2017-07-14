@@ -1,5 +1,7 @@
 package com.adadapted.android.sdk.core.keywordintercept;
 
+import android.util.Log;
+
 import com.adadapted.android.sdk.core.concurrency.ThreadPoolInteractorExecuter;
 import com.adadapted.android.sdk.core.session.Session;
 
@@ -18,13 +20,10 @@ public class KeywordInterceptClient {
 
     private static KeywordInterceptClient instance;
 
-    public static synchronized KeywordInterceptClient createInstance(final KeywordInterceptAdapter adapter,
-                                                                      final KeywordInterceptEventSink sink) {
+    public static synchronized void createInstance(final KeywordInterceptAdapter adapter) {
         if(instance == null) {
-            instance = new KeywordInterceptClient(adapter, sink);
+            instance = new KeywordInterceptClient(adapter);
         }
-
-        return instance;
     }
 
     private static KeywordInterceptClient getInstance() {
@@ -54,6 +53,7 @@ public class KeywordInterceptClient {
 
     public static synchronized void trackSelected(final Session session, final String term, final String userInput) {
         trackEvent(session, "", term, userInput, "selected");
+        publishEvents();
     }
 
     private static synchronized void trackEvent(final Session session,
@@ -81,16 +81,22 @@ public class KeywordInterceptClient {
         });
     }
 
+    public static synchronized void publishEvents() {
+        ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
+            @Override
+            public void run() {
+                getInstance().performPublishEvents();
+            }
+        });
+    }
+
     private final KeywordInterceptAdapter adapter;
-    private final KeywordInterceptEventSink sink;
 
     private final Set<KeywordInterceptEvent> events;
-    private final Lock lock = new ReentrantLock();
+    private final Lock eventLock = new ReentrantLock();
 
-    private KeywordInterceptClient(final KeywordInterceptAdapter adapter,
-                                   final KeywordInterceptEventSink sink) {
+    private KeywordInterceptClient(final KeywordInterceptAdapter adapter) {
         this.adapter = adapter;
-        this.sink = sink;
 
         this.events = new HashSet<>();
     }
@@ -103,46 +109,44 @@ public class KeywordInterceptClient {
                 listener.onKeywordInterceptInitialized(keywordIntercept);
             }
 
-            @Override
-            public void onFailure() {}
         });
     }
 
     private void fileEvent(final KeywordInterceptEvent event) {
-        lock.lock();
+        eventLock.lock();
         try {
-            final Set<KeywordInterceptEvent> events = new HashSet<>(this.events);
+            final Set<KeywordInterceptEvent> currentEvents = new HashSet<>(this.events);
 
-            for (final KeywordInterceptEvent e : events) {
+            for (final KeywordInterceptEvent e : currentEvents) {
                 if (event.supercedes(e)) {
-                    events.remove(e);
+                    currentEvents.remove(e);
                 }
             }
 
             events.add(event);
 
             this.events.clear();
-            this.events.addAll(events);
+            this.events.addAll(currentEvents);
         }
         finally {
-            lock.unlock();
+            eventLock.unlock();
         }
     }
 
-    public void publishEvents() {
-        lock.lock();
+    private void performPublishEvents() {
+        eventLock.lock();
         try {
             if (events.isEmpty()) {
                 return;
             }
 
-            final Set<KeywordInterceptEvent> events = new HashSet<>(this.events);
+            final Set<KeywordInterceptEvent> currentEvents = new HashSet<>(this.events);
             this.events.clear();
 
-            sink.sendBatch(events);
+            adapter.sendBatch(currentEvents);
         }
         finally {
-            lock.unlock();
+            eventLock.unlock();
         }
     }
 }

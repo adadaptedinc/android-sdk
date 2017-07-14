@@ -16,8 +16,10 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -44,10 +46,6 @@ public class DeviceInfoClient {
                                   final boolean isProd,
                                   final Map<String, String> params,
                                   final Callback callback) {
-        if(instance == null) {
-            return;
-        }
-
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
             public void run() {
@@ -57,10 +55,6 @@ public class DeviceInfoClient {
     }
 
     public static synchronized void getDeviceInfo(final Callback callback) {
-        if(instance == null) {
-            return;
-        }
-
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
             public void run() {
@@ -72,11 +66,20 @@ public class DeviceInfoClient {
     private DeviceInfo deviceInfo;
     private final Lock lock = new ReentrantLock();
 
+    private final Set<Callback> callbacks;
+
+    private DeviceInfoClient() {
+        callbacks = new HashSet<>();
+    }
+
     private void performGetInfo(final Callback callback) {
         lock.lock();
         try {
             if(deviceInfo != null) {
                 callback.onDeviceInfoCollected(deviceInfo);
+            }
+            else {
+                callbacks.add(callback);
             }
         }
         finally {
@@ -151,7 +154,26 @@ public class DeviceInfoClient {
         }
 
         if(callback != null) {
+            notifyCallback(callback);
+        }
+        else {
+            Log.w(LOGTAG, "Collect Device Info callback is NULL");
+        }
+    }
+
+    private void notifyCallback(final Callback callback) {
+        lock.lock();
+        try {
             callback.onDeviceInfoCollected(deviceInfo);
+
+            final Set<Callback> current = new HashSet<>(callbacks);
+            for(final Callback c : current) {
+                c.onDeviceInfoCollected(deviceInfo);
+                callbacks.remove(c);
+            }
+        }
+        finally {
+            lock.unlock();
         }
     }
 

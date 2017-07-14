@@ -77,7 +77,7 @@ public class JsonZoneBuilder {
                 portDimension.setWidth(Dimension.MATCH_PARENT);
             }
 
-            builder.getDimensions().put(Dimension.ORIEN.PORT, portDimension);
+            builder.setDimension(Dimension.ORIEN.PORT, portDimension);
         }
 
         if(jsonZone.has(JsonFields.LANDZONEHEIGHT) && jsonZone.has(JsonFields.LANDZONEWIDTH)) {
@@ -97,7 +97,7 @@ public class JsonZoneBuilder {
                 landDimension.setWidth(Dimension.MATCH_PARENT);
             }
 
-            builder.getDimensions().put(Dimension.ORIEN.LAND, landDimension);
+            builder.setDimension(Dimension.ORIEN.LAND, landDimension);
         }
 
         final JSONArray jsonAds = jsonZone.getJSONArray(JsonFields.ADS);

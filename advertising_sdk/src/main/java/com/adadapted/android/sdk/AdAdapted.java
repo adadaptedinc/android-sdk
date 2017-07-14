@@ -4,12 +4,12 @@ import android.content.Context;
 import android.util.Log;
 
 import com.adadapted.android.sdk.config.Config;
+import com.adadapted.android.sdk.core.addit.Content;
 import com.adadapted.android.sdk.core.addit.PayloadClient;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.session.Session;
 import com.adadapted.android.sdk.core.session.SessionClient;
 import com.adadapted.android.sdk.ext.Wireup;
-import com.adadapted.android.sdk.ext.http.HttpRequestManager;
 import com.adadapted.android.sdk.ui.messaging.AaSdkAdditContentListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener;
@@ -17,6 +17,7 @@ import com.adadapted.android.sdk.ui.messaging.AdditContentPublisher;
 import com.adadapted.android.sdk.ui.messaging.SdkEventPublisher;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AdAdapted {
@@ -33,6 +34,8 @@ public class AdAdapted {
     private boolean isProd;
     private Map<String, String> params;
     private AaSdkSessionListener sessionListener;
+    private AaSdkEventListener eventListener;
+    private AaSdkAdditContentListener contentListener;
 
     private AdAdapted() {
         params = new HashMap<>();
@@ -75,13 +78,13 @@ public class AdAdapted {
     }
 
     public AdAdapted setSdkEventListener(final AaSdkEventListener listener) {
-        SdkEventPublisher.getInstance().setListener(listener);
+        eventListener = listener;
 
         return this;
     }
 
     public AdAdapted setSdkAdditContentListener(final AaSdkAdditContentListener listener) {
-        AdditContentPublisher.getInstance().addListener(listener);
+        contentListener = listener;
 
         return this;
     }
@@ -93,14 +96,25 @@ public class AdAdapted {
     }
 
     public void start(final Context context) {
-        HttpRequestManager.createQueue(context.getApplicationContext());
-        Wireup.run(isProd);
+        Wireup.run(context, isProd);
 
-        PayloadClient.pickupPayloads();
+        SdkEventPublisher.getInstance().setListener(eventListener);
+        AdditContentPublisher.getInstance().addListener(contentListener);
+
+        PayloadClient.pickupPayloads(new PayloadClient.Callback() {
+            @Override
+            public void onPayloadAvailable(final List<Content> content) {
+                if(content.size() > 0) {
+                    AdditContentPublisher.getInstance().publishContent(content.get(0));
+                }
+            }
+        });
 
         final SessionClient.Listener startListener = new SessionClient.Listener() {
             @Override
             public void onSessionAvailable(final Session session) {
+                //Log.d(LOGTAG, "onSessionAvailable called. Has ads: " + session.hasActiveCampaigns());
+
                 if(sessionListener != null) {
                     sessionListener.onHasAdsToServe(session.hasActiveCampaigns());
                 }
@@ -108,6 +122,8 @@ public class AdAdapted {
 
             @Override
             public void onAdsAvailable(Session session) {
+                //Log.d(LOGTAG, "onAdsAvailable called. Has ads: " + session.hasActiveCampaigns());
+
                 if(sessionListener != null) {
                     sessionListener.onHasAdsToServe(session.hasActiveCampaigns());
                 }
@@ -121,9 +137,9 @@ public class AdAdapted {
 
         SessionClient.start(
             context.getApplicationContext(),
-                appId,
-                isProd,
-                params,
+            appId,
+            isProd,
+            params,
             startListener);
 
         AppEventClient.trackSdkEvent("app_opened");
@@ -135,11 +151,12 @@ public class AdAdapted {
             );
         }
 
-        //new EventFlushScheduler().start(Config.DEFAULT_EVENT_POLLING);
         Log.i(LOGTAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", Config.SDK_VERSION));
     }
 
     public static synchronized void restart(final Context context) {
+        AppEventClient.trackSdkEvent("sdk_restarted");
+
         restart(context, new HashMap<String, String>());
     }
 
@@ -151,8 +168,6 @@ public class AdAdapted {
             getsInstance().isProd,
             params
         );
-
-        AppEventClient.trackSdkEvent("session_restarted", params);
 
         Log.i(LOGTAG, String.format("AdAdapted Android Advertising SDK v%s reinitialized.", Config.SDK_VERSION));
     }

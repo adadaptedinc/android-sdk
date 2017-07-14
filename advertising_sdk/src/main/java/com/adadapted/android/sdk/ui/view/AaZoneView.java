@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.ui.view;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
@@ -7,12 +8,11 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.adadapted.android.sdk.core.ad.Ad;
+import com.adadapted.android.sdk.core.common.Dimension;
 import com.adadapted.android.sdk.core.zone.Zone;
 import com.adadapted.android.sdk.ui.messaging.AaSdkContentListener;
 import com.adadapted.android.sdk.ui.messaging.SdkContentPublisher;
@@ -29,9 +29,10 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
     private AdWebView webView;
     private AdZonePresenter presenter;
 
-    private PixelWebView pixelWebView;
-
     private boolean isVisible = true;
+
+    private int width;
+    private int height;
 
     private Listener listener;
 
@@ -62,20 +63,17 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
     }
 
     private void setup(final Context context) {
-        Log.d(LOGTAG, "setup called");
-
         this.presenter  = new AdZonePresenter(context.getApplicationContext());
 
         this.webView = new AdWebView(context.getApplicationContext(), this);
         addView(webView);
-
-        this.pixelWebView = new PixelWebView(context.getApplicationContext());
     }
 
     public void init(final String zoneId) {
         presenter.init(zoneId);
     }
 
+    @SuppressWarnings("UnusedParameters")
     @Deprecated
     public void init(final String zoneId,
                      final int layoutResourceId) {
@@ -87,23 +85,6 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
             @Override
             public void run() {
                 AaZoneView.this.setVisibility(View.GONE);
-            }
-        });
-    }
-
-    protected void displayAdView(final View view) {
-        if(view == null) { return; }
-
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                final ViewGroup parent = ((ViewGroup) view.getParent());
-                if (parent != null) {
-                    parent.removeView(view);
-                }
-
-                AaZoneView.this.removeAllViews();
-                AaZoneView.this.addView(view);
             }
         });
     }
@@ -148,89 +129,106 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
         onStop();
     }
 
+    private void notifyAdLoaded() {
+        if(listener != null) {
+            listener.onAdLoaded();
+        }
+    }
+
+    private void notifyAdLoadFailed() {
+        if(listener != null) {
+            listener.onAdLoadFailed();
+        }
+    }
+
+    /*
+     * Overrides from AdZonePresenter.Listener
+     */
+
     @Override
     public void onZoneAvailable(final Zone zone) {
-        Log.d(LOGTAG, "onZoneAvailable called");
+        if(width == 0 || height == 0) {
+            final Dimension dimension = zone.getDimensions().get(Dimension.ORIEN.PORT);
+            width = (dimension == null) ? LayoutParams.MATCH_PARENT : dimension.getWidth();
+            height = (dimension == null) ? LayoutParams.MATCH_PARENT : dimension.getHeight();
+        }
 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                webView.setLayoutParams(new LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                ));
+                webView.setLayoutParams(new LayoutParams(width, height));
             }
         });
     }
 
     @Override
     public void onAdAvailable(final Ad ad) {
-        Log.d(LOGTAG, "onAdAvailable called");
-
         if(isVisible) {
-            Log.i(LOGTAG, "Displaying Ad URL: " + ad.getUrl());
-
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
-                    webView.loadUrl(ad.getUrl());
-                    pixelWebView.loadData(ad.getTrackingHtml(), "text/html", null);
+                    webView.loadAd(ad);
                 }
             });
         }
     }
 
     @Override
-    public void onAdLoaded() {
-        if(listener != null) {
-            listener.onAdLoaded();
-        }
+    public void onNoAdAvailable() {
+        notifyAdLoadFailed();
+
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                webView.loadBlank();
+            }
+        });
+    }
+
+    /*
+     * Overrides from AdWebView.Listener
+     */
+
+    @Override
+    public void onAdLoaded(final Ad ad) {
+        notifyAdLoaded();
 
         if(presenter != null) {
-            presenter.onAdDisplayed();
+            presenter.onAdDisplayed(ad);
         }
     }
 
     @Override
-    public void onAdLoadFailed() {
-        if(listener != null) {
-            listener.onAdLoadFailed();
-        }
-
+    public void onAdLoadFailed(final Ad ad) {
+        notifyAdLoadFailed();
     }
 
     @Override
-    public void onAdClicked() {
+    public void onAdClicked(final Ad ad) {
         if(presenter != null) {
-            presenter.onAdClicked();
+            presenter.onAdClicked(ad);
         }
     }
 
+    @SuppressLint("SwitchIntDef")
     @Override
     protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
 
-        Log.d(LOGTAG, "onVisibilityChanged called");
-
         switch (visibility) {
             case View.GONE:
-                Log.i(LOGTAG, "Visibility changed to GONE");
                 setInvisible();
                 break;
             case View.INVISIBLE:
-                Log.i(LOGTAG, "Visibility changed to INVISIBLE");
                 setInvisible();
                 break;
             case View.VISIBLE:
-                Log.i(LOGTAG, "Visibility changed to VISIBLE");
                 setVisible();
                 break;
         }
     }
 
     private void setVisible() {
-        Log.d(LOGTAG, "setVisible called");
-
         isVisible = true;
         if(presenter != null) {
             presenter.onAttach(this);
@@ -238,8 +236,6 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
     }
 
     private void setInvisible() {
-        Log.d(LOGTAG, "setInvisible called");
-
         isVisible = false;
         if(presenter != null) {
             presenter.onDetach();

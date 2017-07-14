@@ -28,6 +28,7 @@ class AdZonePresenter implements SessionClient.Listener {
     interface Listener {
         void onZoneAvailable(Zone zone);
         void onAdAvailable(Ad ad);
+        void onNoAdAvailable();
     }
 
     private String zoneId;
@@ -38,6 +39,8 @@ class AdZonePresenter implements SessionClient.Listener {
     private Zone currentZone;
     private final Lock zoneLock = new ReentrantLock();
 
+    private final PixelWebView pixelWebView;
+
     private int viewCount;
 
     private Ad currentAd;
@@ -47,6 +50,8 @@ class AdZonePresenter implements SessionClient.Listener {
 
     AdZonePresenter(final Context context) {
         this.context = context.getApplicationContext();
+
+        pixelWebView = new PixelWebView(context.getApplicationContext());
 
         this.currentZone = Zone.emptyZone();
         this.viewCount = 0;
@@ -61,10 +66,7 @@ class AdZonePresenter implements SessionClient.Listener {
     }
 
     void onAttach(final Listener l) {
-        Log.d(LOGTAG, "onAttach called");
-
         if(listener != null) {
-            Log.w(LOGTAG, "View already attached");
             return;
         }
 
@@ -79,10 +81,7 @@ class AdZonePresenter implements SessionClient.Listener {
     }
 
     void onDetach() {
-        Log.d(LOGTAG, "onDetach called");
-
         if(listener == null) {
-            Log.w(LOGTAG, "View already detached");
             return;
         }
 
@@ -93,8 +92,6 @@ class AdZonePresenter implements SessionClient.Listener {
     }
 
     private void updateCurrentZone(final Zone zone) {
-        Log.d(LOGTAG, "updateCurrentZone called");
-
         zoneLock.lock();
         try {
             this.currentZone = zone;
@@ -109,19 +106,20 @@ class AdZonePresenter implements SessionClient.Listener {
     }
 
     private void setNextAd() {
-        Log.d(LOGTAG, "setNextAd called");
-
         completeCurrentAd();
 
         adLock.lock();
         try {
-            if(!currentZone.isEmpty() && currentZone.hasAds()) {
+            if(currentZone.hasAds()) {
                 final int idx = viewCount % currentZone.getAds().size();
                 viewCount++;
 
                 currentAd = currentZone.getAds().get(idx);
                 adStarted = false;
                 adCompleted = false;
+            }
+            else {
+                currentAd = Ad.emptyAd();
             }
         }
         finally {
@@ -132,16 +130,15 @@ class AdZonePresenter implements SessionClient.Listener {
     }
 
     private void displayAd() {
-        Log.d(LOGTAG, "displayAd called");
-
-        if(currentZone.isNotEmpty()) {
+        if(currentZone.hasAds()) {
             notifyAdAvailable(currentAd);
+        }
+        else {
+            notifyNoAdAvailable();
         }
     }
 
     private void completeCurrentAd() {
-        Log.d(LOGTAG, "completeCurrentAd called");
-
         if(currentAd != null && (adStarted && !adCompleted)) {
             adLock.lock();
             try {
@@ -154,13 +151,12 @@ class AdZonePresenter implements SessionClient.Listener {
         }
     }
 
-    void onAdDisplayed() {
-        Log.d(LOGTAG, "onAdDisplayed called");
-
+    void onAdDisplayed(final Ad ad) {
         adLock.lock();
         try {
             adStarted = true;
-            AdEventClient.trackImpression(currentAd);
+            AdEventClient.trackImpression(ad);
+            pixelWebView.loadData(ad.getTrackingHtml(), "text/html", null);
         }
         finally {
             adLock.unlock();
@@ -169,26 +165,17 @@ class AdZonePresenter implements SessionClient.Listener {
         new Timer().schedule(new TimerTask(){
             @Override
             public void run() {
-                Log.i(LOGTAG, "Refreshing Ad");
-
                 setNextAd();
             }
         }, currentAd.getRefreshTime() * 1000);
     }
 
-    void onAdClicked() {
-        Log.d(LOGTAG, "onAdClicked called");
-
-        if(handleAction(currentAd)) {
-            AdEventClient.trackInteraction(currentAd);
+    void onAdClicked(final Ad ad) {
+        if (handleAction(ad)) {
+            AdEventClient.trackInteraction(ad);
         }
     }
 
-    /**
-     *
-     * @param ad The Ad to handle the action for
-     * @return Whether the Ad Interaction should be tracked or not.
-     */
     private boolean handleAction(final Ad ad) {
         if(ad == null) { return false; }
 
@@ -218,7 +205,7 @@ class AdZonePresenter implements SessionClient.Listener {
     private void handleContentAction(final Ad ad) {
         String zoneId = ad.getZoneId();
 
-        AdContentPayload payload = AdContentPayload.createAddToListContent(ad);
+        final AdContentPayload payload = AdContentPayload.createAddToListContent(ad);
         SdkContentPublisher.getInstance().publishContent(zoneId, payload);
     }
 
@@ -237,40 +224,36 @@ class AdZonePresenter implements SessionClient.Listener {
     }
 
     private void notifyZoneAvailable() {
-        Log.d(LOGTAG, "notifyZoneAvailable called");
-
         if(listener != null) {
             listener.onZoneAvailable(currentZone);
         }
     }
 
     private void notifyAdAvailable(final Ad ad) {
-        Log.d(LOGTAG, "notifyAdAvailable called");
-
         if(listener != null) {
             listener.onAdAvailable(ad);
         }
     }
 
+    private void notifyNoAdAvailable() {
+        if(listener != null) {
+            listener.onNoAdAvailable();
+        }
+    }
+
     @Override
     public void onSessionAvailable(final Session session) {
-        Log.d(LOGTAG, "onSessionAvailable called");
-
         updateCurrentZone(session.getZone(zoneId));
         notifyZoneAvailable();
     }
 
     @Override
     public void onAdsAvailable(final Session session) {
-        Log.d(LOGTAG, "onAdsAvailable called");
-
         updateCurrentZone(session.getZone(zoneId));
     }
 
     @Override
     public void onSessionInitFailed() {
-        Log.d(LOGTAG, "onSessionInitFailed called");
-
         updateCurrentZone(Zone.emptyZone());
     }
 }

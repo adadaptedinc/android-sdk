@@ -10,7 +10,6 @@ public class Config {
         public static final String URL_AD_GET = "https://ads.adadapted.com/v/0.9.4/android/ad/get";
         public static final String URL_KI_INIT = "https://ads.adadapted.com/v/0.9.4/android/ki/init";
         public static final String URL_KI_TRACK = "https://ads.adadapted.com/v/0.9.4/android/ki/track";
-        public static final String URL_ANOMALY_BATCH = "https://ads.adadapted.com/v/0.9.4/anomaly/track";
 
         public static final String URL_APP_EVENT_TRACK = "https://ec.adadapted.com/v/1/android/events";
         public static final String URL_APP_ERROR_TRACK = "https://ec.adadapted.com/v/1/android/errors";
@@ -25,7 +24,6 @@ public class Config {
         public static final String URL_AD_GET = "https://sandbox.adadapted.com/v/0.9.4/android/ad/get";
         public static final String URL_KI_INIT = "https://sandbox.adadapted.com/v/0.9.4/android/ki/init";
         public static final String URL_KI_TRACK = "https://sandbox.adadapted.com/v/0.9.4/android/ki/track";
-        public static final String URL_ANOMALY_BATCH = "https://sandbox.adadapted.com/v/0.9.4/anomaly/track";
 
         public static final String URL_APP_EVENT_TRACK = "https://sandec.adadapted.com/v/1/android/events";
         public static final String URL_APP_ERROR_TRACK = "https://sandec.adadapted.com/v/1/android/errors";

@@ -1,9 +1,5 @@
 package com.adadapted.android.sdk.core.ad;
 
-import android.os.Handler;
-import android.util.Log;
-
-import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.concurrency.ThreadPoolInteractorExecuter;
 import com.adadapted.android.sdk.core.session.Session;
 import com.adadapted.android.sdk.core.session.SessionClient;
@@ -113,6 +109,19 @@ public class AdEventClient implements SessionClient.Listener {
         });
     }
 
+    public static synchronized void publishEvents() {
+        if(instance == null) {
+            return;
+        }
+
+        ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
+            @Override
+            public void run() {
+                getInstance().performPublishEvents();
+            }
+        });
+    }
+
     private final AdEventSink adEventSink;
 
     private final Set<Listener> listeners;
@@ -132,16 +141,6 @@ public class AdEventClient implements SessionClient.Listener {
         SessionClient.addListener(this);
     }
 
-    private void startPublishTimer() {
-        new Runnable() {
-            @Override
-            public void run() {
-                publishEvents();
-                new Handler().postDelayed(this, Config.DEFAULT_EVENT_POLLING);
-            }
-        }.run();
-    }
-
     private void fileEvent(final Ad ad, final String eventType) {
         eventLock.lock();
         try {
@@ -150,6 +149,7 @@ public class AdEventClient implements SessionClient.Listener {
                 session.getDeviceInfo().getUdid(),
                 session.getId(),
                 ad.getId(),
+                ad.getZoneId(),
                 ad.getImpressionId(),
                 eventType,
                 session.getDeviceInfo().getSdkVersion()
@@ -163,7 +163,7 @@ public class AdEventClient implements SessionClient.Listener {
         }
     }
 
-    private void publishEvents() {
+    private void performPublishEvents() {
         if(session == null || events.isEmpty()) {
             return;
         }
@@ -172,7 +172,7 @@ public class AdEventClient implements SessionClient.Listener {
 
         eventLock.lock();
         try {
-            Log.i(LOGTAG, "Publishing " + events.size() + " events");
+            //Log.i(LOGTAG, "Publishing " + events.size() + " events");
             currentEvents.addAll(events);
             events.clear();
 
@@ -206,7 +206,7 @@ public class AdEventClient implements SessionClient.Listener {
     private void notifyAdEventTracked(final AdEvent event) {
         listenerLock.lock();
         try {
-            for(Listener l : listeners) {
+            for(final Listener l : listeners) {
                 l.onAdEventTracked(event);
             }
         }
@@ -220,7 +220,6 @@ public class AdEventClient implements SessionClient.Listener {
         eventLock.lock();
         try {
             this.session = session;
-            startPublishTimer();
         }
         finally {
             eventLock.unlock();

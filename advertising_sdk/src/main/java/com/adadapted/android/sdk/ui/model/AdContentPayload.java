@@ -11,7 +11,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +40,7 @@ public class AdContentPayload implements ContentPayload {
     }
 
     public static AdContentPayload createAddToListContent(final Ad ad) {
-        final List items = new ArrayList(); //((ContentAdAction)ad.getAd().getAdAction()).getItems();
+        final List items = ad.getPayload();
         final JSONObject json = new JSONObject();
 
         try {
@@ -52,10 +51,6 @@ public class AdContentPayload implements ContentPayload {
         }
 
         return new AdContentPayload(ad, ADD_TO_LIST, json);
-    }
-
-    public static AdContentPayload createRecipeFavoriteContent(final Ad ad) {
-        return new AdContentPayload(ad, RECIPE_FAVORITE, new JSONObject());
     }
 
     public synchronized void acknowledge() {
@@ -98,10 +93,5 @@ public class AdContentPayload implements ContentPayload {
 
     public JSONObject getPayload() {
         return payload;
-    }
-
-    @Override
-    public String toString() {
-        return "AdContentPayload";
     }
 }

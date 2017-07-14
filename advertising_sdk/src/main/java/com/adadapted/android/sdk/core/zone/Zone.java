@@ -37,21 +37,13 @@ public class Zone {
         return ads;
     }
 
-    public boolean isEmpty() {
-        return ads.isEmpty();
-    }
-
-    public boolean isNotEmpty() {
-        return !ads.isEmpty();
-    }
-
     public boolean hasAds() {
         return !ads.isEmpty();
     }
 
     public static class Builder {
         private String zoneId;
-        private Map<String, Dimension> dimensions;
+        private final Map<String, Dimension> dimensions = new HashMap<>();
         private List<Ad> ads;
 
         public String getZoneId() {
@@ -66,8 +58,8 @@ public class Zone {
             return dimensions;
         }
 
-        public void setDimensions(Map<String, Dimension> dimensions) {
-            this.dimensions = dimensions;
+        public void setDimension(final String key, final Dimension dimension) {
+            this.dimensions.put(key, dimension);
         }
 
         public List<Ad> getAds() {

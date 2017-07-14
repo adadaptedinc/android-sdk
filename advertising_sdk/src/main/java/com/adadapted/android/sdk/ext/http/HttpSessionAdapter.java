@@ -6,14 +6,9 @@ import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.session.SessionAdapter;
 import com.adadapted.android.sdk.core.session.Session;
-import com.adadapted.android.sdk.core.zone.Zone;
-import com.adadapted.android.sdk.ext.json.JsonAdRefreshBuilder;
 import com.adadapted.android.sdk.ext.json.JsonAdRequestBuilder;
 import com.adadapted.android.sdk.ext.json.JsonSessionBuilder;
 import com.adadapted.android.sdk.ext.json.JsonSessionRequestBuilder;
-import com.adadapted.android.sdk.ext.json.JsonZoneBuilder;
-import com.android.volley.NetworkError;
-import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -30,6 +25,8 @@ public class HttpSessionAdapter implements SessionAdapter {
     private final String initUrl;
     private final String refreshUrl;
 
+    private JsonSessionBuilder sessionBuilder;
+
     public HttpSessionAdapter(final String initUrl,
                               final String refreshUrl) {
         this.initUrl = initUrl == null ? "" : initUrl;
@@ -44,15 +41,19 @@ public class HttpSessionAdapter implements SessionAdapter {
         }
 
         final JsonSessionRequestBuilder requestBuilder = new JsonSessionRequestBuilder();
-        final JsonSessionBuilder sessionBuilder = new JsonSessionBuilder(deviceInfo);
+        sessionBuilder = new JsonSessionBuilder(deviceInfo);
 
         final JSONObject json = requestBuilder.buildSessionInitRequest(deviceInfo);
+
+        //Log.d(LOGTAG, json.toString());
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
                 initUrl, json, new Response.Listener<JSONObject>(){
 
             @Override
             public void onResponse(final JSONObject response) {
+                //Log.d(LOGTAG, response.toString());
+
                 final Session session = sessionBuilder.buildSession(response);
                 listener.onSessionInitialized(session);
             }
@@ -61,17 +62,21 @@ public class HttpSessionAdapter implements SessionAdapter {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.w(LOGTAG, "Session Init Request Failed.", error);
+                String reason = "";
+                if(error != null && error.networkResponse != null) {
+                    final int statusCode = error.networkResponse.statusCode;
+                    final String data = new String(error.networkResponse.data);
 
-                if(error instanceof NoConnectionError || error instanceof NetworkError) {
-                    return;
+                    reason = statusCode + " - " + data;
+
+                    Log.e(LOGTAG, "Session Init Request Failed: " + reason, error);
                 }
 
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", initUrl);
                 AppEventClient.trackError(
                         "SESSION_REQUEST_FAILED",
-                        error.getMessage(),
+                        reason,
                         params
                 );
 
@@ -84,38 +89,46 @@ public class HttpSessionAdapter implements SessionAdapter {
     }
 
     @Override
-    public void sentAdGet(final Session session, final AdGetListener listener) {
-        if(session == null || listener == null) {
+    public void sentAdGet(final Session session,
+                          final AdGetListener listener) {
+        if(session == null || listener == null || sessionBuilder == null) {
             return;
         }
 
         final JsonAdRequestBuilder requestBuilder = new JsonAdRequestBuilder();
-        final JsonAdRefreshBuilder builder = new JsonAdRefreshBuilder(new JsonZoneBuilder(session.getDeviceInfo().getScale()));
 
         final JSONObject json = requestBuilder.buildAdRequest(session);
+
+        //Log.d(LOGTAG, json.toString());
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(refreshUrl, json,
                 new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(JSONObject jsonObject) {
-                        final Map<String, Zone> zones = builder.buildRefreshedAds(jsonObject);
-                        listener.onNewAdsLoaded(zones);
+                    public void onResponse(final JSONObject response) {
+                        //Log.d(LOGTAG, response.toString());
+
+                        final Session session = sessionBuilder.buildSession(response);
+                        listener.onNewAdsLoaded(session);
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.i(LOGTAG, "Ad Get Request Failed.");
+                        String reason = "";
+                        if(error != null && error.networkResponse != null) {
+                            final int statusCode = error.networkResponse.statusCode;
+                            final String data = new String(error.networkResponse.data);
 
-                        if(error instanceof NoConnectionError || error instanceof NetworkError) {
-                            return;
+                            reason = statusCode + " - " + data;
+
+                            Log.e(LOGTAG, "Ad Get Request Failed: " + reason, error);
                         }
 
                         final Map<String, String> params = new HashMap<>();
                         params.put("url", refreshUrl);
                         AppEventClient.trackError(
                                 "AD_GET_REQUEST_FAILED",
-                                error.getMessage(),
+                                reason,
                                 params
                         );
 

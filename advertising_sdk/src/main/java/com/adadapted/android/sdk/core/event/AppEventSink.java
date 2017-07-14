@@ -1,13 +1,11 @@
 package com.adadapted.android.sdk.core.event;
 
-import java.util.Map;
+import com.adadapted.android.sdk.core.device.DeviceInfo;
+
+import java.util.Set;
 
 public interface AppEventSink {
-    void publishEvent(final String type,
-                      final String name,
-                      final Map<String, String> params);
-
-    void publishError(final String code,
-                      final String message,
-                      final Map<String, String> params);
+    void generateWrappers(DeviceInfo deviceInfo);
+    void publishEvent(Set<AppEvent> events);
+    void publishError(Set<AppError> errors);
 }

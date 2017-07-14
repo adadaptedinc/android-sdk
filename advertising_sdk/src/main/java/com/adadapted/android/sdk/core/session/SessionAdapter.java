@@ -1,9 +1,6 @@
 package com.adadapted.android.sdk.core.session;
 
 import com.adadapted.android.sdk.core.device.DeviceInfo;
-import com.adadapted.android.sdk.core.zone.Zone;
-
-import java.util.Map;
 
 public interface SessionAdapter {
     interface SessionInitListener {
@@ -12,7 +9,7 @@ public interface SessionAdapter {
     }
 
     interface AdGetListener {
-        void onNewAdsLoaded(Map<String, Zone> zones);
+        void onNewAdsLoaded(Session session);
         void onNewAdsLoadFailed();
     }
 

@@ -5,10 +5,11 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.addit.Content;
 import com.adadapted.android.sdk.core.addit.PayloadAdapter;
 import com.adadapted.android.sdk.core.addit.PayloadContentParser;
+import com.adadapted.android.sdk.core.addit.PayloadEvent;
+import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.event.AppEventClient;
+import com.adadapted.android.sdk.ext.json.JsonPayloadBuilder;
 import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.NetworkError;
-import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -25,46 +26,55 @@ public class HttpPayloadAdapter implements PayloadAdapter {
 
     private final String pickupUrl;
     private final String trackUrl;
+
+    private final JsonPayloadBuilder builder;
     private final PayloadContentParser parser;
 
-    public HttpPayloadAdapter(final String pickupUrl, final String trackUrl) {
+    public HttpPayloadAdapter(final String pickupUrl,
+                              final String trackUrl) {
         this.pickupUrl = pickupUrl;
         this.trackUrl = trackUrl;
 
+        this.builder = new JsonPayloadBuilder();
         this.parser = new PayloadContentParser();
     }
 
     @Override
-    public void pickup(final JSONObject json, final Callback callback) {
-        if(json == null) {
-            return;
-        }
+    public void pickup(final DeviceInfo deviceInfo,
+                       final Callback callback) {
+        final JSONObject json = builder.buildRequest(deviceInfo);
+
+        //Log.d(LOGTAG, json.toString());
 
         final JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
                 this.pickupUrl, json, new Response.Listener<JSONObject>(){
             @Override
             public void onResponse(JSONObject response) {
+                //Log.d(LOGTAG, response.toString());
+
                 final List<Content> content = parser.parse(response);
                 callback.onSuccess(content);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(LOGTAG, "Payload Pickup Request Failed.", error);
+                String reason = "";
+                if(error != null && error.networkResponse != null) {
+                    final int statusCode = error.networkResponse.statusCode;
+                    final String data = new String(error.networkResponse.data);
 
-                if(error instanceof NoConnectionError || error instanceof NetworkError) {
-                    return;
+                    reason = statusCode + " - " + data;
+
+                    Log.e(LOGTAG, "Payload Request Failed: " + reason, error);
                 }
 
                 final Map<String, String> errorParams = new HashMap<>();
                 errorParams.put("endpoint", pickupUrl);
                 AppEventClient.trackError(
                     "PAYLOAD_PICKUP_REQUEST_FAILED",
-                    error.getMessage(),
+                    reason,
                     errorParams
                 );
-
-                callback.onFailure(error.getMessage());
             }
         });
 
@@ -72,8 +82,12 @@ public class HttpPayloadAdapter implements PayloadAdapter {
     }
 
     @Override
-    public void publishEvent(JSONObject payloadEvent) {
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, trackUrl, payloadEvent, new Response.Listener<JSONObject>() {
+    public void publishEvent(final PayloadEvent event) {
+        final JSONObject json = builder.buildEvent(event);
+
+        Log.d(LOGTAG, json.toString());
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, trackUrl, json, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {}
 
@@ -81,10 +95,6 @@ public class HttpPayloadAdapter implements PayloadAdapter {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(LOGTAG, "Payload Event Request Failed.", error);
-
-                if(error instanceof NoConnectionError || error instanceof NetworkError) {
-                    return;
-                }
 
                 final Map<String, String> errorParams = new HashMap<>();
                 errorParams.put("endpoint", trackUrl);
