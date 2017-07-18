@@ -2,10 +2,10 @@ package com.adadapted.android.sdk.ui.model;
 
 import android.util.Log;
 
-import com.adadapted.android.sdk.core.ad.model.ContentAdAction;
+import com.adadapted.android.sdk.core.ad.Ad;
+import com.adadapted.android.sdk.core.ad.AdEventClient;
 import com.adadapted.android.sdk.core.content.ContentPayload;
-import com.adadapted.android.sdk.core.event.model.AppEventSource;
-import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
+import com.adadapted.android.sdk.core.event.AppEventClient;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,9 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 6/5/15.
- */
 public class AdContentPayload implements ContentPayload {
     private static final String LOGTAG = AdContentPayload.class.getName();
 
@@ -26,24 +23,24 @@ public class AdContentPayload implements ContentPayload {
 
     public static final String FIELD_ADD_TO_LIST_ITEMS = "add_to_list_items";
 
-    private final ViewAdWrapper mAd;
-    private final int mType;
-    private final JSONObject mPayload;
+    private final Ad ad;
+    private final int type;
+    private final JSONObject payload;
 
-    private boolean mHandled;
+    private boolean handled;
 
-    private AdContentPayload(final ViewAdWrapper ad,
+    private AdContentPayload(final Ad ad,
                              final int type,
                              final JSONObject payload) {
-        mAd = ad;
-        mType = type;
-        mPayload = payload;
+        this.ad = ad;
+        this.type = type;
+        this.payload = payload;
 
-        mHandled = false;
+        handled = false;
     }
 
-    public static AdContentPayload createAddToListContent(final ViewAdWrapper ad) {
-        final List items = ((ContentAdAction)ad.getAd().getAdAction()).getItems();
+    public static AdContentPayload createAddToListContent(final Ad ad) {
+        final List items = ad.getPayload();
         final JSONObject json = new JSONObject();
 
         try {
@@ -56,30 +53,26 @@ public class AdContentPayload implements ContentPayload {
         return new AdContentPayload(ad, ADD_TO_LIST, json);
     }
 
-    public static AdContentPayload createRecipeFavoriteContent(final ViewAdWrapper ad) {
-        return new AdContentPayload(ad, RECIPE_FAVORITE, new JSONObject());
-    }
-
     public synchronized void acknowledge() {
-        if(mHandled) {
+        if(handled) {
             Log.w(LOGTAG, "Content Payload acknowledged multiple times.");
             return;
         }
 
-        mHandled = true;
+        handled = true;
         Log.d(LOGTAG, "Content Payload acknowledged.");
 
         try {
             final JSONArray array = getPayload().getJSONArray("add_to_list_items");
             for (int i = 0; i < array.length(); i++) {
-                trackItem(mAd.getAdId(), array.getString(i));
+                trackItem(ad.getId(), array.getString(i));
             }
         }
         catch(JSONException ex) {
             Log.w(LOGTAG, "Problem parsing JSON");
         }
 
-        mAd.trackPayloadDelivered();
+        AdEventClient.trackInteraction(ad);
     }
 
     private void trackItem(final String adId, final String itemName) {
@@ -87,23 +80,18 @@ public class AdContentPayload implements ContentPayload {
         params.put("ad_id", adId);
         params.put("item_name", itemName);
 
-        AppEventTrackingManager.registerEvent(AppEventSource.SDK, "atl_added_to_list", params);
+        AppEventClient.trackSdkEvent("atl_added_to_list", params);
     }
 
     public String getZoneId() {
-        return mAd.getAd().getZoneId();
+        return ad.getZoneId();
     }
 
     public int getType() {
-        return mType;
+        return type;
     }
 
     public JSONObject getPayload() {
-        return mPayload;
-    }
-
-    @Override
-    public String toString() {
-        return "AdContentPayload";
+        return payload;
     }
 }

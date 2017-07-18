@@ -2,66 +2,61 @@ package com.adadapted.android.sdk.ext.json;
 
 import android.util.Log;
 
-import com.adadapted.android.sdk.core.event.AppEventBuilder;
-import com.adadapted.android.sdk.core.session.model.Session;
+import com.adadapted.android.sdk.core.device.DeviceInfo;
+import com.adadapted.android.sdk.core.event.AppEvent;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
-/**
- * Created by chrisweeden on 9/16/16.
- */
-public class JsonAppEventBuilder implements AppEventBuilder {
+public class JsonAppEventBuilder {
     private static final String LOGTAG = JsonAppEventBuilder.class.getName();
 
-    @Override
-    public JSONObject buildWrapper(final Session session) {
-        JSONObject item = new JSONObject();
+    public JSONObject buildWrapper(final DeviceInfo deviceInfo) {
+        JSONObject eventWrapper = new JSONObject();
 
         try {
-            item.put(JsonFields.SESSIONID, session.getSessionId());
-            item.put(JsonFields.APPID, session.getDeviceInfo().getAppId());
-            item.put(JsonFields.UDID, session.getDeviceInfo().getUdid());
-            item.put(JsonFields.DEVICEUDID, session.getDeviceInfo().getDeviceUdid());
-            item.put(JsonFields.BUNDLEID, session.getDeviceInfo().getBundleId());
-            item.put(JsonFields.BUNDLEVERSION, session.getDeviceInfo().getBundleVersion());
-            item.put(JsonFields.ALLOWRETARGETING, session.getDeviceInfo().isAllowRetargetingEnabled() ? 1 : 0);
-            item.put(JsonFields.OS, session.getDeviceInfo().getOs());
-            item.put(JsonFields.OSV, session.getDeviceInfo().getOsv());
-            item.put(JsonFields.DEVICE, session.getDeviceInfo().getDevice());
-            item.put(JsonFields.CARRIER, session.getDeviceInfo().getCarrier());
-            item.put(JsonFields.DW, session.getDeviceInfo().getDw());
-            item.put(JsonFields.DH, session.getDeviceInfo().getDh());
-            item.put(JsonFields.DENSITY, session.getDeviceInfo().getDensity().toString());
-            item.put(JsonFields.TIMEZONE, session.getDeviceInfo().getTimezone());
-            item.put(JsonFields.LOCALE, session.getDeviceInfo().getLocale());
-            item.put(JsonFields.SDKVERSION, session.getDeviceInfo().getSdkVersion());
+            eventWrapper.put(JsonFields.APPID, deviceInfo.getAppId());
+            eventWrapper.put(JsonFields.UDID, deviceInfo.getUdid());
+            eventWrapper.put(JsonFields.DEVICEUDID, deviceInfo.getDeviceUdid());
+            eventWrapper.put(JsonFields.BUNDLEID, deviceInfo.getBundleId());
+            eventWrapper.put(JsonFields.BUNDLEVERSION, deviceInfo.getBundleVersion());
+            eventWrapper.put(JsonFields.ALLOWRETARGETING, deviceInfo.isAllowRetargetingEnabled() ? 1 : 0);
+            eventWrapper.put(JsonFields.OS, deviceInfo.getOs());
+            eventWrapper.put(JsonFields.OSV, deviceInfo.getOsv());
+            eventWrapper.put(JsonFields.DEVICE, deviceInfo.getDevice());
+            eventWrapper.put(JsonFields.CARRIER, deviceInfo.getCarrier());
+            eventWrapper.put(JsonFields.DW, deviceInfo.getDw());
+            eventWrapper.put(JsonFields.DH, deviceInfo.getDh());
+            eventWrapper.put(JsonFields.DENSITY, Integer.toString(deviceInfo.getDensity()));
+            eventWrapper.put(JsonFields.TIMEZONE, deviceInfo.getTimezone());
+            eventWrapper.put(JsonFields.LOCALE, deviceInfo.getLocale());
+            eventWrapper.put(JsonFields.SDKVERSION, deviceInfo.getSdkVersion());
         }
         catch (JSONException ex) {
             Log.d(LOGTAG, "Problem converting to JSON.", ex);
         }
 
-        return item;
+        return eventWrapper;
     }
 
-    @Override
     public JSONObject buildItem(final JSONObject eventWrapper,
-                                final String eventSource,
-                                final String eventName,
-                                final Map<String, String> params) {
+                                final Set<AppEvent> events) {
         try {
-            final JSONObject item = new JSONObject();
-            item.put(JsonFields.APP_EVENTSOURCE, eventSource);
-            item.put(JsonFields.APP_EVENTNAME, eventName);
-            item.put(JsonFields.APP_EVENTTIMESTAMP, new Date().getTime());
-            item.put(JsonFields.APP_EVENTPARAMS, buildParams(params));
-
             final JSONArray items = new JSONArray();
-            items.put(item);
+
+            for(AppEvent e : events) {
+                final JSONObject item = new JSONObject();
+                item.put(JsonFields.APP_EVENTSOURCE, e.getType());
+                item.put(JsonFields.APP_EVENTNAME, e.getName());
+                item.put(JsonFields.APP_EVENTTIMESTAMP, e.getDatetime());
+                item.put(JsonFields.APP_EVENTPARAMS, buildParams(e.getParams()));
+
+                items.put(item);
+            }
 
             eventWrapper.put(JsonFields.APP_EVENTS, items);
         }

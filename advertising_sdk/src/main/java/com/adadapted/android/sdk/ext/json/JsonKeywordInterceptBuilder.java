@@ -2,10 +2,9 @@ package com.adadapted.android.sdk.ext.json;
 
 import android.util.Log;
 
-import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptBuilder;
-import com.adadapted.android.sdk.core.keywordintercept.model.AutoFill;
-import com.adadapted.android.sdk.core.keywordintercept.model.KeywordIntercept;
-import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
+import com.adadapted.android.sdk.core.event.AppEventClient;
+import com.adadapted.android.sdk.core.keywordintercept.AutoFill;
+import com.adadapted.android.sdk.core.keywordintercept.KeywordIntercept;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,10 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 6/25/15.
- */
-public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
+public class JsonKeywordInterceptBuilder {
     private static final String TAG = JsonKeywordInterceptBuilder.class.getName();
 
     public KeywordIntercept build(final JSONObject json) {
@@ -38,7 +34,7 @@ public class JsonKeywordInterceptBuilder implements KeywordInterceptBuilder {
             final Map<String, String> params = new HashMap<>();
             params.put("error", ex.getMessage());
             params.put("payload", json.toString());
-            AppEventTrackingManager.registerEvent(
+            AppEventClient.trackError(
                 "KI_PAYLOAD_PARSE_FAILED",
                 "Failed to parse KI payload for processing.",
                 params

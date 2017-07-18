@@ -3,13 +3,8 @@ package com.adadapted.android.sdk.core.addit;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.adadapted.android.sdk.ext.management.ContentTrackingManager;
-
 import java.util.List;
 
-/**
- * Created by chrisweeden on 9/26/16.
- */
 public class Content implements Parcelable {
     public static final Creator<Content> CREATOR = new Creator<Content>() {
         @Override
@@ -58,19 +53,19 @@ public class Content implements Parcelable {
         payload = in.createTypedArrayList(AddToListItem.CREATOR);
     }
 
-    public static Content createDeeplinkContent(final String payloadId,
-                                                final String message,
-                                                final String image,
-                                                final int type,
-                                                final List<AddToListItem> payload) {
+    static Content createDeeplinkContent(final String payloadId,
+                                         final String message,
+                                         final String image,
+                                         final int type,
+                                         final List<AddToListItem> payload) {
         return new Content(payloadId, message, image, type, Sources.DEEPLINK, payload);
     }
 
-    public static Content createPayloadContent(final String payloadId,
-                                               final String message,
-                                               final String image,
-                                               final int type,
-                                               final List<AddToListItem> payload) {
+    static Content createPayloadContent(final String payloadId,
+                                        final String message,
+                                        final String image,
+                                        final int type,
+                                        final List<AddToListItem> payload) {
         return new Content(payloadId, message, image, type, Sources.PAYLOAD, payload);
     }
 
@@ -90,15 +85,15 @@ public class Content implements Parcelable {
     }
 
     public void acknowledge() {
-        ContentTrackingManager.markContentAcknowledged(this);
+        PayloadClient.markContentAcknowledged(this);
     }
 
     public void duplicate() {
-        ContentTrackingManager.markContentDuplicate(this);
+        PayloadClient.markContentDuplicate(this);
     }
 
     public void failed(String message) {
-        ContentTrackingManager.markContentFailed(this, message);
+        PayloadClient.markContentFailed(this, message);
     }
 
     public String getPayloadId() {
@@ -131,17 +126,5 @@ public class Content implements Parcelable {
 
     public List<AddToListItem> getPayload() {
         return payload;
-    }
-
-    @Override
-    public String toString() {
-        return "Content{" +
-                "payloadId='" + payloadId + '\'' +
-                ", message='" + message + '\'' +
-                ", image='" + image + '\'' +
-                ", type=" + type +
-                ", source='" + source + '\'' +
-                ", payload=" + payload +
-                '}';
     }
 }

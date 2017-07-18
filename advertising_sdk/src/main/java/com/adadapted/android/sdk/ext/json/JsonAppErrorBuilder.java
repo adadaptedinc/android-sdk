@@ -3,23 +3,18 @@ package com.adadapted.android.sdk.ext.json;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.device.DeviceInfo;
-import com.adadapted.android.sdk.core.event.AppErrorBuilder;
+import com.adadapted.android.sdk.core.event.AppError;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
-/**
- * Created by chrisweeden on 10/3/16.
- */
-
-public class JsonAppErrorBuilder implements AppErrorBuilder {
+public class JsonAppErrorBuilder {
     private static final String LOGTAG = JsonAppErrorBuilder.class.getName();
 
-    @Override
     public JSONObject buildWrapper(final DeviceInfo deviceInfo) {
         final JSONObject errorWrapper = new JSONObject();
         try {
@@ -35,7 +30,7 @@ public class JsonAppErrorBuilder implements AppErrorBuilder {
             errorWrapper.put(JsonFields.CARRIER, deviceInfo.getCarrier());
             errorWrapper.put(JsonFields.DW, deviceInfo.getDw());
             errorWrapper.put(JsonFields.DH, deviceInfo.getDh());
-            errorWrapper.put(JsonFields.DENSITY, deviceInfo.getDensity().toString());
+            errorWrapper.put(JsonFields.DENSITY, Integer.toString(deviceInfo.getDensity()));
             errorWrapper.put(JsonFields.TIMEZONE, deviceInfo.getTimezone());
             errorWrapper.put(JsonFields.LOCALE, deviceInfo.getLocale());
             errorWrapper.put(JsonFields.SDKVERSION, deviceInfo.getSdkVersion());
@@ -47,21 +42,20 @@ public class JsonAppErrorBuilder implements AppErrorBuilder {
         return errorWrapper;
     }
 
-    @Override
     public JSONObject buildItem(final JSONObject errorWrapper,
-                                final String errorCode,
-                                final String errorMessage,
-                                final Map<String, String> errorParams) {
+                                final Set<AppError> errors) {
         final JSONObject errorItem = new JSONObject();
 
         try {
-            errorItem.put(JsonFields.APP_ERRORCODE, errorCode);
-            errorItem.put(JsonFields.APP_ERRORMESSAGE, errorMessage);
-            errorItem.put(JsonFields.APP_ERRORTIMESTAMP, new Date().getTime());
-            errorItem.put(JsonFields.APP_ERRORPARAMS, buildParams(errorParams));
-
             final JSONArray appErrors = new JSONArray();
-            appErrors.put(errorItem);
+            for(AppError e : errors) {
+                errorItem.put(JsonFields.APP_ERRORCODE, e.getCode());
+                errorItem.put(JsonFields.APP_ERRORMESSAGE, e.getMessage());
+                errorItem.put(JsonFields.APP_ERRORTIMESTAMP, e.getDatetime());
+                errorItem.put(JsonFields.APP_ERRORPARAMS, buildParams(e.getParams()));
+
+                appErrors.put(errorItem);
+            }
 
             errorWrapper.put(JsonFields.APP_ERRORS, appErrors);
         }

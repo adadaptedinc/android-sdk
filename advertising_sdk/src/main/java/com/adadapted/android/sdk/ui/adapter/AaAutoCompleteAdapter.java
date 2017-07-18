@@ -12,26 +12,24 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Created by chrisweeden on 6/18/15
- */
 public class AaAutoCompleteAdapter extends ArrayAdapter<String> {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = AaAutoCompleteAdapter.class.getName();
 
-    private final AaKeywordInterceptMatcher mMatcher;
-    private final List<String> mAllItems;
+    private final AaKeywordInterceptMatcher matcher;
+    private final List<String> allItems;
 
     public AaAutoCompleteAdapter(final Context context,
                                  final int resource,
                                  final List<String> items) {
         super(context.getApplicationContext(), resource, items);
 
-        mMatcher = new AaKeywordInterceptMatcher();
-        mAllItems = new ArrayList<>(items);
+        matcher = new AaKeywordInterceptMatcher();
+        allItems = new ArrayList<>(items);
     }
 
     public boolean suggestionSelected(final String suggestion) {
-        return mMatcher.suggestionSelected(suggestion);
+        return matcher.suggestionSelected(suggestion);
     }
 
     @Override
@@ -47,10 +45,10 @@ public class AaAutoCompleteAdapter extends ArrayAdapter<String> {
             final Set<String> suggestions = new HashSet<>();
 
             if(constraint != null) {
-                SuggestionPayload suggestionPayload = mMatcher.match(constraint);
+                SuggestionPayload suggestionPayload = matcher.match(constraint);
                 suggestions.addAll(suggestionPayload.getSuggestions());
 
-                for(final String item : mAllItems) {
+                for(final String item : allItems) {
                     if (item != null && item.toLowerCase().contains(constraint.toString().toLowerCase())) {
                         suggestionPayload.presented(item);
                         suggestions.add(item);

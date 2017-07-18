@@ -4,15 +4,12 @@ import android.content.Context;
 import android.util.Log;
 
 import com.adadapted.android.sdk.config.Config;
-import com.adadapted.android.sdk.core.event.model.AppEventSource;
-import com.adadapted.android.sdk.core.session.model.Session;
-import com.adadapted.android.sdk.ext.cache.ImageCache;
-import com.adadapted.android.sdk.ext.http.HttpRequestManager;
-import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
-import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
-import com.adadapted.android.sdk.ext.management.PayloadPickupManager;
-import com.adadapted.android.sdk.ext.management.SessionManager;
-import com.adadapted.android.sdk.ext.scheduler.EventFlushScheduler;
+import com.adadapted.android.sdk.core.addit.Content;
+import com.adadapted.android.sdk.core.addit.PayloadClient;
+import com.adadapted.android.sdk.core.event.AppEventClient;
+import com.adadapted.android.sdk.core.session.Session;
+import com.adadapted.android.sdk.core.session.SessionClient;
+import com.adadapted.android.sdk.ext.Wireup;
 import com.adadapted.android.sdk.ui.messaging.AaSdkAdditContentListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener;
@@ -20,17 +17,12 @@ import com.adadapted.android.sdk.ui.messaging.AdditContentPublisher;
 import com.adadapted.android.sdk.ui.messaging.SdkEventPublisher;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-/**
- *
- */
 public class AdAdapted {
     private static final String LOGTAG = AdAdapted.class.getName();
 
-    /**
-     *
-     */
     public static class Env {
         public static final boolean PROD = true;
         public static final boolean DEV = false;
@@ -38,13 +30,15 @@ public class AdAdapted {
 
     private static AdAdapted sInstance;
 
-    private String mAppId;
-    private boolean mIsProd;
-    private Map<String, String> mParams;
+    private String appId;
+    private boolean isProd;
+    private Map<String, String> params;
     private AaSdkSessionListener sessionListener;
+    private AaSdkEventListener eventListener;
+    private AaSdkAdditContentListener contentListener;
 
     private AdAdapted() {
-        mParams = new HashMap<>();
+        params = new HashMap<>();
     }
 
     private synchronized static AdAdapted getsInstance() {
@@ -62,17 +56,17 @@ public class AdAdapted {
     public AdAdapted withAppId(final String appId) {
         if(appId == null) {
             Log.e(LOGTAG, "The Application Id cannot be Null.");
-            mAppId = "";
+            this.appId = "";
         }
         else {
-            mAppId = appId;
+            this.appId = appId;
         }
 
         return this;
     }
 
     public AdAdapted inEnv(final boolean environment) {
-        mIsProd = environment;
+        isProd = environment;
 
         return this;
     }
@@ -84,88 +78,103 @@ public class AdAdapted {
     }
 
     public AdAdapted setSdkEventListener(final AaSdkEventListener listener) {
-        SdkEventPublisher.getInstance().setListener(listener);
+        eventListener = listener;
 
         return this;
     }
 
     public AdAdapted setSdkAdditContentListener(final AaSdkAdditContentListener listener) {
-        AdditContentPublisher.getInstance().addListener(listener);
+        contentListener = listener;
 
         return this;
     }
 
     public AdAdapted withParams(final Map<String, String> params) {
-        mParams = params;
+        this.params = params;
 
         return this;
     }
 
     public void start(final Context context) {
-        ImageCache.getInstance().purgeCache();
-        HttpRequestManager.createQueue(context.getApplicationContext());
-        PayloadPickupManager.pickupPayloads();
+        Wireup.run(context, isProd);
 
-        final SessionManager.Callback startCallback = new SessionManager.Callback() {
+        SdkEventPublisher.getInstance().setListener(eventListener);
+        AdditContentPublisher.getInstance().addListener(contentListener);
+
+        PayloadClient.pickupPayloads(new PayloadClient.Callback() {
+            @Override
+            public void onPayloadAvailable(final List<Content> content) {
+                if(content.size() > 0) {
+                    AdditContentPublisher.getInstance().publishContent(content.get(0));
+                }
+            }
+        });
+
+        final SessionClient.Listener startListener = new SessionClient.Listener() {
             @Override
             public void onSessionAvailable(final Session session) {
+                //Log.d(LOGTAG, "onSessionAvailable called. Has ads: " + session.hasActiveCampaigns());
+
                 if(sessionListener != null) {
                     sessionListener.onHasAdsToServe(session.hasActiveCampaigns());
                 }
             }
 
             @Override
-            public void onNewAdsAvailable(final Session session) {
+            public void onAdsAvailable(Session session) {
+                //Log.d(LOGTAG, "onAdsAvailable called. Has ads: " + session.hasActiveCampaigns());
+
                 if(sessionListener != null) {
                     sessionListener.onHasAdsToServe(session.hasActiveCampaigns());
                 }
+            }
+
+            @Override
+            public void onSessionInitFailed() {
+                sessionListener.onHasAdsToServe(false);
             }
         };
 
-        SessionManager.start(
+        SessionClient.start(
             context.getApplicationContext(),
-            mAppId,
-            mIsProd,
-            mParams,
-            startCallback);
+            appId,
+            isProd,
+            params,
+            startListener);
 
-        AppEventTrackingManager.registerEvent(AppEventSource.SDK, "app_opened");
+        AppEventClient.trackSdkEvent("app_opened");
 
-        if(!mIsProd) {
-            AppErrorTrackingManager.registerEvent(
+        if(!isProd) {
+            AppEventClient.trackError(
                 "NOT_AN_ERROR",
                 "Error Collection Test Message. This message is only sent from the Dev environment."
             );
         }
 
-        new EventFlushScheduler().start(Config.DEFAULT_EVENT_POLLING);
         Log.i(LOGTAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", Config.SDK_VERSION));
     }
 
     public static synchronized void restart(final Context context) {
+        AppEventClient.trackSdkEvent("sdk_restarted");
+
         restart(context, new HashMap<String, String>());
     }
 
     public static synchronized void restart(final Context context,
                                             final Map<String, String> params) {
-        SessionManager.restart(
+        SessionClient.restart(
             context.getApplicationContext(),
-            getsInstance().mAppId,
-            getsInstance().mIsProd,
+            getsInstance().appId,
+            getsInstance().isProd,
             params
         );
-
-        AppEventTrackingManager.registerEvent(
-            AppEventSource.SDK,
-            "session_restarted",
-            params);
 
         Log.i(LOGTAG, String.format("AdAdapted Android Advertising SDK v%s reinitialized.", Config.SDK_VERSION));
     }
 
     public static synchronized void hasAdsToServe() {
         if(getsInstance().sessionListener != null) {
-            final Session session = SessionManager.getCurrentSession();
+            final Session session = SessionClient.getCurrentSession();
 
             if(session != null) {
                 getsInstance().sessionListener.onHasAdsToServe(session.hasActiveCampaigns());
@@ -179,6 +188,6 @@ public class AdAdapted {
 
     public static synchronized void registerEvent(final String eventName,
                                                   final Map<String, String> eventParams) {
-        AppEventTrackingManager.registerEvent(AppEventSource.APP, eventName, eventParams);
+        AppEventClient.trackAppEvent(eventName, eventParams);
     }
 }

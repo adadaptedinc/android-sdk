@@ -3,9 +3,6 @@ package com.adadapted.android.sdk.core.addit;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * Created by chrisweeden on 10/27/16.
- */
 public final class AddToListItem implements Parcelable {
     public static final Creator<AddToListItem> CREATOR = new Creator<AddToListItem>() {
         @Override
@@ -27,13 +24,13 @@ public final class AddToListItem implements Parcelable {
     private final String discount;
     private final String productImage;
 
-    public AddToListItem(final String trackingId,
-                         final String title,
-                         final String brand,
-                         final String category,
-                         final String barCode,
-                         final String discount,
-                         final String productImage) {
+    AddToListItem(final String trackingId,
+                  final String title,
+                  final String brand,
+                  final String category,
+                  final String barCode,
+                  final String discount,
+                  final String productImage) {
         this.trackingId = trackingId;
         this.title = title;
         this.brand = brand;
@@ -95,18 +92,5 @@ public final class AddToListItem implements Parcelable {
 
     public String getProductImage() {
         return productImage;
-    }
-
-    @Override
-    public String toString() {
-        return "AddToListItem{" +
-                "trackingId='" + trackingId + '\'' +
-                ", title='" + title + '\'' +
-                ", brand='" + brand + '\'' +
-                ", category='" + category + '\'' +
-                ", barCode='" + barCode + '\'' +
-                ", discount='" + discount + '\'' +
-                ", productImage='" + productImage + '\'' +
-                '}';
     }
 }

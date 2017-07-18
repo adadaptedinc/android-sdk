@@ -7,9 +7,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
-/**
- * Created by chrisweeden on 3/24/15.
- */
 public class HttpRequestManager {
     private static final String LOGTAG = HttpRequestManager.class.getName();
 

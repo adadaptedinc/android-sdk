@@ -8,11 +8,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.addit.Content;
-import com.adadapted.android.sdk.core.addit.deeplink.DeeplinkContentParser;
-import com.adadapted.android.sdk.core.event.model.AppEventSource;
-import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
-import com.adadapted.android.sdk.ext.management.AppEventTrackingManager;
-import com.adadapted.android.sdk.ext.management.PayloadPickupManager;
+import com.adadapted.android.sdk.core.addit.DeeplinkContentParser;
+import com.adadapted.android.sdk.core.addit.PayloadClient;
+import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.ui.messaging.AdditContentPublisher;
 
 import java.util.HashMap;
@@ -27,12 +25,9 @@ public class AdditInterceptActivity extends AppCompatActivity {
 
         Log.i(LOGTAG, "Addit Intercept Activity Launched.");
 
-        PayloadPickupManager.deeplinkInProgress();
+        PayloadClient.deeplinkInProgress();
 
-        AppEventTrackingManager.registerEvent(
-            AppEventSource.SDK,
-            "addit_app_opened"
-        );
+        AppEventClient.trackSdkEvent("addit_app_opened");
 
         try {
             final Intent additIntent = getIntent();
@@ -50,7 +45,7 @@ public class AdditInterceptActivity extends AppCompatActivity {
 
             final Map<String, String> errorParams = new HashMap<>();
             errorParams.put("exception_message", ex.getMessage());
-            AppErrorTrackingManager.registerEvent(
+            AppEventClient.trackError(
                 "ADDIT_DEEPLINK_HANDLING_ERROR",
                 "Problem handling deeplink",
                 errorParams
@@ -62,7 +57,7 @@ public class AdditInterceptActivity extends AppCompatActivity {
             startActivity(mainActivityIntent);
         }
 
-        PayloadPickupManager.deeplinkCompleted();
+        PayloadClient.deeplinkCompleted();
 
         finish();
     }

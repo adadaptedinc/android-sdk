@@ -1,12 +1,8 @@
 package com.adadapted.android.sdk.core.device;
 
-import com.adadapted.android.sdk.core.ad.model.ImageAdType;
+import com.adadapted.android.sdk.config.Config;
 
 import java.util.Map;
-
-/**
- * Created by chrisweeden on 9/26/16.
- */
 
 public class DeviceInfo {
     static final String UNKNOWN_VALUE = "Unknown";
@@ -26,10 +22,15 @@ public class DeviceInfo {
     private String carrier;
     private int dw;
     private int dh;
-    private ScreenDensity density;
+    private int density;
     private boolean allowRetargeting;
     private String sdkVersion;
     private Map<String, String> params;
+
+    public DeviceInfo() {
+        this.os = "Android";
+        this.sdkVersion = Config.SDK_VERSION;
+    }
 
     public String getAppId() {
         return appId;
@@ -151,11 +152,11 @@ public class DeviceInfo {
         this.dh = dh;
     }
 
-    public ScreenDensity getDensity() {
+    public int getDensity() {
         return density;
     }
 
-    void setDensity(ScreenDensity density) {
+    void setDensity(int density) {
         this.density = density;
     }
 
@@ -181,13 +182,5 @@ public class DeviceInfo {
 
     public void setParams(Map<String, String> params) {
         this.params = params;
-    }
-
-    public String chooseImageSize() {
-        if(density == ScreenDensity.MDPI || density == ScreenDensity.HDPI) {
-            return ImageAdType.STANDARD_IMAGE;
-        }
-
-        return ImageAdType.RETINA_IMAGE;
     }
 }

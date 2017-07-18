@@ -1,11 +1,9 @@
 package com.adadapted.android.sdk.ext.http;
 
-import android.util.Log;
-
+import com.adadapted.android.sdk.core.ad.AdEvent;
 import com.adadapted.android.sdk.core.ad.AdEventSink;
-import com.adadapted.android.sdk.ext.management.AppErrorTrackingManager;
-import com.android.volley.NetworkError;
-import com.android.volley.NoConnectionError;
+import com.adadapted.android.sdk.core.event.AppEventClient;
+import com.adadapted.android.sdk.ext.json.JsonAdEventBuilder;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -15,47 +13,52 @@ import org.json.JSONArray;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
-/**
- * Created by chrisweeden on 3/23/15.
- */
 public class HttpAdEventSink implements AdEventSink {
     private static final String LOGTAG = HttpAdEventSink.class.getName();
 
-    private final String mBatchUrl;
+    private final String batchUrl;
+    private final JsonAdEventBuilder builder;
 
     public HttpAdEventSink(final String batchUrl) {
-        mBatchUrl = batchUrl == null ? "" : batchUrl;
+        this.batchUrl = batchUrl == null ? "" : batchUrl;
+        builder = new JsonAdEventBuilder();
     }
 
     @Override
-    public void sendBatch(final JSONArray json) {
-        if(json == null) {
-            return;
-        }
+    public void sendBatch(final Set<AdEvent> events) {
+        final JSONArray json = builder.buildEvents(events);
+
+        //Log.d(LOGTAG, json.toString());
 
         final JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST,
-                mBatchUrl, json, new Response.Listener<JSONArray>(){
+                batchUrl, json, new Response.Listener<JSONArray>(){
 
             @Override
             public void onResponse(JSONArray response) {
+                //Log.d(LOGTAG, response.toString());
             }
 
         }, new Response.ErrorListener() {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.i(LOGTAG, "Ad Event Batch Request Failed.", error);
+                String reason = "";
+                if(error != null && error.networkResponse != null) {
+                    final int statusCode = error.networkResponse.statusCode;
+                    final String data = new String(error.networkResponse.data);
 
-                if(error instanceof NoConnectionError || error instanceof NetworkError) {
-                    return;
+                    reason = statusCode + " - " + data;
+
+                    //Log.e(LOGTAG, "Ad Batch Request Failed: " + reason, error);
                 }
 
                 final Map<String, String> params = new HashMap<>();
-                params.put("url", mBatchUrl);
-                AppErrorTrackingManager.registerEvent(
+                params.put("url", batchUrl);
+                AppEventClient.trackError(
                     "AD_EVENT_TRACK_REQUEST_FAILED",
-                    error.getMessage(),
+                    reason,
                     params
                 );
             }

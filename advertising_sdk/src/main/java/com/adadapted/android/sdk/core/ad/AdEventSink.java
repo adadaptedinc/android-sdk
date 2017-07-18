@@ -1,11 +1,7 @@
 package com.adadapted.android.sdk.core.ad;
 
-import org.json.JSONArray;
-
-/**
- * Created by chrisweeden on 9/29/16.
- */
+import java.util.Set;
 
 public interface AdEventSink {
-    void sendBatch(JSONArray jsonArray);
+    void sendBatch(Set<AdEvent> events);
 }

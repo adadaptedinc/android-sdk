@@ -1,8 +1,5 @@
 package com.adadapted.android.sdk.ext.json;
 
-/**
- * Created by chrisweeden on 4/28/15.
- */
 class JsonFields {
     static final String APPID = "app_id";
     static final String UDID = "udid";
@@ -62,20 +59,6 @@ class JsonFields {
     static final String EVENTPATH = "event_path";
 
     static final String AD_URL = "ad_url";
-
-    /*
-    static final String JSON_AD_CTA_1 = "ad_cta_1";
-    static final String JSON_AD_CTA_2 = "ad_cta_2";
-    static final String JSON_AD_CAMPAIGN_IMG = "ad_campaign_img";
-    static final String JSON_AD_SPONSOR_LOGO = "ad_sponsor_logo";
-    static final String JSON_AD_SPONSOR_NAME = "ad_sponsor_name";
-    static final String JSON_AD_TITLE = "ad_title";
-    static final String JSON_AD_TAGLINE = "ad_tagline";
-    static final String JSON_AD_TEXT_LONG = "ad_text_long";
-    static final String JSON_AD_SPONSOR_TEXT = "ad_sponsor_text";
-    static final String JSON_AD_APP_ICON_1 = "ad_app_icon_1";
-    static final String JSON_AD_APP_ICON_2 = "ad_app_icon_2";
-    */
 
     static final String IMAGE_ORIENTATION = "orientation";
     static final String IMAGE_URL = "url";

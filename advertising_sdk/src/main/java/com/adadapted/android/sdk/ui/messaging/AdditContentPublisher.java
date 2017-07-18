@@ -5,9 +5,6 @@ import com.adadapted.android.sdk.core.addit.Content;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 9/16/16.
- */
 public class AdditContentPublisher {
     private static AdditContentPublisher sInstance;
 

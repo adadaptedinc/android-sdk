@@ -1,8 +1,5 @@
 package com.adadapted.android.sdk.core.common;
 
-/**
- * Created by chrisweeden on 7/20/15.
- */
 public class DimensionConverter {
     private final float scale;
 

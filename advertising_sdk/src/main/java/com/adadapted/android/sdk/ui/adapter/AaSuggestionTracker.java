@@ -1,22 +1,20 @@
 package com.adadapted.android.sdk.ui.adapter;
 
-import com.adadapted.android.sdk.core.session.model.Session;
-import com.adadapted.android.sdk.ext.management.KeywordInterceptEventTrackingManager;
+import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptClient;
+import com.adadapted.android.sdk.core.session.Session;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by chrisweeden on 7/16/15
- */
 public class AaSuggestionTracker {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = AaSuggestionTracker.class.getName();
 
     // Here the key is the Term Text
-    private final Map<String, String> mItems = new HashMap<>();
+    private final Map<String, String> items = new HashMap<>();
 
     // Here the key is the Replacement Text
-    private final Map<String, String> mReplacements = new HashMap<>();
+    private final Map<String, String> replacements = new HashMap<>();
 
     private Session mSession;
 
@@ -32,28 +30,28 @@ public class AaSuggestionTracker {
         final String lcUserInput = convertToLowerCase(userInput);
         final String lcReplacement = convertToLowerCase(replacement);
 
-        mItems.put(lcTerm, lcUserInput);
-        mReplacements.put(lcReplacement, lcTerm);
+        items.put(lcTerm, lcUserInput);
+        replacements.put(lcReplacement, lcTerm);
 
-        KeywordInterceptEventTrackingManager.trackMatched(session, lcTerm, lcUserInput);
+        KeywordInterceptClient.trackMatched(mSession, lcTerm, lcUserInput);
     }
 
     public void suggestionPresented(final String term) {
         final String lcTerm = convertToLowerCase(term);
 
-        if(mItems.containsKey(lcTerm)) {
-            KeywordInterceptEventTrackingManager.trackPresented(mSession, lcTerm, mItems.get(lcTerm));
+        if(items.containsKey(lcTerm)) {
+            KeywordInterceptClient.trackPresented(mSession, lcTerm, items.get(lcTerm));
         }
     }
 
     public boolean suggestionSelected(final String replacement) {
         final String lcReplacement = convertToLowerCase(replacement);
 
-        if(mReplacements.containsKey(lcReplacement)) {
-            final String term = mReplacements.get(lcReplacement);
-            final String userInput = mItems.get(term);
+        if(replacements.containsKey(lcReplacement)) {
+            final String term = replacements.get(lcReplacement);
+            final String userInput = items.get(term);
 
-            KeywordInterceptEventTrackingManager.trackSelected(mSession, term, userInput);
+            KeywordInterceptClient.trackSelected(mSession, term, userInput);
 
             return true;
         }

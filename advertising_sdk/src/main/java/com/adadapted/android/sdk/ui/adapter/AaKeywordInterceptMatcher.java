@@ -1,44 +1,42 @@
 package com.adadapted.android.sdk.ui.adapter;
 
-import com.adadapted.android.sdk.ext.management.KeywordInterceptManager;
-import com.adadapted.android.sdk.core.keywordintercept.model.AutoFill;
-import com.adadapted.android.sdk.core.keywordintercept.model.KeywordIntercept;
-import com.adadapted.android.sdk.core.session.model.Session;
-import com.adadapted.android.sdk.ext.management.SessionManager;
+import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptClient;
+import com.adadapted.android.sdk.core.session.Session;
+import com.adadapted.android.sdk.core.session.SessionClient;
+import com.adadapted.android.sdk.core.keywordintercept.AutoFill;
+import com.adadapted.android.sdk.core.keywordintercept.KeywordIntercept;
 import com.adadapted.android.sdk.ui.model.SuggestionPayload;
 
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by chrisweeden on 6/25/15
- */
-public class AaKeywordInterceptMatcher implements SessionManager.Callback, KeywordInterceptManager.Callback {
+public class AaKeywordInterceptMatcher implements SessionClient.Listener, KeywordInterceptClient.Listener {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = AaKeywordInterceptMatcher.class.getName();
 
-    private final AaSuggestionTracker mSuggestionTracker;
+    private final AaSuggestionTracker suggestionTracker;
 
-    private KeywordIntercept mKeywordIntercept;
+    private KeywordIntercept keywordIntercept;
     private boolean mLoaded = false;
     private Session mSession;
 
     public AaKeywordInterceptMatcher() {
-        mSuggestionTracker = new AaSuggestionTracker();
+        suggestionTracker = new AaSuggestionTracker();
 
-        SessionManager.getSession(this);
+        SessionClient.getSession(this);
     }
 
     public SuggestionPayload match(final CharSequence constraint) {
         final Set<String> suggestions = new HashSet<>();
 
-        if((isLoaded() && constraint != null && constraint.length() >= mKeywordIntercept.getMinMatchLength())) {
-            for (final String item : mKeywordIntercept.getAutoFill().keySet()) {
+        if((isLoaded() && constraint != null && constraint.length() >= keywordIntercept.getMinMatchLength())) {
+            for (final String item : keywordIntercept.getAutoFill().keySet()) {
                 if (item != null && item.toLowerCase().contains(constraint.toString().toLowerCase())) {
-                    final AutoFill autofill = mKeywordIntercept.getAutoFill().get(item);
+                    final AutoFill autofill = keywordIntercept.getAutoFill().get(item);
                     if(autofill != null) {
                         suggestions.add(autofill.getReplacement());
 
-                        mSuggestionTracker.suggestionMatched(
+                        suggestionTracker.suggestionMatched(
                             mSession,
                             item,
                             autofill.getReplacement(),
@@ -49,11 +47,11 @@ public class AaKeywordInterceptMatcher implements SessionManager.Callback, Keywo
             }
         }
 
-        return new SuggestionPayload(mSuggestionTracker, suggestions);
+        return new SuggestionPayload(suggestionTracker, suggestions);
     }
 
     public boolean suggestionSelected(final String suggestion) {
-        return mSuggestionTracker.suggestionSelected(suggestion);
+        return suggestionTracker.suggestionSelected(suggestion);
     }
 
     private boolean isLoaded() {
@@ -61,17 +59,24 @@ public class AaKeywordInterceptMatcher implements SessionManager.Callback, Keywo
     }
 
     @Override
-    public void onKeywordInterceptInitSuccess(final KeywordIntercept keywordIntercept) {
-        mKeywordIntercept = keywordIntercept;
+    public void onKeywordInterceptInitialized(final KeywordIntercept keywordIntercept) {
+        this.keywordIntercept = keywordIntercept;
         mLoaded = true;
     }
 
     @Override
     public void onSessionAvailable(final Session session) {
         mSession = session;
-        KeywordInterceptManager.initialize(this);
+        KeywordInterceptClient.initialize(session, this);
     }
 
     @Override
-    public void onNewAdsAvailable(final Session session) {}
+    public void onAdsAvailable(Session session) {
+
+    }
+
+    @Override
+    public void onSessionInitFailed() {
+
+    }
 }

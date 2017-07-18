@@ -1,11 +1,11 @@
 package com.adadapted.android.sdk.core.event;
 
-import org.json.JSONObject;
+import com.adadapted.android.sdk.core.device.DeviceInfo;
 
-/**
- * Created by chrisweeden on 9/26/16.
- */
+import java.util.Set;
 
 public interface AppEventSink {
-    void publishEvent(JSONObject appEvent);
+    void generateWrappers(DeviceInfo deviceInfo);
+    void publishEvent(Set<AppEvent> events);
+    void publishError(Set<AppError> errors);
 }

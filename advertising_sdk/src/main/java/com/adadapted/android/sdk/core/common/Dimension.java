@@ -1,8 +1,5 @@
 package com.adadapted.android.sdk.core.common;
 
-/**
- * Created by chrisweeden on 3/26/15.
- */
 public class Dimension {
     public static class ORIEN {
         public static final String LAND = "land";

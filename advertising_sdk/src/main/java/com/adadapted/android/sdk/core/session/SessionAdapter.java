@@ -1,15 +1,21 @@
 package com.adadapted.android.sdk.core.session;
 
-import com.adadapted.android.sdk.core.common.PositiveListener;
-import com.adadapted.android.sdk.core.session.model.Session;
+import com.adadapted.android.sdk.core.device.DeviceInfo;
 
-import org.json.JSONObject;
-
-/**
- * Created by chrisweeden on 3/26/15.
- */
 public interface SessionAdapter {
-    void sendInit(JSONObject request, Callback listener);
+    interface SessionInitListener {
+        void onSessionInitialized(Session session);
+        void onSessionInitializeFailed();
+    }
 
-    interface Callback extends PositiveListener<Session> {}
+    interface AdGetListener {
+        void onNewAdsLoaded(Session session);
+        void onNewAdsLoadFailed();
+    }
+
+    interface Listener extends SessionInitListener, AdGetListener {}
+
+    void sendInit(DeviceInfo deviceInfo, SessionInitListener listener);
+
+    void sentAdGet(Session session, AdGetListener listener);
 }
