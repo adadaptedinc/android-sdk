@@ -1,7 +1,5 @@
 package com.adadapted.android.sdk.ui.messaging;
 
-import android.util.Log;
-
 import com.adadapted.android.sdk.core.ad.AdEvent;
 import com.adadapted.android.sdk.core.ad.AdEventClient;
 
@@ -57,7 +55,6 @@ public class SdkEventPublisher implements AdEventClient.Listener {
     @Override
     public void onAdEventTracked(final AdEvent event) {
         if(listener == null || event == null) {
-            Log.w(LOGTAG, "NULL AaSdkEventListener listener");
             return;
         }
 
