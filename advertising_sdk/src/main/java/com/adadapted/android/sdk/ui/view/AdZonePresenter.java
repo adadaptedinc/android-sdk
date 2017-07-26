@@ -171,35 +171,31 @@ class AdZonePresenter implements SessionClient.Listener {
     }
 
     void onAdClicked(final Ad ad) {
-        if (handleAction(ad)) {
-            AdEventClient.trackInteraction(ad);
-        }
-    }
-
-    private boolean handleAction(final Ad ad) {
-        if(ad == null) { return false; }
-
-        boolean result = true;
         final String actionType = ad.getActionType();
         switch(actionType) {
             case Ad.ActionTypes.CONTENT:
+                final Map<String, String> params = new HashMap<>();
+                params.put("ad_id", ad.getId());
+                AppEventClient.trackSdkEvent("atl_ad_clicked", params);
+
                 handleContentAction(ad);
                 break;
 
             case Ad.ActionTypes.LINK:
+                AdEventClient.trackInteraction(ad);
+
                 handleLinkAction(ad);
                 break;
 
             case Ad.ActionTypes.POPUP:
+                AdEventClient.trackInteraction(ad);
+
                 handlePopupAction(ad);
                 break;
 
             default:
                 Log.w(LOGTAG, "Cannot handle Action type: " + actionType);
-                result = false;
         }
-
-        return result;
     }
 
     private void handleContentAction(final Ad ad) {
