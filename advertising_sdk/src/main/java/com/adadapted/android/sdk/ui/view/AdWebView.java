@@ -41,7 +41,7 @@ class AdWebView extends WebView {
             @Override
             public boolean onTouch(final View v, final MotionEvent event) {
                 switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
+                    case MotionEvent.ACTION_UP:
                         if(!currentAd.getId().isEmpty()) {
                             Log.i(LOGTAG, "Ad has been clicked!");
                             notifyAdClicked();
