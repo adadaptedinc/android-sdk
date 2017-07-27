@@ -1,7 +1,7 @@
 package com.adadapted.android.sdk.config;
 
 public class Config {
-    public static final String SDK_VERSION = "1.0.1";
+    public static final String SDK_VERSION = "1.0.2";
     public static final long DEFAULT_EVENT_POLLING = 5000L;
 
     public static class Prod {
