@@ -54,7 +54,7 @@ class AdZonePresenter implements SessionClient.Listener {
         pixelWebView = new PixelWebView(context.getApplicationContext());
 
         this.currentZone = Zone.emptyZone();
-        this.viewCount = 0;
+        this.viewCount = (int) (Math.random()*10);
     }
 
     void init(final String zoneId) {
