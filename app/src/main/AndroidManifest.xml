@@ -57,7 +57,7 @@
         </activity>
 
         <activity
-            android:name="com.adadapted.android.sdk.addit.AdditInterceptActivity"
+            android:name="com.adadapted.android.sdk.ui.activity.AdditInterceptActivity"
             android:launchMode="singleTask"
             android:taskAffinity=""
             android:excludeFromRecents="true">

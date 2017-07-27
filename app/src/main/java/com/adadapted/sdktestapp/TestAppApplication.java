@@ -5,16 +5,18 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.adadapted.android.sdk.AdAdapted;
-
 import com.adadapted.android.sdk.core.addit.AddToListItem;
 import com.adadapted.android.sdk.core.addit.Content;
 import com.adadapted.android.sdk.ui.messaging.AaSdkAdditContentListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener;
+
 import com.adadapted.sdktestapp.core.todo.TodoList;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;
 import com.adadapted.sdktestapp.ui.todo.activity.TodoListsActivity;
+
 import com.flurry.android.FlurryAgent;
+
 import com.newrelic.agent.android.NewRelic;
 
 import java.util.List;

@@ -63,7 +63,7 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_todo_lists, container, false);
 
-        aaZoneView.init("100680", R.layout.aa_default_json_ad_zone);
+        aaZoneView.init("100680");
 
         ListView listView = (ListView)view.findViewById(android.R.id.list);
         listView.addFooterView(aaZoneView);

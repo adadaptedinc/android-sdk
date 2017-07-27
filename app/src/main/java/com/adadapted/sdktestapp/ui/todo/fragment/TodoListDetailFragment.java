@@ -16,6 +16,7 @@ import android.widget.ListView;
 
 import com.adadapted.android.sdk.ui.messaging.AaSdkContentListener;
 import com.adadapted.android.sdk.ui.model.AdContentPayload;
+import com.adadapted.android.sdk.ui.view.AaZoneView;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.todo.TodoList;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;
@@ -37,6 +38,8 @@ public class TodoListDetailFragment extends ListFragment implements AaSdkContent
 
     private TodoListItemAdapter adapter;
     private DialogFragment dialog;
+
+    private AaZoneView aaZoneView;
 
     private OnFragmentInteractionListener mListener;
 
@@ -81,21 +84,20 @@ public class TodoListDetailFragment extends ListFragment implements AaSdkContent
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView() called.");
 
-        View view = inflater.inflate(R.layout.fragment_todo_list_detail, container, false);
+        return inflater.inflate(R.layout.fragment_todo_list_detail, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         adapter = new TodoListItemAdapter(getActivity(), list.getItems());
+        getListView().setAdapter(adapter);
 
-        return view;
-    }
+        aaZoneView = new AaZoneView(getActivity());
+        aaZoneView.init("100682");
 
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
+        getListView().addHeaderView(aaZoneView);
     }
 
     @Override
@@ -146,7 +148,22 @@ public class TodoListDetailFragment extends ListFragment implements AaSdkContent
     }
 
     @Override
-    public void onContentAvailable(String zoneId, AdContentPayload adContentPayload) {
+    public void onStart() {
+        super.onStart();
+
+        aaZoneView.onStart(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        aaZoneView.onStop(this);
+    }
+
+    @Override
+    public void onContentAvailable(final String zoneId,
+                                   final AdContentPayload adContentPayload) {
         try {
             JSONArray array = adContentPayload.getPayload().getJSONArray("add_to_list_items");
             for(int i = 0; i < array.length(); i++) {
