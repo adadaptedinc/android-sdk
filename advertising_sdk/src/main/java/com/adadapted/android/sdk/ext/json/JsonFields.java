@@ -73,6 +73,7 @@ class JsonFields {
     static final String POPUP_HIDE_BROWSER_NAV = "hide_browser_nav";
 
     static final String CONTENT_LIST_ITEMS = "list-items";
+    static final String CONTENT_DETAILED_LIST_ITEMS = "detailed_list_items";
 
     static final String APP_EVENTS = "events";
     static final String APP_EVENTSOURCE = "event_source";

@@ -1,6 +1,7 @@
 package com.adadapted.android.sdk.ext.json;
 
 import com.adadapted.android.sdk.core.ad.Ad;
+import com.adadapted.android.sdk.core.atl.AddToListItem;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 
 import org.json.JSONArray;
@@ -84,13 +85,30 @@ public class JsonAdBuilder {
         return builder.build();
     }
 
-    private List<String> parseAdContent(final JSONObject jsonAd) throws JSONException{
+    private List<AddToListItem> parseAdContent(final JSONObject jsonAd) throws JSONException{
         final JSONObject payloadObject = jsonAd.getJSONObject(JsonFields.PAYLOAD);
-        final JSONArray jsonItems = payloadObject.getJSONArray(JsonFields.CONTENT_LIST_ITEMS);
 
-        final List<String> listItems = new ArrayList<>();
-        for(int i = 0; i < jsonItems.length(); i++) {
-            listItems.add(jsonItems.getString(i));
+        final List<AddToListItem> listItems = new ArrayList<>();
+        if(payloadObject.has(JsonFields.CONTENT_LIST_ITEMS)) {
+            final JSONArray jsonItems = payloadObject.getJSONArray(JsonFields.CONTENT_LIST_ITEMS);
+            for (int i = 0; i < jsonItems.length(); i++) {
+                AddToListItem item = new AddToListItem.Builder().setTitle(jsonItems.getString(i)).build();
+                listItems.add(item);
+            }
+        } else if(payloadObject.has(JsonFields.CONTENT_LIST_ITEMS)) {
+            final JSONArray jsonItems = payloadObject.getJSONArray(JsonFields.CONTENT_DETAILED_LIST_ITEMS);
+            for (int i = 0; i < jsonItems.length(); i++) {
+                AddToListItem item = new AddToListItem.Builder()
+                        .setTitle("product_title")
+                        .setBrand("product_brand")
+                        .setCategory("product_category")
+                        .setBarCode("product_barcode")
+                        .setDiscount("product_discount")
+                        .setProductImage("product_image")
+                        .build();
+
+                listItems.add(item);
+            }
         }
 
         return listItems;
