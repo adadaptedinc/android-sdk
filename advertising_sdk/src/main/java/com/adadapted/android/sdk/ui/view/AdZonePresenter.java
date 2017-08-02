@@ -60,7 +60,7 @@ class AdZonePresenter implements SessionClient.Listener {
     void init(final String zoneId) {
         this.zoneId = zoneId;
 
-        Map<String, String> params = new HashMap<>();
+        final Map<String, String> params = new HashMap<>();
         params.put("zone_id", zoneId);
         AppEventClient.trackSdkEvent("zone_loaded", params);
     }
@@ -199,7 +199,7 @@ class AdZonePresenter implements SessionClient.Listener {
     }
 
     private void handleContentAction(final Ad ad) {
-        String zoneId = ad.getZoneId();
+        final String zoneId = ad.getZoneId();
 
         final AdContentPayload payload = AdContentPayload.createAddToListContent(ad);
         SdkContentPublisher.getInstance().publishContent(zoneId, payload);

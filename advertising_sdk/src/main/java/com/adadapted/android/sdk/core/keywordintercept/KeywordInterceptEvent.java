@@ -72,7 +72,7 @@ public class KeywordInterceptEvent {
         return sdkVersion;
     }
 
-    public boolean supercedes(final KeywordInterceptEvent e) {
+    public boolean supersedes(final KeywordInterceptEvent e) {
         return e != null && sessionId.equals(e.getSessionId()) &&
                 event.equals(e.getEvent()) &&
                 term.equals(e.getTerm()) &&

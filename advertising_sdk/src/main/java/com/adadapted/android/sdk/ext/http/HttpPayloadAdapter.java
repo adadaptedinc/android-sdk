@@ -42,6 +42,10 @@ public class HttpPayloadAdapter implements PayloadAdapter {
     @Override
     public void pickup(final DeviceInfo deviceInfo,
                        final Callback callback) {
+        if(deviceInfo == null || callback == null) {
+            return;
+        }
+
         final JSONObject json = builder.buildRequest(deviceInfo);
 
         //Log.d(LOGTAG, json.toString());

@@ -36,7 +36,7 @@ public class AdditInterceptActivity extends AppCompatActivity {
             final DeeplinkContentParser parser = new DeeplinkContentParser();
             final Content content = parser.parse(uri);
 
-            Log.i(LOGTAG, "Addit content dispactched to App.");
+            Log.i(LOGTAG, "Addit content dispatched to App.");
 
             AdditContentPublisher.getInstance().publishContent(content);
         }

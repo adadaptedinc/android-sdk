@@ -10,7 +10,6 @@ import com.adadapted.android.sdk.core.concurrency.ThreadPoolInteractorExecuter;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.device.DeviceInfoClient;
 import com.adadapted.android.sdk.core.event.AppEventClient;
-import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptClient;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -176,7 +175,7 @@ public class SessionClient implements SessionAdapter.Listener {
         }
     }
 
-    private void perfrmRefreshAds() {
+    private void performRefreshAds() {
         adapter.sentAdGet(currentSession, this);
     }
 
@@ -224,7 +223,7 @@ public class SessionClient implements SessionAdapter.Listener {
 
                         performInitialize(deviceInfo);
                     } else {
-                        perfrmRefreshAds();
+                        performRefreshAds();
                     }
                 }
             }, currentSession.getRefreshTime());

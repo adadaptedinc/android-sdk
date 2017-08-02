@@ -1,20 +1,20 @@
 package com.adadapted.android.sdk.core.addit;
 
-public class JsonFields {
-    public static final String Payloads = "payloads";
+class JsonFields {
+    static final String Payloads = "payloads";
 
-    public static final String PayloadId = "payload_id";
-    public static final String PayloadMessage = "payload_message";
-    public static final String PayloadImage = "payload_image";
+    static final String PayloadId = "payload_id";
+    static final String PayloadMessage = "payload_message";
+    static final String PayloadImage = "payload_image";
 
-    public static final String DetailedListItems = "detailed_list_items";
-    public static final String DetailedListItem = "detailed_list_item";
+    static final String DetailedListItems = "detailed_list_items";
+    static final String DetailedListItem = "detailed_list_item";
 
-    public static final String TrackingId = "tracking_id";
-    public static final String ProductTitle = "product_title";
-    public static final String ProductBrand = "product_brand";
-    public static final String ProductCategory = "product_category";
-    public static final String ProductBarCode = "product_barcode";
-    public static final String ProductDiscount = "product_discount";
-    public static final String ProductImage = "product_image";
+    static final String TrackingId = "tracking_id";
+    static final String ProductTitle = "product_title";
+    static final String ProductBrand = "product_brand";
+    static final String ProductCategory = "product_category";
+    static final String ProductBarCode = "product_barcode";
+    static final String ProductDiscount = "product_discount";
+    static final String ProductImage = "product_image";
 }

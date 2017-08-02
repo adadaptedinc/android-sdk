@@ -2,7 +2,6 @@ package com.adadapted.android.sdk.ui.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebResourceError;
@@ -25,7 +24,7 @@ class AdWebView extends WebView {
         void onAdClicked(Ad ad);
     }
 
-    private Listener listener;
+    private final Listener listener;
 
     private Ad currentAd;
     private final Lock adLock = new ReentrantLock();
@@ -43,7 +42,6 @@ class AdWebView extends WebView {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_UP:
                         if(!currentAd.getId().isEmpty()) {
-                            Log.i(LOGTAG, "Ad has been clicked!");
                             notifyAdClicked();
                         }
                         return true;
@@ -113,7 +111,7 @@ class AdWebView extends WebView {
         }
     }
 
-    void notifyAdLoaded() {
+    private void notifyAdLoaded() {
         adLock.lock();
         try {
             if(listener != null) {
@@ -125,7 +123,7 @@ class AdWebView extends WebView {
         }
     }
 
-    void notifyAdLoadFailed() {
+    private void notifyAdLoadFailed() {
         adLock.lock();
         try {
             if(listener != null) {
@@ -137,7 +135,7 @@ class AdWebView extends WebView {
         }
     }
 
-    void notifyAdClicked() {
+    private void notifyAdClicked() {
         adLock.lock();
         try {
             if(listener != null) {

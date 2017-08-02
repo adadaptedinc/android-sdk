@@ -27,7 +27,7 @@ public class AaWebViewPopupActivity extends Activity {
     @SuppressWarnings("unused")
     private static final String LOGTAG = AaWebViewPopupActivity.class.getName();
 
-    public static final String EXTRA_POPUP_AD = AaWebViewPopupActivity.class.getName() + ".EXTRA_POPUP_AD";
+    private static final String EXTRA_POPUP_AD = AaWebViewPopupActivity.class.getName() + ".EXTRA_POPUP_AD";
 
     public static Intent createActivity(final Context context,
                                         final Ad ad) {
@@ -55,6 +55,7 @@ public class AaWebViewPopupActivity extends Activity {
         popupLayout.addView(popupWebView);
 
         setContentView(popupLayout);
+        setTitle("Featured");
 
         final Intent intent = getIntent();
         ad = intent.getParcelableExtra(EXTRA_POPUP_AD);

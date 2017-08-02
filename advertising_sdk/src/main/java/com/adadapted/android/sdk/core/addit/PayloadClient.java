@@ -21,7 +21,7 @@ public class PayloadClient {
     private static PayloadClient instance;
 
     private static boolean deeplinkInProgress = false;
-    private static Lock lock = new ReentrantLock();
+    private static final Lock lock = new ReentrantLock();
 
     public static synchronized void createInstance(final PayloadAdapter adapter) {
         if(instance == null) {

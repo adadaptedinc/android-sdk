@@ -1,7 +1,5 @@
 package com.adadapted.android.sdk.core.keywordintercept;
 
-import android.util.Log;
-
 import com.adadapted.android.sdk.core.concurrency.ThreadPoolInteractorExecuter;
 import com.adadapted.android.sdk.core.session.Session;
 
@@ -103,6 +101,10 @@ public class KeywordInterceptClient {
 
     private void performInitialize(final Session session,
                                    final Listener listener) {
+        if(session == null || listener == null) {
+            return;
+        }
+
         adapter.init(session, new KeywordInterceptAdapter.Callback() {
             @Override
             public void onSuccess(final KeywordIntercept keywordIntercept) {
@@ -118,7 +120,7 @@ public class KeywordInterceptClient {
             final Set<KeywordInterceptEvent> currentEvents = new HashSet<>(this.events);
 
             for (final KeywordInterceptEvent e : currentEvents) {
-                if (event.supercedes(e)) {
+                if (event.supersedes(e)) {
                     currentEvents.remove(e);
                 }
             }
