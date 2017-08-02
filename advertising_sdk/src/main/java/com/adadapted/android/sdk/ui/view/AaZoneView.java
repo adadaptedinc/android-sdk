@@ -15,6 +15,8 @@ import com.adadapted.android.sdk.core.ad.Ad;
 import com.adadapted.android.sdk.core.common.Dimension;
 import com.adadapted.android.sdk.core.zone.Zone;
 import com.adadapted.android.sdk.ui.messaging.AaSdkContentListener;
+import com.adadapted.android.sdk.ui.messaging.AdContentListener;
+import com.adadapted.android.sdk.ui.messaging.AdContentPublisher;
 import com.adadapted.android.sdk.ui.messaging.SdkContentPublisher;
 
 public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listener, AdWebView.Listener {
@@ -101,6 +103,7 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
         this.listener = listener;
     }
 
+    @Deprecated
     public void onStart(final Listener listener,
                         final AaSdkContentListener contentListener) {
         onStart();
@@ -109,10 +112,25 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
         SdkContentPublisher.getInstance().addListener(contentListener);
     }
 
+    @Deprecated
     public void onStart(final AaSdkContentListener contentListener) {
         onStart();
 
         SdkContentPublisher.getInstance().addListener(contentListener);
+    }
+
+    public void onStart(final Listener listener,
+                        final AdContentListener contentListener) {
+        onStart();
+
+        this.listener = listener;
+        AdContentPublisher.getInstance().addListener(contentListener);
+    }
+
+    public void onStart(final AdContentListener contentListener) {
+        onStart();
+
+        AdContentPublisher.getInstance().addListener(contentListener);
     }
 
     public void onStop() {
@@ -123,8 +141,15 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
         listener = null;
     }
 
+    @Deprecated
     public void onStop(final AaSdkContentListener listener) {
         SdkContentPublisher.getInstance().removeListener(listener);
+
+        onStop();
+    }
+
+    public void onStop(final AdContentListener listener) {
+        AdContentPublisher.getInstance().removeListener(listener);
 
         onStop();
     }

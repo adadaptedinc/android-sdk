@@ -1,32 +1,31 @@
 package com.adadapted.android.sdk.ui.messaging;
 
-import com.adadapted.android.sdk.ui.model.AdContentPayload;
+import com.adadapted.android.sdk.ui.model.AdContent;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-@Deprecated
-public class SdkContentPublisher {
-    private static SdkContentPublisher sSdkContentPublisher;
+public class AdContentPublisher {
+    private static AdContentPublisher sAdContentPublisher;
 
-    public static synchronized SdkContentPublisher getInstance() {
-        if(sSdkContentPublisher == null) {
-            sSdkContentPublisher = new SdkContentPublisher();
+    public static synchronized AdContentPublisher getInstance() {
+        if(sAdContentPublisher == null) {
+            sAdContentPublisher = new AdContentPublisher();
         }
 
-        return sSdkContentPublisher;
+        return sAdContentPublisher;
     }
 
-    private final Set<AaSdkContentListener> listeners;
+    private final Set<AdContentListener> listeners;
     private final Lock lock = new ReentrantLock();
 
-    private SdkContentPublisher() {
+    private AdContentPublisher() {
         listeners = new HashSet<>();
     }
 
-    public void addListener(final AaSdkContentListener listener) {
+    public void addListener(final AdContentListener listener) {
         lock.lock();
         try {
             if (listener != null) {
@@ -38,7 +37,7 @@ public class SdkContentPublisher {
         }
     }
 
-    public void removeListener(final AaSdkContentListener listener) {
+    public void removeListener(final AdContentListener listener) {
         lock.lock();
         try {
             if(listener != null) {
@@ -51,11 +50,11 @@ public class SdkContentPublisher {
     }
 
     public void publishContent(final String zoneId,
-                               final AdContentPayload payload) {
+                               final AdContent content) {
         lock.lock();
         try {
-            for(final AaSdkContentListener listener : listeners) {
-                listener.onContentAvailable(zoneId, payload);
+            for(final AdContentListener listener : listeners) {
+                listener.onContentAvailable(zoneId, content);
             }
         }
         finally {

@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
 public class AdContentPayload implements ContentPayload {
     private static final String LOGTAG = AdContentPayload.class.getName();
 
@@ -40,7 +41,7 @@ public class AdContentPayload implements ContentPayload {
     }
 
     public static AdContentPayload createAddToListContent(final Ad ad) {
-        final List items = ad.getPayload();
+        final List<String> items = ad.getPayloadNames();
         final JSONObject json = new JSONObject();
 
         try {

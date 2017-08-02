@@ -12,7 +12,9 @@ import com.adadapted.android.sdk.core.session.Session;
 import com.adadapted.android.sdk.core.session.SessionClient;
 import com.adadapted.android.sdk.core.zone.Zone;
 import com.adadapted.android.sdk.ui.activity.AaWebViewPopupActivity;
+import com.adadapted.android.sdk.ui.messaging.AdContentPublisher;
 import com.adadapted.android.sdk.ui.messaging.SdkContentPublisher;
+import com.adadapted.android.sdk.ui.model.AdContent;
 import com.adadapted.android.sdk.ui.model.AdContentPayload;
 
 import java.util.HashMap;
@@ -203,6 +205,9 @@ class AdZonePresenter implements SessionClient.Listener {
 
         final AdContentPayload payload = AdContentPayload.createAddToListContent(ad);
         SdkContentPublisher.getInstance().publishContent(zoneId, payload);
+
+        final AdContent content = AdContent.createAddToListContent(ad);
+        AdContentPublisher.getInstance().publishContent(zoneId, content);
     }
 
     private void handleLinkAction(final Ad ad) {
