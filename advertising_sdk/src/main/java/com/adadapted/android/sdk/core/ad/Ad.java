@@ -3,10 +3,14 @@ package com.adadapted.android.sdk.core.ad;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.adadapted.android.sdk.core.atl.AddToListItem;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Ad implements Parcelable {
+
+
     protected Ad(Parcel in) {
         id = in.readString();
         zoneId = in.readString();
@@ -14,7 +18,7 @@ public class Ad implements Parcelable {
         url = in.readString();
         actionType = in.readString();
         actionPath = in.readString();
-        payload = in.createStringArrayList();
+        payload = in.createTypedArrayList(AddToListItem.CREATOR);
         refreshTime = in.readLong();
         trackingHtml = in.readString();
     }
@@ -44,7 +48,7 @@ public class Ad implements Parcelable {
         parcel.writeString(url);
         parcel.writeString(actionType);
         parcel.writeString(actionPath);
-        parcel.writeStringList(payload);
+        parcel.writeTypedList(payload);
         parcel.writeLong(refreshTime);
         parcel.writeString(trackingHtml);
     }
@@ -61,7 +65,7 @@ public class Ad implements Parcelable {
     private final String url;
     private final String actionType;
     private final String actionPath;
-    private final List<String> payload;
+    private final List<AddToListItem> payload;
     private final long refreshTime;
     private final String trackingHtml;
 
@@ -71,7 +75,7 @@ public class Ad implements Parcelable {
               final String url,
               final String actionType,
               final String actionPath,
-              final List<String> payload,
+              final List<AddToListItem> payload,
               final long refreshTime,
               final String trackingHtml) {
         this.id = id;
@@ -113,8 +117,18 @@ public class Ad implements Parcelable {
         return actionPath;
     }
 
-    public List<String> getPayload() {
+    public List<AddToListItem> getPayload() {
         return payload;
+    }
+
+    public List<String> getPayloadNames() {
+        final List<String> names = new ArrayList<>();
+
+        for(AddToListItem item : payload) {
+            names.add(item.getTitle());
+        }
+
+        return names;
     }
 
     public long getRefreshTime() {
@@ -132,7 +146,7 @@ public class Ad implements Parcelable {
         private String url;
         private String actionType;
         private String actionPath;
-        private List<String> payload;
+        private List<AddToListItem> payload;
         private long refreshTime;
         private String trackingHtml;
 
@@ -196,11 +210,11 @@ public class Ad implements Parcelable {
             this.actionPath = actionPath;
         }
 
-        public List<String> getPayload() {
+        public List<AddToListItem> getPayload() {
             return payload;
         }
 
-        public void setPayload(final List<String> payload) {
+        public void setPayload(final List<AddToListItem> payload) {
             this.payload = payload;
         }
 
