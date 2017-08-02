@@ -96,6 +96,11 @@ public class AdAdapted {
     }
 
     public void start(final Context context) {
+        if(appId == null) {
+            Log.e(LOGTAG, "The Application Id cannot be Null.");
+            return;
+        }
+
         Wireup.run(context, isProd);
 
         SdkEventPublisher.getInstance().setListener(eventListener);
@@ -113,8 +118,6 @@ public class AdAdapted {
         final SessionClient.Listener startListener = new SessionClient.Listener() {
             @Override
             public void onSessionAvailable(final Session session) {
-                //Log.d(LOGTAG, "onSessionAvailable called. Has ads: " + session.hasActiveCampaigns());
-
                 if(sessionListener != null) {
                     sessionListener.onHasAdsToServe(session.hasActiveCampaigns());
                 }
@@ -122,8 +125,6 @@ public class AdAdapted {
 
             @Override
             public void onAdsAvailable(Session session) {
-                //Log.d(LOGTAG, "onAdsAvailable called. Has ads: " + session.hasActiveCampaigns());
-
                 if(sessionListener != null) {
                     sessionListener.onHasAdsToServe(session.hasActiveCampaigns());
                 }
@@ -131,7 +132,9 @@ public class AdAdapted {
 
             @Override
             public void onSessionInitFailed() {
-                sessionListener.onHasAdsToServe(false);
+                if(sessionListener != null) {
+                    sessionListener.onHasAdsToServe(false);
+                }
             }
         };
 
@@ -162,6 +165,11 @@ public class AdAdapted {
 
     public static synchronized void restart(final Context context,
                                             final Map<String, String> params) {
+        if(getsInstance().appId == null) {
+            Log.e(LOGTAG, "The Application Id cannot be Null.");
+            return;
+        }
+
         SessionClient.restart(
             context.getApplicationContext(),
             getsInstance().appId,
