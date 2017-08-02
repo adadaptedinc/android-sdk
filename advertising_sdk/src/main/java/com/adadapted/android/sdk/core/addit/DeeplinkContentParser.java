@@ -3,6 +3,7 @@ package com.adadapted.android.sdk.core.addit;
 import android.net.Uri;
 import android.util.Base64;
 
+import com.adadapted.android.sdk.core.atl.AddToListItem;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 
 import org.json.JSONArray;

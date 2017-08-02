@@ -3,6 +3,8 @@ package com.adadapted.android.sdk.core.addit;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.adadapted.android.sdk.core.atl.AddToListItem;
+
 import java.util.List;
 
 public class Content implements Parcelable {

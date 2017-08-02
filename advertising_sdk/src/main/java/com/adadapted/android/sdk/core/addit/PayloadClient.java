@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.core.addit;
 
+import com.adadapted.android.sdk.core.atl.AddToListItem;
 import com.adadapted.android.sdk.core.concurrency.ThreadPoolInteractorExecuter;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.device.DeviceInfoClient;
