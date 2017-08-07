@@ -22,11 +22,13 @@ class AdWebView extends WebView {
         void onAdLoaded(Ad ad);
         void onAdLoadFailed(Ad ad);
         void onAdClicked(Ad ad);
+        void onBlankLoaded();
     }
 
     private final Listener listener;
 
     private Ad currentAd;
+    private boolean loaded;
     private final Lock adLock = new ReentrantLock();
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -64,7 +66,8 @@ class AdWebView extends WebView {
 
                 adLock.lock();
                 try {
-                    if(!currentAd.getId().isEmpty()) {
+                    if(!currentAd.getId().isEmpty() && !loaded) {
+                        loaded = true;
                         notifyAdLoaded();
                     }
                 }
@@ -79,7 +82,8 @@ class AdWebView extends WebView {
                                         WebResourceError error) {
                 super.onReceivedError(view, request, error);
 
-                if(!currentAd.getId().isEmpty()) {
+                if(!currentAd.getId().isEmpty() && !loaded) {
+                    loaded = true;
                     notifyAdLoadFailed();
                 }
             }
@@ -91,6 +95,7 @@ class AdWebView extends WebView {
         adLock.lock();
         try {
             currentAd = ad;
+            loaded = false;
             loadUrl(currentAd.getUrl());
         }
         finally {
@@ -105,6 +110,8 @@ class AdWebView extends WebView {
 
             final String dummyDocument = "<html><head><meta name=\"viewport\" content=\"width=device-width, user-scalable=no\" /><style>body{width:100px;height100px;}</style></head><body></body></html>";
             loadData(dummyDocument, "text/html", null);
+
+            notifyBlankLoaded();
         }
         finally {
             adLock.unlock();
@@ -128,6 +135,18 @@ class AdWebView extends WebView {
         try {
             if(listener != null) {
                 listener.onAdLoadFailed(currentAd);
+            }
+        }
+        finally {
+            adLock.unlock();
+        }
+    }
+
+    private void notifyBlankLoaded() {
+        adLock.lock();
+        try {
+            if(listener != null) {
+                listener.onBlankLoaded();
             }
         }
         finally {
