@@ -48,13 +48,10 @@ public class HttpPayloadAdapter implements PayloadAdapter {
 
         final JSONObject json = builder.buildRequest(deviceInfo);
 
-        //Log.d(LOGTAG, json.toString());
-
         final JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
                 this.pickupUrl, json, new Response.Listener<JSONObject>(){
             @Override
             public void onResponse(JSONObject response) {
-                //Log.d(LOGTAG, response.toString());
 
                 final List<Content> content = parser.parse(response);
                 callback.onSuccess(content);

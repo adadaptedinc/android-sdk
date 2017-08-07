@@ -30,14 +30,11 @@ public class HttpAdEventSink implements AdEventSink {
     public void sendBatch(final Set<AdEvent> events) {
         final JSONArray json = builder.buildEvents(events);
 
-        //Log.d(LOGTAG, json.toString());
-
         final JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST,
                 batchUrl, json, new Response.Listener<JSONArray>(){
 
             @Override
             public void onResponse(JSONArray response) {
-                //Log.d(LOGTAG, response.toString());
             }
 
         }, new Response.ErrorListener() {
@@ -50,8 +47,6 @@ public class HttpAdEventSink implements AdEventSink {
                     final String data = new String(error.networkResponse.data);
 
                     reason = statusCode + " - " + data;
-
-                    //Log.e(LOGTAG, "Ad Batch Request Failed: " + reason, error);
                 }
 
                 final Map<String, String> params = new HashMap<>();

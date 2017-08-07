@@ -56,8 +56,6 @@ public class HttpAppEventSink implements AppEventSink {
 
         final JSONObject json = eventBuilder.buildItem(eventWrapper, events);
 
-        //Log.d(LOGTAG, json.toString());
-
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
                 eventUrl, json, new Response.Listener<JSONObject>(){
             @Override
@@ -97,8 +95,6 @@ public class HttpAppEventSink implements AppEventSink {
         }
 
         final JSONObject json = errorBuilder.buildItem(errorWrapper, errors);
-
-        //Log.d(LOGTAG, json.toString());
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
                 errorUrl, json, new Response.Listener<JSONObject>(){
