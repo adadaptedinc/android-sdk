@@ -168,11 +168,12 @@ public class SessionClient implements SessionAdapter.Listener {
         deviceInfoLock.lock();
         try {
             this.deviceInfo = deviceInfo;
-            adapter.sendInit(deviceInfo, this);
         }
         finally {
             deviceInfoLock.unlock();
         }
+
+        adapter.sendInit(deviceInfo, this);
     }
 
     private void performRefreshAds() {
@@ -213,6 +214,7 @@ public class SessionClient implements SessionAdapter.Listener {
 
         sessionLock.lock();
         try {
+            Log.i(LOGTAG, "Starting Ad polling timer.");
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -223,6 +225,7 @@ public class SessionClient implements SessionAdapter.Listener {
 
                         performInitialize(deviceInfo);
                     } else {
+                        Log.i(LOGTAG, "Checking for more Ads.");
                         performRefreshAds();
                     }
                 }
@@ -299,7 +302,7 @@ public class SessionClient implements SessionAdapter.Listener {
 
     @Override
     public void onSessionInitializeFailed() {
-        updateCurrentSession(Session.emptySession());
+        updateCurrentSession(Session.emptySession(deviceInfo));
         notifySessionInitFailed();
     }
 
@@ -311,6 +314,7 @@ public class SessionClient implements SessionAdapter.Listener {
 
     @Override
     public void onNewAdsLoadFailed() {
-        updateCurrentZones(Session.emptySession());
+        updateCurrentZones(Session.emptySession(deviceInfo));
+        notifyAdsAvailable();
     }
 }
