@@ -120,7 +120,9 @@ public class AppEventClient {
         DeviceInfoClient.getDeviceInfo(new DeviceInfoClient.Callback() {
             @Override
             public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
-                sink.generateWrappers(deviceInfo);
+                if(deviceInfo != null) {
+                    sink.generateWrappers(deviceInfo);
+                }
             }
         });
     }
@@ -128,7 +130,6 @@ public class AppEventClient {
     private void performTrackEvent(final String type,
                                    final String name,
                                    final Map<String, String> params) {
-        //Log.i(LOGTAG, "App Event: " + type + " - " + name);
         eventLock.lock();
         try {
             events.add(new AppEvent(type, name, params));
