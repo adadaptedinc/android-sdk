@@ -92,20 +92,73 @@ public class JsonAdBuilder {
         if(payloadObject.has(JsonFields.CONTENT_LIST_ITEMS)) {
             final JSONArray jsonItems = payloadObject.getJSONArray(JsonFields.CONTENT_LIST_ITEMS);
             for (int i = 0; i < jsonItems.length(); i++) {
-                AddToListItem item = new AddToListItem.Builder().setTitle(jsonItems.getString(i)).build();
-                listItems.add(item);
+                final String name = jsonItems.getString(i);
+                if(!name.isEmpty()) {
+                    final AddToListItem item = new AddToListItem.Builder().setTitle(name).build();
+                    listItems.add(item);
+                }
             }
-        } else if(payloadObject.has(JsonFields.CONTENT_LIST_ITEMS)) {
+        } else if(payloadObject.has(JsonFields.CONTENT_DETAILED_LIST_ITEMS)) {
             final JSONArray jsonItems = payloadObject.getJSONArray(JsonFields.CONTENT_DETAILED_LIST_ITEMS);
             for (int i = 0; i < jsonItems.length(); i++) {
-                AddToListItem item = new AddToListItem.Builder()
-                        .setTitle("product_title")
-                        .setBrand("product_brand")
-                        .setCategory("product_category")
-                        .setBarCode("product_barcode")
-                        .setDiscount("product_discount")
-                        .setProductImage("product_image")
-                        .build();
+                final AddToListItem.Builder builder = new AddToListItem.Builder();
+
+                if(payloadObject.has("product_title")) {
+                    builder.setTitle(payloadObject.getString("product_title"));
+                } else {
+                    AppEventClient.trackError(
+                        "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                        "Detailed List Items payload should always have a product title."
+                    );
+
+                    break;
+                }
+
+                if(payloadObject.has("product_brand")) {
+                    builder.setBrand(payloadObject.getString("product_brand"));
+                }
+
+                if(payloadObject.has("product_category")) {
+                    builder.setCategory(payloadObject.getString("product_category"));
+                }
+
+                if(payloadObject.has("product_barcode")) {
+                    builder.setBarCode(payloadObject.getString("product_barcode"));
+                }
+
+                if(payloadObject.has("product_discount")) {
+                    builder.setDiscount(payloadObject.getString("product_discount"));
+                }
+
+                if(payloadObject.has("product_image")) {
+                    builder.setProductImage(payloadObject.getString("product_image"));
+                }
+
+                final AddToListItem item = builder.build();
+
+                listItems.add(item);
+            }
+        } else if (payloadObject.has(JsonFields.CONTENT_RICH_LIST_ITEMS)) {
+            final JSONArray jsonItems = payloadObject.getJSONArray(JsonFields.CONTENT_RICH_LIST_ITEMS);
+            for (int i = 0; i < jsonItems.length(); i++) {
+                final AddToListItem.Builder builder = new AddToListItem.Builder();
+
+                if(payloadObject.has("product-title")) {
+                    builder.setTitle(payloadObject.getString("product-title"));
+                } else {
+                    AppEventClient.trackError(
+                            "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                            "Rich List Items payload should always have a product title."
+                    );
+
+                    break;
+                }
+
+                if(payloadObject.has("product-image")) {
+                    builder.setTitle(payloadObject.getString("product-image"));
+                }
+
+                final AddToListItem item = builder.build();
 
                 listItems.add(item);
             }
