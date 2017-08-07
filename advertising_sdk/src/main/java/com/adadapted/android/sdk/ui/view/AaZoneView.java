@@ -68,7 +68,12 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
         this.presenter  = new AdZonePresenter(context.getApplicationContext());
 
         this.webView = new AdWebView(context.getApplicationContext(), this);
-        addView(webView);
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                addView(webView);
+            }
+        });
     }
 
     public void init(final String zoneId) {
@@ -90,6 +95,10 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
             }
         });
     }
+
+    /**
+     * onStart()
+     */
 
     public void onStart() {
         if(presenter != null) {
@@ -132,6 +141,10 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
 
         AdContentPublisher.getInstance().addListener(contentListener);
     }
+
+    /**
+     * onStop()
+     */
 
     public void onStop() {
         if(presenter != null) {
@@ -226,12 +239,23 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
     @Override
     public void onAdLoadFailed(final Ad ad) {
         notifyAdLoadFailed();
+
+        if(presenter != null) {
+            presenter.onAdDisplayFailed(ad);
+        }
     }
 
     @Override
     public void onAdClicked(final Ad ad) {
         if(presenter != null) {
             presenter.onAdClicked(ad);
+        }
+    }
+
+    @Override
+    public void onBlankLoaded() {
+        if(presenter != null) {
+            presenter.onBlankDisplayed();
         }
     }
 
