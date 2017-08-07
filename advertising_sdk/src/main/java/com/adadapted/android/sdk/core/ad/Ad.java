@@ -3,14 +3,13 @@ package com.adadapted.android.sdk.core.ad;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.atl.AddToListItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Ad implements Parcelable {
-
-
     protected Ad(Parcel in) {
         id = in.readString();
         zoneId = in.readString();
@@ -93,6 +92,10 @@ public class Ad implements Parcelable {
         return new Builder().build();
     }
 
+    public boolean isEmpty() {
+        return id.isEmpty();
+    }
+
     public String getId() {
         return id;
     }
@@ -158,7 +161,7 @@ public class Ad implements Parcelable {
             actionType = "";
             actionPath = "";
             payload = new ArrayList<>();
-            refreshTime = 90;
+            refreshTime = Config.DEFAULT_AD_REFRESH;
             trackingHtml = "";
         }
 
