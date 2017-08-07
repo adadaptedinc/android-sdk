@@ -38,6 +38,7 @@ class AdZonePresenter implements SessionClient.Listener {
 
     private Listener listener;
 
+    private boolean zoneLoaded;
     private Zone currentZone;
     private final Lock zoneLock = new ReentrantLock();
 
@@ -50,11 +51,15 @@ class AdZonePresenter implements SessionClient.Listener {
     private boolean adCompleted;
     private final Lock adLock = new ReentrantLock();
 
+    private boolean timerRunning;
+    private final Lock timerLock = new ReentrantLock();
+
     AdZonePresenter(final Context context) {
         this.context = context.getApplicationContext();
 
         pixelWebView = new PixelWebView(context.getApplicationContext());
 
+        this.zoneLoaded = false;
         this.currentZone = Zone.emptyZone();
         this.viewCount = (int) (Math.random()*10);
     }
@@ -68,10 +73,6 @@ class AdZonePresenter implements SessionClient.Listener {
     }
 
     void onAttach(final Listener l) {
-        if(listener != null) {
-            return;
-        }
-
         if(l == null) {
             Log.e(LOGTAG, "NULL Listener provided");
             return;
@@ -80,6 +81,7 @@ class AdZonePresenter implements SessionClient.Listener {
         this.listener = l;
 
         SessionClient.addListener(this);
+        setNextAd();
     }
 
     void onDetach() {
@@ -96,6 +98,7 @@ class AdZonePresenter implements SessionClient.Listener {
     private void updateCurrentZone(final Zone zone) {
         zoneLock.lock();
         try {
+            this.zoneLoaded = true;
             this.currentZone = zone;
         }
         finally {
@@ -108,6 +111,10 @@ class AdZonePresenter implements SessionClient.Listener {
     }
 
     private void setNextAd() {
+        if(!zoneLoaded || timerRunning) {
+            return;
+        }
+
         completeCurrentAd();
 
         adLock.lock();
@@ -132,16 +139,16 @@ class AdZonePresenter implements SessionClient.Listener {
     }
 
     private void displayAd() {
-        if(currentZone.hasAds()) {
-            notifyAdAvailable(currentAd);
+        if(currentAd.isEmpty()) {
+            notifyNoAdAvailable();
         }
         else {
-            notifyNoAdAvailable();
+            notifyAdAvailable(currentAd);
         }
     }
 
     private void completeCurrentAd() {
-        if(currentAd != null && (adStarted && !adCompleted)) {
+        if((currentAd != null && !currentAd.isEmpty()) && (adStarted && !adCompleted)) {
             adLock.lock();
             try {
                 adCompleted = true;
@@ -159,14 +166,60 @@ class AdZonePresenter implements SessionClient.Listener {
             adStarted = true;
             AdEventClient.trackImpression(ad);
             pixelWebView.loadData(ad.getTrackingHtml(), "text/html", null);
+
+            startZoneTimer();
         }
         finally {
             adLock.unlock();
+        }
+    }
+
+    void onAdDisplayFailed(final Ad ad) {
+        adLock.lock();
+        try {
+            adStarted = true;
+            currentAd = Ad.emptyAd();
+
+            startZoneTimer();
+        }
+        finally {
+            adLock.unlock();
+        }
+    }
+
+    void onBlankDisplayed() {
+        adLock.lock();
+        try {
+            adStarted = true;
+            currentAd = Ad.emptyAd();
+
+            startZoneTimer();
+        }
+        finally {
+            adLock.unlock();
+        }
+    }
+
+    private void startZoneTimer() {
+        timerLock.lock();
+        try {
+            timerRunning = true;
+        }
+        finally {
+            timerLock.unlock();
         }
 
         new Timer().schedule(new TimerTask(){
             @Override
             public void run() {
+                timerLock.lock();
+                try {
+                    timerRunning = false;
+                }
+                finally {
+                    timerLock.unlock();
+                }
+
                 setNextAd();
             }
         }, currentAd.getRefreshTime() * 1000);
