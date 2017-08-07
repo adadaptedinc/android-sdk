@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.core.session;
 
+import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.zone.Zone;
 
@@ -75,8 +76,8 @@ public class Session {
         return Zone.emptyZone();
     }
 
-    public static Session emptySession() {
-        return new Session(null, "", false, 0L, new Date(), new HashMap<String, Zone>());
+    public static Session emptySession(final DeviceInfo deviceInfo) {
+        return new Session(deviceInfo, "", false, Config.DEFAULT_AD_POLLING, new Date(), new HashMap<String, Zone>());
     }
 
     public static class Builder {
