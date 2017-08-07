@@ -2,7 +2,9 @@ package com.adadapted.android.sdk.config;
 
 public class Config {
     public static final String SDK_VERSION = "1.1.0";
+    public static final long DEFAULT_AD_POLLING = 300000L;
     public static final long DEFAULT_EVENT_POLLING = 5000L;
+    public static final long DEFAULT_AD_REFRESH = 60L;
 
     public static class Prod {
         public static final String URL_SESSION_INIT = "https://ads.adadapted.com/v/0.9.4/android/session/init";
