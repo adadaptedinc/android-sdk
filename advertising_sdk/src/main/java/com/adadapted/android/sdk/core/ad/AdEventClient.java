@@ -142,6 +142,10 @@ public class AdEventClient implements SessionClient.Listener {
     }
 
     private void fileEvent(final Ad ad, final String eventType) {
+        if(session == null) {
+            return;
+        }
+
         eventLock.lock();
         try {
             final AdEvent event = new AdEvent(
@@ -172,7 +176,6 @@ public class AdEventClient implements SessionClient.Listener {
 
         eventLock.lock();
         try {
-            //Log.i(LOGTAG, "Publishing " + events.size() + " events");
             currentEvents.addAll(events);
             events.clear();
 
