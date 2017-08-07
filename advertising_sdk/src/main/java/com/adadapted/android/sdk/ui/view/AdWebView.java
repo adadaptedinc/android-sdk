@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.ui.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebResourceError;
@@ -38,10 +39,14 @@ class AdWebView extends WebView {
         this.listener = listener;
 
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        setBackgroundColor(Color.TRANSPARENT);
         setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(final View v, final MotionEvent event) {
                 switch (event.getAction()) {
+                    case MotionEvent.ACTION_MOVE:
+                        return true;
+
                     case MotionEvent.ACTION_UP:
                         if(!currentAd.getId().isEmpty()) {
                             notifyAdClicked();
