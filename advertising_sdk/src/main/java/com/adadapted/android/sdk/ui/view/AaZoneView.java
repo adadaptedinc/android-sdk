@@ -229,19 +229,17 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
 
     @Override
     public void onAdLoaded(final Ad ad) {
-        notifyAdLoaded();
-
         if(presenter != null) {
             presenter.onAdDisplayed(ad);
+            notifyAdLoaded();
         }
     }
 
     @Override
     public void onAdLoadFailed(final Ad ad) {
-        notifyAdLoadFailed();
-
         if(presenter != null) {
             presenter.onAdDisplayFailed(ad);
+            notifyAdLoadFailed();
         }
     }
 
