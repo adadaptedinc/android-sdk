@@ -1,7 +1,7 @@
 package com.adadapted.android.sdk.config;
 
 public class Config {
-    public static final String SDK_VERSION = "1.1.2";
+    public static final String SDK_VERSION = "1.1.2s";
     public static final long DEFAULT_AD_POLLING = 300000L;
     public static final long DEFAULT_EVENT_POLLING = 5000L;
     public static final long DEFAULT_AD_REFRESH = 60L;
@@ -32,5 +32,5 @@ public class Config {
 
         public static final String URL_APP_PAYLOAD_PICKUP = "https://sandpayload.adadapted.com/v/1/pickup";
         public static final String URL_APP_PAYLOAD_TRACK = "https://sandpayload.adadapted.com/v/1/tracking";
-    }
+     }
 }
