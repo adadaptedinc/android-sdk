@@ -58,8 +58,8 @@ public class AdContent implements Parcelable {
     }
 
     private AdContent(final Ad ad,
-                             final int type,
-                             final List<AddToListItem> items) {
+                      final int type,
+                      final List<AddToListItem> items) {
         this.ad = ad;
         this.type = type;
         this.items = items;

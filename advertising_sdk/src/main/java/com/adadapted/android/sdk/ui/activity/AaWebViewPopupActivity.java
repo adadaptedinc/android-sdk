@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
+//import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.webkit.WebResourceError;
@@ -101,11 +101,13 @@ public class AaWebViewPopupActivity extends Activity {
 
         popupWebView.getSettings().setJavaScriptEnabled(true);
         popupWebView.setWebViewClient(new WebViewClient() {
+            /**
             @Override
             public boolean shouldOverrideUrlLoading(final WebView view,
                                                     final WebResourceRequest request) {
                 return false;
             }
+             **/
 
             @Override
             public void onReceivedError(WebView view,
@@ -125,6 +127,7 @@ public class AaWebViewPopupActivity extends Activity {
                 );
             }
 
+            /**
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onReceivedHttpError(WebView view,
@@ -143,6 +146,7 @@ public class AaWebViewPopupActivity extends Activity {
                     params
                 );
             }
+            **/
         });
         popupWebView.loadUrl(url);
     }

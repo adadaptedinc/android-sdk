@@ -58,11 +58,13 @@ class AdWebView extends WebView {
             }
         });
         setWebViewClient(new WebViewClient() {
+            /**
             @Override
             public boolean shouldOverrideUrlLoading(final WebView view,
                                                     final WebResourceRequest request) {
                 return true;
             }
+             **/
 
             @Override
             public void onPageFinished(WebView view,
