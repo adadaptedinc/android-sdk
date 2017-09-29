@@ -6,35 +6,53 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AdAdaptedListManager {
-    public static synchronized void itemAddedToList(String item) {
+    private static final String LIST_NAME = "list_name";
+    private static final String ITEM_NAME = "item_name";
+
+    public static synchronized void itemAddedToList(final String item) {
+        itemAddedToList("", item);
+    }
+
+    public static synchronized void itemAddedToList(final String list, final String item) {
         if(item == null || item.isEmpty()) {
             return;
         }
 
         final Map<String, String> params = new HashMap<>();
-        params.put("", item);
+        params.put(LIST_NAME, list);
+        params.put(ITEM_NAME, item);
 
         AppEventClient.trackAppEvent("user_added_to_list", params);
     }
 
-    public static synchronized void itemCrossedOffList(String item) {
+    public static synchronized void itemCrossedOffList(final String item) {
+        itemCrossedOffList("", item);
+    }
+
+    public static synchronized void itemCrossedOffList(final String list, final String item) {
         if(item == null || item.isEmpty()) {
             return;
         }
 
         final Map<String, String> params = new HashMap<>();
-        params.put("", item);
+        params.put(LIST_NAME, list);
+        params.put(ITEM_NAME, item);
 
         AppEventClient.trackAppEvent("user_crossed_off_list", params);
     }
 
-    public static synchronized void itemDeletedFromList(String item) {
+    public static synchronized void itemDeletedFromList(final String item) {
+        itemDeletedFromList("", item);
+    }
+
+    public static synchronized void itemDeletedFromList(final String list, final String item) {
         if(item == null || item.isEmpty()) {
             return;
         }
 
         final Map<String, String> params = new HashMap<>();
-        params.put("item_name", item);
+        params.put(LIST_NAME, list);
+        params.put(ITEM_NAME, item);
 
         AppEventClient.trackAppEvent("user_deleted_from_list", params);
     }
