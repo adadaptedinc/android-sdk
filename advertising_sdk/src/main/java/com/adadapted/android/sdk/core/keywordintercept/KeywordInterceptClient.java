@@ -51,7 +51,6 @@ public class KeywordInterceptClient {
 
     public static synchronized void trackSelected(final Session session, final String term, final String userInput) {
         trackEvent(session, "", term, userInput, "selected");
-        publishEvents();
     }
 
     private static synchronized void trackEvent(final Session session,
@@ -118,21 +117,29 @@ public class KeywordInterceptClient {
         eventLock.lock();
         try {
             final Set<KeywordInterceptEvent> currentEvents = new HashSet<>(this.events);
-
-            for (final KeywordInterceptEvent e : currentEvents) {
-                if (event.supersedes(e)) {
-                    currentEvents.remove(e);
-                }
-            }
-
-            events.add(event);
-
             this.events.clear();
-            this.events.addAll(currentEvents);
+
+            final Set<KeywordInterceptEvent> resultingEvents = consolodateEvents(event, currentEvents);
+
+            this.events.addAll(resultingEvents);
         }
         finally {
             eventLock.unlock();
         }
+    }
+
+    private Set<KeywordInterceptEvent> consolodateEvents(final KeywordInterceptEvent event, final Set<KeywordInterceptEvent> events) {
+        final Set<KeywordInterceptEvent> resultingEvents = new HashSet<>(this.events);
+
+        for (final KeywordInterceptEvent e : events) {
+            if (!event.supersedes(e)) {
+                resultingEvents.add(e);
+            }
+        }
+
+        resultingEvents.add(event);
+
+        return resultingEvents;
     }
 
     private void performPublishEvents() {
