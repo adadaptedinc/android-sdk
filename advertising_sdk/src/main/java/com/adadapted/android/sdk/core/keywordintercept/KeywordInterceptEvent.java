@@ -78,4 +78,13 @@ public class KeywordInterceptEvent {
                 term.equals(e.getTerm()) &&
                 userInput.contains(e.getUserInput());
     }
+
+    @Override
+    public String toString() {
+        return "KeywordInterceptEvent{" +
+                "event='" + event + '\'' +
+                ", userInput='" + userInput + '\'' +
+                ", term='" + term + '\'' +
+                '}';
+    }
 }
