@@ -71,12 +71,8 @@ public class AaKeywordInterceptMatcher implements SessionClient.Listener, Keywor
     }
 
     @Override
-    public void onAdsAvailable(Session session) {
-
-    }
+    public void onAdsAvailable(Session session) {}
 
     @Override
-    public void onSessionInitFailed() {
-
-    }
+    public void onSessionInitFailed() {}
 }

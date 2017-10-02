@@ -10,6 +10,7 @@ import com.adadapted.android.sdk.core.concurrency.ThreadPoolInteractorExecuter;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.device.DeviceInfoClient;
 import com.adadapted.android.sdk.core.event.AppEventClient;
+import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptClient;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -251,6 +252,7 @@ public class SessionClient implements SessionAdapter.Listener {
             public void run() {
                 AdEventClient.publishEvents();
                 AppEventClient.publishEvents();
+                KeywordInterceptClient.publishEvents();
 
                 handler.postDelayed(this, Config.DEFAULT_EVENT_POLLING);
             }

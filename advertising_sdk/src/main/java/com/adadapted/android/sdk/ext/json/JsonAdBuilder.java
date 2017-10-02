@@ -88,80 +88,104 @@ public class JsonAdBuilder {
     private List<AddToListItem> parseAdContent(final JSONObject jsonAd) throws JSONException{
         final JSONObject payloadObject = jsonAd.getJSONObject(JsonFields.PAYLOAD);
 
-        final List<AddToListItem> listItems = new ArrayList<>();
         if(payloadObject.has(JsonFields.CONTENT_LIST_ITEMS)) {
-            final JSONArray jsonItems = payloadObject.getJSONArray(JsonFields.CONTENT_LIST_ITEMS);
-            for (int i = 0; i < jsonItems.length(); i++) {
-                final String name = jsonItems.getString(i);
-                if(!name.isEmpty()) {
-                    final AddToListItem item = new AddToListItem.Builder().setTitle(name).build();
-                    listItems.add(item);
-                }
-            }
-        } else if(payloadObject.has(JsonFields.CONTENT_DETAILED_LIST_ITEMS)) {
-            final JSONArray jsonItems = payloadObject.getJSONArray(JsonFields.CONTENT_DETAILED_LIST_ITEMS);
-            for (int i = 0; i < jsonItems.length(); i++) {
-                final AddToListItem.Builder builder = new AddToListItem.Builder();
+            return parseListItems(payloadObject.getJSONArray(JsonFields.CONTENT_LIST_ITEMS));
+        }
+        else if(payloadObject.has(JsonFields.CONTENT_DETAILED_LIST_ITEMS)) {
+            return parseDetailedListItems(payloadObject.getJSONArray(JsonFields.CONTENT_DETAILED_LIST_ITEMS));
+        }
+        else if (payloadObject.has(JsonFields.CONTENT_RICH_LIST_ITEMS)) {
+            return parseRichListItems(payloadObject.getJSONArray(JsonFields.CONTENT_RICH_LIST_ITEMS));
+        }
 
-                if(payloadObject.has("product_title")) {
-                    builder.setTitle(payloadObject.getString("product_title"));
-                } else {
-                    AppEventClient.trackError(
+        return new ArrayList<>();
+    }
+
+    private List<AddToListItem> parseListItems(JSONArray jsonItems) throws JSONException {
+        final List<AddToListItem> listItems = new ArrayList<>();
+
+        for (int i = 0; i < jsonItems.length(); i++) {
+            final String name = jsonItems.getString(i);
+            if(!name.isEmpty()) {
+                final AddToListItem item = new AddToListItem.Builder().setTitle(name).build();
+                listItems.add(item);
+            }
+        }
+
+        return listItems;
+    }
+
+    private List<AddToListItem> parseRichListItems(JSONArray jsonItems) throws JSONException {
+        final List<AddToListItem> listItems = new ArrayList<>();
+
+        for (int i = 0; i < jsonItems.length(); i++) {
+            final JSONObject jsonItem = jsonItems.getJSONObject(i);
+            final AddToListItem.Builder builder = new AddToListItem.Builder();
+
+            if(jsonItem.has("product-title")) {
+                builder.setTitle(jsonItem.getString("product-title"));
+            } else {
+                AppEventClient.trackError(
+                        "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                        "Rich List Items payload should always have a product title."
+                );
+
+                break;
+            }
+
+            if(jsonItem.has("product-image")) {
+                builder.setTitle(jsonItem.getString("product-image"));
+            }
+
+            final AddToListItem item = builder.build();
+
+            listItems.add(item);
+        }
+
+        return listItems;
+    }
+
+    private List<AddToListItem> parseDetailedListItems(JSONArray jsonItems) throws JSONException {
+        final List<AddToListItem> listItems = new ArrayList<>();
+
+        for (int i = 0; i < jsonItems.length(); i++) {
+            final JSONObject jsonItem = jsonItems.getJSONObject(i);
+            final AddToListItem.Builder builder = new AddToListItem.Builder();
+
+            if(jsonItem.has("product_title")) {
+                builder.setTitle(jsonItem.getString("product_title"));
+            } else {
+                AppEventClient.trackError(
                         "SESSION_AD_PAYLOAD_PARSE_FAILED",
                         "Detailed List Items payload should always have a product title."
-                    );
+                );
 
-                    break;
-                }
-
-                if(payloadObject.has("product_brand")) {
-                    builder.setBrand(payloadObject.getString("product_brand"));
-                }
-
-                if(payloadObject.has("product_category")) {
-                    builder.setCategory(payloadObject.getString("product_category"));
-                }
-
-                if(payloadObject.has("product_barcode")) {
-                    builder.setBarCode(payloadObject.getString("product_barcode"));
-                }
-
-                if(payloadObject.has("product_discount")) {
-                    builder.setDiscount(payloadObject.getString("product_discount"));
-                }
-
-                if(payloadObject.has("product_image")) {
-                    builder.setProductImage(payloadObject.getString("product_image"));
-                }
-
-                final AddToListItem item = builder.build();
-
-                listItems.add(item);
+                break;
             }
-        } else if (payloadObject.has(JsonFields.CONTENT_RICH_LIST_ITEMS)) {
-            final JSONArray jsonItems = payloadObject.getJSONArray(JsonFields.CONTENT_RICH_LIST_ITEMS);
-            for (int i = 0; i < jsonItems.length(); i++) {
-                final AddToListItem.Builder builder = new AddToListItem.Builder();
 
-                if(payloadObject.has("product-title")) {
-                    builder.setTitle(payloadObject.getString("product-title"));
-                } else {
-                    AppEventClient.trackError(
-                            "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                            "Rich List Items payload should always have a product title."
-                    );
-
-                    break;
-                }
-
-                if(payloadObject.has("product-image")) {
-                    builder.setTitle(payloadObject.getString("product-image"));
-                }
-
-                final AddToListItem item = builder.build();
-
-                listItems.add(item);
+            if(jsonItem.has("product_brand")) {
+                builder.setBrand(jsonItem.getString("product_brand"));
             }
+
+            if(jsonItem.has("product_category")) {
+                builder.setCategory(jsonItem.getString("product_category"));
+            }
+
+            if(jsonItem.has("product_barcode")) {
+                builder.setBarCode(jsonItem.getString("product_barcode"));
+            }
+
+            if(jsonItem.has("product_discount")) {
+                builder.setDiscount(jsonItem.getString("product_discount"));
+            }
+
+            if(jsonItem.has("product_image")) {
+                builder.setProductImage(jsonItem.getString("product_image"));
+            }
+
+            final AddToListItem item = builder.build();
+
+            listItems.add(item);
         }
 
         return listItems;
