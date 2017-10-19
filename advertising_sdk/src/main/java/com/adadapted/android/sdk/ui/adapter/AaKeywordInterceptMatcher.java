@@ -50,6 +50,10 @@ public class AaKeywordInterceptMatcher implements SessionClient.Listener, Keywor
         return new SuggestionPayload(suggestionTracker, suggestions);
     }
 
+    public void suggestionPresented(final String suggestion) {
+        suggestionTracker.suggestionPresented(suggestion);
+    }
+
     public boolean suggestionSelected(final String suggestion) {
         return suggestionTracker.suggestionSelected(suggestion);
     }

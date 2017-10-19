@@ -50,7 +50,7 @@ public class AaAutoCompleteAdapter extends ArrayAdapter<String> {
 
                 for(final String item : allItems) {
                     if (item != null && item.toLowerCase().contains(constraint.toString().toLowerCase())) {
-                        suggestionPayload.presented(item);
+                        matcher.suggestionPresented(item);
                         suggestions.add(item);
                     }
                 }

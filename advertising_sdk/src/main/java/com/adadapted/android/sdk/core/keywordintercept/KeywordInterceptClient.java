@@ -119,7 +119,7 @@ public class KeywordInterceptClient {
             final Set<KeywordInterceptEvent> currentEvents = new HashSet<>(this.events);
             this.events.clear();
 
-            final Set<KeywordInterceptEvent> resultingEvents = consolodateEvents(event, currentEvents);
+            final Set<KeywordInterceptEvent> resultingEvents = consolidateEvents(event, currentEvents);
 
             this.events.addAll(resultingEvents);
         }
@@ -128,7 +128,7 @@ public class KeywordInterceptClient {
         }
     }
 
-    private Set<KeywordInterceptEvent> consolodateEvents(final KeywordInterceptEvent event, final Set<KeywordInterceptEvent> events) {
+    private Set<KeywordInterceptEvent> consolidateEvents(final KeywordInterceptEvent event, final Set<KeywordInterceptEvent> events) {
         final Set<KeywordInterceptEvent> resultingEvents = new HashSet<>(this.events);
 
         for (final KeywordInterceptEvent e : events) {
