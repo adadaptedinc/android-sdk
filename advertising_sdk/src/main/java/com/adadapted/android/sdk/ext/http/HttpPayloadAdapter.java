@@ -109,8 +109,6 @@ public class HttpPayloadAdapter implements PayloadAdapter {
             }
         });
 
-        request.setRetryPolicy(new DefaultRetryPolicy(1000 * 20, 2, 1.0f));
-
         HttpRequestManager.queueRequest(request);
     }
 }
