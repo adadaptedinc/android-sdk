@@ -62,23 +62,23 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                String reason = "";
                 if(error != null && error.networkResponse != null) {
                     final int statusCode = error.networkResponse.statusCode;
-                    final String data = new String(error.networkResponse.data);
 
-                    reason = statusCode + " - " + data;
+                    if(statusCode >= 400) {
+                        final String data = new String(error.networkResponse.data);
 
-                    Log.e(LOGTAG, "Keyword Intercept Init Request Failed: " + reason, error);
+                        final Map<String, String> params = new HashMap<>();
+                        params.put("url", initUrl);
+                        params.put("status_code", Integer.toString(statusCode));
+                        params.put("data", data);
+                        AppEventClient.trackError(
+                                "KI_SESSION_REQUEST_FAILED",
+                                error.getMessage(),
+                                params
+                        );
+                    }
                 }
-
-                final Map<String, String> params = new HashMap<>();
-                params.put("url", initUrl);
-                AppEventClient.trackError(
-                    "KI_SESSION_REQUEST_FAILED",
-                    reason,
-                    params
-                );
             }
         });
 
@@ -102,23 +102,23 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                String reason = "";
                 if(error != null && error.networkResponse != null) {
                     final int statusCode = error.networkResponse.statusCode;
-                    final String data = new String(error.networkResponse.data);
 
-                    reason = statusCode + " - " + data;
+                    if(statusCode >= 400) {
+                        final String data = new String(error.networkResponse.data);
 
-                    Log.e(LOGTAG, "Keyword Intercept Batch Request Failed: " + reason, error);
+                        final Map<String, String> params = new HashMap<>();
+                        params.put("url", eventUrl);
+                        params.put("status_code", Integer.toString(statusCode));
+                        params.put("data", data);
+                        AppEventClient.trackError(
+                                "KI_EVENT_REQUEST_FAILED",
+                                error.getMessage(),
+                                params
+                        );
+                    }
                 }
-
-                final Map<String, String> params = new HashMap<>();
-                params.put("url", eventUrl);
-                AppEventClient.trackError(
-                        "KI_EVENT_REQUEST_FAILED",
-                        reason,
-                        params
-                );
             }
         });
 

@@ -9,7 +9,6 @@ import com.adadapted.android.sdk.core.addit.PayloadEvent;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.ext.json.JsonPayloadBuilder;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -48,34 +47,32 @@ public class HttpPayloadAdapter implements PayloadAdapter {
 
         final JSONObject json = builder.buildRequest(deviceInfo);
 
-        final JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
-                this.pickupUrl, json, new Response.Listener<JSONObject>(){
+        final JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, pickupUrl, json, new Response.Listener<JSONObject>(){
             @Override
             public void onResponse(JSONObject response) {
-
                 final List<Content> content = parser.parse(response);
                 callback.onSuccess(content);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                String reason = "";
                 if(error != null && error.networkResponse != null) {
                     final int statusCode = error.networkResponse.statusCode;
-                    final String data = new String(error.networkResponse.data);
 
-                    reason = statusCode + " - " + data;
+                    if(statusCode >= 400) {
+                        final String data = new String(error.networkResponse.data);
 
-                    Log.e(LOGTAG, "Payload Request Failed: " + reason, error);
+                        final Map<String, String> params = new HashMap<>();
+                        params.put("url", pickupUrl);
+                        params.put("status_code", Integer.toString(statusCode));
+                        params.put("data", data);
+                        AppEventClient.trackError(
+                                "PAYLOAD_PICKUP_REQUEST_FAILED",
+                                error.getMessage(),
+                                params
+                        );
+                    }
                 }
-
-                final Map<String, String> errorParams = new HashMap<>();
-                errorParams.put("endpoint", pickupUrl);
-                AppEventClient.trackError(
-                    "PAYLOAD_PICKUP_REQUEST_FAILED",
-                    reason,
-                    errorParams
-                );
             }
         });
 
@@ -95,17 +92,23 @@ public class HttpPayloadAdapter implements PayloadAdapter {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(LOGTAG, "Payload Event Request Failed.", error);
+                if(error != null && error.networkResponse != null) {
+                    final int statusCode = error.networkResponse.statusCode;
 
-                final Map<String, String> errorParams = new HashMap<>();
-                errorParams.put("endpoint", trackUrl);
-                errorParams.put("exception", error.getClass().getName());
+                    if(statusCode >= 400) {
+                        final String data = new String(error.networkResponse.data);
 
-                AppEventClient.trackError(
-                        "PAYLOAD_EVENT_REQUEST_FAILED",
-                        error.getMessage(),
-                        errorParams
-                );
+                        final Map<String, String> params = new HashMap<>();
+                        params.put("url", trackUrl);
+                        params.put("status_code", Integer.toString(statusCode));
+                        params.put("data", data);
+                        AppEventClient.trackError(
+                                "PAYLOAD_EVENT_REQUEST_FAILED",
+                                error.getMessage(),
+                                params
+                        );
+                    }
+                }
             }
         });
 
