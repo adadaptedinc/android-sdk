@@ -48,14 +48,9 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
     public void init(final Session session, final Callback callback) {
         final JSONObject json = requestBuilder.buildInitRequest(session);
 
-        Log.d(LOGTAG, json.toString());
-
-        final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
-                initUrl, json, new Response.Listener<JSONObject>(){
+        final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, initUrl, json, new Response.Listener<JSONObject>(){
             @Override
             public void onResponse(JSONObject response) {
-                Log.d(LOGTAG, response.toString());
-
                 final KeywordIntercept ki = kiBuilder.build(response);
                 callback.onSuccess(ki);
             }
@@ -87,17 +82,12 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
 
     @Override
     public void sendBatch(final Set<KeywordInterceptEvent> events) {
-        Log.d(LOGTAG, "sendBatch called");
-
         final JSONArray json = eventBuilder.buildEvents(events);
-
-        Log.d(LOGTAG, json.toString());
 
         final JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST,
                 eventUrl, json, new Response.Listener<JSONArray>(){
             @Override
             public void onResponse(JSONArray response) {
-                Log.d(LOGTAG, response.toString());
             }
         }, new Response.ErrorListener() {
             @Override
