@@ -201,28 +201,31 @@ class AdZonePresenter implements SessionClient.Listener {
     }
 
     private void startZoneTimer() {
+        if(!zoneLoaded || timerRunning) {
+            return;
+        }
+
         timerLock.lock();
         try {
             timerRunning = true;
+            new Timer().schedule(new TimerTask(){
+                @Override
+                public void run() {
+                    timerLock.lock();
+                    try {
+                        timerRunning = false;
+                    }
+                    finally {
+                        timerLock.unlock();
+                    }
+
+                    setNextAd();
+                }
+            }, currentAd.getRefreshTime() * 1000);
         }
         finally {
             timerLock.unlock();
         }
-
-        new Timer().schedule(new TimerTask(){
-            @Override
-            public void run() {
-                timerLock.lock();
-                try {
-                    timerRunning = false;
-                }
-                finally {
-                    timerLock.unlock();
-                }
-
-                setNextAd();
-            }
-        }, currentAd.getRefreshTime() * 1000);
     }
 
     void onAdClicked(final Ad ad) {
