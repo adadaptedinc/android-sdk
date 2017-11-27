@@ -41,15 +41,18 @@ public class KeywordInterceptClient {
         });
     }
 
-    public static synchronized void trackMatched(final Session session, final String searchId, final String term, final String userInput) {
+    public static synchronized void trackMatched(final Session session, final String searchId,
+                                                 final String term, final String userInput) {
         trackEvent(session, searchId, term, userInput, "matched");
     }
 
-    public static synchronized void trackPresented(final Session session, final String searchId, final String term, final String userInput) {
+    public static synchronized void trackPresented(final Session session, final String searchId,
+                                                   final String term, final String userInput) {
         trackEvent(session, searchId, term, userInput, "presented");
     }
 
-    public static synchronized void trackSelected(final Session session, final String searchId, final String term, final String userInput) {
+    public static synchronized void trackSelected(final Session session, final String searchId,
+                                                  final String term, final String userInput) {
         trackEvent(session, searchId, term, userInput, "selected");
     }
 
