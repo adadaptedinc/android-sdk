@@ -48,37 +48,32 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
     public void init(final Session session, final Callback callback) {
         final JSONObject json = requestBuilder.buildInitRequest(session);
 
-        Log.d(LOGTAG, json.toString());
-
-        final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
-                initUrl, json, new Response.Listener<JSONObject>(){
+        final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, initUrl, json, new Response.Listener<JSONObject>(){
             @Override
             public void onResponse(JSONObject response) {
-                Log.d(LOGTAG, response.toString());
-
                 final KeywordIntercept ki = kiBuilder.build(response);
                 callback.onSuccess(ki);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                String reason = "";
                 if(error != null && error.networkResponse != null) {
                     final int statusCode = error.networkResponse.statusCode;
-                    final String data = new String(error.networkResponse.data);
 
-                    reason = statusCode + " - " + data;
+                    if(statusCode >= 400) {
+                        final String data = new String(error.networkResponse.data);
 
-                    Log.e(LOGTAG, "Keyword Intercept Init Request Failed: " + reason, error);
+                        final Map<String, String> params = new HashMap<>();
+                        params.put("url", initUrl);
+                        params.put("status_code", Integer.toString(statusCode));
+                        params.put("data", data);
+                        AppEventClient.trackError(
+                                "KI_SESSION_REQUEST_FAILED",
+                                error.getMessage(),
+                                params
+                        );
+                    }
                 }
-
-                final Map<String, String> params = new HashMap<>();
-                params.put("url", initUrl);
-                AppEventClient.trackError(
-                    "KI_SESSION_REQUEST_FAILED",
-                    reason,
-                    params
-                );
             }
         });
 
@@ -87,38 +82,33 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
 
     @Override
     public void sendBatch(final Set<KeywordInterceptEvent> events) {
-        Log.d(LOGTAG, "sendBatch called");
-
         final JSONArray json = eventBuilder.buildEvents(events);
-
-        Log.d(LOGTAG, json.toString());
 
         final JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST,
                 eventUrl, json, new Response.Listener<JSONArray>(){
             @Override
             public void onResponse(JSONArray response) {
-                Log.d(LOGTAG, response.toString());
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                String reason = "";
                 if(error != null && error.networkResponse != null) {
                     final int statusCode = error.networkResponse.statusCode;
-                    final String data = new String(error.networkResponse.data);
 
-                    reason = statusCode + " - " + data;
+                    if(statusCode >= 400) {
+                        final String data = new String(error.networkResponse.data);
 
-                    Log.e(LOGTAG, "Keyword Intercept Batch Request Failed: " + reason, error);
+                        final Map<String, String> params = new HashMap<>();
+                        params.put("url", eventUrl);
+                        params.put("status_code", Integer.toString(statusCode));
+                        params.put("data", data);
+                        AppEventClient.trackError(
+                                "KI_EVENT_REQUEST_FAILED",
+                                error.getMessage(),
+                                params
+                        );
+                    }
                 }
-
-                final Map<String, String> params = new HashMap<>();
-                params.put("url", eventUrl);
-                AppEventClient.trackError(
-                        "KI_EVENT_REQUEST_FAILED",
-                        reason,
-                        params
-                );
             }
         });
 
