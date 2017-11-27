@@ -43,17 +43,17 @@ public class KeywordInterceptClient {
 
     public static synchronized void trackMatched(final Session session, final String searchId,
                                                  final String term, final String userInput) {
-        trackEvent(session, searchId, term, userInput, "matched");
+        trackEvent(session, searchId, term, userInput, KeywordInterceptEvent.MATCHED);
     }
 
     public static synchronized void trackPresented(final Session session, final String searchId,
                                                    final String term, final String userInput) {
-        trackEvent(session, searchId, term, userInput, "presented");
+        trackEvent(session, searchId, term, userInput, KeywordInterceptEvent.PRESENTED);
     }
 
     public static synchronized void trackSelected(final Session session, final String searchId,
                                                   final String term, final String userInput) {
-        trackEvent(session, searchId, term, userInput, "selected");
+        trackEvent(session, searchId, term, userInput, KeywordInterceptEvent.SELECTED);
     }
 
     private static synchronized void trackEvent(final Session session,
@@ -135,9 +135,17 @@ public class KeywordInterceptClient {
                                                          final Set<KeywordInterceptEvent> events) {
         final Set<KeywordInterceptEvent> resultingEvents = new HashSet<>(this.events);
 
+        // Create a new Set of Events not superseded by the current Event
         for (final KeywordInterceptEvent e : events) {
             if (!event.supersedes(e)) {
                 resultingEvents.add(e);
+            }
+        }
+
+        // When the User is deleting their input don't include Events that have already been captured
+        for (final KeywordInterceptEvent e : events) {
+            if (e.supersedes(event)) {
+                return resultingEvents;
             }
         }
 
