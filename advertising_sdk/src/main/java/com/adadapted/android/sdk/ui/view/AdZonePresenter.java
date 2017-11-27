@@ -80,7 +80,7 @@ class AdZonePresenter implements SessionClient.Listener {
 
         this.listener = l;
 
-        SessionClient.addListener(this);
+        SessionClient.addPresenter(this);
         setNextAd();
     }
 
@@ -92,7 +92,7 @@ class AdZonePresenter implements SessionClient.Listener {
         listener = null;
 
         completeCurrentAd();
-        SessionClient.removeListener(this);
+        SessionClient.removePresenter(this);
     }
 
     private void updateCurrentZone(final Zone zone) {
