@@ -142,13 +142,6 @@ public class KeywordInterceptClient {
             }
         }
 
-        // When the User is deleting their input don't include Events that have already been captured
-        for (final KeywordInterceptEvent e : events) {
-            if (e.supersedes(event)) {
-                return resultingEvents;
-            }
-        }
-
         resultingEvents.add(event);
 
         return resultingEvents;
