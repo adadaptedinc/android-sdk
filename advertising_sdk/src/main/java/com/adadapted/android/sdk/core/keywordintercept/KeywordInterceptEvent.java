@@ -3,9 +3,9 @@ package com.adadapted.android.sdk.core.keywordintercept;
 import java.util.Date;
 
 public class KeywordInterceptEvent {
-    public static final String MATCHED  = "matched";
-    public static final String PRESENTED  = "presented";
-    public static final String SELECTED  = "selected";
+    static final String MATCHED  = "matched";
+    static final String PRESENTED  = "presented";
+    static final String SELECTED  = "selected";
 
     private final String appId;
     private final String sessionId;
@@ -72,10 +72,20 @@ public class KeywordInterceptEvent {
         return sdkVersion;
     }
 
-    public boolean supersedes(final KeywordInterceptEvent e) {
-        return e != null && sessionId.equals(e.getSessionId()) &&
+    boolean supersedes(final KeywordInterceptEvent e) {
+        return e != null &&
+                sessionId.equals(e.getSessionId()) &&
                 event.equals(e.getEvent()) &&
                 term.equals(e.getTerm()) &&
                 userInput.contains(e.getUserInput());
+    }
+
+    @Override
+    public String toString() {
+        return "KeywordInterceptEvent{" +
+                "event='" + event + '\'' +
+                ", userInput='" + userInput + '\'' +
+                ", term='" + term + '\'' +
+                '}';
     }
 }

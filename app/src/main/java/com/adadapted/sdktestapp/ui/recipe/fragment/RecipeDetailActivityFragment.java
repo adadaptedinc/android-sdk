@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.adadapted.android.sdk.ui.view.AaZoneView;
 import com.adadapted.sdktestapp.R;
@@ -13,9 +14,6 @@ import com.adadapted.sdktestapp.core.recipe.RecipeManager;
 
 import java.util.UUID;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class RecipeDetailActivityFragment extends Fragment implements RecipeManager.Listener {
     private static final String RECIPE_ID = "recipe_id";
 
@@ -53,7 +51,7 @@ public class RecipeDetailActivityFragment extends Fragment implements RecipeMana
         View view = inflater.inflate(R.layout.fragment_recipe_detail, container, false);
 
         aaZoneView = (AaZoneView)view.findViewById(R.id.recipeDetail_aaZoneView);
-        aaZoneView.init("100681", R.layout.aa_default_json_ad_zone);
+        aaZoneView.init("100681");
 
         return view;
     }

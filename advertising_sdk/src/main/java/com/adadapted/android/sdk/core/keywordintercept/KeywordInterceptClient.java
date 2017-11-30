@@ -41,17 +41,19 @@ public class KeywordInterceptClient {
         });
     }
 
-    public static synchronized void trackMatched(final Session session, final String term, final String userInput) {
-        trackEvent(session, "", term, userInput, "matched");
+    public static synchronized void trackMatched(final Session session, final String searchId,
+                                                 final String term, final String userInput) {
+        trackEvent(session, searchId, term, userInput, KeywordInterceptEvent.MATCHED);
     }
 
-    public static synchronized void trackPresented(final Session session, final String term, final String userInput) {
-        trackEvent(session, "", term, userInput, "presented");
+    public static synchronized void trackPresented(final Session session, final String searchId,
+                                                   final String term, final String userInput) {
+        trackEvent(session, searchId, term, userInput, KeywordInterceptEvent.PRESENTED);
     }
 
-    public static synchronized void trackSelected(final Session session, final String term, final String userInput) {
-        trackEvent(session, "", term, userInput, "selected");
-        publishEvents();
+    public static synchronized void trackSelected(final Session session, final String searchId,
+                                                  final String term, final String userInput) {
+        trackEvent(session, searchId, term, userInput, KeywordInterceptEvent.SELECTED);
     }
 
     private static synchronized void trackEvent(final Session session,
@@ -118,21 +120,31 @@ public class KeywordInterceptClient {
         eventLock.lock();
         try {
             final Set<KeywordInterceptEvent> currentEvents = new HashSet<>(this.events);
-
-            for (final KeywordInterceptEvent e : currentEvents) {
-                if (event.supersedes(e)) {
-                    currentEvents.remove(e);
-                }
-            }
-
-            events.add(event);
-
             this.events.clear();
-            this.events.addAll(currentEvents);
+
+            final Set<KeywordInterceptEvent> resultingEvents = consolidateEvents(event, currentEvents);
+
+            this.events.addAll(resultingEvents);
         }
         finally {
             eventLock.unlock();
         }
+    }
+
+    private Set<KeywordInterceptEvent> consolidateEvents(final KeywordInterceptEvent event,
+                                                         final Set<KeywordInterceptEvent> events) {
+        final Set<KeywordInterceptEvent> resultingEvents = new HashSet<>(this.events);
+
+        // Create a new Set of Events not superseded by the current Event
+        for (final KeywordInterceptEvent e : events) {
+            if (!event.supersedes(e)) {
+                resultingEvents.add(e);
+            }
+        }
+
+        resultingEvents.add(event);
+
+        return resultingEvents;
     }
 
     private void performPublishEvents() {

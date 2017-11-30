@@ -41,21 +41,25 @@ public class HttpAdEventSink implements AdEventSink {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                String reason = "";
                 if(error != null && error.networkResponse != null) {
                     final int statusCode = error.networkResponse.statusCode;
-                    final String data = new String(error.networkResponse.data);
 
-                    reason = statusCode + " - " + data;
+                    if(statusCode >= 400) {
+                        final String data = new String(error.networkResponse.data);
+
+                        final Map<String, String> params = new HashMap<>();
+                        params.put("url", batchUrl);
+                        params.put("status_code", Integer.toString(statusCode));
+                        params.put("data", data);
+                        AppEventClient.trackError(
+                                "AD_EVENT_TRACK_REQUEST_FAILED",
+                                error.getMessage(),
+                                params
+                        );
+                    }
                 }
 
-                final Map<String, String> params = new HashMap<>();
-                params.put("url", batchUrl);
-                AppEventClient.trackError(
-                    "AD_EVENT_TRACK_REQUEST_FAILED",
-                    reason,
-                    params
-                );
+
             }
 
         });

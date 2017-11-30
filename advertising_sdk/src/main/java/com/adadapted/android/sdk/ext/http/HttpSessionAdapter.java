@@ -1,7 +1,5 @@
 package com.adadapted.android.sdk.ext.http;
 
-import android.util.Log;
-
 import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.session.SessionAdapter;
@@ -59,23 +57,23 @@ public class HttpSessionAdapter implements SessionAdapter {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                String reason = "";
                 if(error != null && error.networkResponse != null) {
                     final int statusCode = error.networkResponse.statusCode;
-                    final String data = new String(error.networkResponse.data);
 
-                    reason = statusCode + " - " + data;
+                    if(statusCode >= 400) {
+                        final String data = new String(error.networkResponse.data);
 
-                    Log.e(LOGTAG, "Session Init Request Failed: " + reason, error);
+                        final Map<String, String> params = new HashMap<>();
+                        params.put("url", initUrl);
+                        params.put("status_code", Integer.toString(statusCode));
+                        params.put("data", data);
+                        AppEventClient.trackError(
+                                "SESSION_REQUEST_FAILED",
+                                error.getMessage(),
+                                params
+                        );
+                    }
                 }
-
-                final Map<String, String> params = new HashMap<>();
-                params.put("url", initUrl);
-                AppEventClient.trackError(
-                        "SESSION_REQUEST_FAILED",
-                        reason,
-                        params
-                );
 
                 listener.onSessionInitializeFailed();
             }
@@ -107,23 +105,23 @@ public class HttpSessionAdapter implements SessionAdapter {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        String reason = "";
                         if(error != null && error.networkResponse != null) {
                             final int statusCode = error.networkResponse.statusCode;
-                            final String data = new String(error.networkResponse.data);
 
-                            reason = statusCode + " - " + data;
+                            if(statusCode >= 400) {
+                                final String data = new String(error.networkResponse.data);
 
-                            Log.e(LOGTAG, "Ad Get Request Failed: " + reason, error);
+                                final Map<String, String> params = new HashMap<>();
+                                params.put("url", refreshUrl);
+                                params.put("status_code", Integer.toString(statusCode));
+                                params.put("data", data);
+                                AppEventClient.trackError(
+                                        "AD_GET_REQUEST_FAILED",
+                                        error.getMessage(),
+                                        params
+                                );
+                            }
                         }
-
-                        final Map<String, String> params = new HashMap<>();
-                        params.put("url", refreshUrl);
-                        AppEventClient.trackError(
-                                "AD_GET_REQUEST_FAILED",
-                                reason,
-                                params
-                        );
 
                         listener.onNewAdsLoadFailed();
                     }

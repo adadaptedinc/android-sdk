@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +28,7 @@ import java.util.List;
  * Use the {@link TodoListsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TodoListsFragment extends ListFragment implements TodoListManager.Listener {
+public class TodoListsFragment extends ListFragment implements TodoListManager.Listener, AaZoneView.Listener {
     private static final String TAG = TodoListsFragment.class.getName();
 
     private OnFragmentInteractionListener mListener;
@@ -77,7 +78,7 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
         super.onResume();
 
         TodoListManager.getInstance(getActivity()).addListener(this);
-        aaZoneView.onStart();
+        aaZoneView.onStart(this);
     }
 
     @Override
@@ -121,6 +122,16 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
     public void onTodoListsAvailable() {
         lists = TodoListManager.getInstance(getActivity()).getLists();
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onAdLoaded() {
+        Log.i(TAG, "Ad Loaded.");
+    }
+
+    @Override
+    public void onAdLoadFailed() {
+        Log.i(TAG, "Ad Load FAILED.");
     }
 
     /**

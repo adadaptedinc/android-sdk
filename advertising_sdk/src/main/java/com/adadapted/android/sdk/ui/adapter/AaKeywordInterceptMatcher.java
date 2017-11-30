@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.ui.adapter;
 
+import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptClient;
 import com.adadapted.android.sdk.core.session.Session;
 import com.adadapted.android.sdk.core.session.SessionClient;
@@ -38,6 +39,7 @@ public class AaKeywordInterceptMatcher implements SessionClient.Listener, Keywor
 
                         suggestionTracker.suggestionMatched(
                             mSession,
+                            keywordIntercept.getSearchId(),
                             item,
                             autofill.getReplacement(),
                             constraint.toString()
@@ -47,11 +49,15 @@ public class AaKeywordInterceptMatcher implements SessionClient.Listener, Keywor
             }
         }
 
-        return new SuggestionPayload(suggestionTracker, suggestions);
+        return new SuggestionPayload(keywordIntercept.getSearchId(), suggestionTracker, suggestions);
+    }
+
+    public void suggestionPresented(final String suggestion) {
+        suggestionTracker.suggestionPresented(keywordIntercept.getSearchId(), suggestion);
     }
 
     public boolean suggestionSelected(final String suggestion) {
-        return suggestionTracker.suggestionSelected(suggestion);
+        return suggestionTracker.suggestionSelected(keywordIntercept.getSearchId(), suggestion);
     }
 
     private boolean isLoaded() {
@@ -60,6 +66,8 @@ public class AaKeywordInterceptMatcher implements SessionClient.Listener, Keywor
 
     @Override
     public void onKeywordInterceptInitialized(final KeywordIntercept keywordIntercept) {
+        AppEventClient.trackAppEvent("ki_initialized");
+
         this.keywordIntercept = keywordIntercept;
         mLoaded = true;
     }
@@ -71,12 +79,8 @@ public class AaKeywordInterceptMatcher implements SessionClient.Listener, Keywor
     }
 
     @Override
-    public void onAdsAvailable(Session session) {
-
-    }
+    public void onAdsAvailable(Session session) {}
 
     @Override
-    public void onSessionInitFailed() {
-
-    }
+    public void onSessionInitFailed() {}
 }

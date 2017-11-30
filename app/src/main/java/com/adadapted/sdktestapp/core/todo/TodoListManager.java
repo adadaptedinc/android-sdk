@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
+import com.adadapted.android.sdk.AdAdaptedListManager;
 import com.adadapted.sdktestapp.ext.TodoLoader;
 import com.adadapted.sdktestapp.ext.file.FileTodoLoader;
 
@@ -107,6 +108,8 @@ public class TodoListManager implements TodoLoader.Listener {
         Log.d(TAG, "Called addItemToList() " + listId + " " + itemName);
         TodoList list = getList(listId);
         list.addNewItem(itemName);
+
+        AdAdaptedListManager.itemAddedToList(itemName);
 
         saveData();
     }

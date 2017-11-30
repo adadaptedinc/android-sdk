@@ -65,11 +65,13 @@ class AdZonePresenter implements SessionClient.Listener {
     }
 
     void init(final String zoneId) {
-        this.zoneId = zoneId;
+        if(this.zoneId == null) {
+            this.zoneId = zoneId;
 
-        final Map<String, String> params = new HashMap<>();
-        params.put("zone_id", zoneId);
-        AppEventClient.trackSdkEvent("zone_loaded", params);
+            final Map<String, String> params = new HashMap<>();
+            params.put("zone_id", zoneId);
+            AppEventClient.trackSdkEvent("zone_loaded", params);
+        }
     }
 
     void onAttach(final Listener l) {
@@ -80,7 +82,7 @@ class AdZonePresenter implements SessionClient.Listener {
 
         this.listener = l;
 
-        SessionClient.addListener(this);
+        SessionClient.addPresenter(this);
         setNextAd();
     }
 
@@ -92,7 +94,7 @@ class AdZonePresenter implements SessionClient.Listener {
         listener = null;
 
         completeCurrentAd();
-        SessionClient.removeListener(this);
+        SessionClient.removePresenter(this);
     }
 
     private void updateCurrentZone(final Zone zone) {
@@ -201,28 +203,31 @@ class AdZonePresenter implements SessionClient.Listener {
     }
 
     private void startZoneTimer() {
+        if(!zoneLoaded || timerRunning) {
+            return;
+        }
+
         timerLock.lock();
         try {
             timerRunning = true;
+            new Timer().schedule(new TimerTask(){
+                @Override
+                public void run() {
+                    timerLock.lock();
+                    try {
+                        timerRunning = false;
+                    }
+                    finally {
+                        timerLock.unlock();
+                    }
+
+                    setNextAd();
+                }
+            }, currentAd.getRefreshTime() * 1000);
         }
         finally {
             timerLock.unlock();
         }
-
-        new Timer().schedule(new TimerTask(){
-            @Override
-            public void run() {
-                timerLock.lock();
-                try {
-                    timerRunning = false;
-                }
-                finally {
-                    timerLock.unlock();
-                }
-
-                setNextAd();
-            }
-        }, currentAd.getRefreshTime() * 1000);
     }
 
     void onAdClicked(final Ad ad) {

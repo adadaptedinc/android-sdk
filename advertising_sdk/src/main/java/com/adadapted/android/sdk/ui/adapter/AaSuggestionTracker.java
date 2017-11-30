@@ -21,6 +21,7 @@ public class AaSuggestionTracker {
     AaSuggestionTracker() {}
 
     void suggestionMatched(final Session session,
+                           final String searchId,
                            final String term,
                            final String replacement,
                            final String userInput) {
@@ -33,25 +34,25 @@ public class AaSuggestionTracker {
         items.put(lcTerm, lcUserInput);
         replacements.put(lcReplacement, lcTerm);
 
-        KeywordInterceptClient.trackMatched(mSession, lcTerm, lcUserInput);
+        KeywordInterceptClient.trackMatched(mSession, searchId, lcTerm, lcUserInput);
     }
 
-    public void suggestionPresented(final String term) {
+    public void suggestionPresented(final String searchId, final String term) {
         final String lcTerm = convertToLowerCase(term);
 
         if(items.containsKey(lcTerm)) {
-            KeywordInterceptClient.trackPresented(mSession, lcTerm, items.get(lcTerm));
+            KeywordInterceptClient.trackPresented(mSession, searchId,  lcTerm, items.get(lcTerm));
         }
     }
 
-    public boolean suggestionSelected(final String replacement) {
+    public boolean suggestionSelected(final String searchId, final String replacement) {
         final String lcReplacement = convertToLowerCase(replacement);
 
         if(replacements.containsKey(lcReplacement)) {
             final String term = replacements.get(lcReplacement);
             final String userInput = items.get(term);
 
-            KeywordInterceptClient.trackSelected(mSession, term, userInput);
+            KeywordInterceptClient.trackSelected(mSession, searchId,  term, userInput);
 
             return true;
         }

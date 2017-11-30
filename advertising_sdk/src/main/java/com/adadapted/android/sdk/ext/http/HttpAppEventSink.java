@@ -64,23 +64,23 @@ public class HttpAppEventSink implements AppEventSink {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                String reason = "";
                 if(error != null && error.networkResponse != null) {
                     final int statusCode = error.networkResponse.statusCode;
-                    final String data = new String(error.networkResponse.data);
 
-                    reason = statusCode + " - " + data;
+                    if(statusCode >= 400) {
+                        final String data = new String(error.networkResponse.data);
 
-                    Log.e(LOGTAG, "App Event Request Failed: " + reason, error);
+                        final Map<String, String> params = new HashMap<>();
+                        params.put("url", eventUrl);
+                        params.put("status_code", Integer.toString(statusCode));
+                        params.put("data", data);
+                        AppEventClient.trackError(
+                                "APP_EVENT_REQUEST_FAILED",
+                                error.getMessage(),
+                                params
+                        );
+                    }
                 }
-
-                final Map<String, String> errorParams = new HashMap<>();
-                errorParams.put("endpoint", eventUrl);
-                AppEventClient.trackError(
-                    "APP_EVENT_REQUEST_FAILED",
-                    reason,
-                    errorParams
-                );
             }
         });
 

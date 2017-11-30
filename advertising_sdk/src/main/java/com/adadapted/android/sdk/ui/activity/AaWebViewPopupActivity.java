@@ -139,7 +139,7 @@ public class AaWebViewPopupActivity extends Activity {
 
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", url);
-                params.put("error", errorResponse.toString());
+                params.put("error", errorResponse.getReasonPhrase());
                 AppEventClient.trackError(
                     "POPUP_URL_LOAD_FAILED",
                     "Problem loading popup url",

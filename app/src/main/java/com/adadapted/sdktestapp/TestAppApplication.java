@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.adadapted.android.sdk.AdAdapted;
-import com.adadapted.android.sdk.core.addit.AddToListItem;
+import com.adadapted.android.sdk.core.atl.AddToListItem;
 import com.adadapted.android.sdk.core.addit.Content;
 import com.adadapted.android.sdk.ui.messaging.AaSdkAdditContentListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener;

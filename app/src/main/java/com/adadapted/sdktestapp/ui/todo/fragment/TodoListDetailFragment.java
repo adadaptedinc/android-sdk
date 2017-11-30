@@ -1,6 +1,7 @@
 package com.adadapted.sdktestapp.ui.todo.fragment;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -14,8 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.adadapted.android.sdk.ui.messaging.AaSdkContentListener;
-import com.adadapted.android.sdk.ui.model.AdContentPayload;
+import com.adadapted.android.sdk.core.atl.AddToListItem;
+import com.adadapted.android.sdk.ui.messaging.AdContentListener;
+import com.adadapted.android.sdk.ui.model.AdContent;
 import com.adadapted.android.sdk.ui.view.AaZoneView;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.todo.TodoList;
@@ -23,12 +25,10 @@ import com.adadapted.sdktestapp.core.todo.TodoListManager;
 import com.adadapted.sdktestapp.ui.todo.adapter.TodoListItemAdapter;
 import com.adadapted.sdktestapp.ui.todo.dialog.NewListItemDialogFragment;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
+import java.util.List;
 import java.util.UUID;
 
-public class TodoListDetailFragment extends ListFragment implements AaSdkContentListener {
+public class TodoListDetailFragment extends ListFragment implements AdContentListener {
     private static final String TAG = TodoListDetailFragment.class.getName();
 
     private static final String ARG_LIST_ID = "listId";
@@ -162,22 +162,21 @@ public class TodoListDetailFragment extends ListFragment implements AaSdkContent
     }
 
     @Override
-    public void onContentAvailable(final String zoneId,
-                                   final AdContentPayload adContentPayload) {
-        try {
-            JSONArray array = adContentPayload.getPayload().getJSONArray("add_to_list_items");
-            for(int i = 0; i < array.length(); i++) {
-                String item = array.getString(i);
-                TodoListManager.getInstance(getActivity()).addItemToList(listId, item);
+    public void onContentAvailable(final String zoneId, final AdContent content) {
+        final Intent intent = new Intent(getActivity(), TodoListDetailFragment.class);
+        intent.putExtra("aa_atl_items", content);
 
-                adapter.notifyDataSetChanged();
-            }
 
-            adContentPayload.acknowledge();
+        final List<AddToListItem> items = content.getItems();
+
+        for(final AddToListItem item : items) {
+            Log.i(TAG, "Processing: " + item);
+            TodoListManager.getInstance(getActivity()).addItemToList(listId, item.getTitle());
+
+            adapter.notifyDataSetChanged();
         }
-        catch(JSONException ex) {
-            Log.w(TAG, "Problem parsing JSON.");
-        }
+
+        content.acknowledge();
     }
 
     /**
