@@ -31,9 +31,8 @@ public class SessionClient implements SessionAdapter.Listener {
 
     enum Status {
         OK, // Normal Status. No alterations to regular behavior
-        SHOULD_REFRESH_ADS, // SDK should refresh Ads at the next available chance
+        SHOULD_REFRESH, // SDK should refresh Ads or Reinit Session at the next available chance
         IS_REFRESH_ADS, // SDK is currently refreshing Ads
-        SHOULD_REINIT_SESSION, // SDK should reinit the Session at the next available chance
         IS_REINIT_SESSION // SDK is currently reiniting the Session
     }
 
@@ -103,36 +102,56 @@ public class SessionClient implements SessionAdapter.Listener {
         addListener(listener);
     }
 
-    public static synchronized void addListener(Listener listener) {
+    public static synchronized void addListener(final Listener listener) {
         if(instance == null) {
             return;
         }
 
-        getInstance().performAddListener(listener);
+        ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable(){
+            @Override
+            public void run() {
+                getInstance().performAddListener(listener);
+            }
+        });
     }
 
-    public static synchronized void removeListener(Listener listener) {
+    public static synchronized void removeListener(final Listener listener) {
         if(instance == null) {
             return;
         }
 
-        getInstance().performRemoveListener(listener);
+        ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable(){
+            @Override
+            public void run() {
+                getInstance().performRemoveListener(listener);
+            }
+        });
     }
 
-    public static synchronized void addPresenter(Listener listener) {
+    public static synchronized void addPresenter(final Listener listener) {
         if(instance == null) {
             return;
         }
 
-        getInstance().performAddPresenter(listener);
+        ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable(){
+            @Override
+            public void run() {
+                getInstance().performAddPresenter(listener);
+            }
+        });
     }
 
-    public static synchronized void removePresenter(Listener listener) {
+    public static synchronized void removePresenter(final Listener listener) {
         if(instance == null) {
             return;
         }
 
-        getInstance().performRemovePresenter(listener);
+        ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable(){
+            @Override
+            public void run() {
+                getInstance().performRemovePresenter(listener);
+            }
+        });
     }
 
     private final SessionAdapter adapter;
@@ -152,6 +171,7 @@ public class SessionClient implements SessionAdapter.Listener {
     private boolean pollingTimerRunning;
     private boolean eventTimerRunning;
 
+    private final Lock statusLock = new ReentrantLock();
     private Status status;
 
     private SessionClient(final SessionAdapter adapter) {
@@ -164,6 +184,27 @@ public class SessionClient implements SessionAdapter.Listener {
         this.eventTimerRunning = false;
 
         this.status = Status.OK;
+    }
+
+    private Status getStatus() {
+        Status currentStatus;
+        statusLock.lock();
+        try {
+            currentStatus = this.status;
+        } finally {
+            statusLock.unlock();
+        }
+
+        return currentStatus;
+    }
+
+    private void setStatus(final Status status) {
+        statusLock.lock();
+        try {
+            this.status = status;
+        } finally {
+            statusLock.unlock();
+        }
     }
 
     private void performAddListener(final Listener listener) {
@@ -217,12 +258,8 @@ public class SessionClient implements SessionAdapter.Listener {
             listener.onSessionAvailable(currentSession);
         }
 
-        if(this.status == Status.SHOULD_REFRESH_ADS) {
-            performRefreshAds();
-        } else if(this.status == Status.SHOULD_REINIT_SESSION) {
-            if(this.deviceInfo != null) {
-                performReinitialize(this.deviceInfo);
-            }
+        if(getStatus() == Status.SHOULD_REFRESH) {
+            performRefresh();
         }
     }
 
@@ -267,42 +304,58 @@ public class SessionClient implements SessionAdapter.Listener {
         adapter.sendInit(deviceInfo, this);
     }
 
-    private void performReinitialize(final DeviceInfo deviceInfo) {
-        if(this.status == Status.OK || this.status == Status.SHOULD_REINIT_SESSION) {
+    private void performRefresh() {
+        sessionLock.lock();
+        try {
+            if (currentSession.hasExpired()) {
+                Log.i(LOGTAG, "Session has expired. Expired at: " + currentSession.getExpiresAt());
+                AppEventClient.trackSdkEvent("session_expired");
+
+                performReinitialize();
+            } else {
+                performRefreshAds();
+            }
+        }
+        finally {
+            sessionLock.unlock();
+        }
+    }
+
+    private void performReinitialize() {
+        if(getStatus() == Status.OK || getStatus() == Status.SHOULD_REFRESH) {
             if(presenterSize() > 0) {
                 Log.i(LOGTAG, "Reinitializing Session.");
 
-                this.status = Status.IS_REINIT_SESSION;
-
                 deviceInfoLock.lock();
                 try {
-                    this.deviceInfo = deviceInfo;
+                    setStatus(Status.IS_REINIT_SESSION);
+                    adapter.sendInit(this.deviceInfo, this);
                 } finally {
                     deviceInfoLock.unlock();
                 }
-
-                adapter.sendInit(deviceInfo, this);
             } else {
-                Log.w(LOGTAG, "SDK not actively in use. Skipping background Session reinit.");
-                this.status = Status.SHOULD_REINIT_SESSION;
+                //Log.w(LOGTAG, "SDK not actively in use. Skipping background Session reinit.");
+                setStatus(Status.SHOULD_REFRESH);
             }
-
-
         }
     }
 
     private void performRefreshAds() {
-        if(this.status == Status.OK || this.status == Status.SHOULD_REFRESH_ADS) {
+        if(getStatus() == Status.OK || getStatus() == Status.SHOULD_REFRESH) {
             if(presenterSize() > 0) {
                 Log.i(LOGTAG, "Checking for more Ads.");
 
-                SessionClient.this.status = Status.IS_REFRESH_ADS;
-
-                adapter.sentAdGet(currentSession, this);
+                sessionLock.lock();
+                try {
+                    setStatus(Status.IS_REFRESH_ADS);
+                    adapter.sentAdGet(currentSession, this);
+                } finally {
+                    sessionLock.unlock();
+                }
             }
             else {
-                Log.w(LOGTAG, "SDK not actively in use. Skipping background Ad refresh.");
-                this.status = Status.SHOULD_REFRESH_ADS;
+                //Log.w(LOGTAG, "SDK not actively in use. Skipping background Ad refresh.");
+                setStatus(Status.SHOULD_REFRESH);
             }
         }
     }
@@ -346,14 +399,7 @@ public class SessionClient implements SessionAdapter.Listener {
                 @Override
                 public void run() {
                     pollingTimerRunning = false;
-                    if (currentSession.hasExpired()) {
-                        Log.i(LOGTAG, "Session has expired. Expired at: " + currentSession.getExpiresAt());
-                        AppEventClient.trackSdkEvent("session_expired");
-
-                        performReinitialize(deviceInfo);
-                    } else {
-                        performRefreshAds();
-                    }
+                    performRefresh();
                 }
             }, currentSession.getRefreshTime());
         }
@@ -426,7 +472,7 @@ public class SessionClient implements SessionAdapter.Listener {
         updateCurrentSession(session);
         notifySessionAvailable();
 
-        this.status = Status.OK;
+        setStatus(Status.OK);
     }
 
     @Override
@@ -434,7 +480,7 @@ public class SessionClient implements SessionAdapter.Listener {
         updateCurrentSession(Session.emptySession(deviceInfo));
         notifySessionInitFailed();
 
-        this.status = Status.OK;
+        setStatus(Status.OK);
     }
 
     @Override
@@ -442,7 +488,7 @@ public class SessionClient implements SessionAdapter.Listener {
         updateCurrentZones(session);
         notifyAdsAvailable();
 
-        this.status = Status.OK;
+        setStatus(Status.OK);
     }
 
     @Override
@@ -450,6 +496,6 @@ public class SessionClient implements SessionAdapter.Listener {
         updateCurrentZones(Session.emptySession(deviceInfo));
         notifyAdsAvailable();
 
-        this.status = Status.OK;
+        setStatus(Status.OK);
     }
 }
