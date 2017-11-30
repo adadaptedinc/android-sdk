@@ -77,7 +77,9 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
     }
 
     public void init(final String zoneId) {
-        presenter.init(zoneId);
+        if(presenter != null) {
+            presenter.init(zoneId);
+        }
     }
 
     @SuppressWarnings("UnusedParameters")

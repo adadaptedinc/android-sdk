@@ -65,11 +65,13 @@ class AdZonePresenter implements SessionClient.Listener {
     }
 
     void init(final String zoneId) {
-        this.zoneId = zoneId;
+        if(this.zoneId == null) {
+            this.zoneId = zoneId;
 
-        final Map<String, String> params = new HashMap<>();
-        params.put("zone_id", zoneId);
-        AppEventClient.trackSdkEvent("zone_loaded", params);
+            final Map<String, String> params = new HashMap<>();
+            params.put("zone_id", zoneId);
+            AppEventClient.trackSdkEvent("zone_loaded", params);
+        }
     }
 
     void onAttach(final Listener l) {
