@@ -93,7 +93,7 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                AaZoneView.this.setVisibility(View.GONE);
+                AaZoneView.this.onStop();
             }
         });
     }
@@ -150,9 +150,10 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
 
     public void onStop() {
         if(presenter != null) {
-            presenter.onDetach();
+            presenter.stop();
         }
 
+        presenter = null;
         listener = null;
     }
 
@@ -279,6 +280,7 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
 
     private void setVisible() {
         isVisible = true;
+
         if(presenter != null) {
             presenter.onAttach(this);
         }
@@ -286,8 +288,11 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
 
     private void setInvisible() {
         isVisible = false;
+
         if(presenter != null) {
             presenter.onDetach();
         }
+
+        listener = null;
     }
 }

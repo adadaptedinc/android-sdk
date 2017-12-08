@@ -77,6 +77,21 @@ class AdZonePresenter implements SessionClient.Listener {
         }
     }
 
+    void stop() {
+        this.onDetach();
+        timer.cancel();
+
+        zoneLock.lock();
+        try {
+            this.zoneId = null;
+            this.zoneLoaded = false;
+            this.currentZone = Zone.emptyZone();
+        }
+        finally {
+            zoneLock.unlock();
+        }
+    }
+
     void onAttach(final Listener l) {
         if(l == null) {
             Log.e(LOGTAG, "NULL Listener provided");
@@ -90,11 +105,7 @@ class AdZonePresenter implements SessionClient.Listener {
     }
 
     void onDetach() {
-        if(listener == null) {
-            return;
-        }
-
-        listener = null;
+        this.listener = null;
 
         completeCurrentAd();
         SessionClient.removePresenter(this);
