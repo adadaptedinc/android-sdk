@@ -53,6 +53,7 @@ class AdZonePresenter implements SessionClient.Listener {
 
     private boolean timerRunning;
     private final Lock timerLock = new ReentrantLock();
+    private final Timer timer;
 
     AdZonePresenter(final Context context) {
         this.context = context.getApplicationContext();
@@ -62,6 +63,8 @@ class AdZonePresenter implements SessionClient.Listener {
         this.zoneLoaded = false;
         this.currentZone = Zone.emptyZone();
         this.viewCount = (int) (Math.random()*10);
+
+        timer = new Timer();
     }
 
     void init(final String zoneId) {
@@ -210,7 +213,7 @@ class AdZonePresenter implements SessionClient.Listener {
         timerLock.lock();
         try {
             timerRunning = true;
-            new Timer().schedule(new TimerTask(){
+            timer.schedule(new TimerTask(){
                 @Override
                 public void run() {
                     timerLock.lock();
