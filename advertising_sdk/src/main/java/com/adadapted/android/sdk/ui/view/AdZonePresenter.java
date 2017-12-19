@@ -79,7 +79,6 @@ class AdZonePresenter implements SessionClient.Listener {
 
     void stop() {
         this.onDetach();
-        timer.cancel();
 
         zoneLock.lock();
         try {
