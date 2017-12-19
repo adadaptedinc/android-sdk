@@ -18,6 +18,7 @@ import com.adadapted.sdktestapp.ui.todo.activity.TodoListsActivity;
 import com.flurry.android.FlurryAgent;
 
 import com.newrelic.agent.android.NewRelic;
+import com.squareup.leakcanary.LeakCanary;
 
 import java.util.List;
 
@@ -34,6 +35,13 @@ public class TestAppApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+        LeakCanary.install(this);
 
         FlurryAgent.setLogEnabled(false);
         FlurryAgent.init(this, getString(R.string.flurry_api_id));
