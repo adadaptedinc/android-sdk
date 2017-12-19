@@ -1,5 +1,8 @@
 package com.adadapted.android.sdk.ui.messaging;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import com.adadapted.android.sdk.ui.model.AdContent;
 
 import java.util.HashSet;
@@ -51,14 +54,19 @@ public class AdContentPublisher {
 
     public void publishContent(final String zoneId,
                                final AdContent content) {
-        lock.lock();
-        try {
-            for(final AdContentListener listener : listeners) {
-                listener.onContentAvailable(zoneId, content);
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                lock.lock();
+                try {
+                    for(final AdContentListener listener : listeners) {
+                        listener.onContentAvailable(zoneId, content);
+                    }
+                }
+                finally {
+                    lock.unlock();
+                }
             }
-        }
-        finally {
-            lock.unlock();
-        }
+        });
     }
 }

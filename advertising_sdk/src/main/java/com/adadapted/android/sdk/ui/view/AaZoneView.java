@@ -171,15 +171,25 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
     }
 
     private void notifyAdLoaded() {
-        if(listener != null) {
-            listener.onAdLoaded();
-        }
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                if(listener != null) {
+                    listener.onAdLoaded();
+                }
+            }
+        });
     }
 
     private void notifyAdLoadFailed() {
-        if(listener != null) {
-            listener.onAdLoadFailed();
-        }
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                if(listener != null) {
+                    listener.onAdLoadFailed();
+                }
+            }
+        });
     }
 
     /*
