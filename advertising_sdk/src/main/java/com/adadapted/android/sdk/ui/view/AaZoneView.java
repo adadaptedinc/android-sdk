@@ -117,9 +117,8 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
     @Deprecated
     public void onStart(final Listener listener,
                         final AaSdkContentListener contentListener) {
-        onStart();
+        onStart(listener);
 
-        this.listener = listener;
         SdkContentPublisher.getInstance().addListener(contentListener);
     }
 
@@ -132,9 +131,8 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
 
     public void onStart(final Listener listener,
                         final AdContentListener contentListener) {
-        onStart();
+        onStart(listener);
 
-        this.listener = listener;
         AdContentPublisher.getInstance().addListener(contentListener);
     }
 
@@ -149,12 +147,11 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
      */
 
     public void onStop() {
-        if(presenter != null) {
-            presenter.stop();
-        }
-
-        presenter = null;
         listener = null;
+
+        if(presenter != null) {
+            presenter.onDetach();
+        }
     }
 
     @Deprecated
@@ -302,7 +299,5 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
         if(presenter != null) {
             presenter.onDetach();
         }
-
-        listener = null;
     }
 }
