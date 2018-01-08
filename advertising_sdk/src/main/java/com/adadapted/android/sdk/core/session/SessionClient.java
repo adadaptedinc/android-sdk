@@ -254,10 +254,6 @@ public class SessionClient implements SessionAdapter.Listener {
             presenterLock.unlock();
         }
 
-        if(currentSession != null) {
-            listener.onSessionAvailable(currentSession);
-        }
-
         if(getStatus() == Status.SHOULD_REFRESH) {
             performRefresh();
         }
