@@ -11,6 +11,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class AdContentPublisher {
+    @SuppressWarnings("unused")
+    private static final String TAG = AdContentPublisher.class.getName();
+
     private static AdContentPublisher sAdContentPublisher;
 
     public static synchronized AdContentPublisher getInstance() {

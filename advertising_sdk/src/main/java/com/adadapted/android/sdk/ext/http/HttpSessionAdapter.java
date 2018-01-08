@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpSessionAdapter implements SessionAdapter {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = HttpSessionAdapter.class.getName();
 
     private final String initUrl;
