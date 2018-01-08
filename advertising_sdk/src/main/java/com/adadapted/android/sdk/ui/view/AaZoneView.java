@@ -24,6 +24,7 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
     private static final String LOGTAG = AaZoneView.class.getName();
 
     public interface Listener {
+        void onZoneHasAds(boolean hasAds);
         void onAdLoaded();
         void onAdLoadFailed();
     }
@@ -167,6 +168,21 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
         onStop();
     }
 
+    /*
+     * Notifies AaZoneView.Listener
+     */
+
+    private void notifyZoneHasAds(final boolean hasAds) {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                if(listener != null) {
+                    listener.onZoneHasAds(hasAds);
+                }
+            }
+        });
+    }
+
     private void notifyAdLoaded() {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
@@ -207,6 +223,13 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
                 webView.setLayoutParams(new LayoutParams(width, height));
             }
         });
+
+        notifyZoneHasAds(zone.hasAds());
+    }
+
+    @Override
+    public void onAdsRefreshed(final Zone zone) {
+        notifyZoneHasAds(zone.hasAds());
     }
 
     @Override
