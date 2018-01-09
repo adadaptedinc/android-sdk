@@ -39,12 +39,12 @@ class AdZonePresenter implements SessionClient.Listener {
 
     private Listener listener;
 
-    private final Lock presenterLock = new ReentrantLock();
     private boolean attached;
 
+    private final Lock zoneLock = new ReentrantLock();
+    private String sessionId;
     private boolean zoneLoaded;
     private Zone currentZone;
-    private final Lock zoneLock = new ReentrantLock();
 
     private final PixelWebView pixelWebView;
 
@@ -103,7 +103,7 @@ class AdZonePresenter implements SessionClient.Listener {
             return;
         }
 
-        presenterLock.lock();
+        adLock.lock();
         try {
             if (!attached) {
                 attached = true;
@@ -111,16 +111,17 @@ class AdZonePresenter implements SessionClient.Listener {
                 this.listener = l;
 
                 SessionClient.addPresenter(this);
-                setNextAd();
             }
+
+            setNextAd();
         }
         finally {
-            presenterLock.unlock();
+            adLock.unlock();
         }
     }
 
     void onDetach() {
-        presenterLock.lock();
+        adLock.lock();
         try {
             if(attached) {
                 attached = false;
@@ -132,22 +133,7 @@ class AdZonePresenter implements SessionClient.Listener {
             }
         }
         finally {
-            presenterLock.unlock();
-        }
-    }
-
-    private void updateCurrentZone(final Zone zone) {
-        zoneLock.lock();
-        try {
-            this.zoneLoaded = true;
-            this.currentZone = zone;
-        }
-        finally {
-            zoneLock.unlock();
-        }
-
-        if(currentAd == null) {
-            setNextAd();
+            adLock.unlock();
         }
     }
 
@@ -160,17 +146,18 @@ class AdZonePresenter implements SessionClient.Listener {
 
         adLock.lock();
         try {
-            if(currentZone.hasAds()) {
+            if(listener != null && currentZone.hasAds()) {
                 final int idx = viewCount % currentZone.getAds().size();
                 viewCount++;
 
                 currentAd = currentZone.getAds().get(idx);
-                adStarted = false;
-                adCompleted = false;
             }
             else {
                 currentAd = Ad.emptyAd();
             }
+
+            adStarted = false;
+            adCompleted = false;
         }
         finally {
             adLock.unlock();
@@ -345,14 +332,47 @@ class AdZonePresenter implements SessionClient.Listener {
         }
     }
 
-    /**
+    private boolean updateSessionId(final String sessionId) {
+        zoneLock.lock();
+        try {
+            if(this.sessionId == null || !this.sessionId.equals(sessionId)) {
+                this.sessionId = sessionId;
+                return true;
+            }
+        }
+        finally {
+            zoneLock.unlock();
+        }
+
+        return false;
+    }
+
+    private void updateCurrentZone(final Zone zone) {
+        zoneLock.lock();
+        try {
+            this.zoneLoaded = true;
+            this.currentZone = zone;
+        }
+        finally {
+            zoneLock.unlock();
+        }
+
+        if(currentAd == null || currentAd.isEmpty()) {
+            setNextAd();
+        }
+    }
+
+    /*
      * Overrides SessionClient.Listener
      */
 
     @Override
     public void onSessionAvailable(final Session session) {
         updateCurrentZone(session.getZone(zoneId));
-        notifyZoneAvailable();
+
+        if(updateSessionId(session.getId())) {
+            notifyZoneAvailable();
+        }
     }
 
     @Override
@@ -364,6 +384,5 @@ class AdZonePresenter implements SessionClient.Listener {
     @Override
     public void onSessionInitFailed() {
         updateCurrentZone(Zone.emptyZone());
-        notifyZoneAvailable();
     }
 }
