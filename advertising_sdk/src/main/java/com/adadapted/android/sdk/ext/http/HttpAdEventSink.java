@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class HttpAdEventSink implements AdEventSink {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = HttpAdEventSink.class.getName();
 
     private final String batchUrl;

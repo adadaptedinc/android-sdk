@@ -17,6 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @SuppressLint("ViewConstructor")
 class AdWebView extends WebView {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = AdWebView.class.getName();
 
     interface Listener {

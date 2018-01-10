@@ -13,6 +13,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class PayloadClient {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = PayloadClient.class.getName();
 
     public interface Callback {

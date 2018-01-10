@@ -254,10 +254,6 @@ public class SessionClient implements SessionAdapter.Listener {
             presenterLock.unlock();
         }
 
-        if(currentSession != null) {
-            listener.onSessionAvailable(currentSession);
-        }
-
         if(getStatus() == Status.SHOULD_REFRESH) {
             performRefresh();
         }
@@ -280,7 +276,7 @@ public class SessionClient implements SessionAdapter.Listener {
     }
 
     private int presenterSize() {
-        int presenterSize = 0;
+        int presenterSize;
 
         presenterLock.lock();
         try {

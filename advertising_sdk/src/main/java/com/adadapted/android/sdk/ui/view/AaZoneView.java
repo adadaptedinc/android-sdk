@@ -24,6 +24,7 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
     private static final String LOGTAG = AaZoneView.class.getName();
 
     public interface Listener {
+        void onZoneHasAds(boolean hasAds);
         void onAdLoaded();
         void onAdLoadFailed();
     }
@@ -117,9 +118,8 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
     @Deprecated
     public void onStart(final Listener listener,
                         final AaSdkContentListener contentListener) {
-        onStart();
+        onStart(listener);
 
-        this.listener = listener;
         SdkContentPublisher.getInstance().addListener(contentListener);
     }
 
@@ -132,9 +132,8 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
 
     public void onStart(final Listener listener,
                         final AdContentListener contentListener) {
-        onStart();
+        onStart(listener);
 
-        this.listener = listener;
         AdContentPublisher.getInstance().addListener(contentListener);
     }
 
@@ -149,12 +148,11 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
      */
 
     public void onStop() {
-        if(presenter != null) {
-            presenter.stop();
-        }
-
-        presenter = null;
         listener = null;
+
+        if(presenter != null) {
+            presenter.onDetach();
+        }
     }
 
     @Deprecated
@@ -168,6 +166,21 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
         AdContentPublisher.getInstance().removeListener(listener);
 
         onStop();
+    }
+
+    /*
+     * Notifies AaZoneView.Listener
+     */
+
+    private void notifyZoneHasAds(final boolean hasAds) {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                if(listener != null) {
+                    listener.onZoneHasAds(hasAds);
+                }
+            }
+        });
     }
 
     private void notifyAdLoaded() {
@@ -210,6 +223,13 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
                 webView.setLayoutParams(new LayoutParams(width, height));
             }
         });
+
+        notifyZoneHasAds(zone.hasAds());
+    }
+
+    @Override
+    public void onAdsRefreshed(final Zone zone) {
+        notifyZoneHasAds(zone.hasAds());
     }
 
     @Override
@@ -302,7 +322,5 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
         if(presenter != null) {
             presenter.onDetach();
         }
-
-        listener = null;
     }
 }

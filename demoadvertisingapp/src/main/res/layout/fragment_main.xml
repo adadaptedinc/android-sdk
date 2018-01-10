@@ -13,4 +13,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <com.adadapted.android.sdk.ui.view.AaZoneView
+        android:id="@+id/item_details_AdAdapted"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_below="@+id/section_label"/>
+
 </RelativeLayout>

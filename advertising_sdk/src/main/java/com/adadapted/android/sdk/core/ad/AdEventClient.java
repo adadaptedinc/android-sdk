@@ -10,6 +10,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class AdEventClient implements SessionClient.Listener {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = AdEventClient.class.getName();
 
     public interface Listener {

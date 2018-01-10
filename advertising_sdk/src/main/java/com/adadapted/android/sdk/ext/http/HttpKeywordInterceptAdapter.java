@@ -1,7 +1,5 @@
 package com.adadapted.android.sdk.ext.http;
 
-import android.util.Log;
-
 import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordIntercept;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptAdapter;
@@ -24,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = HttpKeywordInterceptAdapter.class.getName();
 
     private final String initUrl;
