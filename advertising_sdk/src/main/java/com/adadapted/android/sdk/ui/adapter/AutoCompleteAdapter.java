@@ -47,8 +47,8 @@ public class AutoCompleteAdapter extends ArrayAdapter<String> {
             if(constraint != null) {
                 final Set<Suggestion> suggestions = matcher.match(constraint);
                 for(final Suggestion suggestion : suggestions) {
-                    items.add(suggestion.getReplacement());
-                    matcher.suggestionPresented(suggestion.getReplacement());
+                    items.add(suggestion.getName());
+                    matcher.suggestionPresented(suggestion.getName());
                 }
 
                 for(final String item : allItems) {

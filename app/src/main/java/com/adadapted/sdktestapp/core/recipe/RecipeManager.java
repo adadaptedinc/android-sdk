@@ -28,12 +28,12 @@ public class RecipeManager {
 
     private final Set<Listener> listeners;
 
-    private final Context context;
+    //private final Context context;
     private boolean isLoaded;
     private final List<Recipe> recipes;
 
     private RecipeManager(Context context) {
-        this.context = context;
+        //this.context = context;
 
         listeners = new HashSet<>();
 

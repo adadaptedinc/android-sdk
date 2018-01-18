@@ -51,14 +51,12 @@ public class TodoListsActivity extends SpinnerActionBarActivity
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
+    public void onFragmentInteraction(Uri uri) {}
 
     @Override
     public boolean onNavigationItemSelected(int i, long l) {
         if(getMenuItem(i).equals("Recipes")) {
-            Intent intent = new Intent(this, RecipesActivity.class);
+            final Intent intent = new Intent(this, RecipesActivity.class);
             startActivity(intent);
 
             return true;

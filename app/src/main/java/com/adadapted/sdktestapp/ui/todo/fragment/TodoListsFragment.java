@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.adadapted.android.sdk.ui.view.AaZoneView;
 import com.adadapted.sdktestapp.R;
@@ -45,8 +47,7 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
      */
     // TODO: Rename and change types and number of parameters
     public static TodoListsFragment newInstance() {
-        TodoListsFragment fragment = new TodoListsFragment();
-        return fragment;
+        return new TodoListsFragment();
     }
 
     public TodoListsFragment() {}
@@ -57,16 +58,15 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
 
         lists = TodoListManager.getInstance(getActivity()).getLists();
         adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, lists);
-
-        aaZoneView = new AaZoneView(getActivity());
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_todo_lists, container, false);
 
+        aaZoneView = new AaZoneView(getActivity());
         aaZoneView.init("100680");
 
-        ListView listView = (ListView)view.findViewById(android.R.id.list);
+        final ListView listView = view.findViewById(android.R.id.list);
         listView.addFooterView(aaZoneView);
         listView.setAdapter(adapter);
 
@@ -125,13 +125,24 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
     }
 
     @Override
+    public void onZoneHasAds(boolean hasAds) {
+        Log.i(TAG, "Has Ads to serve:" + hasAds);
+    }
+
+    @Override
     public void onAdLoaded() {
         Log.i(TAG, "Ad Loaded.");
+
+        Toast.makeText(getActivity(), "Ad Loaded", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onAdLoadFailed() {
         Log.i(TAG, "Ad Load FAILED.");
+
+        Toast.makeText(getActivity(), "Ad Load FAILED", Toast.LENGTH_SHORT).show();
+
+        aaZoneView.shutdown();
     }
 
     /**

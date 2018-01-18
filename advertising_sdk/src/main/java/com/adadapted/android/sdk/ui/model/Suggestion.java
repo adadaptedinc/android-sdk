@@ -21,7 +21,7 @@ public class Suggestion implements Parcelable {
 
     private final String searchId;
 
-    private final String replacement;
+    private final String name;
     private final String icon;
     private final String tagLine;
 
@@ -31,7 +31,7 @@ public class Suggestion implements Parcelable {
     public Suggestion(final String searchId, final AutoFill autoFill) {
         this.searchId = searchId;
 
-        this.replacement = autoFill.getReplacement();
+        this.name = autoFill.getReplacement();
         this.icon = autoFill.getIcon();
         this.tagLine = autoFill.getTagLine();
 
@@ -41,15 +41,15 @@ public class Suggestion implements Parcelable {
 
     protected Suggestion(Parcel in) {
         searchId = in.readString();
-        replacement = in.readString();
+        name = in.readString();
         icon = in.readString();
         tagLine = in.readString();
         presented = in.readByte() != 0;
         selected = in.readByte() != 0;
     }
 
-    public String getReplacement() {
-        return replacement;
+    public String getName() {
+        return name;
     }
 
     public String getIcon() {
@@ -63,14 +63,14 @@ public class Suggestion implements Parcelable {
     public void presented() {
         if(!presented) {
             presented = true;
-            SuggestionTracker.suggestionPresented(searchId, getReplacement());
+            SuggestionTracker.suggestionPresented(searchId, getName());
         }
     }
 
     public void selected() {
         if(!selected) {
             selected = true;
-            SuggestionTracker.suggestionSelected(searchId, getReplacement());
+            SuggestionTracker.suggestionSelected(searchId, getName());
         }
     }
 
@@ -82,7 +82,7 @@ public class Suggestion implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(searchId);
-        parcel.writeString(replacement);
+        parcel.writeString(name);
         parcel.writeString(icon);
         parcel.writeString(tagLine);
         parcel.writeByte((byte) (presented ? 1 : 0));

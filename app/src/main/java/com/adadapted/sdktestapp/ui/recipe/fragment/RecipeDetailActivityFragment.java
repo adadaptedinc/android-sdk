@@ -2,10 +2,12 @@ package com.adadapted.sdktestapp.ui.recipe.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.adadapted.android.sdk.ui.view.AaZoneView;
 import com.adadapted.sdktestapp.R;
@@ -14,7 +16,9 @@ import com.adadapted.sdktestapp.core.recipe.RecipeManager;
 
 import java.util.UUID;
 
-public class RecipeDetailActivityFragment extends Fragment implements RecipeManager.Listener {
+public class RecipeDetailActivityFragment extends Fragment implements AaZoneView.Listener, RecipeManager.Listener {
+    private static final String TAG = RecipeDetailActivityFragment.class.getName();
+
     private static final String RECIPE_ID = "recipe_id";
 
     private UUID recipeId;
@@ -79,5 +83,24 @@ public class RecipeDetailActivityFragment extends Fragment implements RecipeMana
         recipe = RecipeManager.getInstance(getActivity()).getRecipe(recipeId);
 
         getActivity().setTitle(recipe.getName());
+    }
+
+    @Override
+    public void onZoneHasAds(boolean hasAds) {
+        Log.i(TAG, "Has Ads to serve:" + hasAds);
+    }
+
+    @Override
+    public void onAdLoaded() {
+        Log.i(TAG, "Ad Loaded.");
+
+        Toast.makeText(getActivity(), "Ad Loaded", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onAdLoadFailed() {
+        Log.i(TAG, "Ad Load FAILED.");
+
+        Toast.makeText(getActivity(), "Ad Load FAILED", Toast.LENGTH_SHORT).show();
     }
 }
