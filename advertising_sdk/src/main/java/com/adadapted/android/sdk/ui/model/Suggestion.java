@@ -56,9 +56,9 @@ public class Suggestion implements Parcelable {
         return icon;
     }
 
-    public String getTagLine() {
-        return tagLine;
-    }
+    //public String getTagLine() {
+    //    return tagLine;
+    //}
 
     public void presented() {
         if(!presented) {
