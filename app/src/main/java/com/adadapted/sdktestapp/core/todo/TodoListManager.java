@@ -24,7 +24,7 @@ public class TodoListManager implements TodoLoader.Listener {
 
     public static synchronized TodoListManager getInstance(Context context) {
         if(ourInstance == null) {
-            ourInstance = new TodoListManager(context);
+            ourInstance = new TodoListManager(context.getApplicationContext());
             ourInstance.loadData();
         }
 
@@ -37,7 +37,7 @@ public class TodoListManager implements TodoLoader.Listener {
 
     private final Set<Listener> listeners;
 
-    private final Context context;
+    //private final Context context;
     private final TodoLoader todoLoader;
     private boolean isLoaded;
     private final List<TodoList> lists;
@@ -61,7 +61,7 @@ public class TodoListManager implements TodoLoader.Listener {
     private final Handler handler = new Handler();
 
     private TodoListManager(Context context) {
-        this.context = context;
+        //this.context = context;
 
         this.listeners = new HashSet<>();
 

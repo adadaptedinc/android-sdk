@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.adadapted.android.sdk.core.atl.AddToListItem;
 import com.adadapted.android.sdk.ui.messaging.AdContentListener;
@@ -28,7 +30,7 @@ import com.adadapted.sdktestapp.ui.todo.dialog.NewListItemDialogFragment;
 import java.util.List;
 import java.util.UUID;
 
-public class TodoListDetailFragment extends ListFragment implements AdContentListener {
+public class TodoListDetailFragment extends ListFragment implements AaZoneView.Listener, AdContentListener {
     private static final String TAG = TodoListDetailFragment.class.getName();
 
     private static final String ARG_LIST_ID = "listId";
@@ -76,9 +78,18 @@ public class TodoListDetailFragment extends ListFragment implements AdContentLis
 
         list = TodoListManager.getInstance(getActivity()).getList(listId);
 
-        getActivity().setTitle(list.getName());
+        final Activity activity = getActivity();
+        if(activity != null) {
+            activity.setTitle(list.getName());
+        }
 
         dialog = new NewListItemDialogFragment();
+    }
+
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -151,7 +162,7 @@ public class TodoListDetailFragment extends ListFragment implements AdContentLis
     public void onStart() {
         super.onStart();
 
-        aaZoneView.onStart(this);
+        aaZoneView.onStart(this, this);
     }
 
     @Override
@@ -162,12 +173,31 @@ public class TodoListDetailFragment extends ListFragment implements AdContentLis
     }
 
     @Override
-    public void onContentAvailable(final String zoneId, final AdContent content) {
-        final Intent intent = new Intent(getActivity(), TodoListDetailFragment.class);
-        intent.putExtra("aa_atl_items", content);
+    public void onZoneHasAds(boolean hasAds) {
+        Log.i(TAG, "Has Ads to serve:" + hasAds);
+    }
 
+    @Override
+    public void onAdLoaded() {
+        Log.i(TAG, "Ad Loaded.");
+
+        Toast.makeText(getActivity(), "Ad Loaded", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onAdLoadFailed() {
+        Log.i(TAG, "Ad Load FAILED.");
+
+        Toast.makeText(getActivity(), "Ad Load FAILED", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onContentAvailable(final String zoneId, final AdContent content) {
+        //final Intent intent = new Intent(getActivity(), TodoListDetailFragment.class);
+        //intent.putExtra("aa_atl_items", content);
 
         final List<AddToListItem> items = content.getItems();
+        Log.i(TAG, "Received " + items.size() + " items.");
 
         for(final AddToListItem item : items) {
             Log.i(TAG, "Processing: " + item);

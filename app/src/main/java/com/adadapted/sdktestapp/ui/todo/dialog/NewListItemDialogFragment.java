@@ -10,7 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 
-import com.adadapted.android.sdk.ui.adapter.AaAutoCompleteAdapter;
+import com.adadapted.android.sdk.ui.adapter.AutoCompleteAdapter;
 import com.adadapted.sdktestapp.R;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class NewListItemDialogFragment extends DialogFragment {
 
     // Use this instance of the interface to deliver action events
     NewListItemDialogListener mListener;
-    AaAutoCompleteAdapter adapter;
+    AutoCompleteAdapter adapter;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -42,7 +42,7 @@ public class NewListItemDialogFragment extends DialogFragment {
         String[] autoCompleteList = getResources().getStringArray(R.array.list_of_groceries);
         List<String> items = new ArrayList<>(Arrays.asList(autoCompleteList));
 
-        adapter = new AaAutoCompleteAdapter(getActivity(), android.R.layout.simple_list_item_1, items);
+        adapter = new AutoCompleteAdapter(getActivity(), android.R.layout.simple_list_item_1, items);
 
         final AutoCompleteTextView actv = new AutoCompleteTextView(getActivity());
         actv.setAdapter(adapter);

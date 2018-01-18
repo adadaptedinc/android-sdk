@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.adadapted.android.sdk.ui.view.AaZoneView;
 import com.adadapted.sdktestapp.R;
@@ -27,7 +29,9 @@ import java.util.List;
  * Use the {@link RecipesFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RecipesFragment extends ListFragment implements RecipeManager.Listener {
+public class RecipesFragment extends ListFragment implements AaZoneView.Listener, RecipeManager.Listener {
+    private static final String TAG = RecipesFragment.class.getName();
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -147,6 +151,25 @@ public class RecipesFragment extends ListFragment implements RecipeManager.Liste
     @Override
     public void onRecipesAvailable() {
 
+    }
+
+    @Override
+    public void onZoneHasAds(boolean hasAds) {
+        Log.i(TAG, "Has Ads to serve:" + hasAds);
+    }
+
+    @Override
+    public void onAdLoaded() {
+        Log.i(TAG, "Ad Loaded.");
+
+        Toast.makeText(getActivity(), "Ad Loaded", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onAdLoadFailed() {
+        Log.i(TAG, "Ad Load FAILED.");
+
+        Toast.makeText(getActivity(), "Ad Load FAILED", Toast.LENGTH_SHORT).show();
     }
 
     /**

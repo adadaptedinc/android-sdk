@@ -147,13 +147,6 @@ public class AdAdapted {
 
         AppEventClient.trackSdkEvent("app_opened");
 
-        if(!isProd) {
-            AppEventClient.trackError(
-                "NOT_AN_ERROR",
-                "Error Collection Test Message. This message is only sent from the Dev environment."
-            );
-        }
-
         Log.i(LOGTAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", Config.SDK_VERSION));
     }
 
