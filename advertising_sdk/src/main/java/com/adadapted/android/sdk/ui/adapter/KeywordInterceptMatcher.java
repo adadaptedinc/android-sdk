@@ -4,51 +4,45 @@ import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptClient;
 import com.adadapted.android.sdk.core.session.Session;
 import com.adadapted.android.sdk.core.session.SessionClient;
-import com.adadapted.android.sdk.core.keywordintercept.Suggestion;
+import com.adadapted.android.sdk.core.keywordintercept.AutoFill;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordIntercept;
-import com.adadapted.android.sdk.ui.model.SuggestionPayload;
+import com.adadapted.android.sdk.ui.model.Suggestion;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class AaKeywordInterceptMatcher implements SessionClient.Listener, KeywordInterceptClient.Listener {
+public class KeywordInterceptMatcher implements SessionClient.Listener, KeywordInterceptClient.Listener {
     @SuppressWarnings("unused")
-    private static final String LOGTAG = AaKeywordInterceptMatcher.class.getName();
-
-    private final AaSuggestionTracker suggestionTracker;
+    private static final String LOGTAG = KeywordInterceptMatcher.class.getName();
 
     private final Lock interceptLock = new ReentrantLock();
     private KeywordIntercept keywordIntercept;
     private boolean mLoaded = false;
     private Session mSession;
 
-    public AaKeywordInterceptMatcher() {
-        suggestionTracker = new AaSuggestionTracker();
-
+    public KeywordInterceptMatcher() {
         SessionClient.getSession(this);
     }
 
-    public SuggestionPayload match(final CharSequence constraint) {
+    public Set<Suggestion> match(final CharSequence constraint) {
         final Set<Suggestion> suggestions = new HashSet<>();
-        String searchId = "";
 
         interceptLock.lock();
         try {
-            searchId = keywordIntercept.getSearchId();
             if((isLoaded() && constraint != null && constraint.length() >= keywordIntercept.getMinMatchLength())) {
                 for (final String item : keywordIntercept.getAutoFill().keySet()) {
                     if (item != null && item.toLowerCase().contains(constraint.toString().toLowerCase())) {
-                        final Suggestion suggestion = keywordIntercept.getAutoFill().get(item);
-                        if(suggestion != null) {
-                            suggestions.add(suggestion);
+                        final AutoFill autoFill = keywordIntercept.getAutoFill().get(item);
+                        if(autoFill != null) {
+                            suggestions.add(new Suggestion(keywordIntercept.getSearchId(), autoFill));
 
-                            suggestionTracker.suggestionMatched(
+                            SuggestionTracker.suggestionMatched(
                                 mSession,
                                 keywordIntercept.getSearchId(),
                                 item,
-                                suggestion.getReplacement(),
+                                autoFill.getReplacement(),
                                 constraint.toString()
                             );
                         }
@@ -60,23 +54,23 @@ public class AaKeywordInterceptMatcher implements SessionClient.Listener, Keywor
             interceptLock.unlock();
         }
 
-        return new SuggestionPayload(searchId, suggestionTracker, suggestions);
+        return suggestions;
     }
 
     public void suggestionPresented(final String suggestion) {
         interceptLock.lock();
         try {
-            suggestionTracker.suggestionPresented(keywordIntercept.getSearchId(), suggestion);
+            SuggestionTracker.suggestionPresented(keywordIntercept.getSearchId(), suggestion);
         }
             finally {
             interceptLock.unlock();
         }
     }
 
-    public boolean suggestionSelected(final String suggestion) {
+    public void suggestionSelected(final String suggestion) {
         interceptLock.lock();
         try {
-            return suggestionTracker.suggestionSelected(keywordIntercept.getSearchId(), suggestion);
+            SuggestionTracker.suggestionSelected(keywordIntercept.getSearchId(), suggestion);
         }
         finally {
             interceptLock.unlock();

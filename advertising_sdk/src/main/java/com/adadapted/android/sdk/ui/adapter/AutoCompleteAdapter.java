@@ -5,31 +5,31 @@ import android.support.annotation.NonNull;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 
-import com.adadapted.android.sdk.ui.model.SuggestionPayload;
+import com.adadapted.android.sdk.ui.model.Suggestion;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class AaAutoCompleteAdapter extends ArrayAdapter<String> {
+public class AutoCompleteAdapter extends ArrayAdapter<String> {
     @SuppressWarnings("unused")
-    private static final String LOGTAG = AaAutoCompleteAdapter.class.getName();
+    private static final String LOGTAG = AutoCompleteAdapter.class.getName();
 
-    private final AaKeywordInterceptMatcher matcher;
+    private final KeywordInterceptMatcher matcher;
     private final List<String> allItems;
 
-    public AaAutoCompleteAdapter(final Context context,
-                                 final int resource,
-                                 final List<String> items) {
+    public AutoCompleteAdapter(final Context context,
+                               final int resource,
+                               final List<String> items) {
         super(context.getApplicationContext(), resource, items);
 
-        matcher = new AaKeywordInterceptMatcher();
+        matcher = new KeywordInterceptMatcher();
         allItems = new ArrayList<>(items);
     }
 
-    public boolean suggestionSelected(final String suggestion) {
-        return matcher.suggestionSelected(suggestion);
+    public void suggestionSelected(final String suggestion) {
+        matcher.suggestionSelected(suggestion);
     }
 
     @Override
@@ -42,22 +42,24 @@ public class AaAutoCompleteAdapter extends ArrayAdapter<String> {
         @Override
         protected Filter.FilterResults performFiltering(final CharSequence constraint) {
             final FilterResults filterResults = new FilterResults();
-            final Set<String> suggestions = new HashSet<>();
+            final Set<String> items = new HashSet<>();
 
             if(constraint != null) {
-                SuggestionPayload suggestionPayload = matcher.match(constraint);
-                suggestions.addAll(suggestionPayload.getSuggestions());
+                final Set<Suggestion> suggestions = matcher.match(constraint);
+                for(final Suggestion suggestion : suggestions) {
+                    items.add(suggestion.getReplacement());
+                    matcher.suggestionPresented(suggestion.getReplacement());
+                }
 
                 for(final String item : allItems) {
                     if (item != null && item.toLowerCase().contains(constraint.toString().toLowerCase())) {
-                        matcher.suggestionPresented(item);
-                        suggestions.add(item);
+                        items.add(item);
                     }
                 }
             }
 
-            filterResults.values = new ArrayList<>(suggestions);
-            filterResults.count = suggestions.size();
+            filterResults.values = new ArrayList<>(items);
+            filterResults.count = items.size();
 
             return filterResults;
         }
