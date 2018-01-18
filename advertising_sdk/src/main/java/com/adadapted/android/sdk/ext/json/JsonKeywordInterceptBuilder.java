@@ -3,7 +3,7 @@ package com.adadapted.android.sdk.ext.json;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.event.AppEventClient;
-import com.adadapted.android.sdk.core.keywordintercept.AutoFill;
+import com.adadapted.android.sdk.core.keywordintercept.Suggestion;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordIntercept;
 
 import org.json.JSONException;
@@ -24,7 +24,7 @@ public class JsonKeywordInterceptBuilder {
             final long refreshTime = json.has(JsonFields.REFRESHTIME) ? Long.parseLong(json.getString(JsonFields.REFRESHTIME)) : 0L;
             final int minMatchLength = json.has(JsonFields.MINMATCHLENGTH) ? Integer.parseInt(json.getString(JsonFields.MINMATCHLENGTH)) : 2;
 
-            final Map<String, AutoFill> interceptMap = parseAutofill(json);
+            final Map<String, Suggestion> interceptMap = parseAutofill(json);
 
             return new KeywordIntercept(searchId, refreshTime, minMatchLength, interceptMap);
         }
@@ -44,8 +44,8 @@ public class JsonKeywordInterceptBuilder {
         return null;
     }
 
-    private Map<String, AutoFill> parseAutofill(final JSONObject json) throws JSONException {
-        final Map<String, AutoFill> interceptMap = new HashMap<>();
+    private Map<String, Suggestion> parseAutofill(final JSONObject json) throws JSONException {
+        final Map<String, Suggestion> interceptMap = new HashMap<>();
 
         final Object obj = json.get(JsonFields.AUTOFILL);
         if(obj instanceof JSONObject) {
@@ -59,7 +59,7 @@ public class JsonKeywordInterceptBuilder {
                 final String icon = jsonTerm.has(JsonFields.ICON) ? jsonTerm.getString(JsonFields.ICON) : "";
                 final String tagline = jsonTerm.has(JsonFields.TAGLINE) ? jsonTerm.getString(JsonFields.TAGLINE) : "";
 
-                final AutoFill autofill = new AutoFill(replacement, icon, tagline);
+                final Suggestion autofill = new Suggestion(replacement, icon, tagline);
 
                 interceptMap.put(term, autofill);
             }

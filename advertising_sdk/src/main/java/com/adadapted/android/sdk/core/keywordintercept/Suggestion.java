@@ -1,13 +1,13 @@
 package com.adadapted.android.sdk.core.keywordintercept;
 
-public class AutoFill {
+public class Suggestion {
     private final String replacement;
     private final String icon;
     private final String tagLine;
 
-    public AutoFill(final String replacement,
-                    final String icon,
-                    final String tagLine) {
+    public Suggestion(final String replacement,
+                      final String icon,
+                      final String tagLine) {
         this.replacement = replacement;
         this.icon = icon;
         this.tagLine = tagLine;
