@@ -30,6 +30,7 @@ public class AdAdapted {
 
     private static AdAdapted sInstance;
 
+    private boolean hasStarted;
     private String appId;
     private boolean isProd;
     private Map<String, String> params;
@@ -38,6 +39,7 @@ public class AdAdapted {
     private AaSdkAdditContentListener contentListener;
 
     private AdAdapted() {
+        hasStarted = false;
         params = new HashMap<>();
     }
 
@@ -96,10 +98,22 @@ public class AdAdapted {
     }
 
     public void start(final Context context) {
-        if(appId == null) {
-            Log.e(LOGTAG, "The Application Id cannot be Null.");
+        if(context == null) {
+            Log.e(LOGTAG, "The Context cannot be NULL");
             return;
         }
+
+        if(appId == null) {
+            Log.e(LOGTAG, "The Application Id cannot be NULL");
+            return;
+        }
+
+        if(hasStarted) {
+            Log.w(LOGTAG, "AdAdapted Android Advertising SDK has already been started");
+            return;
+        }
+
+        hasStarted = true;
 
         Wireup.run(context, isProd);
 
@@ -151,17 +165,22 @@ public class AdAdapted {
     }
 
     public static synchronized void restart(final Context context) {
-        AppEventClient.trackSdkEvent("sdk_restarted");
-
         restart(context, new HashMap<String, String>());
     }
 
     public static synchronized void restart(final Context context,
                                             final Map<String, String> params) {
+        if(context == null) {
+            Log.e(LOGTAG, "The Context cannot be NULL");
+            return;
+        }
+
         if(getsInstance().appId == null) {
             Log.e(LOGTAG, "The Application Id cannot be Null.");
             return;
         }
+
+        AppEventClient.trackSdkEvent("sdk_restarted");
 
         SessionClient.restart(
             context.getApplicationContext(),
