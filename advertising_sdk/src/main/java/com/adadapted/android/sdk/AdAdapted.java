@@ -110,6 +110,7 @@ public class AdAdapted {
 
         if(hasStarted) {
             Log.w(LOGTAG, "AdAdapted Android Advertising SDK has already been started");
+            AppEventClient.trackError("MULTIPLE_SDK_STARTS", "App has attempted to start the SDK Multiple times");
             return;
         }
 
