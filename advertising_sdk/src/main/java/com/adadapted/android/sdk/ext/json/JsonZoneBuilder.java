@@ -38,7 +38,7 @@ public class JsonZoneBuilder {
                 zones.put(zoneId, zone);
             }
         }
-        catch(JSONException ex) {
+        catch(Exception ex) {
             Log.w(LOGTAG, "Problem converting to JSON.", ex);
 
             final Map<String, String> errorParams = new HashMap<>();
@@ -56,7 +56,7 @@ public class JsonZoneBuilder {
     }
 
     private Zone buildZone(final String zoneId,
-                           final JSONObject jsonZone) throws JSONException{
+                           final JSONObject jsonZone) throws JSONException, NumberFormatException{
         final Zone.Builder builder = new Zone.Builder();
         builder.setZoneId(zoneId);
 
@@ -106,7 +106,7 @@ public class JsonZoneBuilder {
         return builder.build();
     }
 
-    private int calculateDimensionValue(final String value) {
+    private int calculateDimensionValue(final String value) throws NumberFormatException {
         return mDimensionConverter.convertDpToPx(Integer.parseInt(value));
     }
 }

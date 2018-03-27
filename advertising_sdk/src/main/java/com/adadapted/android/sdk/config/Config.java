@@ -1,7 +1,7 @@
 package com.adadapted.android.sdk.config;
 
 public class Config {
-    public static final String SDK_VERSION = "1.1.11";
+    public static final String SDK_VERSION = "1.1.12";
     public static final long DEFAULT_AD_POLLING = 300000L;
     public static final long DEFAULT_EVENT_POLLING = 5000L;
     public static final long DEFAULT_AD_REFRESH = 60L;
