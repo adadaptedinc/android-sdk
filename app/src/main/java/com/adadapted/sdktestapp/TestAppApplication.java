@@ -46,7 +46,7 @@ public class TestAppApplication extends Application {
         FlurryAgent.setLogEnabled(false);
         FlurryAgent.init(this, getString(R.string.flurry_api_id));
 
-        NewRelic.withApplicationToken(getString(R.string.newrelic_api_id)).start(this);
+        //NewRelic.withApplicationToken(getString(R.string.newrelic_api_id)).start(this);
 
         String apiKey = getResources().getString(R.string.adadapted_api_key);
 
