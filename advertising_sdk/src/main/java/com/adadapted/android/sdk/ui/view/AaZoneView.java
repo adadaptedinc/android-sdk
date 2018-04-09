@@ -246,8 +246,6 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
 
     @Override
     public void onNoAdAvailable() {
-        notifyAdLoadFailed();
-
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {

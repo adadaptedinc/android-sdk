@@ -144,7 +144,7 @@ public class Ad implements Parcelable {
 
     public static class Builder {
         private String adId;
-        private String zoneId = "";
+        private String zoneId;
         private String impressionId;
         private String url;
         private String actionType;

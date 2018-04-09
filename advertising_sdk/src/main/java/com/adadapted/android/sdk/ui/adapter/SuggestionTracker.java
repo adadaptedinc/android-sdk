@@ -2,7 +2,6 @@ package com.adadapted.android.sdk.ui.adapter;
 
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptClient;
 import com.adadapted.android.sdk.core.session.Session;
-import com.adadapted.android.sdk.ui.model.Suggestion;
 
 import java.util.HashMap;
 import java.util.Map;

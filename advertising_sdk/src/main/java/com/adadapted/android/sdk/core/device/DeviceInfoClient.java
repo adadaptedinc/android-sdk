@@ -11,6 +11,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.concurrency.ThreadPoolInteractorExecuter;
+import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -183,6 +184,8 @@ public class DeviceInfoClient {
         }
         catch (GooglePlayServicesNotAvailableException | GooglePlayServicesRepairableException | IOException ex) {
             Log.w(LOGTAG, "Problem retrieving Google Play Advertiser Info");
+
+            AppEventClient.trackError("GAID_UNAVAILABLE", ex.getMessage());
         }
 
         return null;

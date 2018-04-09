@@ -53,7 +53,8 @@ public class AdEventClient implements SessionClient.Listener {
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
             public void run() {
-                getInstance().fileEvent(ad, AdEvent.Types.IMPRESSION);
+                final int count = ImpressionIdCounter.getsInstance().getIncrementedCountFor(ad.getImpressionId());
+                getInstance().fileEvent(ad, AdEvent.Types.IMPRESSION, count);
             }
         });
     }
@@ -66,7 +67,8 @@ public class AdEventClient implements SessionClient.Listener {
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
             public void run() {
-                getInstance().fileEvent(ad, AdEvent.Types.IMPRESSION_END);
+                final int count = ImpressionIdCounter.getsInstance().getCurrentCountFor(ad.getImpressionId());
+                getInstance().fileEvent(ad, AdEvent.Types.IMPRESSION_END, count);
             }
         });
     }
@@ -79,7 +81,8 @@ public class AdEventClient implements SessionClient.Listener {
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
             public void run() {
-                getInstance().fileEvent(ad, AdEvent.Types.INTERACTION);
+                final int count = ImpressionIdCounter.getsInstance().getCurrentCountFor(ad.getImpressionId());
+                getInstance().fileEvent(ad, AdEvent.Types.INTERACTION, count);
             }
         });
     }
@@ -92,7 +95,8 @@ public class AdEventClient implements SessionClient.Listener {
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
             public void run() {
-                getInstance().fileEvent(ad, AdEvent.Types.POPUP_BEGIN);
+                final int count = ImpressionIdCounter.getsInstance().getCurrentCountFor(ad.getImpressionId());
+                getInstance().fileEvent(ad, AdEvent.Types.POPUP_BEGIN, count);
             }
         });
     }
@@ -105,7 +109,8 @@ public class AdEventClient implements SessionClient.Listener {
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
             public void run() {
-                getInstance().fileEvent(ad, AdEvent.Types.POPUP_END);
+                final int count = ImpressionIdCounter.getsInstance().getCurrentCountFor(ad.getImpressionId());
+                getInstance().fileEvent(ad, AdEvent.Types.POPUP_END, count);
             }
         });
     }
@@ -142,7 +147,7 @@ public class AdEventClient implements SessionClient.Listener {
         SessionClient.addListener(this);
     }
 
-    private void fileEvent(final Ad ad, final String eventType) {
+    private void fileEvent(final Ad ad, final String eventType, final int count) {
         if(session == null) {
             return;
         }
@@ -155,7 +160,7 @@ public class AdEventClient implements SessionClient.Listener {
                 session.getId(),
                 ad.getId(),
                 ad.getZoneId(),
-                ad.getImpressionId(),
+                ad.getImpressionId() + "::" + count,
                 eventType,
                 session.getDeviceInfo().getSdkVersion()
             );
@@ -173,11 +178,9 @@ public class AdEventClient implements SessionClient.Listener {
             return;
         }
 
-        final Set<AdEvent> currentEvents = new HashSet<>();
-
         eventLock.lock();
         try {
-            currentEvents.addAll(events);
+            final Set<AdEvent> currentEvents = new HashSet<>(events);
             events.clear();
 
             adEventSink.sendBatch(currentEvents);
