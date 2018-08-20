@@ -2,7 +2,7 @@ package com.adadapted.android.sdk.ext.http;
 
 import android.util.Log;
 
-import com.adadapted.android.sdk.core.addit.Content;
+import com.adadapted.android.sdk.core.addit.AdditContent;
 import com.adadapted.android.sdk.core.addit.PayloadAdapter;
 import com.adadapted.android.sdk.core.addit.PayloadContentParser;
 import com.adadapted.android.sdk.core.addit.PayloadEvent;
@@ -50,7 +50,7 @@ public class HttpPayloadAdapter implements PayloadAdapter {
         final JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, pickupUrl, json, new Response.Listener<JSONObject>(){
             @Override
             public void onResponse(JSONObject response) {
-                final List<Content> content = parser.parse(response);
+                final List<AdditContent> content = parser.parse(response);
                 callback.onSuccess(content);
             }
         }, new Response.ErrorListener() {

@@ -75,11 +75,7 @@ public class JsonAdBuilder {
 
         builder.setActionType(jsonAd.getString(JsonFields.ACTION_TYPE));
         builder.setActionPath(jsonAd.getString(JsonFields.ACTION_PATH));
-
-        if(builder.getActionType().equals(Ad.ActionTypes.CONTENT)) {
-            builder.setPayload(parseAdContent(jsonAd));
-        }
-
+        builder.setPayload(parseAdContent(jsonAd));
         builder.setTrackingHtml(jsonAd.getString(JsonFields.TRACKING_HTML));
 
         return builder.build();

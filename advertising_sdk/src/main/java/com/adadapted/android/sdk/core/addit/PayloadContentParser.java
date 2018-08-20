@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 public class PayloadContentParser {
-    public List<Content> parse(final JSONObject json) {
-        final List<Content> content = new ArrayList<>();
+    public List<AdditContent> parse(final JSONObject json) {
+        final List<AdditContent> content = new ArrayList<>();
 
         if(json != null) {
             try {
@@ -26,9 +26,9 @@ public class PayloadContentParser {
                 final Map<String, String> errorParams = new HashMap<>();
                 errorParams.put("exception_message", ex.getMessage());
                 AppEventClient.trackError(
-                        "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
-                        "Problem parsing Addit JSON payload",
-                        errorParams
+                    "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
+                    "Problem parsing Addit JSON payload",
+                    errorParams
                 );
             }
         }
@@ -36,7 +36,7 @@ public class PayloadContentParser {
         return content;
     }
 
-    private Content parsePayload(final JSONObject json) throws JSONException {
+    private AdditContent parsePayload(final JSONObject json) throws JSONException {
         final String payloadId = json.has(JsonFields.PayloadId) ? json.getString(JsonFields.PayloadId) : "";
         final String message = json.has(JsonFields.PayloadMessage) ? json.getString(JsonFields.PayloadMessage) : "";
         final String image = json.has(JsonFields.PayloadImage) ? json.getString(JsonFields.PayloadImage) : "";
@@ -60,7 +60,7 @@ public class PayloadContentParser {
             );
         }
 
-        return Content.createPayloadContent(payloadId, message, image, ContentTypes.ADD_TO_LIST_ITEMS, payload);
+        return AdditContent.createPayloadContent(payloadId, message, image, ContentTypes.ADD_TO_LIST_ITEMS, payload);
     }
 
     private AddToListItem parseItem(final JSONObject itemJson) {

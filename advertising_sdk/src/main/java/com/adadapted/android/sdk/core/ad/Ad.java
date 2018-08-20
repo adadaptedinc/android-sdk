@@ -56,6 +56,7 @@ public class Ad implements Parcelable {
         public static final String CONTENT = "c";
         public static final String LINK = "l";
         public static final String POPUP = "p";
+        public static final String CONTENT_POPUP = "cp";
     }
 
     private final String id;
@@ -122,6 +123,10 @@ public class Ad implements Parcelable {
 
     public List<AddToListItem> getPayload() {
         return payload;
+    }
+
+    public AdContent getContent() {
+        return AdContent.createAddToListContent(this);
     }
 
     public List<String> getPayloadNames() {
@@ -220,6 +225,7 @@ public class Ad implements Parcelable {
         public void setPayload(final List<AddToListItem> payload) {
             this.payload = payload;
         }
+
 
         public long getRefreshTime() {
             return refreshTime;

@@ -3,7 +3,7 @@ package com.adadapted.android.sdk.ui.messaging;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.adadapted.android.sdk.ui.model.AdContent;
+import com.adadapted.android.sdk.core.ad.AdContent;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -57,6 +57,10 @@ public class AdContentPublisher {
 
     public void publishContent(final String zoneId,
                                final AdContent content) {
+        if (content.hasNoItems()) {
+            return;
+        }
+
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
