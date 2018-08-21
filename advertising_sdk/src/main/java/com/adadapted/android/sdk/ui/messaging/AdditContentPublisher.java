@@ -1,6 +1,10 @@
 package com.adadapted.android.sdk.ui.messaging;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import com.adadapted.android.sdk.core.addit.AdditContent;
+import com.adadapted.android.sdk.core.atl.AddToListContent;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.ad.AdContent;
 
@@ -60,7 +64,7 @@ public class AdditContentPublisher {
             }
             else if(listener != null) {
                 publishedContent.put(content.getPayloadId(), content);
-                listener.onContentAvailable(content);
+                notifyContentAvailable(content);
             }
         }
         finally {
@@ -83,10 +87,19 @@ public class AdditContentPublisher {
                 return;
             }
 
-            listener.onContentAvailable(content);
+            notifyContentAvailable(content);
         }
         finally {
             lock.unlock();
         }
+    }
+
+    private void notifyContentAvailable(final AddToListContent content) {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                listener.onContentAvailable(content);
+            }
+        });
     }
 }

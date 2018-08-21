@@ -1,5 +1,8 @@
 package com.adadapted.android.sdk.ui.messaging;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import com.adadapted.android.sdk.core.ad.AdEvent;
 import com.adadapted.android.sdk.core.ad.AdEventClient;
 
@@ -61,14 +64,23 @@ public class SdkEventPublisher implements AdEventClient.Listener {
         lock.lock();
         try {
             if(event.getEventType().equals(AdEvent.Types.IMPRESSION)) {
-                listener.onNextAdEvent(event.getZoneId(), EventTypes.IMPRESSION);
+                notifyNextAdEvent(event.getZoneId(), EventTypes.IMPRESSION);
             }
             else if(event.getEventType().equals(AdEvent.Types.INTERACTION)) {
-                listener.onNextAdEvent(event.getZoneId(), EventTypes.CLICK);
+                notifyNextAdEvent(event.getZoneId(), EventTypes.CLICK);
             }
         }
         finally {
             lock.unlock();
         }
+    }
+
+    private void notifyNextAdEvent(final String zoneId, final String eventType) {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                listener.onNextAdEvent(zoneId, eventType);
+            }
+        });
     }
 }
