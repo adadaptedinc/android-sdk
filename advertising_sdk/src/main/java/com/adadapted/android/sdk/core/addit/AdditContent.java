@@ -121,7 +121,6 @@ public class AdditContent implements AddToListContent, Parcelable {
         finally {
             lock.unlock();
         }
-
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.adadapted.android.sdk.core.ad.Ad;
 import com.adadapted.android.sdk.core.addit.AdditContent;
 import com.adadapted.android.sdk.core.addit.ContentTypes;
 import com.adadapted.android.sdk.core.atl.AddToListItem;
+import com.adadapted.android.sdk.core.atl.PopupContent;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.ui.messaging.AdditContentPublisher;
 import com.adadapted.android.sdk.core.ad.AdContent;
@@ -57,14 +58,11 @@ class PopupJavascriptBridge {
                 productImage
         ));
 
-        final AdditContent content = AdditContent.createInAppContent(
+        final PopupContent content = PopupContent.createPopupContent(
                 payloadId,
-                title,
-                productImage,
-                ContentTypes.ADD_TO_LIST_ITEMS,
                 items
         );
 
-        AdditContentPublisher.getInstance().publishAdditContent(content);
+        AdditContentPublisher.getInstance().publishPopupContent(content);
     }
 }

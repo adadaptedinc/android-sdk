@@ -5,6 +5,7 @@ import android.os.Looper;
 
 import com.adadapted.android.sdk.core.addit.AdditContent;
 import com.adadapted.android.sdk.core.atl.AddToListContent;
+import com.adadapted.android.sdk.core.atl.PopupContent;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.ad.AdContent;
 
@@ -54,7 +55,7 @@ public class AdditContentPublisher {
             if (listener == null) {
                 AppEventClient.trackError(
                     "NO_ADDIT_CONTENT_LISTENER",
-                    "App did not register an Addit AdditContent listener"
+                    "App did not register an Addit Content listener"
                 );
                 return;
             }
@@ -72,6 +73,28 @@ public class AdditContentPublisher {
         }
     }
 
+    public void publishPopupContent(final PopupContent content) {
+        if(content == null || content.hasNoItems()) {
+            return;
+        }
+
+        lock.lock();
+        try {
+            if (listener == null) {
+                AppEventClient.trackError(
+                        "NO_ADDIT_CONTENT_LISTENER",
+                        "App did not register an Addit Content listener"
+                );
+                return;
+            }
+
+            notifyContentAvailable(content);
+        }
+        finally {
+            lock.unlock();
+        }
+    }
+
     public void publishAdContent(final AdContent content) {
         if(content == null || content.hasNoItems()) {
             return;
@@ -82,7 +105,7 @@ public class AdditContentPublisher {
             if (listener == null) {
                 AppEventClient.trackError(
                     "NO_ADDIT_CONTENT_LISTENER",
-                    "App did not register an Addit AdditContent listener"
+                    "App did not register an Addit Content listener"
                 );
                 return;
             }

@@ -11,9 +11,9 @@ import org.json.JSONObject;
 
 import java.util.Date;
 
-import static com.google.ads.AdRequest.LOGTAG;
-
 public class JsonPayloadBuilder {
+    private static final String LOGTAG = JsonPayloadBuilder.class.getName();
+
     private JSONObject wrapper;
 
     public JsonPayloadBuilder() {
@@ -36,7 +36,7 @@ public class JsonPayloadBuilder {
             request.put("timestamp", new Date().getTime());
         }
         catch(JSONException ex) {
-            Log.w(LOGTAG, "Problem building App Event JSON");
+            Log.w(LOGTAG, "Problem building App Event JSON", ex);
         }
 
         return request;
@@ -56,7 +56,7 @@ public class JsonPayloadBuilder {
                 wrapper.put("device", deviceInfo.getDevice());
                 wrapper.put("sdk_version", deviceInfo.getSdkVersion());
             } catch (JSONException ex) {
-                Log.w(LOGTAG, "Problem building Payload Tracking Wrapper JSON");
+                Log.w(LOGTAG, "Problem building Payload Tracking Wrapper JSON", ex);
             }
         }
 
@@ -80,7 +80,7 @@ public class JsonPayloadBuilder {
 
         }
         catch(JSONException ex) {
-            Log.w(LOGTAG, "Problem building Payload Event JSON");
+            Log.w(LOGTAG, "Problem building Payload Event JSON", ex);
         }
 
         return new JSONObject();
