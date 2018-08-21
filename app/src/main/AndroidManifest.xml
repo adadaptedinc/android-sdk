@@ -67,24 +67,11 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
-                <!-- note that the leading "/" is required for pathPrefix -->
-                <data
-                    android:host="dl.adadapted.com"
-                    android:pathPrefix="/demo"
-                    android:scheme="http" />
-
-                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
-                <!-- note that the leading "/" is required for pathPrefix -->
-                <data
-                    android:host="dl.adadapted.com"
-                    android:pathPrefix="/demo"
-                    android:scheme="https" />
-
                 <!-- Accepts URIs that begin with "example://gizmos” -->
                 <data
-                    android:host="demo"
-                    android:scheme="addit" />
+                    android:host="adadapted.com"
+                    android:pathPrefix="/"
+                    android:scheme="droidrecipe" />
             </intent-filter>
         </activity>
 
