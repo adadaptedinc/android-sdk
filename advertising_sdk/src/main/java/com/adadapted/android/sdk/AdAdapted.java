@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.adadapted.android.sdk.config.Config;
-import com.adadapted.android.sdk.core.addit.Content;
+import com.adadapted.android.sdk.core.addit.AdditContent;
 import com.adadapted.android.sdk.core.addit.PayloadClient;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.session.Session;
@@ -123,9 +123,9 @@ public class AdAdapted {
 
         PayloadClient.pickupPayloads(new PayloadClient.Callback() {
             @Override
-            public void onPayloadAvailable(final List<Content> content) {
+            public void onPayloadAvailable(final List<AdditContent> content) {
                 if(content.size() > 0) {
-                    AdditContentPublisher.getInstance().publishContent(content.get(0));
+                    AdditContentPublisher.getInstance().publishAdditContent(content.get(0));
                 }
             }
         });

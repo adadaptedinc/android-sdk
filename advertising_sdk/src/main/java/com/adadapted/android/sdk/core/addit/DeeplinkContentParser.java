@@ -19,7 +19,7 @@ public class DeeplinkContentParser {
     @SuppressWarnings("unused")
     private static final String LOGTAG = DeeplinkContentParser.class.getName();
 
-    public Content parse(final Uri uri) throws Exception {
+    public AdditContent parse(final Uri uri) throws Exception {
         if(uri == null) {
             AppEventClient.trackError(
                 "ADDIT_NO_DEEPLINK_RECEIVED",
@@ -56,14 +56,14 @@ public class DeeplinkContentParser {
                     payload.add(parseItem(item));
                 }
 
-                return Content.createDeeplinkContent(payloadId, message, image, ContentTypes.ADD_TO_LIST_ITEMS, payload);
+                return AdditContent.createDeeplinkContent(payloadId, message, image, ContentTypes.ADD_TO_LIST_ITEMS, payload);
             }
             else if (uri.getPath().endsWith("addit_add_list_item")) {
                 final JSONObject detailListItem = jsonObject.getJSONObject(JsonFields.DetailedListItem);
 
                 payload.add(parseItem(detailListItem));
 
-                return Content.createDeeplinkContent(payloadId, message, image, ContentTypes.ADD_TO_LIST_ITEM, payload);
+                return AdditContent.createDeeplinkContent(payloadId, message, image, ContentTypes.ADD_TO_LIST_ITEM, payload);
             }
 
             final Map<String, String> errorParams = new HashMap<>();

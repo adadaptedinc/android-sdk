@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.adadapted.android.sdk.core.addit.Content;
+import com.adadapted.android.sdk.core.addit.AdditContent;
 import com.adadapted.android.sdk.core.addit.DeeplinkContentParser;
 import com.adadapted.android.sdk.core.addit.PayloadClient;
 import com.adadapted.android.sdk.core.event.AppEventClient;
@@ -34,11 +34,11 @@ public class AdditInterceptActivity extends AppCompatActivity {
             final Uri uri = additIntent.getData();
 
             final DeeplinkContentParser parser = new DeeplinkContentParser();
-            final Content content = parser.parse(uri);
+            final AdditContent content = parser.parse(uri);
 
             Log.i(LOGTAG, "Addit content dispatched to App.");
 
-            AdditContentPublisher.getInstance().publishContent(content);
+            AdditContentPublisher.getInstance().publishAdditContent(content);
         }
         catch(Exception ex) {
             Log.w(LOGTAG, "Problem dealing with Addit content. Recovering. " + ex.getMessage());

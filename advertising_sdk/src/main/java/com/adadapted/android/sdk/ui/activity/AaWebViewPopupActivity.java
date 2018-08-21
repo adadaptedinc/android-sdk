@@ -100,6 +100,7 @@ public class AaWebViewPopupActivity extends Activity {
         }
 
         popupWebView.getSettings().setJavaScriptEnabled(true);
+        popupWebView.addJavascriptInterface(new PopupJavascriptBridge(ad), "AdAdapted");
         popupWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(final WebView view,

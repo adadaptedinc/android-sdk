@@ -1,7 +1,7 @@
 package com.adadapted.android.sdk.ui.messaging;
 
-import com.adadapted.android.sdk.core.addit.Content;
+import com.adadapted.android.sdk.core.atl.AddToListContent;
 
 public interface AaSdkAdditContentListener {
-    void onContentAvailable(Content payload);
+    void onContentAvailable(AddToListContent content);
 }

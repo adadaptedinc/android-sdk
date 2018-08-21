@@ -7,7 +7,7 @@ import android.view.View;
 
 import com.adadapted.android.sdk.core.atl.AddToListItem;
 import com.adadapted.android.sdk.ui.messaging.AdContentListener;
-import com.adadapted.android.sdk.ui.model.AdContent;
+import com.adadapted.android.sdk.core.ad.AdContent;
 import com.adadapted.android.sdk.ui.view.AaZoneView;
 
 import java.util.List;

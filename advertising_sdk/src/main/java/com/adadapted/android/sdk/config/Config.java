@@ -1,10 +1,10 @@
 package com.adadapted.android.sdk.config;
 
 public class Config {
-    public static final String SDK_VERSION = "1.1.12";
-    public static final long DEFAULT_AD_POLLING = 300000L;
-    public static final long DEFAULT_EVENT_POLLING = 5000L;
-    public static final long DEFAULT_AD_REFRESH = 60L;
+    public static final String SDK_VERSION = "1.2.1";
+    public static final long DEFAULT_AD_POLLING = 300000L; // If the new Ad polling isn't set it will default to every 5 minutes
+    public static final long DEFAULT_EVENT_POLLING = 2500L; // Events will be pushed to the server every 2.5 seconds
+    public static final long DEFAULT_AD_REFRESH = 60L; // If an Ad does not have a refresh time it will default to 60 seconds
 
     public static class Prod {
         public static final String URL_SESSION_INIT = "https://ads.adadapted.com/v/0.9.4/android/session/init";

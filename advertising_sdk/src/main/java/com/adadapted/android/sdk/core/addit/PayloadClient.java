@@ -17,7 +17,7 @@ public class PayloadClient {
     private static final String LOGTAG = PayloadClient.class.getName();
 
     public interface Callback {
-        void onPayloadAvailable(List<Content> content);
+        void onPayloadAvailable(List<AdditContent> content);
     }
 
     private static PayloadClient instance;
@@ -78,29 +78,34 @@ public class PayloadClient {
         }
     }
 
-    static synchronized void markContentAcknowledged(final Content content) {
+    static synchronized void markContentAcknowledged(final AdditContent content) {
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
             public void run() {
-                final List<AddToListItem> payload = content.getPayload();
-                for (AddToListItem item : payload) {
-                    final Map<String, String> eventParams = new HashMap<>();
-                    eventParams.put("payload_id", content.getPayloadId());
-                    eventParams.put("tracking_id", item.getTrackingId());
-                    eventParams.put("item_name", item.getTitle());
-                    eventParams.put("source", content.getSource());
-
-                    AppEventClient.trackSdkEvent("addit_added_to_list", eventParams);
-                }
-
-                if(content.isPayloadSource()) {
-                    getInstance().trackPayload(content, "delivered");
-                }
+            if(content.isPayloadSource()) {
+                getInstance().trackPayload(content, "delivered");
+            }
             }
         });
     }
 
-    static synchronized void markContentDuplicate(final Content content) {
+    public synchronized static void markContentItemAcknowledged(final AdditContent content,
+                                                                final AddToListItem item) {
+        ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
+            @Override
+            public void run() {
+            final Map<String, String> eventParams = new HashMap<>();
+            eventParams.put("payload_id", content.getPayloadId());
+            eventParams.put("tracking_id", item.getTrackingId());
+            eventParams.put("item_name", item.getTitle());
+            eventParams.put("source", content.getSource());
+
+            AppEventClient.trackSdkEvent("addit_added_to_list", eventParams);
+            }
+        });
+    }
+
+    static synchronized void markContentDuplicate(final AdditContent content) {
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
             public void run() {
@@ -116,7 +121,7 @@ public class PayloadClient {
         });
     }
 
-    static synchronized void markContentFailed(final Content content,
+    static synchronized void markContentFailed(final AdditContent content,
                                                final String message) {
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
@@ -129,6 +134,21 @@ public class PayloadClient {
                 if(content.isPayloadSource()) {
                     getInstance().trackPayload(content, "rejected");
                 }
+            }
+        });
+    }
+
+    public synchronized static void markContentItemFailed(final AdditContent content,
+                                                          final AddToListItem item,
+                                                          final String message) {
+        ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
+            @Override
+            public void run() {
+            final Map<String, String> eventParams = new HashMap<>();
+            eventParams.put("payload_id", content.getPayloadId());
+            eventParams.put("tracking_id", item.getTrackingId());
+
+            AppEventClient.trackError("ADDIT_CONTENT_ITEM_FAILED", message, eventParams);
             }
         });
     }
@@ -147,7 +167,7 @@ public class PayloadClient {
 
                 adapter.pickup(deviceInfo, new PayloadAdapter.Callback() {
                     @Override
-                    public void onSuccess(List<Content> content) {
+                    public void onSuccess(List<AdditContent> content) {
                         callback.onPayloadAvailable(content);
                     }
                 });
@@ -155,7 +175,7 @@ public class PayloadClient {
         });
     }
 
-    private void trackPayload(final Content content,
+    private void trackPayload(final AdditContent content,
                               final String result) {
         final PayloadEvent event = new PayloadEvent(content.getPayloadId(), result);
         adapter.publishEvent(event);

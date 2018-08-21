@@ -1,7 +1,6 @@
 package com.adadapted.sdktestapp.ui.todo.fragment;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,9 +16,10 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.adadapted.android.sdk.core.atl.AddToListContent;
 import com.adadapted.android.sdk.core.atl.AddToListItem;
 import com.adadapted.android.sdk.ui.messaging.AdContentListener;
-import com.adadapted.android.sdk.ui.model.AdContent;
+import com.adadapted.android.sdk.core.ad.AdContent;
 import com.adadapted.android.sdk.ui.view.AaZoneView;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.todo.TodoList;
@@ -192,7 +192,7 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
     }
 
     @Override
-    public void onContentAvailable(final String zoneId, final AdContent content) {
+    public void onContentAvailable(final String zoneId, final AddToListContent content) {
         //final Intent intent = new Intent(getActivity(), TodoListDetailFragment.class);
         //intent.putExtra("aa_atl_items", content);
 
@@ -202,6 +202,7 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
         for(final AddToListItem item : items) {
             Log.i(TAG, "Processing: " + item);
             TodoListManager.getInstance(getActivity()).addItemToList(listId, item.getTitle());
+            content.itemAcknowledge(item);
 
             adapter.notifyDataSetChanged();
         }
