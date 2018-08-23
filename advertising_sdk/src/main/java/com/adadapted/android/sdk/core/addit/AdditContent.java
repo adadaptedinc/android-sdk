@@ -12,6 +12,8 @@ import java.util.Locale;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.xml.transform.Source;
+
 public class AdditContent implements AddToListContent, Parcelable {
     public static final Creator<AdditContent> CREATOR = new Creator<AdditContent>() {
         @Override
@@ -25,11 +27,18 @@ public class AdditContent implements AddToListContent, Parcelable {
         }
     };
 
+    final class AdditSources {
+        public static final String IN_APP = "in_app";
+        private final static String DEEPLINK = "deeplink";
+        private final static String PAYLOAD = "payload";
+    }
+
     private final String payloadId;
     private final String message;
     private final String image;
     private final int type;
     private final String source;
+    private final String additSource;
     private final List<AddToListItem> items;
 
     private boolean handled;
@@ -40,6 +49,7 @@ public class AdditContent implements AddToListContent, Parcelable {
                         final String image,
                         final int type,
                         final String source,
+                        final String additSource,
                         final List<AddToListItem> items) {
         if (items.size() == 0) {
             AppEventClient.trackError(
@@ -53,6 +63,7 @@ public class AdditContent implements AddToListContent, Parcelable {
         this.image = image;
         this.type = type;
         this.source = source;
+        this.additSource = additSource;
         this.items = items;
 
         this.handled = false;
@@ -64,6 +75,7 @@ public class AdditContent implements AddToListContent, Parcelable {
         image = in.readString();
         type = in.readInt();
         source = in.readString();
+        additSource = in.readString();
         items = in.createTypedArrayList(AddToListItem.CREATOR);
         handled = in.readByte() != 0;
     }
@@ -73,7 +85,7 @@ public class AdditContent implements AddToListContent, Parcelable {
                                               final String image,
                                               final int type,
                                               final List<AddToListItem> items) {
-        return new AdditContent(payloadId, message, image, type, Sources.DEEPLINK, items);
+        return new AdditContent(payloadId, message, image, type, Sources.OUT_OF_APP, AdditSources.DEEPLINK, items);
     }
 
     public static AdditContent createInAppContent(final String payloadId,
@@ -81,7 +93,7 @@ public class AdditContent implements AddToListContent, Parcelable {
                                                   final String image,
                                                   final int type,
                                                   final List<AddToListItem> items) {
-        return new AdditContent(payloadId, message, image, type, Sources.IN_APP, items);
+        return new AdditContent(payloadId, message, image, type, Sources.IN_APP, AdditSources.IN_APP, items);
     }
 
     static AdditContent createPayloadContent(final String payloadId,
@@ -89,7 +101,7 @@ public class AdditContent implements AddToListContent, Parcelable {
                                              final String image,
                                              final int type,
                                              final List<AddToListItem> items) {
-        return new AdditContent(payloadId, message, image, type, Sources.PAYLOAD, items);
+        return new AdditContent(payloadId, message, image, type, Sources.OUT_OF_APP, AdditSources.PAYLOAD, items);
     }
 
     @Override
@@ -104,6 +116,7 @@ public class AdditContent implements AddToListContent, Parcelable {
         dest.writeString(image);
         dest.writeInt(type);
         dest.writeString(source);
+        dest.writeString(additSource);
         dest.writeTypedList(items);
         dest.writeByte((byte) (handled ? 1 : 0));
     }
@@ -201,15 +214,15 @@ public class AdditContent implements AddToListContent, Parcelable {
     }
 
     public boolean isDeeplinkSource() {
-        return source.equals(Sources.DEEPLINK);
+        return source.equals(AdditSources.DEEPLINK);
     }
 
     public boolean isInAppSource() {
-        return source.equals(Sources.IN_APP);
+        return source.equals(AdditSources.IN_APP);
     }
 
     public boolean isPayloadSource() {
-        return source.equals(Sources.PAYLOAD);
+        return source.equals(AdditSources.PAYLOAD);
     }
 
     public List<AddToListItem> getItems() {

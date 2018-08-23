@@ -86,7 +86,7 @@ public class TestAppApplication extends Application {
 
                         content.acknowledge();
 
-                        if (content.getSource().equals(AddToListContent.Sources.DEEPLINK)) {
+                        if (content.getSource().equals(AddToListContent.Sources.OUT_OF_APP)) {
                             final Intent intent = new Intent(getApplicationContext(), TodoListsActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
