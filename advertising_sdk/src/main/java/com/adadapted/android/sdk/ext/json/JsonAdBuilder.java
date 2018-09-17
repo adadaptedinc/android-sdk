@@ -1,6 +1,8 @@
 package com.adadapted.android.sdk.ext.json;
 
+import com.adadapted.android.sdk.core.ad.AdActionType;
 import com.adadapted.android.sdk.core.ad.Ad;
+import com.adadapted.android.sdk.core.ad.AdDisplayType;
 import com.adadapted.android.sdk.core.atl.AddToListItem;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 
@@ -26,7 +28,7 @@ public class JsonAdBuilder {
         for(int i = 0; i < adCount; i++) {
             try {
                 final JSONObject jsonAd = jsonAds.getJSONObject(i);
-                if(jsonAd.getString(JsonFields.AD_TYPE).equals("html")) {
+                if(AdDisplayType.isValidType(jsonAd.getString(JsonFields.AD_TYPE))) {
                     final Ad ad  = buildAd(jsonAd);
                     ads.add(ad);
                 }
@@ -44,7 +46,7 @@ public class JsonAdBuilder {
 
                 AppEventClient.trackError(
                         "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                        "Problem parsing Image JSON.",
+                        "Problem parsing Ad JSON.",
                         errorParams);
             }
         }
@@ -75,7 +77,11 @@ public class JsonAdBuilder {
 
         builder.setActionType(jsonAd.getString(JsonFields.ACTION_TYPE));
         builder.setActionPath(jsonAd.getString(JsonFields.ACTION_PATH));
-        builder.setPayload(parseAdContent(jsonAd));
+
+        if (AdActionType.handlesContent((builder.getActionType()))) {
+            builder.setPayload(parseAdContent(jsonAd));
+        }
+
         builder.setTrackingHtml(jsonAd.getString(JsonFields.TRACKING_HTML));
 
         return builder.build();
