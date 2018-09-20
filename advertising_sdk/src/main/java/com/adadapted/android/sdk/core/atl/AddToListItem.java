@@ -20,7 +20,8 @@ public final class AddToListItem implements Parcelable {
     private final String title;
     private final String brand;
     private final String category;
-    private final String barCode;
+    private final String productUpc;
+    private final String retailerSku;
     private final String discount;
     private final String productImage;
 
@@ -28,14 +29,33 @@ public final class AddToListItem implements Parcelable {
                          final String title,
                          final String brand,
                          final String category,
-                         final String barCode,
+                         final String productUpc,
                          final String discount,
                          final String productImage) {
         this.trackingId = trackingId;
         this.title = title;
         this.brand = brand;
         this.category = category;
-        this.barCode = barCode;
+        this.productUpc = productUpc;
+        this.retailerSku = "";
+        this.discount = discount;
+        this.productImage = productImage;
+    }
+
+    public AddToListItem(final String trackingId,
+                         final String title,
+                         final String brand,
+                         final String category,
+                         final String productUpc,
+                         final String retailerSku,
+                         final String discount,
+                         final String productImage) {
+        this.trackingId = trackingId;
+        this.title = title;
+        this.brand = brand;
+        this.category = category;
+        this.productUpc = productUpc;
+        this.retailerSku = retailerSku;
         this.discount = discount;
         this.productImage = productImage;
     }
@@ -45,7 +65,8 @@ public final class AddToListItem implements Parcelable {
         title = in.readString();
         brand = in.readString();
         category = in.readString();
-        barCode = in.readString();
+        productUpc = in.readString();
+        retailerSku = in.readString();
         discount = in.readString();
         productImage = in.readString();
     }
@@ -61,7 +82,8 @@ public final class AddToListItem implements Parcelable {
         dest.writeString(title);
         dest.writeString(brand);
         dest.writeString(category);
-        dest.writeString(barCode);
+        dest.writeString(productUpc);
+        dest.writeString(retailerSku);
         dest.writeString(discount);
         dest.writeString(productImage);
     }
@@ -82,8 +104,17 @@ public final class AddToListItem implements Parcelable {
         return category;
     }
 
+    @Deprecated
     public String getBarCode() {
-        return barCode;
+        return productUpc;
+    }
+
+    public String getProductUpc() {
+        return productUpc;
+    }
+
+    public String getRetailerSku() {
+        return retailerSku;
     }
 
     public String getDiscount() {
@@ -101,7 +132,8 @@ public final class AddToListItem implements Parcelable {
                 ", title='" + title + '\'' +
                 ", brand='" + brand + '\'' +
                 ", category='" + category + '\'' +
-                ", barCode='" + barCode + '\'' +
+                ", productUpc='" + productUpc + '\'' +
+                ", retailerSku='" + retailerSku + '\'' +
                 ", discount='" + discount + '\'' +
                 ", productImage='" + productImage + '\'' +
                 '}';
@@ -112,7 +144,8 @@ public final class AddToListItem implements Parcelable {
         private String title;
         private String brand;
         private String category;
-        private String barCode;
+        private String productUpc;
+        private String retailerSku;
         private String discount;
         private String productImage;
 
@@ -121,7 +154,8 @@ public final class AddToListItem implements Parcelable {
             title = "";
             brand = "";
             category = "";
-            barCode = "";
+            productUpc = "";
+            retailerSku = "";
             discount = "";
             productImage = "";
         }
@@ -167,11 +201,21 @@ public final class AddToListItem implements Parcelable {
         }
 
         public String getBarCode() {
-            return barCode;
+            return productUpc;
         }
 
-        public Builder setBarCode(String barCode) {
-            this.barCode = barCode;
+        public Builder setProductUpc(String productUpc) {
+            this.productUpc = productUpc;
+
+            return this;
+        }
+
+        public String getRetailerSku() {
+            return retailerSku;
+        }
+
+        public Builder setRetailerSku(String retailerSku) {
+            this.retailerSku = retailerSku;
 
             return this;
         }
@@ -197,7 +241,15 @@ public final class AddToListItem implements Parcelable {
         }
 
         public AddToListItem build() {
-            return new AddToListItem(trackingId, title, brand, category, barCode, discount, productImage);
+            return new AddToListItem(
+                    trackingId,
+                    title,
+                    brand,
+                    category,
+                    productUpc,
+                    retailerSku,
+                    discount,
+                    productImage);
         }
     }
 }
