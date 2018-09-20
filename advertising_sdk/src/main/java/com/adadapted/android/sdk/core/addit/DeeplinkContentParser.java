@@ -96,8 +96,8 @@ public class DeeplinkContentParser {
                 .setTitle(parseField(itemJson, JsonFields.ProductTitle))
                 .setBrand(parseField(itemJson, JsonFields.ProductBrand))
                 .setCategory(parseField(itemJson, JsonFields.ProductCategory))
-                .setBarCode(parseField(itemJson, JsonFields.ProductBarCode))
-                .setSku(parseField(itemJson, JsonFields.ProductSku))
+                .setProductUpc(parseField(itemJson, JsonFields.ProductBarCode))
+                .setRetailerSku(parseField(itemJson, JsonFields.ProductSku))
                 .setDiscount(parseField(itemJson, JsonFields.ProductDiscount))
                 .setProductImage(parseField(itemJson, JsonFields.ProductImage));
 

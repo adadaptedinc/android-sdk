@@ -174,11 +174,11 @@ public class JsonAdBuilder {
             }
 
             if(jsonItem.has("product_barcode")) {
-                builder.setBarCode(jsonItem.getString("product_barcode"));
+                builder.setProductUpc(jsonItem.getString("product_barcode"));
             }
 
             if(jsonItem.has("product_sku")) {
-                builder.setSku(jsonItem.getString("product_sku"));
+                builder.setRetailerSku(jsonItem.getString("product_sku"));
             }
 
             if(jsonItem.has("product_discount")) {
