@@ -15,6 +15,7 @@ class JsonFields {
     static final String ProductBrand = "product_brand";
     static final String ProductCategory = "product_category";
     static final String ProductBarCode = "product_barcode";
+    static final String ProductSku = "product_sku";
     static final String ProductDiscount = "product_discount";
     static final String ProductImage = "product_image";
 }

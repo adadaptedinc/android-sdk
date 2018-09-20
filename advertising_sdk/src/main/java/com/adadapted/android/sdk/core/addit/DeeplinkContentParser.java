@@ -91,15 +91,17 @@ public class DeeplinkContentParser {
     }
 
     private AddToListItem parseItem(final JSONObject itemJson) {
-        final String trackingId = parseField(itemJson, JsonFields.TrackingId);
-        final String title = parseField(itemJson, JsonFields.ProductTitle);
-        final String brand = parseField(itemJson, JsonFields.ProductBrand);
-        final String category = parseField(itemJson, JsonFields.ProductCategory);
-        final String barCode = parseField(itemJson, JsonFields.ProductBarCode);
-        final String discount = parseField(itemJson, JsonFields.ProductDiscount);
-        final String productImage = parseField(itemJson, JsonFields.ProductImage);
+        final AddToListItem.Builder builder = new AddToListItem.Builder();
+        builder.setTrackingId(parseField(itemJson, JsonFields.TrackingId))
+                .setTitle(parseField(itemJson, JsonFields.ProductTitle))
+                .setBrand(parseField(itemJson, JsonFields.ProductBrand))
+                .setCategory(parseField(itemJson, JsonFields.ProductCategory))
+                .setBarCode(parseField(itemJson, JsonFields.ProductBarCode))
+                .setSku(parseField(itemJson, JsonFields.ProductSku))
+                .setDiscount(parseField(itemJson, JsonFields.ProductDiscount))
+                .setProductImage(parseField(itemJson, JsonFields.ProductImage));
 
-        return new AddToListItem(trackingId, title, brand, category, barCode, discount, productImage);
+        return builder.build();
     }
 
     private String parseField(final JSONObject itemJson, final String fieldName) {

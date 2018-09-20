@@ -21,6 +21,7 @@ public final class AddToListItem implements Parcelable {
     private final String brand;
     private final String category;
     private final String barCode;
+    private final String sku;
     private final String discount;
     private final String productImage;
 
@@ -36,6 +37,25 @@ public final class AddToListItem implements Parcelable {
         this.brand = brand;
         this.category = category;
         this.barCode = barCode;
+        this.sku = "";
+        this.discount = discount;
+        this.productImage = productImage;
+    }
+
+    public AddToListItem(final String trackingId,
+                         final String title,
+                         final String brand,
+                         final String category,
+                         final String barCode,
+                         final String sku,
+                         final String discount,
+                         final String productImage) {
+        this.trackingId = trackingId;
+        this.title = title;
+        this.brand = brand;
+        this.category = category;
+        this.barCode = barCode;
+        this.sku = sku;
         this.discount = discount;
         this.productImage = productImage;
     }
@@ -46,6 +66,7 @@ public final class AddToListItem implements Parcelable {
         brand = in.readString();
         category = in.readString();
         barCode = in.readString();
+        sku = in.readString();
         discount = in.readString();
         productImage = in.readString();
     }
@@ -62,6 +83,7 @@ public final class AddToListItem implements Parcelable {
         dest.writeString(brand);
         dest.writeString(category);
         dest.writeString(barCode);
+        dest.writeString(sku);
         dest.writeString(discount);
         dest.writeString(productImage);
     }
@@ -86,6 +108,10 @@ public final class AddToListItem implements Parcelable {
         return barCode;
     }
 
+    public String getSku() {
+        return sku;
+    }
+
     public String getDiscount() {
         return discount;
     }
@@ -102,6 +128,7 @@ public final class AddToListItem implements Parcelable {
                 ", brand='" + brand + '\'' +
                 ", category='" + category + '\'' +
                 ", barCode='" + barCode + '\'' +
+                ", sku='" + sku + '\'' +
                 ", discount='" + discount + '\'' +
                 ", productImage='" + productImage + '\'' +
                 '}';
@@ -113,6 +140,7 @@ public final class AddToListItem implements Parcelable {
         private String brand;
         private String category;
         private String barCode;
+        private String sku;
         private String discount;
         private String productImage;
 
@@ -122,6 +150,7 @@ public final class AddToListItem implements Parcelable {
             brand = "";
             category = "";
             barCode = "";
+            sku = "";
             discount = "";
             productImage = "";
         }
@@ -176,6 +205,16 @@ public final class AddToListItem implements Parcelable {
             return this;
         }
 
+        public String getSku() {
+            return sku;
+        }
+
+        public Builder setSku(String sku) {
+            this.sku = sku;
+
+            return this;
+        }
+
         public String getDiscount() {
             return discount;
         }
@@ -197,7 +236,15 @@ public final class AddToListItem implements Parcelable {
         }
 
         public AddToListItem build() {
-            return new AddToListItem(trackingId, title, brand, category, barCode, discount, productImage);
+            return new AddToListItem(
+                    trackingId,
+                    title,
+                    brand,
+                    category,
+                    barCode,
+                    sku,
+                    discount,
+                    productImage);
         }
     }
 }

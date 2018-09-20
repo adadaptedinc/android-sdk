@@ -177,6 +177,10 @@ public class JsonAdBuilder {
                 builder.setBarCode(jsonItem.getString("product_barcode"));
             }
 
+            if(jsonItem.has("product_sku")) {
+                builder.setSku(jsonItem.getString("product_sku"));
+            }
+
             if(jsonItem.has("product_discount")) {
                 builder.setDiscount(jsonItem.getString("product_discount"));
             }
