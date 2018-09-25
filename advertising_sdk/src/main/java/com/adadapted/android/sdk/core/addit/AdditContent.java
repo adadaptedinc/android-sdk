@@ -12,8 +12,6 @@ import java.util.Locale;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.xml.transform.Source;
-
 public class AdditContent implements AddToListContent, Parcelable {
     public static final Creator<AdditContent> CREATOR = new Creator<AdditContent>() {
         @Override
@@ -214,15 +212,15 @@ public class AdditContent implements AddToListContent, Parcelable {
     }
 
     public boolean isDeeplinkSource() {
-        return source.equals(AdditSources.DEEPLINK);
+        return additSource.equals(AdditSources.DEEPLINK);
+    }
+
+    public boolean isPayloadSource() {
+        return additSource.equals(AdditSources.PAYLOAD);
     }
 
     public boolean isInAppSource() {
         return source.equals(AdditSources.IN_APP);
-    }
-
-    public boolean isPayloadSource() {
-        return source.equals(AdditSources.PAYLOAD);
     }
 
     public List<AddToListItem> getItems() {

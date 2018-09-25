@@ -25,22 +25,22 @@ public final class AddToListItem implements Parcelable {
     private final String discount;
     private final String productImage;
 
-    public AddToListItem(final String trackingId,
-                         final String title,
-                         final String brand,
-                         final String category,
-                         final String productUpc,
-                         final String discount,
-                         final String productImage) {
-        this.trackingId = trackingId;
-        this.title = title;
-        this.brand = brand;
-        this.category = category;
-        this.productUpc = productUpc;
-        this.retailerSku = "";
-        this.discount = discount;
-        this.productImage = productImage;
-    }
+    //public AddToListItem(final String trackingId,
+    //                     final String title,
+    //                     final String brand,
+    //                     final String category,
+    //                     final String productUpc,
+    //                     final String discount,
+    //                     final String productImage) {
+    //    this.trackingId = trackingId;
+    //    this.title = title;
+    //    this.brand = brand;
+    //    this.category = category;
+    //    this.productUpc = productUpc;
+    //    this.retailerSku = "";
+    //    this.discount = discount;
+    //    this.productImage = productImage;
+    //}
 
     public AddToListItem(final String trackingId,
                          final String title,

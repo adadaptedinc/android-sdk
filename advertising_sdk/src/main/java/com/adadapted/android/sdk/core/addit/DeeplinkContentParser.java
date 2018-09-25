@@ -48,17 +48,16 @@ public class DeeplinkContentParser {
             final String message = jsonObject.has(JsonFields.PayloadMessage) ? jsonObject.getString(JsonFields.PayloadMessage) : "";
             final String image = jsonObject.has(JsonFields.PayloadImage) ? jsonObject.getString(JsonFields.PayloadImage) : "";
 
-            if(uri.getPath().endsWith("addit_add_list_items")) {
+            if (uri.getPath().endsWith("addit_add_list_items")) {
                 final JSONArray detailListItems = jsonObject.getJSONArray(JsonFields.DetailedListItems);
 
-                for(int i = 0; i < detailListItems.length(); i++) {
+                for (int i = 0; i < detailListItems.length(); i++) {
                     final JSONObject item = (JSONObject) detailListItems.get(i);
                     payload.add(parseItem(item));
                 }
 
                 return AdditContent.createDeeplinkContent(payloadId, message, image, ContentTypes.ADD_TO_LIST_ITEMS, payload);
-            }
-            else if (uri.getPath().endsWith("addit_add_list_item")) {
+            } else if (uri.getPath().endsWith("addit_add_list_item")) {
                 final JSONObject detailListItem = jsonObject.getJSONObject(JsonFields.DetailedListItem);
 
                 payload.add(parseItem(detailListItem));

@@ -3,8 +3,6 @@ package com.adadapted.android.sdk.ui.activity;
 import android.webkit.JavascriptInterface;
 
 import com.adadapted.android.sdk.core.ad.Ad;
-import com.adadapted.android.sdk.core.addit.AdditContent;
-import com.adadapted.android.sdk.core.addit.ContentTypes;
 import com.adadapted.android.sdk.core.atl.AddToListItem;
 import com.adadapted.android.sdk.core.atl.PopupContent;
 import com.adadapted.android.sdk.core.event.AppEventClient;
@@ -41,6 +39,7 @@ class PopupJavascriptBridge {
                        final String brand,
                        final String category,
                        final String barCode,
+                       final String retailerSku,
                        final String discount,
                        final String productImage) {
         final HashMap<String, String> params = new HashMap<>();
@@ -54,6 +53,7 @@ class PopupJavascriptBridge {
                 brand,
                 category,
                 barCode,
+                retailerSku,
                 discount,
                 productImage
         ));
