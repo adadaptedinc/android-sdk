@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.core.addit;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.adadapted.android.sdk.core.atl.AddToListContent;
 import com.adadapted.android.sdk.core.atl.AddToListItem;
@@ -15,6 +16,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.xml.transform.Source;
 
 public class AdditContent implements AddToListContent, Parcelable {
+    private static final String TAG = AdditContent.class.getName();
+
     public static final Creator<AdditContent> CREATOR = new Creator<AdditContent>() {
         @Override
         public AdditContent createFromParcel(Parcel in) {
@@ -125,11 +128,13 @@ public class AdditContent implements AddToListContent, Parcelable {
         lock.lock();
         try {
             if (handled) {
+                Log.w(TAG, "Content handled. Will NOT acknowledge");
                 return;
             }
 
             handled = true;
             PayloadClient.markContentAcknowledged(this);
+            Log.i(TAG, "Content acknowledged");
         }
         finally {
             lock.unlock();
@@ -143,6 +148,7 @@ public class AdditContent implements AddToListContent, Parcelable {
             if (!handled) {
                 handled = true;
                 PayloadClient.markContentAcknowledged(this);
+                Log.i(TAG, "Content acknowledged");
             }
 
             PayloadClient.markContentItemAcknowledged(this, item);
@@ -214,15 +220,15 @@ public class AdditContent implements AddToListContent, Parcelable {
     }
 
     public boolean isDeeplinkSource() {
-        return source.equals(AdditSources.DEEPLINK);
+        return additSource.equals(AdditSources.DEEPLINK);
+    }
+
+    public boolean isPayloadSource() {
+        return additSource.equals(AdditSources.PAYLOAD);
     }
 
     public boolean isInAppSource() {
         return source.equals(AdditSources.IN_APP);
-    }
-
-    public boolean isPayloadSource() {
-        return source.equals(AdditSources.PAYLOAD);
     }
 
     public List<AddToListItem> getItems() {
