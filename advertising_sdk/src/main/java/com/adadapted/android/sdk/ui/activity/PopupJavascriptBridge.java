@@ -3,8 +3,6 @@ package com.adadapted.android.sdk.ui.activity;
 import android.webkit.JavascriptInterface;
 
 import com.adadapted.android.sdk.core.ad.Ad;
-import com.adadapted.android.sdk.core.addit.AdditContent;
-import com.adadapted.android.sdk.core.addit.ContentTypes;
 import com.adadapted.android.sdk.core.atl.AddToListItem;
 import com.adadapted.android.sdk.core.atl.PopupContent;
 import com.adadapted.android.sdk.core.event.AppEventClient;
