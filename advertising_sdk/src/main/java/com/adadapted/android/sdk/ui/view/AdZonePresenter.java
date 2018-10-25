@@ -255,10 +255,12 @@ class AdZonePresenter implements SessionClient.Listener {
 
     void onAdClicked(final Ad ad) {
         final String actionType = ad.getActionType();
+
+        final Map<String, String> params = new HashMap<>();
+        params.put("ad_id", ad.getId());
+
         switch(actionType) {
             case Ad.ActionTypes.CONTENT:
-                final Map<String, String> params = new HashMap<>();
-                params.put("ad_id", ad.getId());
                 AppEventClient.trackSdkEvent("atl_ad_clicked", params);
 
                 handleContentAction(ad);
@@ -277,6 +279,8 @@ class AdZonePresenter implements SessionClient.Listener {
                 break;
 
             case Ad.ActionTypes.CONTENT_POPUP:
+                AppEventClient.trackSdkEvent("popup_ad_clicked", params);
+
                 handlePopupAction(ad);
                 break;
 

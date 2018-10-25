@@ -115,7 +115,7 @@ public class AdContent implements AddToListContent, Parcelable {
         params.put("ad_id", ad.getId());
         params.put("item_name", itemName);
 
-        AppEventClient.trackSdkEvent("atl_added_to_list", params);
+        AppEventClient.trackSdkEvent("atl_item_added_to_list", params);
     }
 
     public synchronized void failed(final String message) {
