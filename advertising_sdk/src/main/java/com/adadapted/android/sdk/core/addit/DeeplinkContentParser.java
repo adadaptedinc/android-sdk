@@ -29,13 +29,6 @@ public class DeeplinkContentParser {
             throw new Exception("Did not receive a deeplink url.");
         }
 
-        final Map<String, String> params = new HashMap<>();
-        params.put("url", uri.toString());
-        AppEventClient.trackSdkEvent(
-            "deeplink_url_received",
-            params
-        );
-
         final String data = uri.getQueryParameter("data");
         final byte[] decodedData = Base64.decode(data, Base64.DEFAULT);
         final String jsonString = new String(decodedData);
@@ -48,7 +41,8 @@ public class DeeplinkContentParser {
             final String message = jsonObject.has(JsonFields.PayloadMessage) ? jsonObject.getString(JsonFields.PayloadMessage) : "";
             final String image = jsonObject.has(JsonFields.PayloadImage) ? jsonObject.getString(JsonFields.PayloadImage) : "";
 
-            if (uri.getPath().endsWith("addit_add_list_items")) {
+            final String urlPath = uri.getPath();
+            if (urlPath != null && urlPath.endsWith("addit_add_list_items")) {
                 final JSONArray detailListItems = jsonObject.getJSONArray(JsonFields.DetailedListItems);
 
                 for (int i = 0; i < detailListItems.length(); i++) {
@@ -57,7 +51,7 @@ public class DeeplinkContentParser {
                 }
 
                 return AdditContent.createDeeplinkContent(payloadId, message, image, ContentTypes.ADD_TO_LIST_ITEMS, payload);
-            } else if (uri.getPath().endsWith("addit_add_list_item")) {
+            } else if (urlPath != null && urlPath.endsWith("addit_add_list_item")) {
                 final JSONObject detailListItem = jsonObject.getJSONObject(JsonFields.DetailedListItem);
 
                 payload.add(parseItem(detailListItem));
