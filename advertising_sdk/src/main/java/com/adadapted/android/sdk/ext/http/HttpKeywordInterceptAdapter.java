@@ -47,7 +47,11 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
     public void init(final Session session, final Callback callback) {
         final JSONObject json = requestBuilder.buildInitRequest(session);
 
-        final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, initUrl, json, new Response.Listener<JSONObject>(){
+        final JsonObjectRequest jsonRequest = new JsonObjectRequest(
+                Request.Method.POST,
+                initUrl,
+                json,
+                new Response.Listener<JSONObject>(){
             @Override
             public void onResponse(JSONObject response) {
                 final KeywordIntercept ki = kiBuilder.build(response);

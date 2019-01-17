@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-class PopupJavascriptBridge {
+public class PopupJavascriptBridge {
     private static final String TAG = PopupJavascriptBridge.class.getName();
 
     private final Ad ad;
@@ -23,7 +23,7 @@ class PopupJavascriptBridge {
     }
 
     @JavascriptInterface
-    void deliverAdContent() {
+    public void deliverAdContent() {
         final HashMap<String, String> params = new HashMap<>();
         params.put("ad_id", ad.getId());
         AppEventClient.trackSdkEvent("popup_content_clicked", params);
@@ -33,7 +33,7 @@ class PopupJavascriptBridge {
     }
 
     @JavascriptInterface
-    void addItemToList(final String payloadId,
+    public void addItemToList(final String payloadId,
                        final String trackingId,
                        final String title,
                        final String brand,

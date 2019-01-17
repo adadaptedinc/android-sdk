@@ -41,7 +41,7 @@ public class JsonKeywordInterceptBuilder {
             );
         }
 
-        return null;
+        return KeywordIntercept.empty();
     }
 
     private Map<String, AutoFill> parseAutofill(final JSONObject json) throws JSONException {

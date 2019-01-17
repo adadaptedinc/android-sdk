@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.core.keywordintercept;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class KeywordIntercept {
@@ -7,6 +8,15 @@ public class KeywordIntercept {
     private final long refreshTime;
     private final int minMatchLength;
     private final Map<String, AutoFill> autoFill;
+
+    public static KeywordIntercept empty() {
+        return new KeywordIntercept(
+            "empty",
+            300,
+            3,
+            new HashMap<String, AutoFill>()
+        );
+    }
 
     public KeywordIntercept(final String searchId,
                             final long refreshTime,
