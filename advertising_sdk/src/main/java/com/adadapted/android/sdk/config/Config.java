@@ -21,11 +21,11 @@ public class Config {
     }
 
     public static class Sand {
-        public static final String URL_SESSION_INIT = "http://sand-adservice-web-alb-178922581.us-east-1.elb.amazonaws.com/v/0.9.4/android/session/init";
-        public static final String URL_EVENT_BATCH = "http://sand-adservice-web-alb-178922581.us-east-1.elb.amazonaws.com/v/0.9.4/android/event/batch";
-        public static final String URL_AD_GET = "http://sand-adservice-web-alb-178922581.us-east-1.elb.amazonaws.com/v/0.9.4/android/ad/get";
-        public static final String URL_KI_INIT = "http://sand-adservice-web-alb-178922581.us-east-1.elb.amazonaws.com/v/0.9.4/android/ki/init";
-        public static final String URL_KI_TRACK = "http://sand-adservice-web-alb-178922581.us-east-1.elb.amazonaws.com/v/0.9.4/android/ki/track";
+        public static final String URL_SESSION_INIT = "https://sandbox.adadapted.com/v/0.9.4/android/session/init";
+        public static final String URL_EVENT_BATCH = "https://sandbox.adadapted.com/v/0.9.4/android/event/batch";
+        public static final String URL_AD_GET = "https://sandbox.adadapted.com/v/0.9.4/android/ad/get";
+        public static final String URL_KI_INIT = "https://sandbox.adadapted.com/v/0.9.4/android/ki/init";
+        public static final String URL_KI_TRACK = "https://sandbox.adadapted.com/v/0.9.4/android/ki/track";
 
         public static final String URL_APP_EVENT_TRACK = "https://sandec.adadapted.com/v/1/android/events";
         public static final String URL_APP_ERROR_TRACK = "https://sandec.adadapted.com/v/1/android/errors";
