@@ -17,7 +17,7 @@ public class JsonKeywordInterceptBuilder {
     private static final String TAG = JsonKeywordInterceptBuilder.class.getName();
 
     public KeywordIntercept build(final JSONObject json) {
-        if(json == null) { return null; }
+        if(json == null) { return KeywordIntercept.empty(); }
 
         try {
             final String searchId = json.has(JsonFields.SEARCHID) ? json.getString(JsonFields.SEARCHID) : "";
@@ -41,7 +41,7 @@ public class JsonKeywordInterceptBuilder {
             );
         }
 
-        return null;
+        return KeywordIntercept.empty();
     }
 
     private Map<String, AutoFill> parseAutofill(final JSONObject json) throws JSONException {
