@@ -116,7 +116,9 @@ public class KeywordInterceptClient {
         adapter.init(session, new KeywordInterceptAdapter.Callback() {
             @Override
             public void onSuccess(final KeywordIntercept keywordIntercept) {
-                listener.onKeywordInterceptInitialized(keywordIntercept);
+                if (keywordIntercept != null) {
+                    listener.onKeywordInterceptInitialized(keywordIntercept);
+                }
             }
 
         });

@@ -54,8 +54,7 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
                 new Response.Listener<JSONObject>(){
             @Override
             public void onResponse(JSONObject response) {
-                final KeywordIntercept ki = kiBuilder.build(response);
-                callback.onSuccess(ki);
+                callback.onSuccess(kiBuilder.build(response));
             }
         }, new Response.ErrorListener() {
             @Override

@@ -23,6 +23,7 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, KeywordI
     private Session mSession;
 
     public KeywordInterceptMatcher() {
+        keywordIntercept = KeywordIntercept.empty();
         SessionClient.getSession(this);
     }
 
@@ -31,21 +32,25 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, KeywordI
 
         interceptLock.lock();
         try {
-            if((isLoaded() && constraint != null && constraint.length() >= keywordIntercept.getMinMatchLength())) {
-                for (final String item : keywordIntercept.getAutoFill().keySet()) {
-                    if (item != null && item.toLowerCase().contains(constraint.toString().toLowerCase())) {
-                        final AutoFill autoFill = keywordIntercept.getAutoFill().get(item);
-                        if(autoFill != null) {
-                            suggestions.add(new Suggestion(keywordIntercept.getSearchId(), autoFill));
+            if(!shouldCheckConstraint(constraint)) {
+                return suggestions;
+            }
 
-                            SuggestionTracker.suggestionMatched(
+            final String term = constraint.toString().toLowerCase();
+
+            for (final String item : keywordIntercept.getAutoFill().keySet()) {
+                if (item != null && item.toLowerCase().contains(term)) {
+                    final AutoFill autoFill = keywordIntercept.getAutoFill().get(item);
+                    if(autoFill != null) {
+                        suggestions.add(new Suggestion(keywordIntercept.getSearchId(), autoFill));
+
+                        SuggestionTracker.suggestionMatched(
                                 mSession,
                                 keywordIntercept.getSearchId(),
                                 item,
                                 autoFill.getReplacement(),
                                 constraint.toString()
-                            );
-                        }
+                        );
                     }
                 }
             }
@@ -55,6 +60,12 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, KeywordI
         }
 
         return suggestions;
+    }
+
+    private boolean shouldCheckConstraint(final CharSequence constraint) {
+        return isLoaded() &&
+                constraint != null &&
+                constraint.length() >= keywordIntercept.getMinMatchLength();
     }
 
     public void suggestionPresented(final String suggestion) {
@@ -78,7 +89,13 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, KeywordI
     }
 
     private boolean isLoaded() {
-        return mLoaded;
+        interceptLock.lock();
+        try {
+            return mLoaded && keywordIntercept != null;
+        }
+        finally {
+            interceptLock.unlock();
+        }
     }
 
     @Override
