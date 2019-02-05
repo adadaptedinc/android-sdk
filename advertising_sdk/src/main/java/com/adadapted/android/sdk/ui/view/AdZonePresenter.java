@@ -50,7 +50,6 @@ class AdZonePresenter implements SessionClient.Listener {
     private Ad currentAd;
     private boolean adStarted;
     private boolean adCompleted;
-    private final Lock adLock = new ReentrantLock();
 
     private boolean timerRunning;
     private final Lock timerLock = new ReentrantLock();
@@ -100,7 +99,7 @@ class AdZonePresenter implements SessionClient.Listener {
             return;
         }
 
-        adLock.lock();
+        zoneLock.lock();
         try {
             if (!attached) {
                 attached = true;
@@ -113,12 +112,12 @@ class AdZonePresenter implements SessionClient.Listener {
             setNextAd();
         }
         finally {
-            adLock.unlock();
+            zoneLock.unlock();
         }
     }
 
     void onDetach() {
-        adLock.lock();
+        zoneLock.lock();
         try {
             if(attached) {
                 attached = false;
@@ -130,7 +129,7 @@ class AdZonePresenter implements SessionClient.Listener {
             }
         }
         finally {
-            adLock.unlock();
+            zoneLock.unlock();
         }
     }
 
@@ -141,7 +140,7 @@ class AdZonePresenter implements SessionClient.Listener {
 
         completeCurrentAd();
 
-        adLock.lock();
+        zoneLock.lock();
         try {
             if(listener != null && currentZone.hasAds()) {
                 final int idx = viewCount % currentZone.getAds().size();
@@ -157,7 +156,7 @@ class AdZonePresenter implements SessionClient.Listener {
             adCompleted = false;
         }
         finally {
-            adLock.unlock();
+            zoneLock.unlock();
         }
 
         displayAd();
@@ -174,19 +173,19 @@ class AdZonePresenter implements SessionClient.Listener {
 
     private void completeCurrentAd() {
         if((currentAd != null && !currentAd.isEmpty()) && (adStarted && !adCompleted)) {
-            adLock.lock();
+            zoneLock.lock();
             try {
                 adCompleted = true;
                 AdEventClient.trackImpressionEnd(currentAd);
             }
             finally {
-                adLock.unlock();
+                zoneLock.unlock();
             }
         }
     }
 
     void onAdDisplayed(final Ad ad) {
-        adLock.lock();
+        zoneLock.lock();
         try {
             adStarted = true;
             AdEventClient.trackImpression(ad);
@@ -195,12 +194,12 @@ class AdZonePresenter implements SessionClient.Listener {
             startZoneTimer();
         }
         finally {
-            adLock.unlock();
+            zoneLock.unlock();
         }
     }
 
     void onAdDisplayFailed(final Ad ad) {
-        adLock.lock();
+        zoneLock.lock();
         try {
             adStarted = true;
             currentAd = Ad.emptyAd();
@@ -208,12 +207,12 @@ class AdZonePresenter implements SessionClient.Listener {
             startZoneTimer();
         }
         finally {
-            adLock.unlock();
+            zoneLock.unlock();
         }
     }
 
     void onBlankDisplayed() {
-        adLock.lock();
+        zoneLock.lock();
         try {
             adStarted = true;
             currentAd = Ad.emptyAd();
@@ -221,7 +220,7 @@ class AdZonePresenter implements SessionClient.Listener {
             startZoneTimer();
         }
         finally {
-            adLock.unlock();
+            zoneLock.unlock();
         }
     }
 
