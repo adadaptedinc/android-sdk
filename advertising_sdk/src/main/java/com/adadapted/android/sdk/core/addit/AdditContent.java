@@ -211,6 +211,10 @@ public class AdditContent implements AddToListContent, Parcelable {
         return source;
     }
 
+    public String getAdditSource() {
+        return additSource;
+    }
+
     public boolean isDeeplinkSource() {
         return additSource.equals(AdditSources.DEEPLINK);
     }

@@ -82,6 +82,12 @@ public class PayloadClient {
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
             public void run() {
+            final Map<String, String> eventParams = new HashMap<>();
+            eventParams.put("payload_id", content.getPayloadId());
+            eventParams.put("source", content.getAdditSource());
+
+            AppEventClient.trackSdkEvent("addit_added_to_list", eventParams);
+
             if(content.isPayloadSource()) {
                 getInstance().trackPayload(content, "delivered");
             }
@@ -98,9 +104,9 @@ public class PayloadClient {
             eventParams.put("payload_id", content.getPayloadId());
             eventParams.put("tracking_id", item.getTrackingId());
             eventParams.put("item_name", item.getTitle());
-            eventParams.put("source", content.getSource());
+            eventParams.put("source", content.getAdditSource());
 
-            AppEventClient.trackSdkEvent("addit_added_to_list", eventParams);
+            AppEventClient.trackSdkEvent("addit_item_added_to_list", eventParams);
             }
         });
     }
