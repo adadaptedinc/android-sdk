@@ -48,6 +48,12 @@ public class KeywordInterceptClient {
         trackEvent(session, searchId, term, userInput, KeywordInterceptEvent.MATCHED);
     }
 
+    public static synchronized void trackNotMatched(final Session session,
+                                                 final String searchId,
+                                                 final String userInput) {
+        trackEvent(session, searchId, "NA", userInput, KeywordInterceptEvent.NOT_MATCHED);
+    }
+
     public static synchronized void trackPresented(final Session session,
                                                    final String searchId,
                                                    final String term,

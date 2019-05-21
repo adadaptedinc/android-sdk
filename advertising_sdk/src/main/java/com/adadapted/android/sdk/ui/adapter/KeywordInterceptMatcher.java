@@ -53,6 +53,13 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, KeywordI
                         );
                     }
                 }
+                else {
+                    SuggestionTracker.suggestionNotMatched(
+                            mSession,
+                            keywordIntercept.getSearchId(),
+                            constraint.toString()
+                    );
+                }
             }
         }
         finally {

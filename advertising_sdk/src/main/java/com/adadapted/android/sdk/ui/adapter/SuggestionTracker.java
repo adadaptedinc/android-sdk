@@ -30,6 +30,12 @@ public class SuggestionTracker {
         getInstance().performSuggestionMatched(session, searchId, term, replacement, userInput);
     }
 
+    static synchronized void suggestionNotMatched(final Session session,
+                                                  final String searchId,
+                                                  final String userInput) {
+        getInstance().performSuggestionNotMatched(session, searchId, userInput);
+    }
+
     public static synchronized void suggestionPresented(final String searchId,
                                                         final String replacement) {
         getInstance().performSuggestionPresented(searchId, replacement);
@@ -69,6 +75,20 @@ public class SuggestionTracker {
             replacements.put(lcReplacement, lcTerm);
 
             KeywordInterceptClient.trackMatched(mSession, searchId, lcTerm, lcUserInput);
+        }
+        finally {
+            matcherLock.unlock();
+        }
+    }
+
+    private void performSuggestionNotMatched(final Session session,
+                                             final String searchId,
+                                             final String userInput) {
+        matcherLock.lock();
+        try {
+            mSession = session;
+            final String lcUserInput = convertToLowerCase(userInput);
+            KeywordInterceptClient.trackNotMatched(mSession, searchId, lcUserInput);
         }
         finally {
             matcherLock.unlock();

@@ -4,6 +4,7 @@ import java.util.Date;
 
 public class KeywordInterceptEvent {
     static final String MATCHED  = "matched";
+    static final String NOT_MATCHED  = "not_matched";
     static final String PRESENTED  = "presented";
     static final String SELECTED  = "selected";
 
