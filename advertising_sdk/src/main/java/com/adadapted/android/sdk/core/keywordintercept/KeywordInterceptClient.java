@@ -43,33 +43,37 @@ public class KeywordInterceptClient {
 
     public static synchronized void trackMatched(final Session session,
                                                  final String searchId,
+                                                 final String termId,
                                                  final String term,
                                                  final String userInput) {
-        trackEvent(session, searchId, term, userInput, KeywordInterceptEvent.MATCHED);
-    }
-
-    public static synchronized void trackNotMatched(final Session session,
-                                                 final String searchId,
-                                                 final String userInput) {
-        trackEvent(session, searchId, "NA", userInput, KeywordInterceptEvent.NOT_MATCHED);
+        trackEvent(session, searchId, termId, term, userInput, KeywordInterceptEvent.MATCHED);
     }
 
     public static synchronized void trackPresented(final Session session,
                                                    final String searchId,
+                                                   final String termId,
                                                    final String term,
                                                    final String userInput) {
-        trackEvent(session, searchId, term, userInput, KeywordInterceptEvent.PRESENTED);
+        trackEvent(session, searchId, termId, term, userInput, KeywordInterceptEvent.PRESENTED);
     }
 
     public static synchronized void trackSelected(final Session session,
                                                   final String searchId,
+                                                  final String termId,
                                                   final String term,
                                                   final String userInput) {
-        trackEvent(session, searchId, term, userInput, KeywordInterceptEvent.SELECTED);
+        trackEvent(session, searchId, termId, term, userInput, KeywordInterceptEvent.SELECTED);
+    }
+
+    public static synchronized void trackNotMatched(final Session session,
+                                                    final String searchId,
+                                                    final String userInput) {
+        trackEvent(session, searchId, "", "NA", userInput, KeywordInterceptEvent.NOT_MATCHED);
     }
 
     private static synchronized void trackEvent(final Session session,
                                                 final String searchId,
+                                                final String termId,
                                                 final String term,
                                                 final String userInput,
                                                 final String eventType) {
@@ -82,8 +86,16 @@ public class KeywordInterceptClient {
         final String udid = session.getDeviceInfo().getUdid();
         final String sdkVersion = session.getDeviceInfo().getSdkVersion();
 
-        final KeywordInterceptEvent event = new KeywordInterceptEvent(appId, sessionId, udid, searchId,
-                eventType, userInput, term, sdkVersion);
+        final KeywordInterceptEvent event = new KeywordInterceptEvent(
+                appId,
+                sessionId,
+                udid,
+                searchId,
+                eventType,
+                userInput,
+                termId,
+                term,
+                sdkVersion);
 
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
@@ -137,7 +149,6 @@ public class KeywordInterceptClient {
             this.events.clear();
 
             final Set<KeywordInterceptEvent> resultingEvents = consolidateEvents(event, currentEvents);
-
             this.events.addAll(resultingEvents);
         }
         finally {

@@ -24,26 +24,29 @@ public class SuggestionTracker {
 
     static synchronized void suggestionMatched(final Session session,
                                                final String searchId,
+                                               final String termId,
                                                final String term,
                                                final String replacement,
                                                final String userInput) {
-        getInstance().performSuggestionMatched(session, searchId, term, replacement, userInput);
+        getInstance().performSuggestionMatched(session, searchId, termId, term, replacement, userInput);
+    }
+
+    public static synchronized void suggestionPresented(final String searchId,
+                                                        final String termId,
+                                                        final String replacement) {
+        getInstance().performSuggestionPresented(searchId, termId, replacement);
+    }
+
+    public static synchronized  void suggestionSelected(final String searchId,
+                                                        final String termId,
+                                                        final String replacement) {
+        getInstance().performSuggestionSelected(searchId, termId, replacement);
     }
 
     static synchronized void suggestionNotMatched(final Session session,
                                                   final String searchId,
                                                   final String userInput) {
         getInstance().performSuggestionNotMatched(session, searchId, userInput);
-    }
-
-    public static synchronized void suggestionPresented(final String searchId,
-                                                        final String replacement) {
-        getInstance().performSuggestionPresented(searchId, replacement);
-    }
-
-    public static synchronized  void suggestionSelected(final String searchId,
-                                                        final String replacement) {
-        getInstance().performSuggestionSelected(searchId, replacement);
     }
 
     private final Lock matcherLock = new ReentrantLock();
@@ -60,6 +63,7 @@ public class SuggestionTracker {
 
     private void performSuggestionMatched(final Session session,
                                           final String searchId,
+                                          final String termId,
                                           final String term,
                                           final String replacement,
                                           final String userInput) {
@@ -74,9 +78,47 @@ public class SuggestionTracker {
             items.put(lcTerm, lcUserInput);
             replacements.put(lcReplacement, lcTerm);
 
-            KeywordInterceptClient.trackMatched(mSession, searchId, lcTerm, lcUserInput);
+            KeywordInterceptClient.trackMatched(mSession, searchId, termId, lcTerm, lcUserInput);
         }
         finally {
+            matcherLock.unlock();
+        }
+    }
+
+    private void performSuggestionPresented(final String searchId,
+                                            final String termId,
+                                            final String replacement) {
+        final String lcReplacement = convertToLowerCase(replacement);
+
+        matcherLock.lock();
+        try {
+            if(replacements.containsKey(lcReplacement)) {
+                final String term = replacements.get(lcReplacement);
+                final String userInput = items.get(term);
+
+                KeywordInterceptClient.trackPresented(mSession, searchId, termId,  term, userInput);
+            }
+        }
+        finally {
+            matcherLock.unlock();
+        }
+    }
+
+    private void performSuggestionSelected(final String searchId,
+                                           final String termId,
+                                           final String replacement) {
+        final String lcReplacement = convertToLowerCase(replacement);
+
+        matcherLock.lock();
+        try {
+            if(replacements.containsKey(lcReplacement)) {
+                final String term = replacements.get(lcReplacement);
+                final String userInput = items.get(term);
+
+                KeywordInterceptClient.trackSelected(mSession, searchId, termId, term, userInput);
+            }
+        }
+            finally {
             matcherLock.unlock();
         }
     }
@@ -91,42 +133,6 @@ public class SuggestionTracker {
             KeywordInterceptClient.trackNotMatched(mSession, searchId, lcUserInput);
         }
         finally {
-            matcherLock.unlock();
-        }
-    }
-
-    private void performSuggestionPresented(final String searchId,
-                                            final String replacement) {
-        final String lcReplacement = convertToLowerCase(replacement);
-
-        matcherLock.lock();
-        try {
-            if(replacements.containsKey(lcReplacement)) {
-                final String term = replacements.get(lcReplacement);
-                final String userInput = items.get(term);
-
-                KeywordInterceptClient.trackPresented(mSession, searchId,  term, userInput);
-            }
-        }
-        finally {
-            matcherLock.unlock();
-        }
-    }
-
-    private void performSuggestionSelected(final String searchId,
-                                           final String replacement) {
-        final String lcReplacement = convertToLowerCase(replacement);
-
-        matcherLock.lock();
-        try {
-            if(replacements.containsKey(lcReplacement)) {
-                final String term = replacements.get(lcReplacement);
-                final String userInput = items.get(term);
-
-                KeywordInterceptClient.trackSelected(mSession, searchId,  term, userInput);
-            }
-        }
-            finally {
             matcherLock.unlock();
         }
     }

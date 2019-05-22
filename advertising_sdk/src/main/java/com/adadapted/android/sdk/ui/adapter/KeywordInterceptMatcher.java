@@ -22,6 +22,18 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, KeywordI
     private boolean mLoaded = false;
     private Session mSession;
 
+    private static class Contains {
+        boolean found;
+        String input;
+        AutoFill autoFill;
+
+        Contains() {
+            found = false;
+            input = "";
+            autoFill = null;
+        }
+    }
+
     public KeywordInterceptMatcher() {
         keywordIntercept = KeywordIntercept.empty();
         SessionClient.getSession(this);
@@ -32,28 +44,33 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, KeywordI
 
         interceptLock.lock();
         try {
-            if(!shouldCheckConstraint(constraint)) {
+            final String input = constraint.toString().toLowerCase();
+            if(!shouldCheckConstraint(input)) {
                 return suggestions;
             }
 
-            final String term = constraint.toString().toLowerCase();
-
-            for (final String item : keywordIntercept.getAutoFill().keySet()) {
-                if (item != null && item.toLowerCase().contains(term)) {
-                    final AutoFill autoFill = keywordIntercept.getAutoFill().get(item);
-                    if(autoFill != null) {
-                        suggestions.add(new Suggestion(keywordIntercept.getSearchId(), autoFill));
-
-                        SuggestionTracker.suggestionMatched(
-                                mSession,
-                                keywordIntercept.getSearchId(),
-                                item,
-                                autoFill.getReplacement(),
-                                constraint.toString()
-                        );
-                    }
+            final Contains contains = new Contains();
+            for (final AutoFill autoFill : keywordIntercept.getAutoFill()) {
+                if (autoFill == null) {
+                    continue;
                 }
-                else {
+
+                final String lcTerm = autoFill.getTerm().toLowerCase();
+                if (lcTerm.startsWith(input)) {
+                    fileTerm(autoFill, constraint.toString(), suggestions);
+                    break;
+                }
+                else if (!contains.found && lcTerm.contains(input)) {
+                    contains.found = true;
+                    contains.input = input;
+                    contains.autoFill = autoFill;
+                }
+            }
+
+            if(suggestions.isEmpty()) {
+                if(contains.found) {
+                    fileTerm(contains.autoFill, contains.input, suggestions);
+                } else {
                     SuggestionTracker.suggestionNotMatched(
                             mSession,
                             keywordIntercept.getSearchId(),
@@ -69,30 +86,25 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, KeywordI
         return suggestions;
     }
 
-    private boolean shouldCheckConstraint(final CharSequence constraint) {
+    private void fileTerm(final AutoFill autoFill, final String input, final Set<Suggestion> suggestions) {
+        if(autoFill != null) {
+            suggestions.add(new Suggestion(keywordIntercept.getSearchId(), autoFill));
+
+            SuggestionTracker.suggestionMatched(
+                    mSession,
+                    keywordIntercept.getSearchId(),
+                    autoFill.getTermId(),
+                    autoFill.getTerm(),
+                    autoFill.getReplacement(),
+                    input
+            );
+        }
+    }
+
+    private boolean shouldCheckConstraint(final String input) {
         return isLoaded() &&
-                constraint != null &&
-                constraint.length() >= keywordIntercept.getMinMatchLength();
-    }
-
-    public void suggestionPresented(final String suggestion) {
-        interceptLock.lock();
-        try {
-            SuggestionTracker.suggestionPresented(keywordIntercept.getSearchId(), suggestion);
-        }
-            finally {
-            interceptLock.unlock();
-        }
-    }
-
-    public void suggestionSelected(final String suggestion) {
-        interceptLock.lock();
-        try {
-            SuggestionTracker.suggestionSelected(keywordIntercept.getSearchId(), suggestion);
-        }
-        finally {
-            interceptLock.unlock();
-        }
+                input != null &&
+                input.length() >= keywordIntercept.getMinMatchLength();
     }
 
     private boolean isLoaded() {

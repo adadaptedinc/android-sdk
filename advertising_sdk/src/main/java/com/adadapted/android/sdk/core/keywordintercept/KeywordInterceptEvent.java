@@ -15,6 +15,7 @@ public class KeywordInterceptEvent {
     private final Date datetime;
     private final String event;
     private final String userInput;
+    private final String termId;
     private final String term;
     private final String sdkVersion;
 
@@ -24,6 +25,7 @@ public class KeywordInterceptEvent {
                           final String searchId,
                           final String event,
                           final String userInput,
+                          final String termId,
                           final String term,
                           final String sdkVersion) {
         this.appId = (appId == null) ? "" : appId;
@@ -33,6 +35,7 @@ public class KeywordInterceptEvent {
         this.datetime = new Date();
         this.event = (event == null) ? "" : event;
         this.userInput = (userInput == null) ? "" : userInput;
+        this.termId = (termId == null) ? "" : termId;
         this.term = (term == null) ? "" : term;
         this.sdkVersion = (sdkVersion == null) ? "" : sdkVersion;
     }
@@ -65,6 +68,10 @@ public class KeywordInterceptEvent {
         return userInput;
     }
 
+    public String getTermId() {
+        return termId;
+    }
+
     public String getTerm() {
         return term;
     }
@@ -77,16 +84,23 @@ public class KeywordInterceptEvent {
         return e != null &&
                 sessionId.equals(e.getSessionId()) &&
                 event.equals(e.getEvent()) &&
-                term.equals(e.getTerm()) &&
+                termId.equals(e.getTermId()) &&
                 userInput.contains(e.getUserInput());
     }
 
     @Override
     public String toString() {
         return "KeywordInterceptEvent{" +
-                "event='" + event + '\'' +
+                "appId='" + appId + '\'' +
+                ", sessionId='" + sessionId + '\'' +
+                ", udid='" + udid + '\'' +
+                ", searchId='" + searchId + '\'' +
+                ", datetime=" + datetime +
+                ", event='" + event + '\'' +
                 ", userInput='" + userInput + '\'' +
+                ", termId='" + termId + '\'' +
                 ", term='" + term + '\'' +
+                ", sdkVersion='" + sdkVersion + '\'' +
                 '}';
     }
 }

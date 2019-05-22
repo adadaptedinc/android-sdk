@@ -34,12 +34,14 @@ class JsonFields {
     static final String SEARCHID = "search_id";
     static final String REFRESHTIME = "refresh_time";
     static final String MINMATCHLENGTH = "min_match_length";
+    static final String TERMID = "term_id";
     static final String TERM = "term";
     static final String USERINPUT = "user_input";
     static final String AUTOFILL = "autofill";
     static final String REPLACEMENT = "replacement";
     static final String ICON = "icon";
     static final String TAGLINE = "tagline";
+    static final String PRIORITY = "priority";
 
     static final String ADID = "ad_id";
     static final String ZONE = "zone";

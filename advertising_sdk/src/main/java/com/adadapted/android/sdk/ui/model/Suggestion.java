@@ -21,6 +21,7 @@ public class Suggestion implements Parcelable {
 
     private final String searchId;
 
+    private final String termId;
     private final String name;
     private final String icon;
     private final String tagLine;
@@ -31,6 +32,7 @@ public class Suggestion implements Parcelable {
     public Suggestion(final String searchId, final AutoFill autoFill) {
         this.searchId = searchId;
 
+        this.termId = autoFill.getTermId();
         this.name = autoFill.getReplacement();
         this.icon = autoFill.getIcon();
         this.tagLine = autoFill.getTagLine();
@@ -41,11 +43,16 @@ public class Suggestion implements Parcelable {
 
     protected Suggestion(Parcel in) {
         searchId = in.readString();
+        termId = in.readString();
         name = in.readString();
         icon = in.readString();
         tagLine = in.readString();
         presented = in.readByte() != 0;
         selected = in.readByte() != 0;
+    }
+
+    public String getTermId() {
+        return termId;
     }
 
     public String getName() {
@@ -63,14 +70,14 @@ public class Suggestion implements Parcelable {
     public void presented() {
         if(!presented) {
             presented = true;
-            SuggestionTracker.suggestionPresented(searchId, getName());
+            SuggestionTracker.suggestionPresented(searchId, getTermId(), getName());
         }
     }
 
     public void selected() {
         if(!selected) {
             selected = true;
-            SuggestionTracker.suggestionSelected(searchId, getName());
+            SuggestionTracker.suggestionSelected(searchId, getTermId(), getName());
         }
     }
 
@@ -82,6 +89,7 @@ public class Suggestion implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(searchId);
+        parcel.writeString(termId);
         parcel.writeString(name);
         parcel.writeString(icon);
         parcel.writeString(tagLine);

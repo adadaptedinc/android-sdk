@@ -25,9 +25,8 @@ public class ImpressionIdCounter {
         idCounts = new HashMap<>();
     }
 
-    private int initCountFor(final String impressionId) {
+    private void initCountFor(final String impressionId) {
         idCounts.put(impressionId, INITIAL_VAL);
-        return INITIAL_VAL;
     }
 
     public synchronized int getIncrementedCountFor(final String impressionId) {
@@ -40,7 +39,8 @@ public class ImpressionIdCounter {
 
                 return val;
             } else {
-                return initCountFor(impressionId);
+                initCountFor(impressionId);
+                return idCounts.get(impressionId);
             }
         }
         finally {
@@ -54,7 +54,8 @@ public class ImpressionIdCounter {
             if (idCounts.containsKey(impressionId)) {
                 return idCounts.get(impressionId);
             } else {
-                return initCountFor(impressionId);
+                initCountFor(impressionId);
+                return idCounts.get(impressionId);
             }
         }
         finally {

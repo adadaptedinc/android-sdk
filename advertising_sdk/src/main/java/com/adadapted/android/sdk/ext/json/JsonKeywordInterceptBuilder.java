@@ -9,8 +9,11 @@ import com.adadapted.android.sdk.core.keywordintercept.KeywordIntercept;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class JsonKeywordInterceptBuilder {
@@ -24,9 +27,11 @@ public class JsonKeywordInterceptBuilder {
             final long refreshTime = json.has(JsonFields.REFRESHTIME) ? Long.parseLong(json.getString(JsonFields.REFRESHTIME)) : 0L;
             final int minMatchLength = json.has(JsonFields.MINMATCHLENGTH) ? Integer.parseInt(json.getString(JsonFields.MINMATCHLENGTH)) : 2;
 
-            final Map<String, AutoFill> interceptMap = parseAutofill(json);
+            final List<AutoFill> intercepts = sortAutoFills(parseAutoFills(json));
 
-            return new KeywordIntercept(searchId, refreshTime, minMatchLength, interceptMap);
+            Log.i(TAG, intercepts.toString());
+
+            return new KeywordIntercept(searchId, refreshTime, minMatchLength, intercepts);
         }
         catch(JSONException ex) {
             Log.w(TAG, "Problem parsing JSON", ex);
@@ -44,27 +49,44 @@ public class JsonKeywordInterceptBuilder {
         return KeywordIntercept.empty();
     }
 
-    private Map<String, AutoFill> parseAutofill(final JSONObject json) throws JSONException {
-        final Map<String, AutoFill> interceptMap = new HashMap<>();
+    private List<AutoFill> parseAutoFills(final JSONObject json) throws JSONException {
+        final List<AutoFill> autoFills = new ArrayList<>();
 
         final Object obj = json.get(JsonFields.AUTOFILL);
         if(obj instanceof JSONObject) {
-            final JSONObject autofillJson = (JSONObject)obj;
+            final JSONObject autoFillJson = (JSONObject)obj;
 
-            for(final Iterator<String> z = autofillJson.keys(); z.hasNext();) {
+            for(final Iterator<String> z = autoFillJson.keys(); z.hasNext();) {
                 final String term = z.next();
-                final JSONObject jsonTerm = autofillJson.getJSONObject(term);
+                final JSONObject jsonTerm = autoFillJson.getJSONObject(term);
 
+                final String termId = jsonTerm.has(JsonFields.TERMID) ?  jsonTerm.getString(JsonFields.TERMID) : "";
                 final String replacement = jsonTerm.has(JsonFields.REPLACEMENT) ? jsonTerm.getString(JsonFields.REPLACEMENT) : "";
                 final String icon = jsonTerm.has(JsonFields.ICON) ? jsonTerm.getString(JsonFields.ICON) : "";
-                final String tagline = jsonTerm.has(JsonFields.TAGLINE) ? jsonTerm.getString(JsonFields.TAGLINE) : "";
+                final String tagLine = jsonTerm.has(JsonFields.TAGLINE) ? jsonTerm.getString(JsonFields.TAGLINE) : "";
+                final int priority = jsonTerm.has(JsonFields.PRIORITY) ? jsonTerm.getInt(JsonFields.PRIORITY) : 0;
 
-                final AutoFill autofill = new AutoFill(replacement, icon, tagline);
-
-                interceptMap.put(term, autofill);
+                autoFills.add(new AutoFill(termId, term, replacement, icon, tagLine, priority));
             }
         }
 
-        return interceptMap;
+        return autoFills;
+    }
+
+    private List<AutoFill> sortAutoFills(final List<AutoFill> autoFills) {
+        final AutoFill[] arr = new AutoFill[autoFills.size()];
+        autoFills.toArray(arr);
+        final int size = arr.length;
+        for(int i = 0; i < size; i++) {
+            for(int j = 0; j < size; j++) {
+                if (arr[i].compareTo(arr[j]) < 1) {
+                    final AutoFill temp = arr[i];
+                    arr[i] = arr[j];
+                    arr[j] = temp;
+                }
+            }
+        }
+
+        return Arrays.asList(arr);
     }
 }

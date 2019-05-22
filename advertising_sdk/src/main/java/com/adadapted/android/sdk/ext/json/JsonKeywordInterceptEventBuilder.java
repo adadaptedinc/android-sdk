@@ -36,6 +36,7 @@ public class JsonKeywordInterceptEventBuilder {
         json.put(JsonFields.UDID, event.getUdid());
         json.put(JsonFields.SEARCHID, event.getSearchId());
         json.put(JsonFields.DATETIME, event.getDatetime().getTime());
+        json.put(JsonFields.TERMID, event.getTermId());
         json.put(JsonFields.TERM, event.getTerm());
         json.put(JsonFields.USERINPUT, event.getUserInput());
         json.put(JsonFields.EVENTTYPE, event.getEvent());

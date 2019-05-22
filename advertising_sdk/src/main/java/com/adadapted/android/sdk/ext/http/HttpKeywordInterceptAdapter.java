@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.ext.http;
 
 import com.adadapted.android.sdk.core.event.AppEventClient;
-import com.adadapted.android.sdk.core.keywordintercept.KeywordIntercept;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptAdapter;
 import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptEvent;
 import com.adadapted.android.sdk.core.session.Session;
