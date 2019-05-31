@@ -44,6 +44,10 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
 
     @Override
     public void init(final Session session, final Callback callback) {
+        if(session.getId() == null || session.getId().isEmpty()) {
+            return;
+        }
+
         final JSONObject json = requestBuilder.buildInitRequest(session);
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(
