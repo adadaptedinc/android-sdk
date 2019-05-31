@@ -23,7 +23,7 @@ public class Session {
                    final Date expiresAt,
                    final Map<String, Zone> zones) {
         this.deviceInfo = deviceInfo;
-        this.id = id;
+        this.id = id == null ? "" : id;
         this.hasAds = hasAds;
         this.refreshTime = refreshTime;
         this.expiresAt = expiresAt;
@@ -32,12 +32,14 @@ public class Session {
 
     public Session(final Session session,
                    final Map<String, Zone> zones) {
-        this.deviceInfo = session.getDeviceInfo();
-        this.id = session.getId();
-        this.hasAds = session.hasActiveCampaigns();
-        this.refreshTime = session.getRefreshTime();
-        this.expiresAt = session.getExpiresAt();
-        this.zones = (zones != null) ? zones : new HashMap<String, Zone>();
+        this(
+            session.getDeviceInfo(),
+            session.getId(),
+            session.hasActiveCampaigns(),
+            session.getRefreshTime(),
+            session.getExpiresAt(),
+            (zones != null) ? zones : new HashMap<String, Zone>()
+        );
     }
 
     public DeviceInfo getDeviceInfo() {
