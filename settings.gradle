@@ -1,1 +1,1 @@
-include ':app', ':advertising_sdk', ':addit_sdk'
+include ':app', ':advertising_sdk'
