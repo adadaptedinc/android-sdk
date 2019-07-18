@@ -20,29 +20,29 @@ public class WireUp {
         HttpRequestManager.createQueue(context.getApplicationContext());
 
         SessionClient.createInstance(new HttpSessionAdapter(
-            isProd ? Config.Prod.URL_SESSION_INIT : Config.Sand.URL_SESSION_INIT,
-            isProd ? Config.Prod.URL_AD_GET : Config.Sand.URL_AD_GET
+            Config.initializeSessionUrl(isProd),
+            Config.refreshAdsUrl(isProd)
         ));
 
         AppEventClient.createInstance(new HttpAppEventSink(
-            isProd ? Config.Prod.URL_APP_EVENT_TRACK : Config.Sand.URL_APP_EVENT_TRACK,
-            isProd ? Config.Prod.URL_APP_ERROR_TRACK : Config.Sand.URL_APP_ERROR_TRACK
+            Config.appEventsUrl(isProd),
+            Config.appErrorsUrl(isProd)
         ));
 
         AdEventClient.createInstance(new HttpAdEventSink(
-            isProd ? Config.Prod.URL_EVENT_BATCH : Config.Sand.URL_EVENT_BATCH
+            Config.adEventsUrl(isProd)
         ));
 
         KeywordInterceptClient.createInstance(
             new HttpKeywordInterceptAdapter(
-                isProd ? Config.Prod.URL_KI_INIT : Config.Sand.URL_KI_INIT,
-                isProd ? Config.Prod.URL_KI_TRACK : Config.Sand.URL_KI_TRACK
+                Config.retrieveInterceptsUrl(isProd),
+                Config.interceptEventsUrl(isProd)
             )
         );
 
         PayloadClient.createInstance(new HttpPayloadAdapter(
-            isProd ? Config.Prod.URL_APP_PAYLOAD_PICKUP : Config.Sand.URL_APP_PAYLOAD_PICKUP,
-            isProd ? Config.Prod.URL_APP_PAYLOAD_TRACK : Config.Sand.URL_APP_PAYLOAD_TRACK
+            Config.pickupPayloadsUrl(isProd),
+            Config.trackPayloadUrl(isProd)
         ));
     }
 }
