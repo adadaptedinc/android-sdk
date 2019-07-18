@@ -1,9 +1,9 @@
-package com.adadapted.android.sdk.core.keywordintercept;
+package com.adadapted.android.sdk.core.intercept;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class KeywordIntercept {
+public class Intercept {
     private static final String SEARCH_ID = "empty";
     private static final long REFRESH_TIME = 300;
     private static final int MIN_MATCH_LENGTH = 3;
@@ -11,25 +11,25 @@ public class KeywordIntercept {
     private final String searchId;
     private final long refreshTime;
     private final int minMatchLength;
-    private final List<AutoFill> autoFill;
+    private final List<Term> terms;
 
-    public static KeywordIntercept empty() {
-        return new KeywordIntercept(
+    public static Intercept empty() {
+        return new Intercept(
             SEARCH_ID,
             REFRESH_TIME,
             MIN_MATCH_LENGTH,
-            new ArrayList<AutoFill>()
+            new ArrayList<Term>()
         );
     }
 
-    public KeywordIntercept(final String searchId,
-                            final long refreshTime,
-                            final int minMatchLength,
-                            final List<AutoFill> autoFill) {
+    public Intercept(final String searchId,
+                     final long refreshTime,
+                     final int minMatchLength,
+                     final List<Term> terms) {
         this.searchId = searchId;
         this.refreshTime = refreshTime;
         this.minMatchLength = minMatchLength;
-        this.autoFill = autoFill;
+        this.terms = terms;
     }
 
     public String getSearchId() {
@@ -44,7 +44,7 @@ public class KeywordIntercept {
         return minMatchLength;
     }
 
-    public List<AutoFill> getAutoFill() {
-        return autoFill;
+    public List<Term> getTerms() {
+        return terms;
     }
 }

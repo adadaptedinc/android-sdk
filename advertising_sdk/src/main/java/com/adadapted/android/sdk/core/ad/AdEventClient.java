@@ -155,14 +155,10 @@ public class AdEventClient implements SessionClient.Listener {
         eventLock.lock();
         try {
             final AdEvent event = new AdEvent(
-                session.getDeviceInfo().getAppId(),
-                session.getDeviceInfo().getUdid(),
-                session.getId(),
                 ad.getId(),
                 ad.getZoneId(),
                 ad.getImpressionId() + "::" + count,
-                eventType,
-                session.getDeviceInfo().getSdkVersion()
+                eventType
             );
 
             events.add(event);
@@ -183,7 +179,7 @@ public class AdEventClient implements SessionClient.Listener {
             final Set<AdEvent> currentEvents = new HashSet<>(events);
             events.clear();
 
-            adEventSink.sendBatch(currentEvents);
+            adEventSink.sendBatch(session, currentEvents);
         }
         finally {
             eventLock.unlock();

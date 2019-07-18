@@ -1,62 +1,63 @@
 package com.adadapted.android.sdk.ext.http;
 
+import android.util.Log;
+
 import com.adadapted.android.sdk.core.event.AppEventClient;
-import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptAdapter;
-import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptEvent;
+import com.adadapted.android.sdk.core.intercept.InterceptAdapter;
+import com.adadapted.android.sdk.core.intercept.InterceptEvent;
 import com.adadapted.android.sdk.core.session.Session;
-import com.adadapted.android.sdk.ext.json.JsonKeywordInterceptBuilder;
-import com.adadapted.android.sdk.ext.json.JsonKeywordInterceptEventBuilder;
-import com.adadapted.android.sdk.ext.json.JsonKeywordInterceptRequestBuilder;
+import com.adadapted.android.sdk.ext.json.JsonInterceptBuilder;
+import com.adadapted.android.sdk.ext.json.JsonInterceptEventBuilder;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
+public class HttpInterceptAdapter implements InterceptAdapter {
     @SuppressWarnings("unused")
-    private static final String LOGTAG = HttpKeywordInterceptAdapter.class.getName();
+    private static final String LOGTAG = HttpInterceptAdapter.class.getName();
 
     private final String initUrl;
-    private final JsonKeywordInterceptRequestBuilder requestBuilder;
-    private final JsonKeywordInterceptBuilder kiBuilder;
+    private final JsonInterceptBuilder kiBuilder;
 
     private final String eventUrl;
-    private final JsonKeywordInterceptEventBuilder eventBuilder;
+    private final JsonInterceptEventBuilder eventBuilder;
 
-    public HttpKeywordInterceptAdapter(final String initUrl,
-                                       final String eventUrl) {
+    public HttpInterceptAdapter(final String initUrl,
+                                final String eventUrl) {
         this.initUrl = initUrl == null ? "" : initUrl;
-
-        this.requestBuilder = new JsonKeywordInterceptRequestBuilder();
-        this.kiBuilder = new JsonKeywordInterceptBuilder();
+        this.kiBuilder = new JsonInterceptBuilder();
 
         this.eventUrl = eventUrl;
-        this.eventBuilder = new JsonKeywordInterceptEventBuilder();
+        this.eventBuilder = new JsonInterceptEventBuilder();
     }
 
     @Override
-    public void init(final Session session, final Callback callback) {
+    public void retrieve(final Session session, final Callback callback) {
         if(session == null || session.getId().isEmpty()) {
             return;
         }
 
-        final JSONObject json = requestBuilder.buildInitRequest(session);
+        final String url = initUrl
+                .concat(String.format("?aid=%s", session.getDeviceInfo().getAppId()))
+                .concat(String.format("&uid=%s", session.getDeviceInfo().getUdid()))
+                .concat(String.format("&sid=%s", session.getId()))
+                .concat(String.format("&sdk=%s", session.getDeviceInfo().getSdkVersion()));
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(
-                Request.Method.POST,
-                initUrl,
-                json,
+                Request.Method.GET,
+                url,
+                null,
                 new Response.Listener<JSONObject>(){
             @Override
             public void onResponse(JSONObject response) {
+                Log.i(LOGTAG, response.toString());
                 callback.onSuccess(kiBuilder.build(response));
             }
         }, new Response.ErrorListener() {
@@ -73,9 +74,9 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
                         params.put("status_code", Integer.toString(statusCode));
                         params.put("data", data);
                         AppEventClient.trackError(
-                                "KI_SESSION_REQUEST_FAILED",
-                                error.getMessage(),
-                                params
+                            "KI_SESSION_REQUEST_FAILED",
+                            error.getMessage(),
+                            params
                         );
                     }
                 }
@@ -86,14 +87,14 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
     }
 
     @Override
-    public void sendBatch(final Set<KeywordInterceptEvent> events) {
-        final JSONArray json = eventBuilder.buildEvents(events);
+    public void sendEvents(final Session session, final Set<InterceptEvent> events) {
+        final JSONObject json = eventBuilder.marshalEvents(session, events);
+        Log.i(LOGTAG, json.toString());
 
-        final JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST,
-                eventUrl, json, new Response.Listener<JSONArray>(){
+        final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
+                eventUrl, json, new Response.Listener<JSONObject>(){
             @Override
-            public void onResponse(JSONArray response) {
-            }
+            public void onResponse(JSONObject response) {}
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
@@ -108,9 +109,9 @@ public class HttpKeywordInterceptAdapter implements KeywordInterceptAdapter {
                         params.put("status_code", Integer.toString(statusCode));
                         params.put("data", data);
                         AppEventClient.trackError(
-                                "KI_EVENT_REQUEST_FAILED",
-                                error.getMessage(),
-                                params
+                            "KI_EVENT_REQUEST_FAILED",
+                            error.getMessage(),
+                            params
                         );
                     }
                 }

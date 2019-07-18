@@ -1,6 +1,6 @@
-package com.adadapted.android.sdk.core.keywordintercept;
+package com.adadapted.android.sdk.core.intercept;
 
-public class AutoFill {
+public class Term {
     private final String termId;
     private final String term;
     private final String replacement;
@@ -8,12 +8,12 @@ public class AutoFill {
     private final String tagLine;
     private final int priority;
 
-    public AutoFill(final String termId,
-                    final String term,
-                    final String replacement,
-                    final String icon,
-                    final String tagLine,
-                    final int priority) {
+    public Term(final String termId,
+                final String term,
+                final String replacement,
+                final String icon,
+                final String tagLine,
+                final int priority) {
         this.termId = termId;
         this.term = term;
         this.replacement = replacement;
@@ -46,7 +46,7 @@ public class AutoFill {
         return priority;
     }
 
-    public int compareTo(AutoFill a2) {
+    public int compareTo(Term a2) {
         if(this.getPriority() == a2.getPriority()) {
             return this.getTerm().compareTo(a2.getTerm());
         } else if(this.getPriority() < a2.getPriority()) {
@@ -58,7 +58,7 @@ public class AutoFill {
 
     @Override
     public String toString() {
-        return "AutoFill{" +
+        return "Term{" +
                 "termId='" + termId + '\'' +
                 ", term='" + term + '\'' +
                 ", replacement='" + replacement + '\'' +

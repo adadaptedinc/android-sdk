@@ -1,10 +1,10 @@
-package com.adadapted.android.sdk.core.keywordintercept;
+package com.adadapted.android.sdk.core.intercept;
 
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class KeywordInterceptTest {
+public class InterceptTest {
 
     @Test
     public void empty() {

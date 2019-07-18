@@ -10,7 +10,7 @@ import com.adadapted.android.sdk.core.concurrency.ThreadPoolInteractorExecuter;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.device.DeviceInfoClient;
 import com.adadapted.android.sdk.core.event.AppEventClient;
-import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptClient;
+import com.adadapted.android.sdk.core.intercept.InterceptClient;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -344,7 +344,7 @@ public class SessionClient implements SessionAdapter.Listener {
                 sessionLock.lock();
                 try {
                     setStatus(Status.IS_REFRESH_ADS);
-                    adapter.sentAdGet(currentSession, this);
+                    adapter.sendRefreshAds(currentSession, this);
                 } finally {
                     sessionLock.unlock();
                 }
@@ -419,7 +419,7 @@ public class SessionClient implements SessionAdapter.Listener {
             public void run() {
                 AdEventClient.publishEvents();
                 AppEventClient.publishEvents();
-                KeywordInterceptClient.publishEvents();
+                InterceptClient.publishEvents();
 
                 handler.postDelayed(this, Config.DEFAULT_EVENT_POLLING);
             }

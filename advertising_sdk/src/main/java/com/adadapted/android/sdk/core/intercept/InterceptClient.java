@@ -1,30 +1,32 @@
-package com.adadapted.android.sdk.core.keywordintercept;
+package com.adadapted.android.sdk.core.intercept;
 
 import com.adadapted.android.sdk.core.concurrency.ThreadPoolInteractorExecuter;
+import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.session.Session;
+import com.adadapted.android.sdk.core.session.SessionClient;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class KeywordInterceptClient {
+public class InterceptClient implements SessionClient.Listener {
     @SuppressWarnings("unused")
-    private static final String LOGTAG = KeywordInterceptClient.class.getName();
+    private static final String LOGTAG = InterceptClient.class.getName();
 
     public interface Listener {
-        void onKeywordInterceptInitialized(KeywordIntercept keywordIntercept);
+        void onKeywordInterceptInitialized(Intercept intercept);
     }
 
-    private static KeywordInterceptClient instance;
+    private static InterceptClient instance;
 
-    public static synchronized void createInstance(final KeywordInterceptAdapter adapter) {
+    public static synchronized void createInstance(final InterceptAdapter adapter) {
         if(instance == null) {
-            instance = new KeywordInterceptClient(adapter);
+            instance = new InterceptClient(adapter);
         }
     }
 
-    private static KeywordInterceptClient getInstance() {
+    private static InterceptClient getInstance() {
         return instance;
     }
 
@@ -41,38 +43,33 @@ public class KeywordInterceptClient {
         });
     }
 
-    public static synchronized void trackMatched(final Session session,
-                                                 final String searchId,
+    public static synchronized void trackMatched(final String searchId,
                                                  final String termId,
                                                  final String term,
                                                  final String userInput) {
-        trackEvent(session, searchId, termId, term, userInput, KeywordInterceptEvent.MATCHED);
+        trackEvent(searchId, termId, term, userInput, InterceptEvent.MATCHED);
     }
 
-    public static synchronized void trackPresented(final Session session,
-                                                   final String searchId,
+    public static synchronized void trackPresented(final String searchId,
                                                    final String termId,
                                                    final String term,
                                                    final String userInput) {
-        trackEvent(session, searchId, termId, term, userInput, KeywordInterceptEvent.PRESENTED);
+        trackEvent(searchId, termId, term, userInput, InterceptEvent.PRESENTED);
     }
 
-    public static synchronized void trackSelected(final Session session,
-                                                  final String searchId,
+    public static synchronized void trackSelected(final String searchId,
                                                   final String termId,
                                                   final String term,
                                                   final String userInput) {
-        trackEvent(session, searchId, termId, term, userInput, KeywordInterceptEvent.SELECTED);
+        trackEvent(searchId, termId, term, userInput, InterceptEvent.SELECTED);
     }
 
-    public static synchronized void trackNotMatched(final Session session,
-                                                    final String searchId,
+    public static synchronized void trackNotMatched(final String searchId,
                                                     final String userInput) {
-        trackEvent(session, searchId, "", "NA", userInput, KeywordInterceptEvent.NOT_MATCHED);
+        trackEvent(searchId, "", "NA", userInput, InterceptEvent.NOT_MATCHED);
     }
 
-    private static synchronized void trackEvent(final Session session,
-                                                final String searchId,
+    private static synchronized void trackEvent(final String searchId,
                                                 final String termId,
                                                 final String term,
                                                 final String userInput,
@@ -81,21 +78,13 @@ public class KeywordInterceptClient {
             return;
         }
 
-        final String appId = session.getDeviceInfo().getAppId();
-        final String sessionId = session.getId();
-        final String udid = session.getDeviceInfo().getUdid();
-        final String sdkVersion = session.getDeviceInfo().getSdkVersion();
-
-        final KeywordInterceptEvent event = new KeywordInterceptEvent(
-                appId,
-                sessionId,
-                udid,
-                searchId,
-                eventType,
-                userInput,
-                termId,
-                term,
-                sdkVersion);
+        final InterceptEvent event = new InterceptEvent(
+            searchId,
+            eventType,
+            userInput,
+            termId,
+            term
+        );
 
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
@@ -114,14 +103,17 @@ public class KeywordInterceptClient {
         });
     }
 
-    private final KeywordInterceptAdapter adapter;
+    private final InterceptAdapter adapter;
 
-    private final Set<KeywordInterceptEvent> events;
+    private final Set<InterceptEvent> events;
     private final Lock eventLock = new ReentrantLock();
 
-    private KeywordInterceptClient(final KeywordInterceptAdapter adapter) {
+    private Session currentSession;
+
+    private InterceptClient(final InterceptAdapter adapter) {
         this.adapter = adapter;
 
+        SessionClient.addListener(this);
         this.events = new HashSet<>();
     }
 
@@ -131,24 +123,23 @@ public class KeywordInterceptClient {
             return;
         }
 
-        adapter.init(session, new KeywordInterceptAdapter.Callback() {
+        adapter.retrieve(session, new InterceptAdapter.Callback() {
             @Override
-            public void onSuccess(final KeywordIntercept keywordIntercept) {
-                if (keywordIntercept != null) {
-                    listener.onKeywordInterceptInitialized(keywordIntercept);
+            public void onSuccess(final Intercept intercept) {
+                if (intercept != null) {
+                    listener.onKeywordInterceptInitialized(intercept);
                 }
             }
-
         });
     }
 
-    private void fileEvent(final KeywordInterceptEvent event) {
+    private void fileEvent(final InterceptEvent event) {
         eventLock.lock();
         try {
-            final Set<KeywordInterceptEvent> currentEvents = new HashSet<>(this.events);
+            final Set<InterceptEvent> currentEvents = new HashSet<>(this.events);
             this.events.clear();
 
-            final Set<KeywordInterceptEvent> resultingEvents = consolidateEvents(event, currentEvents);
+            final Set<InterceptEvent> resultingEvents = consolidateEvents(event, currentEvents);
             this.events.addAll(resultingEvents);
         }
         finally {
@@ -156,12 +147,12 @@ public class KeywordInterceptClient {
         }
     }
 
-    private Set<KeywordInterceptEvent> consolidateEvents(final KeywordInterceptEvent event,
-                                                         final Set<KeywordInterceptEvent> events) {
-        final Set<KeywordInterceptEvent> resultingEvents = new HashSet<>(this.events);
+    private Set<InterceptEvent> consolidateEvents(final InterceptEvent event,
+                                                  final Set<InterceptEvent> events) {
+        final Set<InterceptEvent> resultingEvents = new HashSet<>(this.events);
 
         // Create a new Set of Events not superseded by the current Event
-        for (final KeywordInterceptEvent e : events) {
+        for (final InterceptEvent e : events) {
             if (!event.supersedes(e)) {
                 resultingEvents.add(e);
             }
@@ -179,13 +170,30 @@ public class KeywordInterceptClient {
                 return;
             }
 
-            final Set<KeywordInterceptEvent> currentEvents = new HashSet<>(this.events);
+            final Set<InterceptEvent> currentEvents = new HashSet<>(this.events);
             this.events.clear();
 
-            adapter.sendBatch(currentEvents);
+            adapter.sendEvents(currentSession, currentEvents);
         }
         finally {
             eventLock.unlock();
         }
     }
+
+    @Override
+    public void onSessionAvailable(final Session session) {
+        eventLock.lock();
+        try {
+            currentSession = session;
+        }
+        finally {
+            eventLock.unlock();
+        }
+    }
+
+    @Override
+    public void onAdsAvailable(final Session session) { }
+
+    @Override
+    public void onSessionInitFailed() { }
 }

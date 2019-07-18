@@ -1,15 +1,18 @@
 package com.adadapted.android.sdk.ext.http;
 
+import android.util.Log;
+
 import com.adadapted.android.sdk.core.ad.AdEvent;
 import com.adadapted.android.sdk.core.ad.AdEventSink;
 import com.adadapted.android.sdk.core.event.AppEventClient;
+import com.adadapted.android.sdk.core.session.Session;
 import com.adadapted.android.sdk.ext.json.JsonAdEventBuilder;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 
-import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,14 +31,15 @@ public class HttpAdEventSink implements AdEventSink {
     }
 
     @Override
-    public void sendBatch(final Set<AdEvent> events) {
-        final JSONArray json = builder.buildEvents(events);
+    public void sendBatch(final Session session, final Set<AdEvent> events) {
+        final JSONObject json = builder.marshalEvents(session, events);
+        Log.i(LOGTAG, json.toString());
 
-        final JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST,
-                batchUrl, json, new Response.Listener<JSONArray>(){
+        final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
+                batchUrl, json, new Response.Listener<JSONObject>(){
 
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
             }
 
         }, new Response.ErrorListener() {
@@ -59,8 +63,6 @@ public class HttpAdEventSink implements AdEventSink {
                         );
                     }
                 }
-
-
             }
 
         });

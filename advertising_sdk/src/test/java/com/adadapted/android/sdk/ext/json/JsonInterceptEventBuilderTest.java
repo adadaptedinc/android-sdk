@@ -4,10 +4,10 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class JsonKeywordInterceptRequestBuilderTest {
+public class JsonInterceptEventBuilderTest {
 
     @Test
-    public void buildInitRequest() {
+    public void buildEvents() {
         assertTrue(true);
     }
 }

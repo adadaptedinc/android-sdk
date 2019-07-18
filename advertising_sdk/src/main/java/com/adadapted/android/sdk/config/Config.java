@@ -13,19 +13,19 @@ public class Config {
     }
 
     public static class Sand {
-//        private static final String HOST = "https://sandbox.adadapted.com";
-//        private static final String EVENTCOLLECTOR_HOST = "https://sandec.adadapted.com";
-//        private static final String PAYLOAD_HOST = "https://sandpayload.adadapted.com";
+        private static final String ADSERVER_HOST = "https://sandbox.adadapted.com";
+        private static final String EVENTCOLLECTOR_HOST = "https://sandec.adadapted.com";
+        private static final String PAYLOAD_HOST = "https://sandpayload.adadapted.com";
 
-        static final String ADSERVER_HOST = "http://10.100.131.183:8081";
-        static final String EVENTCOLLECTOR_HOST = "http://10.100.131.183:8084";
-        static final String PAYLOAD_HOST = "http://10.100.131.183:8085";
+//        static final String ADSERVER_HOST = "http://10.100.131.183:8081";
+//        static final String EVENTCOLLECTOR_HOST = "http://10.100.131.183:8084";
+//        static final String PAYLOAD_HOST = "http://10.100.131.183:8085";
     }
 
     private static final String SESSION_INIT_PATH = "/v/0.9.5/android/sessions/initialize";
     private static final String REFRESH_ADS_PATH = "/v/0.9.5/android/ads/retrieve";
     private static final String AD_EVENTS_PATH = "/v/0.9.5/android/ads/events";
-    private static final String RETRIEVE_INTERCEPTS_PATH = "/v/0.9.5/ios/intercepts/retrieve";
+    private static final String RETRIEVE_INTERCEPTS_PATH = "/v/0.9.5/android/intercepts/retrieve";
     private static final String INTERCEPT_EVENTS_PATH = "/v/0.9.5/android/intercepts/events";
 
     private static final String EVENT_TRACK_PATH = "/v/1/android/events";

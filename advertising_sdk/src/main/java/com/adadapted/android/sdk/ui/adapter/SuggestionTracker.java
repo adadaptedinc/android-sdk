@@ -1,6 +1,6 @@
 package com.adadapted.android.sdk.ui.adapter;
 
-import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptClient;
+import com.adadapted.android.sdk.core.intercept.InterceptClient;
 import com.adadapted.android.sdk.core.session.Session;
 
 import java.util.HashMap;
@@ -23,13 +23,12 @@ public class SuggestionTracker {
         return instance;
     }
 
-    static synchronized void suggestionMatched(final Session session,
-                                               final String searchId,
+    static synchronized void suggestionMatched(final String searchId,
                                                final String termId,
                                                final String term,
                                                final String replacement,
                                                final String userInput) {
-        getInstance().performSuggestionMatched(session, searchId, termId, term, replacement, userInput);
+        getInstance().performSuggestionMatched(searchId, termId, term, replacement, userInput);
     }
 
     public static synchronized void suggestionPresented(final String searchId,
@@ -44,10 +43,9 @@ public class SuggestionTracker {
         getInstance().performSuggestionSelected(searchId, termId, replacement);
     }
 
-    static synchronized void suggestionNotMatched(final Session session,
-                                                  final String searchId,
+    static synchronized void suggestionNotMatched(final String searchId,
                                                   final String userInput) {
-        getInstance().performSuggestionNotMatched(session, searchId, userInput);
+        getInstance().performSuggestionNotMatched(searchId, userInput);
     }
 
     private final Lock matcherLock = new ReentrantLock();
@@ -62,16 +60,13 @@ public class SuggestionTracker {
 
     private SuggestionTracker() {}
 
-    private void performSuggestionMatched(final Session session,
-                                          final String searchId,
+    private void performSuggestionMatched(final String searchId,
                                           final String termId,
                                           final String term,
                                           final String replacement,
                                           final String userInput) {
         matcherLock.lock();
         try {
-            mSession = session;
-
             final String lcTerm = convertToLowerCase(term);
             final String lcUserInput = convertToLowerCase(userInput);
             final String lcReplacement = convertToLowerCase(replacement);
@@ -79,7 +74,7 @@ public class SuggestionTracker {
             items.put(lcTerm, lcUserInput);
             replacements.put(lcReplacement, lcTerm);
 
-            KeywordInterceptClient.trackMatched(mSession, searchId, termId, lcTerm, lcUserInput);
+            InterceptClient.trackMatched(searchId, termId, lcTerm, lcUserInput);
         }
         finally {
             matcherLock.unlock();
@@ -97,7 +92,7 @@ public class SuggestionTracker {
                 final String term = replacements.get(lcReplacement);
                 final String userInput = items.get(term);
 
-                KeywordInterceptClient.trackPresented(mSession, searchId, termId,  term, userInput);
+                InterceptClient.trackPresented(searchId, termId,  term, userInput);
             }
         }
         finally {
@@ -116,7 +111,7 @@ public class SuggestionTracker {
                 final String term = replacements.get(lcReplacement);
                 final String userInput = items.get(term);
 
-                KeywordInterceptClient.trackSelected(mSession, searchId, termId, term, userInput);
+                InterceptClient.trackSelected(searchId, termId, term, userInput);
             }
         }
             finally {
@@ -124,14 +119,12 @@ public class SuggestionTracker {
         }
     }
 
-    private void performSuggestionNotMatched(final Session session,
-                                             final String searchId,
+    private void performSuggestionNotMatched(final String searchId,
                                              final String userInput) {
         matcherLock.lock();
         try {
-            mSession = session;
             final String lcUserInput = convertToLowerCase(userInput);
-            KeywordInterceptClient.trackNotMatched(mSession, searchId, lcUserInput);
+            InterceptClient.trackNotMatched(searchId, lcUserInput);
         }
         finally {
             matcherLock.unlock();

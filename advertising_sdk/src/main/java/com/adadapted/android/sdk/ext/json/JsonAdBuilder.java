@@ -22,18 +22,19 @@ public class JsonAdBuilder {
     private static final int DEFAULT_REFRESH_TIME = 90;
 
     private static final String AD_ID = "ad_id";
-    private static final String AD_TYPE = "ad_type";
-    private static final String ZONE = "zone";
     private static final String IMPRESSION_ID = "impression_id";
     private static final String REFRESH_TIME  = "refresh_time";
-    private static final String ACTION_TYPE = "ad_type";
-    private static final String ACTION_PATH = "ad_path";
-    private static final String AD_URL = "ad_url";
-    private static final String TRACKING_HTML = "tracking_html";
+    private static final String HIDE_AFTER_INTERACTION = "hide_after_interaction";
+    private static final String TYPE = "type";
+    private static final String CREATIVE_URL = "creative_url";
+    private static final String ACTION_TYPE = "action_type";
+    private static final String ACTION_PATH = "action_path";
     private static final String PAYLOAD = "payload";
+    private static final String POPUP = "popup";
+    private static final String TRACKING_HTML = "tracking_html";
+    private static final String SETTINGS = "settings";
 
     private static final String CONTENT_DETAILED_LIST_ITEMS = "detailed_list_items";
-
     private static final String PRODUCT_TITLE = "product_title";
     private static final String PRODUCT_BRAND = "product_brand";
     private static final String PRODUCT_CATEGORY = "product_category";
@@ -43,20 +44,20 @@ public class JsonAdBuilder {
     private static final String PRODUCT_IMAGE = "product_image";
 
 
-    public List<Ad> buildAds(final JSONArray jsonAds) {
+    public List<Ad> buildAds(final String zoneId, final JSONArray jsonAds) {
         final List<Ad> ads = new ArrayList<>();
 
         final int adCount = jsonAds.length();
         for(int i = 0; i < adCount; i++) {
             try {
                 final JSONObject ad = jsonAds.getJSONObject(i);
-                if(AdDisplayType.isValidType(ad.getString(AD_TYPE))) {
-                    ads.add(buildAd(ad));
+                if(AdDisplayType.isValidType(ad.getString(TYPE))) {
+                    ads.add(buildAd(zoneId, ad));
                 }
                 else {
                     AppEventClient.trackError(
-                        "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                        "Ad " + ad.getString(AD_ID) + " has unsupported ad_type: " + ad.getString(AD_TYPE)
+                        "AD_PAYLOAD_PARSE_FAILED",
+                        "Ad " + ad.getString(AD_ID) + " has unsupported ad_type: " + ad.getString(TYPE)
                     );
                 }
             }
@@ -66,7 +67,7 @@ public class JsonAdBuilder {
                 errorParams.put("exception", ex.getMessage());
 
                 AppEventClient.trackError(
-                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                    "AD_PAYLOAD_PARSE_FAILED",
                     "Problem parsing Ad JSON.",
                     errorParams
                 );
@@ -76,11 +77,11 @@ public class JsonAdBuilder {
         return ads;
     }
 
-    public Ad buildAd(final JSONObject ad) throws JSONException {
+    public Ad buildAd(final String zoneId, final JSONObject ad) throws JSONException {
         final Ad.Builder builder = new Ad.Builder();
 
         builder.setAdId(ad.getString(AD_ID));
-        builder.setZoneId(ad.getString(ZONE));
+        builder.setZoneId(zoneId);
         builder.setImpressionId(ad.getString(IMPRESSION_ID));
 
         try {
@@ -88,18 +89,18 @@ public class JsonAdBuilder {
         }
         catch(NumberFormatException ex) {
             AppEventClient.trackError(
-                "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                "AD_PAYLOAD_PARSE_FAILED",
                 "Ad " + builder.getAdId() + " has an improperly set refresh_time."
             );
 
             builder.setRefreshTime(DEFAULT_REFRESH_TIME);
         }
 
-        builder.setUrl(ad.getString(AD_URL));
+        builder.setUrl(ad.getString(CREATIVE_URL));
         builder.setActionType(ad.getString(ACTION_TYPE));
         builder.setActionPath(ad.getString(ACTION_PATH));
 
-        if (AdActionType.handlesContent((builder.getActionType()))) {
+        if (AdActionType.handlesContent(builder.getActionType())) {
             builder.setPayload(parseAdContent(ad));
         }
 

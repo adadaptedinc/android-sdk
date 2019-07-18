@@ -4,10 +4,10 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class JsonAdRequestBuilderTest {
+public class JsonInterceptBuilderTest {
 
     @Test
-    public void buildAdRequest() {
+    public void build() {
         assertTrue(true);
     }
 }

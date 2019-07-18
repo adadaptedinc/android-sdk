@@ -12,45 +12,21 @@ public class AdEvent {
         public static final String CUSTOM = "custom";
     }
 
-    private final String appId;
-    private final String udid;
-    private final String sessionId;
     private final String adId;
     private final String zoneId;
     private final String impressionId;
     private final String eventType;
-    private final long datetime;
-    private final String sdkVersion;
+    private final long createdAt;
 
-    AdEvent(final String appId,
-            final String udid,
-            final String sessionId,
-            final String adId,
+    AdEvent(final String adId,
             final String zoneId,
             final String impressionId,
-            final String eventType,
-            final String sdkVersion) {
-        this.appId = appId;
-        this.udid = udid;
-        this.sessionId = sessionId;
+            final String eventType) {
         this.adId = adId;
         this.zoneId = zoneId;
         this.impressionId = impressionId;
         this.eventType = eventType;
-        this.datetime = (new Date()).getTime();
-        this.sdkVersion = sdkVersion;
-    }
-
-    public String getAppId() {
-        return appId;
-    }
-
-    public String getUdid() {
-        return udid;
-    }
-
-    public String getSessionId() {
-        return sessionId;
+        this.createdAt = (new Date()).getTime();
     }
 
     public String getAdId() {
@@ -69,11 +45,7 @@ public class AdEvent {
         return eventType;
     }
 
-    public long getDatetime() {
-        return datetime;
-    }
-
-    public String getSdkVersion() {
-        return sdkVersion;
+    public long getCreatedAt() {
+        return createdAt;
     }
 }

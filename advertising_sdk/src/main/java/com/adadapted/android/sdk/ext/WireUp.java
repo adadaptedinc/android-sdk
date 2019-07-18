@@ -6,11 +6,11 @@ import com.adadapted.android.sdk.config.Config;
 import com.adadapted.android.sdk.core.ad.AdEventClient;
 import com.adadapted.android.sdk.core.addit.PayloadClient;
 import com.adadapted.android.sdk.core.event.AppEventClient;
-import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptClient;
+import com.adadapted.android.sdk.core.intercept.InterceptClient;
 import com.adadapted.android.sdk.core.session.SessionClient;
 import com.adadapted.android.sdk.ext.http.HttpAdEventSink;
 import com.adadapted.android.sdk.ext.http.HttpAppEventSink;
-import com.adadapted.android.sdk.ext.http.HttpKeywordInterceptAdapter;
+import com.adadapted.android.sdk.ext.http.HttpInterceptAdapter;
 import com.adadapted.android.sdk.ext.http.HttpPayloadAdapter;
 import com.adadapted.android.sdk.ext.http.HttpRequestManager;
 import com.adadapted.android.sdk.ext.http.HttpSessionAdapter;
@@ -33,8 +33,8 @@ public class WireUp {
             Config.adEventsUrl(isProd)
         ));
 
-        KeywordInterceptClient.createInstance(
-            new HttpKeywordInterceptAdapter(
+        InterceptClient.createInstance(
+            new HttpInterceptAdapter(
                 Config.retrieveInterceptsUrl(isProd),
                 Config.interceptEventsUrl(isProd)
             )

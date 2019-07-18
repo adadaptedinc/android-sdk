@@ -17,6 +17,7 @@ public class JsonSessionBuilder {
     private static final String LOGTAG = JsonSessionBuilder.class.getName();
 
     private static final String SESSION_ID = "session_id";
+    private static final String WILL_SERVE_ADS = "will_serve_ads";
     private static final String ACTIVE_CAMPAIGNS = "active_campaigns";
     private static final String SESSION_EXPIRES_AT = "session_expires_at";
     private static final String POLLING_INTERVAL_MS = "polling_interval_ms";
@@ -36,6 +37,7 @@ public class JsonSessionBuilder {
 
         try {
             builder.setSessionId(response.getString(SESSION_ID));
+            builder.setWillServeAds(response.getBoolean(WILL_SERVE_ADS));
             builder.setActiveCampaigns(response.getBoolean(ACTIVE_CAMPAIGNS));
             builder.setExpiresAt(response.getLong(SESSION_EXPIRES_AT));
             builder.setPollingInterval(response.getLong(POLLING_INTERVAL_MS));

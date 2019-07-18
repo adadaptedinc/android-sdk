@@ -17,5 +17,5 @@ public interface SessionAdapter {
 
     void sendInit(DeviceInfo deviceInfo, SessionInitListener listener);
 
-    void sentAdGet(Session session, AdGetListener listener);
+    void sendRefreshAds(Session session, AdGetListener listener);
 }
