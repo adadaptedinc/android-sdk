@@ -1,11 +1,13 @@
 package com.adadapted.android.sdk.core.keywordintercept;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class KeywordIntercept {
+    private static final String SEARCH_ID = "empty";
+    private static final long REFRESH_TIME = 300;
+    private static final int MIN_MATCH_LENGTH = 3;
+
     private final String searchId;
     private final long refreshTime;
     private final int minMatchLength;
@@ -13,9 +15,9 @@ public class KeywordIntercept {
 
     public static KeywordIntercept empty() {
         return new KeywordIntercept(
-            "empty",
-            300,
-            3,
+            SEARCH_ID,
+            REFRESH_TIME,
+            MIN_MATCH_LENGTH,
             new ArrayList<AutoFill>()
         );
     }

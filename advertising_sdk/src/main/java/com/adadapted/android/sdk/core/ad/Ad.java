@@ -129,15 +129,15 @@ public class Ad implements Parcelable {
         return AdContent.createAddToListContent(this);
     }
 
-    public List<String> getPayloadNames() {
-        final List<String> names = new ArrayList<>();
-
-        for(AddToListItem item : payload) {
-            names.add(item.getTitle());
-        }
-
-        return names;
-    }
+//    public List<String> getPayloadNames() {
+//        final List<String> names = new ArrayList<>();
+//
+//        for(AddToListItem item : payload) {
+//            names.add(item.getTitle());
+//        }
+//
+//        return names;
+//    }
 
     public long getRefreshTime() {
         return refreshTime;

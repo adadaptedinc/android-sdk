@@ -1,5 +1,7 @@
 package com.adadapted.android.sdk.ext.http;
 
+import android.util.Log;
+
 import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.session.SessionAdapter;
@@ -49,7 +51,7 @@ public class HttpSessionAdapter implements SessionAdapter {
 
             @Override
             public void onResponse(final JSONObject response) {
-
+                Log.i(LOGTAG, response.toString());
                 final Session session = sessionBuilder.buildSession(response);
                 listener.onSessionInitialized(session);
             }

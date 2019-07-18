@@ -9,6 +9,7 @@ import com.adadapted.android.sdk.core.keywordintercept.KeywordIntercept;
 import com.adadapted.android.sdk.ui.model.Suggestion;
 
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -44,7 +45,7 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, KeywordI
 
         interceptLock.lock();
         try {
-            final String input = constraint.toString().toLowerCase();
+            final String input = constraint.toString().toLowerCase(Locale.ROOT);
             if(!shouldCheckConstraint(input)) {
                 return suggestions;
             }
@@ -55,7 +56,7 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, KeywordI
                     continue;
                 }
 
-                final String lcTerm = autoFill.getTerm().toLowerCase();
+                final String lcTerm = autoFill.getTerm().toLowerCase(Locale.ROOT);
                 if (lcTerm.startsWith(input)) {
                     fileTerm(autoFill, constraint.toString(), suggestions);
                     break;

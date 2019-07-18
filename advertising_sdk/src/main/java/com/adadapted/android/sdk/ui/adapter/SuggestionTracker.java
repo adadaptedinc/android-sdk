@@ -4,6 +4,7 @@ import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptClient;
 import com.adadapted.android.sdk.core.session.Session;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -138,6 +139,6 @@ public class SuggestionTracker {
     }
 
     private String convertToLowerCase(final String str) {
-        return str != null ? str.toLowerCase() : "";
+        return str != null ? str.toLowerCase(Locale.ROOT) : "";
     }
 }

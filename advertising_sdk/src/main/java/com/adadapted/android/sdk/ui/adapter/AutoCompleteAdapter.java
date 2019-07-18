@@ -10,6 +10,7 @@ import com.adadapted.android.sdk.ui.model.Suggestion;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public class AutoCompleteAdapter extends ArrayAdapter<String> {
@@ -59,13 +60,13 @@ public class AutoCompleteAdapter extends ArrayAdapter<String> {
                     suggestion.presented();
                 }
 
-                final String input = constraint.toString().toLowerCase();
+                final String input = constraint.toString().toLowerCase(Locale.ROOT);
                 for(final String item : allItems) {
                     if (item != null) {
-                        if (item.toLowerCase().startsWith(input)) {
+                        if (item.toLowerCase(Locale.ROOT).startsWith(input)) {
                             items.add(item);
                         }
-                        else if (item.toLowerCase().contains(input)) {
+                        else if (item.toLowerCase(Locale.ROOT).contains(input)) {
                             items.add(item);
                         }
                     }

@@ -15,7 +15,7 @@ import com.adadapted.android.sdk.ext.http.HttpPayloadAdapter;
 import com.adadapted.android.sdk.ext.http.HttpRequestManager;
 import com.adadapted.android.sdk.ext.http.HttpSessionAdapter;
 
-public class Wireup {
+public class WireUp {
     public static void run(final Context context, final boolean isProd) {
         HttpRequestManager.createQueue(context.getApplicationContext());
 

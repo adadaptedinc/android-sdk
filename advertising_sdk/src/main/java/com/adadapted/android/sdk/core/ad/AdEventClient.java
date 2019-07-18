@@ -53,7 +53,7 @@ public class AdEventClient implements SessionClient.Listener {
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
             public void run() {
-                final int count = ImpressionIdCounter.getsInstance().getIncrementedCountFor(ad.getImpressionId());
+                final int count = ImpressionIdCounter.getInstance().getIncrementedCountFor(ad.getImpressionId());
                 getInstance().fileEvent(ad, AdEvent.Types.IMPRESSION, count);
             }
         });
@@ -67,7 +67,7 @@ public class AdEventClient implements SessionClient.Listener {
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
             public void run() {
-                final int count = ImpressionIdCounter.getsInstance().getCurrentCountFor(ad.getImpressionId());
+                final int count = ImpressionIdCounter.getInstance().getCurrentCountFor(ad.getImpressionId());
                 getInstance().fileEvent(ad, AdEvent.Types.IMPRESSION_END, count);
             }
         });
@@ -81,7 +81,7 @@ public class AdEventClient implements SessionClient.Listener {
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
             public void run() {
-                final int count = ImpressionIdCounter.getsInstance().getCurrentCountFor(ad.getImpressionId());
+                final int count = ImpressionIdCounter.getInstance().getCurrentCountFor(ad.getImpressionId());
                 getInstance().fileEvent(ad, AdEvent.Types.INTERACTION, count);
             }
         });
@@ -95,7 +95,7 @@ public class AdEventClient implements SessionClient.Listener {
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
             public void run() {
-                final int count = ImpressionIdCounter.getsInstance().getCurrentCountFor(ad.getImpressionId());
+                final int count = ImpressionIdCounter.getInstance().getCurrentCountFor(ad.getImpressionId());
                 getInstance().fileEvent(ad, AdEvent.Types.POPUP_BEGIN, count);
             }
         });
@@ -109,7 +109,7 @@ public class AdEventClient implements SessionClient.Listener {
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
             public void run() {
-                final int count = ImpressionIdCounter.getsInstance().getCurrentCountFor(ad.getImpressionId());
+                final int count = ImpressionIdCounter.getInstance().getCurrentCountFor(ad.getImpressionId());
                 getInstance().fileEvent(ad, AdEvent.Types.POPUP_END, count);
             }
         });

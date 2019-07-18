@@ -31,9 +31,9 @@ public class SessionClient implements SessionAdapter.Listener {
 
     enum Status {
         OK, // Normal Status. No alterations to regular behavior
-        SHOULD_REFRESH, // SDK should refresh Ads or Reinit Session at the next available chance
+        SHOULD_REFRESH, // SDK should refresh Ads or Reinitialize Session at the next available chance
         IS_REFRESH_ADS, // SDK is currently refreshing Ads
-        IS_REINIT_SESSION // SDK is currently reiniting the Session
+        IS_REINITIALIZING_SESSION // SDK is currently reinitializing the Session
     }
 
     private static SessionClient instance;
@@ -324,13 +324,13 @@ public class SessionClient implements SessionAdapter.Listener {
 
                 deviceInfoLock.lock();
                 try {
-                    setStatus(Status.IS_REINIT_SESSION);
+                    setStatus(Status.IS_REINITIALIZING_SESSION);
                     adapter.sendInit(this.deviceInfo, this);
                 } finally {
                     deviceInfoLock.unlock();
                 }
             } else {
-                //Log.w(LOGTAG, "SDK not actively in use. Skipping background Session reinit.");
+                //Log.w(LOGTAG, "SDK not actively in use. Skipping background Session reinitialize.");
                 setStatus(Status.SHOULD_REFRESH);
             }
         }

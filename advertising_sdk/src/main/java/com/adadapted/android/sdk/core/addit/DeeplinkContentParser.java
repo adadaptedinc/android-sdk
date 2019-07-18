@@ -75,7 +75,7 @@ public class DeeplinkContentParser {
             errorParams.put("exception_message", ex.getMessage());
             AppEventClient.trackError(
                 "ADDIT_PAYLOAD_PARSE_FAILED",
-                "Problem parsing Addit JSON input",
+                "Problem parsing Deeplink JSON input",
                 errorParams
             );
 
@@ -107,7 +107,7 @@ public class DeeplinkContentParser {
             errorParams.put("field_name", fieldName);
             AppEventClient.trackError(
                 "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
-                "Problem parsing Addit JSON input field " + fieldName,
+                "Problem parsing Deeplink JSON input field " + fieldName,
                 errorParams
             );
 

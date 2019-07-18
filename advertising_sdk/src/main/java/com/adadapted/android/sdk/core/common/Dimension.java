@@ -1,7 +1,7 @@
 package com.adadapted.android.sdk.core.common;
 
 public class Dimension {
-    public static class ORIEN {
+    public static class Orientation {
         public static final String LAND = "land";
         public static final String PORT = "port";
     }

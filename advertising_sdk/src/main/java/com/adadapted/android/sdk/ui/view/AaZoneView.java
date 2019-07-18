@@ -188,7 +188,7 @@ public class AaZoneView extends RelativeLayout implements AdZonePresenter.Listen
     @Override
     public void onZoneAvailable(final Zone zone) {
         if(width == 0 || height == 0) {
-            final Dimension dimension = zone.getDimensions().get(Dimension.ORIEN.PORT);
+            final Dimension dimension = zone.getDimensions().get(Dimension.Orientation.PORT);
             width = (dimension == null) ? LayoutParams.MATCH_PARENT : dimension.getWidth();
             height = (dimension == null) ? LayoutParams.MATCH_PARENT : dimension.getHeight();
         }

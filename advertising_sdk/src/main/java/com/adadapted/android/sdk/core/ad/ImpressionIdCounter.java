@@ -8,7 +8,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ImpressionIdCounter {
     private static ImpressionIdCounter instance;
 
-    public static ImpressionIdCounter getsInstance() {
+    public static ImpressionIdCounter getInstance() {
         if(instance == null) {
             instance = new ImpressionIdCounter();
         }
