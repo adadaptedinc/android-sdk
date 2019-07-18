@@ -19,17 +19,26 @@ import java.util.Map;
 public class JsonKeywordInterceptBuilder {
     private static final String TAG = JsonKeywordInterceptBuilder.class.getName();
 
+    private static final String SEARCH_ID = "search_id";
+    private static final String REFRESH_TIME = "refresh_time";
+    private static final String MIN_MATCH_LENGTH = "min_match_length";
+    private static final String TERM_ID = "term_id";
+    private static final String TERM = "term";
+    private static final String AUTO_FILL = "autofill";
+    private static final String REPLACEMENT = "replacement";
+    private static final String ICON = "icon";
+    private static final String TAG_LINE = "tagline";
+    private static final String PRIORITY = "priority";
+
     public KeywordIntercept build(final JSONObject json) {
         if(json == null) { return KeywordIntercept.empty(); }
 
         try {
-            final String searchId = json.has(JsonFields.SEARCHID) ? json.getString(JsonFields.SEARCHID) : "";
-            final long refreshTime = json.has(JsonFields.REFRESHTIME) ? Long.parseLong(json.getString(JsonFields.REFRESHTIME)) : 0L;
-            final int minMatchLength = json.has(JsonFields.MINMATCHLENGTH) ? Integer.parseInt(json.getString(JsonFields.MINMATCHLENGTH)) : 2;
+            final String searchId = json.has(SEARCH_ID) ? json.getString(SEARCH_ID) : "";
+            final long refreshTime = json.has(REFRESH_TIME) ? Long.parseLong(json.getString(REFRESH_TIME)) : 0L;
+            final int minMatchLength = json.has(MIN_MATCH_LENGTH) ? Integer.parseInt(json.getString(MIN_MATCH_LENGTH)) : 2;
 
             final List<AutoFill> intercepts = sortAutoFills(parseAutoFills(json));
-
-            Log.i(TAG, intercepts.toString());
 
             return new KeywordIntercept(searchId, refreshTime, minMatchLength, intercepts);
         }
@@ -52,7 +61,7 @@ public class JsonKeywordInterceptBuilder {
     private List<AutoFill> parseAutoFills(final JSONObject json) throws JSONException {
         final List<AutoFill> autoFills = new ArrayList<>();
 
-        final Object obj = json.get(JsonFields.AUTOFILL);
+        final Object obj = json.get(AUTO_FILL);
         if(obj instanceof JSONObject) {
             final JSONObject autoFillJson = (JSONObject)obj;
 
@@ -60,11 +69,11 @@ public class JsonKeywordInterceptBuilder {
                 final String term = z.next();
                 final JSONObject jsonTerm = autoFillJson.getJSONObject(term);
 
-                final String termId = jsonTerm.has(JsonFields.TERMID) ?  jsonTerm.getString(JsonFields.TERMID) : "";
-                final String replacement = jsonTerm.has(JsonFields.REPLACEMENT) ? jsonTerm.getString(JsonFields.REPLACEMENT) : "";
-                final String icon = jsonTerm.has(JsonFields.ICON) ? jsonTerm.getString(JsonFields.ICON) : "";
-                final String tagLine = jsonTerm.has(JsonFields.TAGLINE) ? jsonTerm.getString(JsonFields.TAGLINE) : "";
-                final int priority = jsonTerm.has(JsonFields.PRIORITY) ? jsonTerm.getInt(JsonFields.PRIORITY) : 0;
+                final String termId = jsonTerm.has(TERM_ID) ?  jsonTerm.getString(TERM_ID) : "";
+                final String replacement = jsonTerm.has(REPLACEMENT) ? jsonTerm.getString(REPLACEMENT) : "";
+                final String icon = jsonTerm.has(ICON) ? jsonTerm.getString(ICON) : "";
+                final String tagLine = jsonTerm.has(TAG_LINE) ? jsonTerm.getString(TAG_LINE) : "";
+                final int priority = jsonTerm.has(PRIORITY) ? jsonTerm.getInt(PRIORITY) : 0;
 
                 autoFills.add(new AutoFill(termId, term, replacement, icon, tagLine, priority));
             }

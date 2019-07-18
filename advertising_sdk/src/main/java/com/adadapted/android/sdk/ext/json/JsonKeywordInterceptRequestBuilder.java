@@ -13,16 +13,22 @@ import java.util.Date;
 public class JsonKeywordInterceptRequestBuilder {
     private static final String TAG = JsonKeywordInterceptRequestBuilder.class.getName();
 
+    private static final String SESSION_ID = "session_id";
+    private static final String APP_ID = "app_id";
+    private static final String UDID = "udid";
+    private static final String DATETIME = "datetime";
+    private static final String SDK_VERSION = "sdk_version";
+
     public JSONObject buildInitRequest(final Session session) {
         final JSONObject json = new JSONObject();
         final DeviceInfo deviceInfo = session.getDeviceInfo();
 
         try {
-            json.put(JsonFields.SESSIONID, session.getId());
-            json.put(JsonFields.APPID, deviceInfo.getAppId());
-            json.put(JsonFields.UDID, deviceInfo.getUdid());
-            json.put(JsonFields.DATETIME, new Date().getTime());
-            json.put(JsonFields.SDKVERSION, deviceInfo.getSdkVersion());
+            json.put(SESSION_ID, session.getId());
+            json.put(APP_ID, deviceInfo.getAppId());
+            json.put(UDID, deviceInfo.getUdid());
+            json.put(DATETIME, new Date().getTime());
+            json.put(SDK_VERSION, deviceInfo.getSdkVersion());
         }
         catch(JSONException ex) {
             Log.w(TAG, "Problem converting to JSON.", ex);

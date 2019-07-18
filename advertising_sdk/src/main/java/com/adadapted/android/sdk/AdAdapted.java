@@ -9,7 +9,7 @@ import com.adadapted.android.sdk.core.addit.PayloadClient;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.session.Session;
 import com.adadapted.android.sdk.core.session.SessionClient;
-import com.adadapted.android.sdk.ext.Wireup;
+import com.adadapted.android.sdk.ext.WireUp;
 import com.adadapted.android.sdk.ui.messaging.AaSdkAdditContentListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener;
@@ -118,7 +118,7 @@ public class AdAdapted {
 
         hasStarted = true;
 
-        Wireup.run(context, isProd);
+        WireUp.run(context, isProd);
 
         SdkEventPublisher.getInstance().setListener(eventListener);
         AdditContentPublisher.getInstance().addListener(contentListener);
