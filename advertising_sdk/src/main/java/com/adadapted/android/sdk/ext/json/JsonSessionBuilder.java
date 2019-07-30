@@ -16,6 +16,13 @@ import java.util.Map;
 public class JsonSessionBuilder {
     private static final String LOGTAG = JsonSessionBuilder.class.getName();
 
+    private static final String SESSION_ID = "session_id";
+    private static final String WILL_SERVE_ADS = "will_serve_ads";
+    private static final String ACTIVE_CAMPAIGNS = "active_campaigns";
+    private static final String SESSION_EXPIRES_AT = "session_expires_at";
+    private static final String POLLING_INTERVAL_MS = "polling_interval_ms";
+    private static final String ZONES = "zones";
+
     private final DeviceInfo deviceInfo;
     private final JsonZoneBuilder zoneBuilder;
 
@@ -29,14 +36,15 @@ public class JsonSessionBuilder {
         builder.setDeviceInfo(deviceInfo);
 
         try {
-            builder.setSessionId(response.getString(JsonFields.SESSIONID));
-            builder.setActiveCampaigns(response.getBoolean(JsonFields.ACTIVECAMPAIGNS));
-            builder.setExpiresAt(response.getLong(JsonFields.SESSIONEXPIRESAT));
-            builder.setPollingInterval(response.getLong(JsonFields.POLLINGINTERVALMS));
+            builder.setSessionId(response.getString(SESSION_ID));
+            builder.setWillServeAds(response.getBoolean(WILL_SERVE_ADS));
+            builder.setActiveCampaigns(response.getBoolean(ACTIVE_CAMPAIGNS));
+            builder.setExpiresAt(response.getLong(SESSION_EXPIRES_AT));
+            builder.setPollingInterval(response.getLong(POLLING_INTERVAL_MS));
 
             if(builder.hasActiveCampaigns()) {
-                if(response.has(JsonFields.ZONES) && (response.get(JsonFields.ZONES).getClass() == JSONObject.class)) {
-                    final JSONObject jsonZones = response.getJSONObject(JsonFields.ZONES);
+                if(response.has(ZONES) && (response.get(ZONES).getClass() == JSONObject.class)) {
+                    final JSONObject jsonZones = response.getJSONObject(ZONES);
                     final Map<String, Zone> zones = zoneBuilder.buildZones(jsonZones);
                     builder.setZones(zones);
                 }

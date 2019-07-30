@@ -11,6 +11,7 @@ import java.util.Map;
 public class Session {
     private final DeviceInfo deviceInfo;
     private final String id;
+    private final boolean willServeAds;
     private final boolean hasAds;
     private final long refreshTime;
     private final Date expiresAt;
@@ -18,12 +19,14 @@ public class Session {
 
     public Session(final DeviceInfo deviceInfo,
                    final String id,
+                   final boolean willServeAds,
                    final boolean hasAds,
                    final long refreshTime,
                    final Date expiresAt,
                    final Map<String, Zone> zones) {
         this.deviceInfo = deviceInfo;
-        this.id = id;
+        this.id = id == null ? "" : id;
+        this.willServeAds = willServeAds;
         this.hasAds = hasAds;
         this.refreshTime = refreshTime;
         this.expiresAt = expiresAt;
@@ -32,12 +35,15 @@ public class Session {
 
     public Session(final Session session,
                    final Map<String, Zone> zones) {
-        this.deviceInfo = session.getDeviceInfo();
-        this.id = session.getId();
-        this.hasAds = session.hasActiveCampaigns();
-        this.refreshTime = session.getRefreshTime();
-        this.expiresAt = session.getExpiresAt();
-        this.zones = (zones != null) ? zones : new HashMap<String, Zone>();
+        this(
+            session.getDeviceInfo(),
+            session.getId(),
+            session.willServeAds(),
+            session.hasActiveCampaigns(),
+            session.getRefreshTime(),
+            session.getExpiresAt(),
+            (zones != null) ? zones : new HashMap<String, Zone>()
+        );
     }
 
     public DeviceInfo getDeviceInfo() {
@@ -46,6 +52,10 @@ public class Session {
 
     public String getId() {
         return id;
+    }
+
+    public boolean willServeAds() {
+        return willServeAds;
     }
 
     public boolean hasActiveCampaigns() {
@@ -77,12 +87,21 @@ public class Session {
     }
 
     public static Session emptySession(final DeviceInfo deviceInfo) {
-        return new Session(deviceInfo, "", false, Config.DEFAULT_AD_POLLING, new Date(), new HashMap<String, Zone>());
+        return new Session(
+            deviceInfo,
+            "",
+            false,
+            false,
+            Config.DEFAULT_AD_POLLING,
+            new Date(),
+            new HashMap<String, Zone>()
+        );
     }
 
     public static class Builder {
         private DeviceInfo deviceInfo;
         private String sessionId;
+        private boolean willServeAds;
         private boolean hasAds;
         private long refreshTime;
         private Date expiresAt;
@@ -90,6 +109,7 @@ public class Session {
 
         public Builder() {
             sessionId = "";
+            willServeAds = false;
             hasAds = false;
             refreshTime = 0L;
             expiresAt = new Date();
@@ -110,6 +130,14 @@ public class Session {
 
         public void setSessionId(String sessionId) {
             this.sessionId = sessionId;
+        }
+
+        public boolean willServeAds() {
+            return willServeAds;
+        }
+
+        public void setWillServeAds(boolean willServeAds) {
+            this.willServeAds = willServeAds;
         }
 
         public boolean hasActiveCampaigns() {
@@ -148,6 +176,7 @@ public class Session {
             return new Session(
                 getDeviceInfo(),
                 getSessionId(),
+                willServeAds(),
                 hasActiveCampaigns(),
                 getPollingInterval(),
                 getExpiresAt(),

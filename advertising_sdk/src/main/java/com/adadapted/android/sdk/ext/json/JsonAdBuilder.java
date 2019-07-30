@@ -21,21 +21,43 @@ public class JsonAdBuilder {
 
     private static final int DEFAULT_REFRESH_TIME = 90;
 
-    public List<Ad> buildAds(final JSONArray jsonAds) {
+    private static final String AD_ID = "ad_id";
+    private static final String IMPRESSION_ID = "impression_id";
+    private static final String REFRESH_TIME  = "refresh_time";
+    private static final String HIDE_AFTER_INTERACTION = "hide_after_interaction";
+    private static final String TYPE = "type";
+    private static final String CREATIVE_URL = "creative_url";
+    private static final String ACTION_TYPE = "action_type";
+    private static final String ACTION_PATH = "action_path";
+    private static final String PAYLOAD = "payload";
+    private static final String POPUP = "popup";
+    private static final String TRACKING_HTML = "tracking_html";
+    private static final String SETTINGS = "settings";
+
+    private static final String CONTENT_DETAILED_LIST_ITEMS = "detailed_list_items";
+    private static final String PRODUCT_TITLE = "product_title";
+    private static final String PRODUCT_BRAND = "product_brand";
+    private static final String PRODUCT_CATEGORY = "product_category";
+    private static final String PRODUCT_BARCODE = "product_barcode";
+    private static final String PRODUCT_SKU = "product_sku";
+    private static final String PRODUCT_DISCOUNT = "product_discount";
+    private static final String PRODUCT_IMAGE = "product_image";
+
+
+    public List<Ad> buildAds(final String zoneId, final JSONArray jsonAds) {
         final List<Ad> ads = new ArrayList<>();
 
         final int adCount = jsonAds.length();
         for(int i = 0; i < adCount; i++) {
             try {
-                final JSONObject jsonAd = jsonAds.getJSONObject(i);
-                if(AdDisplayType.isValidType(jsonAd.getString(JsonFields.AD_TYPE))) {
-                    final Ad ad  = buildAd(jsonAd);
-                    ads.add(ad);
+                final JSONObject ad = jsonAds.getJSONObject(i);
+                if(AdDisplayType.isValidType(ad.getString(TYPE))) {
+                    ads.add(buildAd(zoneId, ad));
                 }
                 else {
                     AppEventClient.trackError(
-                        "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                        "Ad " + jsonAd.getString(JsonFields.ADID) + " has unsupported ad_type: " + jsonAd.getString(JsonFields.AD_TYPE)
+                        "AD_PAYLOAD_PARSE_FAILED",
+                        "Ad " + ad.getString(AD_ID) + " has unsupported ad_type: " + ad.getString(TYPE)
                     );
                 }
             }
@@ -45,153 +67,96 @@ public class JsonAdBuilder {
                 errorParams.put("exception", ex.getMessage());
 
                 AppEventClient.trackError(
-                        "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                        "Problem parsing Ad JSON.",
-                        errorParams);
+                    "AD_PAYLOAD_PARSE_FAILED",
+                    "Problem parsing Ad JSON.",
+                    errorParams
+                );
             }
         }
 
         return ads;
     }
 
-    public Ad buildAd(final JSONObject jsonAd) throws JSONException {
+    public Ad buildAd(final String zoneId, final JSONObject ad) throws JSONException {
         final Ad.Builder builder = new Ad.Builder();
 
-        builder.setAdId(jsonAd.getString(JsonFields.ADID));
-        builder.setZoneId(jsonAd.getString(JsonFields.ZONE));
-        builder.setImpressionId(jsonAd.getString(JsonFields.IMPRESSIONID));
+        builder.setAdId(ad.getString(AD_ID));
+        builder.setZoneId(zoneId);
+        builder.setImpressionId(ad.getString(IMPRESSION_ID));
 
         try {
-            builder.setRefreshTime(Integer.parseInt(jsonAd.getString(JsonFields.REFRESH_TIME)));
+            builder.setRefreshTime(Integer.parseInt(ad.getString(REFRESH_TIME)));
         }
         catch(NumberFormatException ex) {
             AppEventClient.trackError(
-                "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                "AD_PAYLOAD_PARSE_FAILED",
                 "Ad " + builder.getAdId() + " has an improperly set refresh_time."
             );
 
             builder.setRefreshTime(DEFAULT_REFRESH_TIME);
         }
 
-        builder.setUrl(jsonAd.getString(JsonFields.AD_URL));
+        builder.setUrl(ad.getString(CREATIVE_URL));
+        builder.setActionType(ad.getString(ACTION_TYPE));
+        builder.setActionPath(ad.getString(ACTION_PATH));
 
-        builder.setActionType(jsonAd.getString(JsonFields.ACTION_TYPE));
-        builder.setActionPath(jsonAd.getString(JsonFields.ACTION_PATH));
-
-        if (AdActionType.handlesContent((builder.getActionType()))) {
-            builder.setPayload(parseAdContent(jsonAd));
+        if (AdActionType.handlesContent(builder.getActionType())) {
+            builder.setPayload(parseAdContent(ad));
         }
 
-        builder.setTrackingHtml(jsonAd.getString(JsonFields.TRACKING_HTML));
+        builder.setTrackingHtml(ad.getString(TRACKING_HTML));
 
         return builder.build();
     }
 
-    private List<AddToListItem> parseAdContent(final JSONObject jsonAd) throws JSONException{
-        final JSONObject payloadObject = jsonAd.getJSONObject(JsonFields.PAYLOAD);
-
-        if(payloadObject.has(JsonFields.CONTENT_LIST_ITEMS)) {
-            return parseListItems(payloadObject.getJSONArray(JsonFields.CONTENT_LIST_ITEMS));
-        }
-        else if(payloadObject.has(JsonFields.CONTENT_DETAILED_LIST_ITEMS)) {
-            return parseDetailedListItems(payloadObject.getJSONArray(JsonFields.CONTENT_DETAILED_LIST_ITEMS));
-        }
-        else if (payloadObject.has(JsonFields.CONTENT_RICH_LIST_ITEMS)) {
-            return parseRichListItems(payloadObject.getJSONArray(JsonFields.CONTENT_RICH_LIST_ITEMS));
-        }
-
-        return new ArrayList<>();
+    private List<AddToListItem> parseAdContent(final JSONObject ad) throws JSONException{
+        final JSONObject payloadObject = ad.getJSONObject(PAYLOAD);
+        return parseDetailedListItems(payloadObject.getJSONArray(CONTENT_DETAILED_LIST_ITEMS));
     }
 
-    private List<AddToListItem> parseListItems(JSONArray jsonItems) throws JSONException {
+    private List<AddToListItem> parseDetailedListItems(final JSONArray items) throws JSONException {
         final List<AddToListItem> listItems = new ArrayList<>();
 
-        for (int i = 0; i < jsonItems.length(); i++) {
-            final String name = jsonItems.getString(i);
-            if(!name.isEmpty()) {
-                final AddToListItem item = new AddToListItem.Builder().setTitle(name).build();
-                listItems.add(item);
-            }
-        }
-
-        return listItems;
-    }
-
-    private List<AddToListItem> parseRichListItems(JSONArray jsonItems) throws JSONException {
-        final List<AddToListItem> listItems = new ArrayList<>();
-
-        for (int i = 0; i < jsonItems.length(); i++) {
-            final JSONObject jsonItem = jsonItems.getJSONObject(i);
+        for (int i = 0; i < items.length(); i++) {
+            final JSONObject item = items.getJSONObject(i);
             final AddToListItem.Builder builder = new AddToListItem.Builder();
 
-            if(jsonItem.has("product-title")) {
-                builder.setTitle(jsonItem.getString("product-title"));
+            if(item.has(PRODUCT_TITLE)) {
+                builder.setTitle(item.getString(PRODUCT_TITLE));
             } else {
                 AppEventClient.trackError(
-                        "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                        "Rich List Items payload should always have a product title."
+                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                    "Detailed List Items payload should always have a product title."
                 );
 
                 break;
             }
 
-            if(jsonItem.has("product-image")) {
-                builder.setTitle(jsonItem.getString("product-image"));
+            if(item.has(PRODUCT_BRAND)) {
+                builder.setBrand(item.getString(PRODUCT_BRAND));
             }
 
-            final AddToListItem item = builder.build();
-
-            listItems.add(item);
-        }
-
-        return listItems;
-    }
-
-    private List<AddToListItem> parseDetailedListItems(JSONArray jsonItems) throws JSONException {
-        final List<AddToListItem> listItems = new ArrayList<>();
-
-        for (int i = 0; i < jsonItems.length(); i++) {
-            final JSONObject jsonItem = jsonItems.getJSONObject(i);
-            final AddToListItem.Builder builder = new AddToListItem.Builder();
-
-            if(jsonItem.has("product_title")) {
-                builder.setTitle(jsonItem.getString("product_title"));
-            } else {
-                AppEventClient.trackError(
-                        "SESSION_AD_PAYLOAD_PARSE_FAILED",
-                        "Detailed List Items payload should always have a product title."
-                );
-
-                break;
+            if(item.has(PRODUCT_CATEGORY)) {
+                builder.setCategory(item.getString(PRODUCT_CATEGORY));
             }
 
-            if(jsonItem.has("product_brand")) {
-                builder.setBrand(jsonItem.getString("product_brand"));
+            if(item.has(PRODUCT_BARCODE)) {
+                builder.setProductUpc(item.getString(PRODUCT_BARCODE));
             }
 
-            if(jsonItem.has("product_category")) {
-                builder.setCategory(jsonItem.getString("product_category"));
+            if(item.has(PRODUCT_SKU)) {
+                builder.setRetailerSku(item.getString(PRODUCT_SKU));
             }
 
-            if(jsonItem.has("product_barcode")) {
-                builder.setProductUpc(jsonItem.getString("product_barcode"));
+            if(item.has(PRODUCT_DISCOUNT)) {
+                builder.setDiscount(item.getString(PRODUCT_DISCOUNT));
             }
 
-            if(jsonItem.has("product_sku")) {
-                builder.setRetailerSku(jsonItem.getString("product_sku"));
+            if(item.has(PRODUCT_IMAGE)) {
+                builder.setProductImage(item.getString(PRODUCT_IMAGE));
             }
 
-            if(jsonItem.has("product_discount")) {
-                builder.setDiscount(jsonItem.getString("product_discount"));
-            }
-
-            if(jsonItem.has("product_image")) {
-                builder.setProductImage(jsonItem.getString("product_image"));
-            }
-
-            final AddToListItem item = builder.build();
-
-            listItems.add(item);
+            listItems.add(builder.build());
         }
 
         return listItems;

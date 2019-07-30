@@ -42,11 +42,13 @@ public class DeviceInfoClient {
         return instance;
     }
 
-    public static synchronized void collectDeviceInfo(final Context context,
-                                  final String appId,
-                                  final boolean isProd,
-                                  final Map<String, String> params,
-                                  final Callback callback) {
+    public static synchronized void collectDeviceInfo(
+        final Context context,
+        final String appId,
+        final boolean isProd,
+        final Map<String, String> params,
+        final Callback callback
+    ) {
         ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
             @Override
             public void run() {

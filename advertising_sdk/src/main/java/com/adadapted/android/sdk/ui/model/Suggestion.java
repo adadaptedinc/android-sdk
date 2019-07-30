@@ -3,7 +3,7 @@ package com.adadapted.android.sdk.ui.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.adadapted.android.sdk.core.keywordintercept.AutoFill;
+import com.adadapted.android.sdk.core.intercept.Term;
 import com.adadapted.android.sdk.ui.adapter.SuggestionTracker;
 
 public class Suggestion implements Parcelable {
@@ -21,6 +21,7 @@ public class Suggestion implements Parcelable {
 
     private final String searchId;
 
+    private final String termId;
     private final String name;
     private final String icon;
     private final String tagLine;
@@ -28,12 +29,13 @@ public class Suggestion implements Parcelable {
     private boolean presented;
     private boolean selected;
 
-    public Suggestion(final String searchId, final AutoFill autoFill) {
+    public Suggestion(final String searchId, final Term term) {
         this.searchId = searchId;
 
-        this.name = autoFill.getReplacement();
-        this.icon = autoFill.getIcon();
-        this.tagLine = autoFill.getTagLine();
+        this.termId = term.getTermId();
+        this.name = term.getReplacement();
+        this.icon = term.getIcon();
+        this.tagLine = term.getTagLine();
 
         presented = false;
         selected = false;
@@ -41,6 +43,7 @@ public class Suggestion implements Parcelable {
 
     protected Suggestion(Parcel in) {
         searchId = in.readString();
+        termId = in.readString();
         name = in.readString();
         icon = in.readString();
         tagLine = in.readString();
@@ -56,21 +59,21 @@ public class Suggestion implements Parcelable {
         return icon;
     }
 
-    //public String getTagLine() {
-    //    return tagLine;
-    //}
+    public String getTagLine() {
+        return tagLine;
+    }
 
     public void presented() {
         if(!presented) {
             presented = true;
-            SuggestionTracker.suggestionPresented(searchId, getName());
+            SuggestionTracker.suggestionPresented(searchId, termId, getName());
         }
     }
 
     public void selected() {
         if(!selected) {
             selected = true;
-            SuggestionTracker.suggestionSelected(searchId, getName());
+            SuggestionTracker.suggestionSelected(searchId, termId, getName());
         }
     }
 
@@ -82,6 +85,7 @@ public class Suggestion implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(searchId);
+        parcel.writeString(termId);
         parcel.writeString(name);
         parcel.writeString(icon);
         parcel.writeString(tagLine);

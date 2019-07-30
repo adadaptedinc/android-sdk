@@ -1,29 +1,41 @@
 package com.adadapted.android.sdk.ui.adapter;
 
 import com.adadapted.android.sdk.core.event.AppEventClient;
-import com.adadapted.android.sdk.core.keywordintercept.KeywordInterceptClient;
+import com.adadapted.android.sdk.core.intercept.InterceptClient;
 import com.adadapted.android.sdk.core.session.Session;
 import com.adadapted.android.sdk.core.session.SessionClient;
-import com.adadapted.android.sdk.core.keywordintercept.AutoFill;
-import com.adadapted.android.sdk.core.keywordintercept.KeywordIntercept;
+import com.adadapted.android.sdk.core.intercept.Term;
+import com.adadapted.android.sdk.core.intercept.Intercept;
 import com.adadapted.android.sdk.ui.model.Suggestion;
 
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class KeywordInterceptMatcher implements SessionClient.Listener, KeywordInterceptClient.Listener {
+public class KeywordInterceptMatcher implements SessionClient.Listener, InterceptClient.Listener {
     @SuppressWarnings("unused")
     private static final String LOGTAG = KeywordInterceptMatcher.class.getName();
 
     private final Lock interceptLock = new ReentrantLock();
-    private KeywordIntercept keywordIntercept;
+    private Intercept intercept;
     private boolean mLoaded = false;
-    private Session mSession;
+
+    private static class Contains {
+        boolean found;
+        String input;
+        Term term;
+
+        Contains() {
+            found = false;
+            input = "";
+            term = null;
+        }
+    }
 
     public KeywordInterceptMatcher() {
-        keywordIntercept = KeywordIntercept.empty();
+        intercept = Intercept.empty();
         SessionClient.getSession(this);
     }
 
@@ -32,26 +44,37 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, KeywordI
 
         interceptLock.lock();
         try {
-            if(!shouldCheckConstraint(constraint)) {
+            final String input = constraint.toString().toLowerCase(Locale.ROOT);
+            if(!shouldCheckConstraint(input)) {
                 return suggestions;
             }
 
-            final String term = constraint.toString().toLowerCase();
+            final Contains contains = new Contains();
+            for (final Term term : intercept.getTerms()) {
+                if (term == null) {
+                    continue;
+                }
 
-            for (final String item : keywordIntercept.getAutoFill().keySet()) {
-                if (item != null && item.toLowerCase().contains(term)) {
-                    final AutoFill autoFill = keywordIntercept.getAutoFill().get(item);
-                    if(autoFill != null) {
-                        suggestions.add(new Suggestion(keywordIntercept.getSearchId(), autoFill));
+                final String lcTerm = term.getTerm().toLowerCase(Locale.ROOT);
+                if (lcTerm.startsWith(input)) {
+                    fileTerm(term, constraint.toString(), suggestions);
+                    break;
+                }
+                else if (!contains.found && lcTerm.contains(input)) {
+                    contains.found = true;
+                    contains.input = input;
+                    contains.term = term;
+                }
+            }
 
-                        SuggestionTracker.suggestionMatched(
-                                mSession,
-                                keywordIntercept.getSearchId(),
-                                item,
-                                autoFill.getReplacement(),
-                                constraint.toString()
-                        );
-                    }
+            if(suggestions.isEmpty()) {
+                if(contains.found) {
+                    fileTerm(contains.term, contains.input, suggestions);
+                } else {
+                    SuggestionTracker.suggestionNotMatched(
+                        intercept.getSearchId(),
+                        constraint.toString()
+                    );
                 }
             }
         }
@@ -62,36 +85,30 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, KeywordI
         return suggestions;
     }
 
-    private boolean shouldCheckConstraint(final CharSequence constraint) {
+    private void fileTerm(final Term term, final String input, final Set<Suggestion> suggestions) {
+        if(term != null) {
+            suggestions.add(new Suggestion(intercept.getSearchId(), term));
+
+            SuggestionTracker.suggestionMatched(
+                    intercept.getSearchId(),
+                    term.getTermId(),
+                    term.getTerm(),
+                    term.getReplacement(),
+                    input
+            );
+        }
+    }
+
+    private boolean shouldCheckConstraint(final String input) {
         return isLoaded() &&
-                constraint != null &&
-                constraint.length() >= keywordIntercept.getMinMatchLength();
-    }
-
-    public void suggestionPresented(final String suggestion) {
-        interceptLock.lock();
-        try {
-            SuggestionTracker.suggestionPresented(keywordIntercept.getSearchId(), suggestion);
-        }
-            finally {
-            interceptLock.unlock();
-        }
-    }
-
-    public void suggestionSelected(final String suggestion) {
-        interceptLock.lock();
-        try {
-            SuggestionTracker.suggestionSelected(keywordIntercept.getSearchId(), suggestion);
-        }
-        finally {
-            interceptLock.unlock();
-        }
+                input != null &&
+                input.length() >= intercept.getMinMatchLength();
     }
 
     private boolean isLoaded() {
         interceptLock.lock();
         try {
-            return mLoaded && keywordIntercept != null;
+            return mLoaded && intercept != null;
         }
         finally {
             interceptLock.unlock();
@@ -99,12 +116,12 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, KeywordI
     }
 
     @Override
-    public void onKeywordInterceptInitialized(final KeywordIntercept keywordIntercept) {
+    public void onKeywordInterceptInitialized(final Intercept intercept) {
         AppEventClient.trackAppEvent("ki_initialized");
 
         interceptLock.lock();
         try {
-            this.keywordIntercept = keywordIntercept;
+            this.intercept = intercept;
             mLoaded = true;
         }
         finally {
@@ -114,28 +131,16 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, KeywordI
 
     @Override
     public void onSessionAvailable(final Session session) {
-        interceptLock.lock();
-        try {
-            mSession = session;
+        if(!session.getId().isEmpty()) {
+            InterceptClient.initialize(session, this);
         }
-        finally {
-            interceptLock.unlock();
-        }
-
-        KeywordInterceptClient.initialize(session, this);
     }
 
     @Override
     public void onAdsAvailable(final Session session) {
-        interceptLock.lock();
-        try {
-            mSession = session;
+        if(!session.getId().isEmpty()) {
+            InterceptClient.initialize(session, this);
         }
-        finally {
-            interceptLock.unlock();
-        }
-
-        KeywordInterceptClient.initialize(session, this);
     }
 
     @Override

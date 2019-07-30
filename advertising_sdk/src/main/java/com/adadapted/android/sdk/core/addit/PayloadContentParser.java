@@ -27,7 +27,7 @@ public class PayloadContentParser {
                 errorParams.put("exception_message", ex.getMessage());
                 AppEventClient.trackError(
                     "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
-                    "Problem parsing Addit JSON payload",
+                    "Problem parsing Payload JSON payload",
                     errorParams
                 );
             }
@@ -87,7 +87,7 @@ public class PayloadContentParser {
             errorParams.put("field_name", fieldName);
             AppEventClient.trackError(
                 "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
-                "Problem parsing Addit JSON input field " + fieldName,
+                "Problem parsing Payload JSON input field " + fieldName,
                 errorParams
             );
 

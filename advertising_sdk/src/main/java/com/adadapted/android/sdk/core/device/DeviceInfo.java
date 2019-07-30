@@ -7,6 +7,10 @@ import java.util.Map;
 public class DeviceInfo {
     static final String UNKNOWN_VALUE = "Unknown";
 
+    public static DeviceInfo empty() {
+        return new DeviceInfo();
+    }
+
     private String appId;
     private boolean isProd;
     private float scale;

@@ -42,6 +42,7 @@ class AdWebView extends WebView {
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         setBackgroundColor(Color.TRANSPARENT);
         setOnTouchListener(new OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(final View v, final MotionEvent event) {
                 switch (event.getAction()) {
@@ -57,6 +58,8 @@ class AdWebView extends WebView {
 
                 return false;
             }
+
+
         });
         setWebViewClient(new WebViewClient() {
             @Override

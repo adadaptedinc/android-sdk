@@ -114,7 +114,8 @@ public class AaWebViewPopupActivity extends Activity {
                                         WebResourceError error) {
                 super.onReceivedError(view, request, error);
 
-                Log.w(LOGTAG, "onReceivedError: " + error.toString());
+
+                Log.w(LOGTAG, "onReceivedError: " + request.toString() + " " + error.toString());
 
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", url);

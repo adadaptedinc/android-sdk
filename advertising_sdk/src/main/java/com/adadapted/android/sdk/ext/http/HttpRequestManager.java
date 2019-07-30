@@ -20,7 +20,7 @@ public class HttpRequestManager {
         }
     }
 
-    static synchronized void queueRequest(Request request) {
+    static synchronized void queueRequest(final Request request) {
         if(requestQueue != null) {
             requestQueue.add(request);
         }

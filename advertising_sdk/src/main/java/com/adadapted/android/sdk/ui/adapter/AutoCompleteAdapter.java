@@ -10,6 +10,7 @@ import com.adadapted.android.sdk.ui.model.Suggestion;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public class AutoCompleteAdapter extends ArrayAdapter<String> {
@@ -18,18 +19,24 @@ public class AutoCompleteAdapter extends ArrayAdapter<String> {
 
     private final KeywordInterceptMatcher matcher;
     private final List<String> allItems;
+    private final Set<Suggestion> currentSuggestions;
 
     public AutoCompleteAdapter(final Context context,
                                final int resource,
                                final List<String> items) {
         super(context.getApplicationContext(), resource, items);
 
-        matcher = new KeywordInterceptMatcher();
-        allItems = new ArrayList<>(items);
+        this.matcher = new KeywordInterceptMatcher();
+        this.allItems = new ArrayList<>(items);
+        this.currentSuggestions = new HashSet<>();
     }
 
-    public void suggestionSelected(final String suggestion) {
-        matcher.suggestionSelected(suggestion);
+    public void suggestionSelected(final String name) {
+        for(Suggestion suggestion : currentSuggestions) {
+            if (suggestion.getName().equals(name)) {
+                suggestion.selected();
+            }
+        }
     }
 
     @Override
@@ -42,18 +49,26 @@ public class AutoCompleteAdapter extends ArrayAdapter<String> {
         @Override
         protected Filter.FilterResults performFiltering(final CharSequence constraint) {
             final FilterResults filterResults = new FilterResults();
-            final Set<String> items = new HashSet<>();
+            final List<String> items = new ArrayList<>();
 
             if(constraint != null) {
-                final Set<Suggestion> suggestions = matcher.match(constraint);
-                for(final Suggestion suggestion : suggestions) {
+                currentSuggestions.clear();
+                currentSuggestions.addAll(matcher.match(constraint));
+
+                for(final Suggestion suggestion : currentSuggestions) {
                     items.add(suggestion.getName());
-                    matcher.suggestionPresented(suggestion.getName());
+                    suggestion.presented();
                 }
 
+                final String input = constraint.toString().toLowerCase(Locale.ROOT);
                 for(final String item : allItems) {
-                    if (item != null && item.toLowerCase().contains(constraint.toString().toLowerCase())) {
-                        items.add(item);
+                    if (item != null) {
+                        if (item.toLowerCase(Locale.ROOT).startsWith(input)) {
+                            items.add(item);
+                        }
+                        else if (item.toLowerCase(Locale.ROOT).contains(input)) {
+                            items.add(item);
+                        }
                     }
                 }
             }

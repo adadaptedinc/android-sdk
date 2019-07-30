@@ -13,6 +13,7 @@ class PopupClient {
             public void run() {
                 final Map<String, String> params = new HashMap<>();
                 params.put("payload_id", content.getPayloadId());
+
                 AppEventClient.trackSdkEvent("popup_added_to_list", params);
             }
         });
@@ -26,6 +27,7 @@ class PopupClient {
                 params.put("payload_id", content.getPayloadId());
                 params.put("tracking_id", item.getTrackingId());
                 params.put("item_name", item.getTitle());
+
                 AppEventClient.trackSdkEvent("popup_item_added_to_list", params);
             }
         });
