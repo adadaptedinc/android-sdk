@@ -51,10 +51,6 @@ public class Suggestion implements Parcelable {
         selected = in.readByte() != 0;
     }
 
-    public String getTermId() {
-        return termId;
-    }
-
     public String getName() {
         return name;
     }
@@ -70,14 +66,14 @@ public class Suggestion implements Parcelable {
     public void presented() {
         if(!presented) {
             presented = true;
-            SuggestionTracker.suggestionPresented(searchId, getTermId(), getName());
+            SuggestionTracker.suggestionPresented(searchId, termId, getName());
         }
     }
 
     public void selected() {
         if(!selected) {
             selected = true;
-            SuggestionTracker.suggestionSelected(searchId, getTermId(), getName());
+            SuggestionTracker.suggestionSelected(searchId, termId, getName());
         }
     }
 

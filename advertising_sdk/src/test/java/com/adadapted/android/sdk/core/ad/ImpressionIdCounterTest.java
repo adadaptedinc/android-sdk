@@ -7,17 +7,28 @@ import static org.junit.Assert.*;
 public class ImpressionIdCounterTest {
 
     @Test
-    public void getInstance() {
-        assertTrue(true);
-    }
-
-    @Test
     public void getIncrementedCountFor() {
-        assertTrue(true);
+        final ImpressionIdCounter counter = ImpressionIdCounter.getInstance();
+        final int count = counter.getIncrementedCountFor("test_impression1");
+
+        assertEquals(1, count);
     }
 
     @Test
-    public void getCurrentCountFor() {
-        assertTrue(true);
+    public void getCurrentCountFor_WithNewCounter() {
+        final ImpressionIdCounter counter = ImpressionIdCounter.getInstance();
+        final int count = counter.getCurrentCountFor("test_impression2");
+
+        assertEquals(1, count);
+    }
+
+    @Test
+    public void getCurrentCountFor_WithExistingCounter() {
+        final ImpressionIdCounter counter = ImpressionIdCounter.getInstance();
+        counter.getIncrementedCountFor("test_impression3");
+
+        final int count = counter.getCurrentCountFor("test_impression3");
+
+        assertEquals(1, count);
     }
 }

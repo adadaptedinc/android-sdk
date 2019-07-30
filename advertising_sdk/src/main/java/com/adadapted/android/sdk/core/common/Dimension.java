@@ -9,8 +9,18 @@ public class Dimension {
     public static final int MATCH_PARENT = -1;
     public static final int WRAP_CONTENT = -2;
 
-    private int height = 0;
-    private int width = 0;
+    private int height;
+    private int width;
+
+    public Dimension() {
+        this.height = 0;
+        this.width = 0;
+    }
+
+    public Dimension(final int height, final int width) {
+        this.height = height;
+        this.width = width;
+    }
 
     public int getHeight() {
         return height;

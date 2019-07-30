@@ -27,8 +27,8 @@ public class AdditContent implements AddToListContent, Parcelable {
 
     final class AdditSources {
         public static final String IN_APP = "in_app";
-        private final static String DEEPLINK = "deeplink";
-        private final static String PAYLOAD = "payload";
+        final static String DEEPLINK = "deeplink";
+        final static String PAYLOAD = "payload";
     }
 
     private final String payloadId;
@@ -42,13 +42,15 @@ public class AdditContent implements AddToListContent, Parcelable {
     private boolean handled;
     private final Lock lock = new ReentrantLock();
 
-    public AdditContent(final String payloadId,
-                        final String message,
-                        final String image,
-                        final int type,
-                        final String source,
-                        final String additSource,
-                        final List<AddToListItem> items) {
+    public AdditContent(
+        final String payloadId,
+        final String message,
+        final String image,
+        final int type,
+        final String source,
+        final String additSource,
+        final List<AddToListItem> items
+    ) {
         if (items.size() == 0) {
             AppEventClient.trackError(
                 "ADDIT_PAYLOAD_IS_EMPTY",
@@ -78,27 +80,33 @@ public class AdditContent implements AddToListContent, Parcelable {
         handled = in.readByte() != 0;
     }
 
-    static AdditContent createDeeplinkContent(final String payloadId,
-                                              final String message,
-                                              final String image,
-                                              final int type,
-                                              final List<AddToListItem> items) {
+    static AdditContent createDeeplinkContent(
+        final String payloadId,
+        final String message,
+        final String image,
+        final int type,
+        final List<AddToListItem> items
+    ) {
         return new AdditContent(payloadId, message, image, type, Sources.OUT_OF_APP, AdditSources.DEEPLINK, items);
     }
 
-    public static AdditContent createInAppContent(final String payloadId,
-                                                  final String message,
-                                                  final String image,
-                                                  final int type,
-                                                  final List<AddToListItem> items) {
+    public static AdditContent createInAppContent(
+        final String payloadId,
+        final String message,
+        final String image,
+        final int type,
+        final List<AddToListItem> items
+    ) {
         return new AdditContent(payloadId, message, image, type, Sources.IN_APP, AdditSources.IN_APP, items);
     }
 
-    static AdditContent createPayloadContent(final String payloadId,
-                                             final String message,
-                                             final String image,
-                                             final int type,
-                                             final List<AddToListItem> items) {
+    static AdditContent createPayloadContent(
+        final String payloadId,
+        final String message,
+        final String image,
+        final int type,
+        final List<AddToListItem> items
+    ) {
         return new AdditContent(payloadId, message, image, type, Sources.OUT_OF_APP, AdditSources.PAYLOAD, items);
     }
 

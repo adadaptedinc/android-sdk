@@ -6,20 +6,16 @@ public class Config {
     public static final long DEFAULT_EVENT_POLLING = 2500L; // Events will be pushed to the server every 2.5 seconds
     public static final long DEFAULT_AD_REFRESH = 60L; // If an Ad does not have a refresh time it will default to 60 seconds
 
-    public static class Prod {
-        static final String ADSERVER_HOST = "https://ads.adadapted.com";
-        static final String EVENTCOLLECTOR_HOST = "https://ec.adadapted.com";
+    static class Prod {
+        static final String AD_SERVER_HOST = "https://ads.adadapted.com";
+        static final String EVENT_COLLECTOR_HOST = "https://ec.adadapted.com";
         static final String PAYLOAD_HOST = "https://payload.adadapted.com";
     }
 
-    public static class Sand {
-        private static final String ADSERVER_HOST = "https://sandbox.adadapted.com";
-        private static final String EVENTCOLLECTOR_HOST = "https://sandec.adadapted.com";
-        private static final String PAYLOAD_HOST = "https://sandpayload.adadapted.com";
-
-//        static final String ADSERVER_HOST = "http://10.100.131.183:8081";
-//        static final String EVENTCOLLECTOR_HOST = "http://10.100.131.183:8084";
-//        static final String PAYLOAD_HOST = "http://10.100.131.183:8085";
+    static class Sand {
+        static final String AD_SERVER_HOST = "https://sandbox.adadapted.com";
+        static final String EVENT_COLLECTOR_HOST = "https://sandec.adadapted.com";
+        static final String PAYLOAD_HOST = "https://sandpayload.adadapted.com";
     }
 
     private static final String SESSION_INIT_PATH = "/v/0.9.5/android/sessions/initialize";
@@ -34,50 +30,51 @@ public class Config {
     private static final String PAYLOAD_PICKUP_PATH = "/v/1/pickup";
     private static final String PAYLOAD_TRACK_PATH = "/v/1/tracking";
 
-    public static String initializeSessionUrl(final boolean isProd) {
-        final String url = isProd ? Prod.ADSERVER_HOST : Sand.ADSERVER_HOST;
-        return url.concat(SESSION_INIT_PATH);
+    private static String getAdServerHost(final boolean isProd) {
+        return isProd ? Prod.AD_SERVER_HOST : Sand.AD_SERVER_HOST;
+    }
 
+    private static String getEventCollectorHost(final boolean isProd) {
+        return isProd ? Prod.EVENT_COLLECTOR_HOST : Sand.EVENT_COLLECTOR_HOST;
+    }
+
+    private static String getPayloadHost(final boolean isProd) {
+        return isProd ? Prod.PAYLOAD_HOST : Sand.PAYLOAD_HOST;
+    }
+
+    public static String initializeSessionUrl(final boolean isProd) {
+        return getAdServerHost(isProd).concat(SESSION_INIT_PATH);
     }
 
     public static String refreshAdsUrl(final boolean isProd) {
-        final String url = isProd ? Prod.ADSERVER_HOST : Sand.ADSERVER_HOST;
-        return url.concat(REFRESH_ADS_PATH);
+        return getAdServerHost(isProd).concat(REFRESH_ADS_PATH);
     }
 
     public static String adEventsUrl(final boolean isProd) {
-        final String url = isProd ? Prod.ADSERVER_HOST : Sand.ADSERVER_HOST;
-        return url.concat(AD_EVENTS_PATH);
+        return getAdServerHost(isProd).concat(AD_EVENTS_PATH);
     }
 
     public static String retrieveInterceptsUrl(final boolean isProd) {
-        final String url = isProd ? Prod.ADSERVER_HOST : Sand.ADSERVER_HOST;
-        return url.concat(RETRIEVE_INTERCEPTS_PATH);
+        return getAdServerHost(isProd).concat(RETRIEVE_INTERCEPTS_PATH);
     }
 
     public static String interceptEventsUrl(final boolean isProd) {
-        final String url = isProd ? Prod.ADSERVER_HOST : Sand.ADSERVER_HOST;
-        return url.concat(INTERCEPT_EVENTS_PATH);
+        return getAdServerHost(isProd).concat(INTERCEPT_EVENTS_PATH);
     }
 
     public static String appEventsUrl(final boolean isProd) {
-        final String url = isProd ? Prod.EVENTCOLLECTOR_HOST : Sand.EVENTCOLLECTOR_HOST;
-        return url.concat(EVENT_TRACK_PATH);
+        return getEventCollectorHost(isProd).concat(EVENT_TRACK_PATH);
     }
 
     public static String appErrorsUrl(final boolean isProd) {
-        final String url = isProd ? Prod.EVENTCOLLECTOR_HOST : Sand.EVENTCOLLECTOR_HOST;
-        return url.concat(ERROR_TRACK_PATH);
+        return getEventCollectorHost(isProd).concat(ERROR_TRACK_PATH);
     }
 
     public static String pickupPayloadsUrl(final boolean isProd) {
-        final String url = isProd ? Prod.PAYLOAD_HOST : Sand.PAYLOAD_HOST;
-        return url.concat(PAYLOAD_PICKUP_PATH);
+        return getPayloadHost(isProd).concat(PAYLOAD_PICKUP_PATH);
     }
 
     public static String trackPayloadUrl(final boolean isProd) {
-        final String url = isProd ? Prod.PAYLOAD_HOST : Sand.PAYLOAD_HOST;
-        return url.concat(PAYLOAD_TRACK_PATH);
+        return getPayloadHost(isProd).concat(PAYLOAD_TRACK_PATH);
     }
-
 }
