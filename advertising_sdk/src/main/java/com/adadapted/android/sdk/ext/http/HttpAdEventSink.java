@@ -33,7 +33,6 @@ public class HttpAdEventSink implements AdEventSink {
     @Override
     public void sendBatch(final Session session, final Set<AdEvent> events) {
         final JSONObject json = builder.marshalEvents(session, events);
-        Log.i(LOGTAG, json.toString());
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
                 batchUrl, json, new Response.Listener<JSONObject>(){

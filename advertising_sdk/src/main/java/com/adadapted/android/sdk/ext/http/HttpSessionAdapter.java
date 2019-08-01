@@ -44,14 +44,12 @@ public class HttpSessionAdapter implements SessionAdapter {
         sessionBuilder = new JsonSessionBuilder(deviceInfo);
 
         final JSONObject json = requestBuilder.buildSessionInitRequest(deviceInfo);
-        Log.i(LOGTAG, json.toString());
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
                 initUrl, json, new Response.Listener<JSONObject>(){
 
             @Override
             public void onResponse(final JSONObject response) {
-                Log.i(LOGTAG, response.toString());
                 final Session session = sessionBuilder.buildSession(response);
                 listener.onSessionInitialized(session);
             }
@@ -88,7 +86,7 @@ public class HttpSessionAdapter implements SessionAdapter {
 
     @Override
     public void sendRefreshAds(final Session session,
-                          final AdGetListener listener) {
+                               final AdGetListener listener) {
         if(session == null || listener == null || sessionBuilder == null) {
             return;
         }
