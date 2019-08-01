@@ -57,7 +57,6 @@ public class HttpInterceptAdapter implements InterceptAdapter {
                 new Response.Listener<JSONObject>(){
             @Override
             public void onResponse(JSONObject response) {
-                Log.i(LOGTAG, response.toString());
                 callback.onSuccess(kiBuilder.build(response));
             }
         }, new Response.ErrorListener() {
@@ -89,7 +88,6 @@ public class HttpInterceptAdapter implements InterceptAdapter {
     @Override
     public void sendEvents(final Session session, final Set<InterceptEvent> events) {
         final JSONObject json = eventBuilder.marshalEvents(session, events);
-        Log.i(LOGTAG, json.toString());
 
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST,
                 eventUrl, json, new Response.Listener<JSONObject>(){

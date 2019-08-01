@@ -330,7 +330,6 @@ public class SessionClient implements SessionAdapter.Listener {
                     deviceInfoLock.unlock();
                 }
             } else {
-                //Log.w(LOGTAG, "SDK not actively in use. Skipping background Session reinitialize.");
                 setStatus(Status.SHOULD_REFRESH);
             }
         }
@@ -350,7 +349,6 @@ public class SessionClient implements SessionAdapter.Listener {
                 }
             }
             else {
-                //Log.w(LOGTAG, "SDK not actively in use. Skipping background Ad refresh.");
                 setStatus(Status.SHOULD_REFRESH);
             }
         }
@@ -382,7 +380,8 @@ public class SessionClient implements SessionAdapter.Listener {
     }
 
     private void startPollingTimer() {
-        if(pollingTimerRunning || currentSession.getRefreshTime() == 0L) {
+        if(pollingTimerRunning || currentSession.willNotServeAds()) {
+            Log.i(LOGTAG, "Session will not serve Ads. Ignoring Ad polling timer.");
             return;
         }
 

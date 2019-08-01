@@ -117,7 +117,7 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, Intercep
 
     @Override
     public void onKeywordInterceptInitialized(final Intercept intercept) {
-        AppEventClient.trackAppEvent("ki_initialized");
+        AppEventClient.trackSdkEvent("ki_initialized");
 
         interceptLock.lock();
         try {

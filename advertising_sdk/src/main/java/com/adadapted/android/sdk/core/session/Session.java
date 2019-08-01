@@ -86,6 +86,10 @@ public class Session {
         return Zone.emptyZone();
     }
 
+    public boolean willNotServeAds() {
+        return !willServeAds || refreshTime == 0L;
+    }
+
     public static Session emptySession(final DeviceInfo deviceInfo) {
         return new Session(
             deviceInfo,

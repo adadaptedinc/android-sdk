@@ -83,8 +83,6 @@ public class HttpPayloadAdapter implements PayloadAdapter {
     public void publishEvent(final PayloadEvent event) {
         final JSONObject json = builder.buildEvent(event);
 
-        Log.d(LOGTAG, json.toString());
-
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, trackUrl, json, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {}
