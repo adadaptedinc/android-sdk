@@ -117,7 +117,7 @@ class AdWebView extends WebView {
         try {
             currentAd = Ad.emptyAd();
 
-            final String dummyDocument = "<html><head><meta name=\"viewport\" content=\"width=device-width, user-scalable=no\" /><style>body{width:100px;height100px;}</style></head><body></body></html>";
+            final String dummyDocument = "<html><head><meta name=\"viewport\" content=\"width=device-width, user-scalable=no\" /></head><body></body></html>";
             loadData(dummyDocument, "text/html", null);
 
             notifyBlankLoaded();
