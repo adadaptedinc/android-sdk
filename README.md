@@ -1,6 +1,10 @@
 # AdAdapted Android SDK
 
-The Android SDK integrates AdAdapted services with partner Android apps. Development is done using Android Studio. Documentation for integrating the SDK with and App can be found at [https://dev.adadapted.com/android/index.html](https://dev.adadapted.com/android/index.html)
+The Android SDK integrates AdAdapted services with partner Android apps.
+
+Development is done using Android Studio. Updating the public facing API should be done with care since those changes will require more than a drop-in update from partners.
+
+Documentation for integrating the SDK with and App can be found at [https://dev.adadapted.com/android/index.html](https://dev.adadapted.com/android/index.html)
 
 ### Prerequisites
 
@@ -8,7 +12,7 @@ The Android SDK integrates AdAdapted services with partner Android apps. Develop
 
 ### Installing
 
-Project should be checked out from version control through Android Studio. Project can also be manually checked out into a location
+Project should be checked out from version control through Android Studio. Project can also be manually checked out and manually opened/imported into Android Studio.
 
 ## Running the tests
 
@@ -28,7 +32,7 @@ Once the master branch is built the resulting .apk file is uploaded to the docum
 
 SDK version is maintained in the com.adadapted.android.sdk.config.Config class. Each new rounds of updates should increment the appropriate values based on the significance of the update
 
-Typically the value is updates from right to left based on this loose criteria:
+The value is updated from right to left based on this loose criteria:
 * Bug fixes and minor tweaks
 * Small feature additions or refactor
 * Major feature additions or refactor
