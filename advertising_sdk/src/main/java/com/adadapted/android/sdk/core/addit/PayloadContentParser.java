@@ -14,23 +14,33 @@ import java.util.Map;
 
 public class PayloadContentParser {
     public List<AdditContent> parse(final JSONObject json) {
+        if(json == null) {
+            return new ArrayList<>();
+        }
+
         final List<AdditContent> content = new ArrayList<>();
 
-        if(json != null) {
-            try {
-                final JSONArray payloads = json.getJSONArray(JsonFields.Payloads);
-                for(int i = 0; i < payloads.length(); i++) {
-                    content.add(parsePayload(payloads.getJSONObject(i)));
+        try {
+            final JSONArray payloads = json.getJSONArray(JsonFields.Payloads);
+
+            if(payloads != null) {
+                for (int i = 0; i < payloads.length(); i++) {
+                    final JSONObject payload = payloads.getJSONObject(i);
+                    if (payload != null) {
+                        final AdditContent parsed = parsePayload(payload);
+                        content.add(parsed);
+                    }
                 }
-            } catch (JSONException ex) {
-                final Map<String, String> errorParams = new HashMap<>();
-                errorParams.put("exception_message", ex.getMessage());
-                AppEventClient.trackError(
+            }
+
+        } catch (JSONException ex) {
+            final Map<String, String> errorParams = new HashMap<>();
+            errorParams.put("exception_message", ex.getMessage());
+            AppEventClient.trackError(
                     "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
                     "Problem parsing Payload JSON payload",
                     errorParams
-                );
-            }
+            );
         }
 
         return content;
