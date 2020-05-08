@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.core.device;
 
-import com.adadapted.android.sdk.config.Config;
-
+import com.adadapted.android.sdk.BuildConfig;
 import java.util.Map;
 
 public class DeviceInfo {
@@ -33,7 +32,7 @@ public class DeviceInfo {
 
     public DeviceInfo() {
         this.os = "Android";
-        this.sdkVersion = Config.SDK_VERSION;
+        this.sdkVersion = BuildConfig.VERSION_NAME;
     }
 
     public String getAppId() {
@@ -104,10 +103,6 @@ public class DeviceInfo {
         return os;
     }
 
-    void setOs(String os) {
-        this.os = os;
-    }
-
     public String getOsv() {
         return osv;
     }
@@ -174,10 +169,6 @@ public class DeviceInfo {
 
     public String getSdkVersion() {
         return sdkVersion;
-    }
-
-    void setSdkVersion(String sdkVersion) {
-        this.sdkVersion = sdkVersion;
     }
 
     public Map<String, String> getParams() {

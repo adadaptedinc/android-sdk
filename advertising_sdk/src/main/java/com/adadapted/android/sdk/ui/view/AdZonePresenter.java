@@ -266,6 +266,7 @@ class AdZonePresenter implements SessionClient.Listener {
                 break;
 
             case Ad.ActionTypes.LINK:
+            case Ad.ActionTypes.EXTERNAL_LINK:
                 AdEventClient.trackInteraction(ad);
 
                 handleLinkAction(ad);

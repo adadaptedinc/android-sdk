@@ -30,7 +30,7 @@ Once the master branch is built the resulting .apk file is uploaded to the docum
 
 ## Versioning
 
-SDK version is maintained in the com.adadapted.android.sdk.config.Config class. Each new rounds of updates should increment the appropriate values based on the significance of the update
+SDK version is maintained in the BuildConfig. Each new rounds of updates should increment the appropriate values based on the significance of the update
 
 The value is updated from right to left based on this loose criteria:
 * Bug fixes and minor tweaks
