@@ -57,6 +57,7 @@ public class Ad implements Parcelable {
         public static final String LINK = "l";
         public static final String POPUP = "p";
         public static final String CONTENT_POPUP = "cp";
+        public static final String EXTERNAL_LINK = "e";
     }
 
     private final String id;

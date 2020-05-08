@@ -164,7 +164,7 @@ public class AdAdapted {
 
         AppEventClient.trackSdkEvent("app_opened");
 
-        Log.i(LOGTAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", Config.SDK_VERSION));
+        Log.i(LOGTAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", BuildConfig.VERSION_NAME));
     }
 
     public static synchronized void restart(final Context context) {
@@ -192,7 +192,7 @@ public class AdAdapted {
             params
         );
 
-        Log.i(LOGTAG, String.format("AdAdapted Android Advertising SDK v%s reinitialized.", Config.SDK_VERSION));
+        Log.i(LOGTAG, String.format("AdAdapted Android Advertising SDK v%s reinitialized.", BuildConfig.VERSION_NAME));
     }
 
     public static synchronized void hasAdsToServe() {
