@@ -2,6 +2,8 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 27
@@ -35,6 +37,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads:12.0.1'
     implementation 'com.android.support:support-v4:27.1.1'
     implementation 'com.android.volley:volley:1.1.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     testImplementation 'junit:junit:4.12'
     testImplementation "org.robolectric:robolectric:3.4.2"
@@ -72,4 +75,7 @@ tasks.withType(Test) {
             }
         }
     }
+}
+repositories {
+    mavenCentral()
 }

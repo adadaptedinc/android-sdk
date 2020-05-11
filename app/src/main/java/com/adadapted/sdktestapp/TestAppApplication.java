@@ -6,14 +6,12 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.adadapted.android.sdk.AdAdapted;
-import com.adadapted.android.sdk.core.addit.AdditContent;
 import com.adadapted.android.sdk.core.atl.AddToListContent;
 import com.adadapted.android.sdk.core.atl.AddToListItem;
 import com.adadapted.android.sdk.ui.messaging.AaSdkAdditContentListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener;
 
-import com.adadapted.android.sdk.core.ad.AdContent;
 import com.adadapted.sdktestapp.core.todo.TodoList;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;
 import com.adadapted.sdktestapp.ui.todo.activity.TodoListsActivity;
@@ -25,9 +23,6 @@ import com.squareup.leakcanary.LeakCanary;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Created by chrisweeden on 3/16/15.
- */
 public class TestAppApplication extends Application {
     private static final String TAG = TestAppApplication.class.getName();
 
@@ -53,7 +48,7 @@ public class TestAppApplication extends Application {
 
         String apiKey = getResources().getString(R.string.adadapted_api_key);
 
-        AdAdapted.init()
+        AdAdapted.INSTANCE
             .withAppId(apiKey)
             .inEnv(AdAdapted.Env.DEV)
             .setSdkSessionListener(new AaSdkSessionListener() {
@@ -106,7 +101,7 @@ public class TestAppApplication extends Application {
             })
             .start(this);
 
-        AdAdapted.init()
+        AdAdapted.INSTANCE
             .withAppId(apiKey)
             .inEnv(AdAdapted.Env.DEV)
             .start(this);
