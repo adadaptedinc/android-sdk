@@ -25,6 +25,10 @@ before_script:
   - yes | android-sdk-linux/tools/bin/sdkmanager --licenses
   - set -o pipefail
 
+stages:
+  - build
+  - test
+
 lintDebug:
   stage: build
   script:
@@ -41,4 +45,7 @@ assembleDebug:
 debugTests:
   stage: test
   script:
-    - ./gradlew -Pci --console=plain :app:testDebug
+    - ./gradlew test
+  artifacts:
+    reports:
+      junit: build/test-results/**/TEST-*.xml
