@@ -8,9 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.sdktestapp.R;
 
-/**
- * Created by chrisweeden on 4/7/15.
- */
 public abstract class SingleFragmentActivity extends AppCompatActivity {
     protected abstract Fragment createFragment();
 
@@ -19,7 +16,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_fragment);
 
-        AdAdapted.init()
+        AdAdapted.INSTANCE
                 .withAppId(getResources().getString(R.string.adadapted_api_key))
                 .inEnv(AdAdapted.Env.DEV)
                 .start(this);
