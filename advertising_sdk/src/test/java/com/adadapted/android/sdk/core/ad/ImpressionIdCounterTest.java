@@ -8,7 +8,8 @@ public class ImpressionIdCounterTest {
 
     @Test
     public void getIncrementedCountFor() {
-        final ImpressionIdCounter counter = ImpressionIdCounter.getInstance();
+        final ImpressionIdCounter counter = ImpressionIdCounter.Companion.getInstance();
+        assert counter != null;
         final int count = counter.getIncrementedCountFor("test_impression1");
 
         assertEquals(1, count);
@@ -16,7 +17,8 @@ public class ImpressionIdCounterTest {
 
     @Test
     public void getCurrentCountFor_WithNewCounter() {
-        final ImpressionIdCounter counter = ImpressionIdCounter.getInstance();
+        final ImpressionIdCounter counter = ImpressionIdCounter.Companion.getInstance();
+        assert counter != null;
         final int count = counter.getCurrentCountFor("test_impression2");
 
         assertEquals(1, count);
@@ -24,7 +26,8 @@ public class ImpressionIdCounterTest {
 
     @Test
     public void getCurrentCountFor_WithExistingCounter() {
-        final ImpressionIdCounter counter = ImpressionIdCounter.getInstance();
+        final ImpressionIdCounter counter = ImpressionIdCounter.Companion.getInstance();
+        assert counter != null;
         counter.getIncrementedCountFor("test_impression3");
 
         final int count = counter.getCurrentCountFor("test_impression3");

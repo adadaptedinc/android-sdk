@@ -115,7 +115,7 @@ class AdWebView extends WebView {
     void loadBlank() {
         adLock.lock();
         try {
-            currentAd = Ad.emptyAd();
+            currentAd = new Ad();
 
             final String dummyDocument = "<html><head><meta name=\"viewport\" content=\"width=device-width, user-scalable=no\" /></head><body></body></html>";
             loadData(dummyDocument, "text/html", null);

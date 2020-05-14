@@ -112,11 +112,6 @@ public class PopupContent implements AddToListContent, Parcelable {
     }
 
     @Override
-    public boolean hasItems() {
-        return items.size() > 0;
-    }
-
-    @Override
     public boolean hasNoItems() {
         return items.size() == 0;
     }

@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.adadapted.android.sdk.core.ad.Ad;
+import com.adadapted.android.sdk.core.ad.AdActionType;
 import com.adadapted.android.sdk.core.ad.AdEventClient;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.session.Session;
@@ -149,7 +150,7 @@ class AdZonePresenter implements SessionClient.Listener {
                 currentAd = currentZone.getAds().get(idx);
             }
             else {
-                currentAd = Ad.emptyAd();
+                currentAd = new Ad();
             }
 
             adStarted = false;
@@ -176,7 +177,7 @@ class AdZonePresenter implements SessionClient.Listener {
             zoneLock.lock();
             try {
                 adCompleted = true;
-                AdEventClient.trackImpressionEnd(currentAd);
+                AdEventClient.Companion.trackImpressionEnd(currentAd);
             }
             finally {
                 zoneLock.unlock();
@@ -188,7 +189,7 @@ class AdZonePresenter implements SessionClient.Listener {
         zoneLock.lock();
         try {
             adStarted = true;
-            AdEventClient.trackImpression(ad);
+            AdEventClient.Companion.trackImpression(ad);
             pixelWebView.loadData(ad.getTrackingHtml(), "text/html", null);
 
             startZoneTimer();
@@ -202,7 +203,7 @@ class AdZonePresenter implements SessionClient.Listener {
         zoneLock.lock();
         try {
             adStarted = true;
-            currentAd = Ad.emptyAd();
+            currentAd = new Ad();
 
             startZoneTimer();
         }
@@ -215,7 +216,7 @@ class AdZonePresenter implements SessionClient.Listener {
         zoneLock.lock();
         try {
             adStarted = true;
-            currentAd = Ad.emptyAd();
+            currentAd = new Ad();
 
             startZoneTimer();
         }
@@ -259,26 +260,26 @@ class AdZonePresenter implements SessionClient.Listener {
         params.put("ad_id", ad.getId());
 
         switch(actionType) {
-            case Ad.ActionTypes.CONTENT:
+            case AdActionType.CONTENT:
                 AppEventClient.trackSdkEvent("atl_ad_clicked", params);
 
                 handleContentAction(ad);
                 break;
 
-            case Ad.ActionTypes.LINK:
-            case Ad.ActionTypes.EXTERNAL_LINK:
-                AdEventClient.trackInteraction(ad);
+            case AdActionType.LINK:
+            case AdActionType.EXTERNAL_LINK:
+                AdEventClient.Companion.trackInteraction(ad);
 
                 handleLinkAction(ad);
                 break;
 
-            case Ad.ActionTypes.POPUP:
-                AdEventClient.trackInteraction(ad);
+            case AdActionType.POPUP:
+                AdEventClient.Companion.trackInteraction(ad);
 
                 handlePopupAction(ad);
                 break;
 
-            case Ad.ActionTypes.CONTENT_POPUP:
+            case AdActionType.CONTENT_POPUP:
                 AppEventClient.trackSdkEvent("popup_ad_clicked", params);
 
                 handlePopupAction(ad);

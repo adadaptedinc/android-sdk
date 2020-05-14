@@ -74,12 +74,12 @@ public class AaWebViewPopupActivity extends Activity {
     @Override
     public void onStart() {
         super.onStart();
-        AdEventClient.trackPopupBegin(ad);
+        AdEventClient.Companion.trackPopupBegin(ad);
     }
 
     public void onPause() {
         super.onPause();
-        AdEventClient.trackPopupEnd(ad);
+        AdEventClient.Companion.trackPopupEnd(ad);
     }
 
     @Override

@@ -416,7 +416,7 @@ public class SessionClient implements SessionAdapter.Listener {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                AdEventClient.publishEvents();
+                AdEventClient.Companion.publishEvents();
                 AppEventClient.publishEvents();
                 InterceptClient.publishEvents();
 
