@@ -51,7 +51,7 @@ public class JsonAdBuilder {
         for(int i = 0; i < adCount; i++) {
             try {
                 final JSONObject ad = jsonAds.getJSONObject(i);
-                if(AdDisplayType.isValidType(ad.getString(TYPE))) {
+                if(ad.getString(TYPE).equals(AdDisplayType.HTML)) {
                     ads.add(buildAd(zoneId, ad));
                 }
                 else {
@@ -78,35 +78,34 @@ public class JsonAdBuilder {
     }
 
     public Ad buildAd(final String zoneId, final JSONObject ad) throws JSONException {
-        final Ad.Builder builder = new Ad.Builder();
-
-        builder.setAdId(ad.getString(AD_ID));
-        builder.setZoneId(zoneId);
-        builder.setImpressionId(ad.getString(IMPRESSION_ID));
-
+        int parsedRefreshTime = DEFAULT_REFRESH_TIME;
         try {
-            builder.setRefreshTime(Integer.parseInt(ad.getString(REFRESH_TIME)));
+            parsedRefreshTime = Integer.parseInt(ad.getString(REFRESH_TIME));
         }
         catch(NumberFormatException ex) {
             AppEventClient.trackError(
-                "AD_PAYLOAD_PARSE_FAILED",
-                "Ad " + builder.getAdId() + " has an improperly set refresh_time."
+                    "AD_PAYLOAD_PARSE_FAILED",
+                    "Ad " + ad.get(AD_ID) + " has an improperly set refresh_time."
             );
-
-            builder.setRefreshTime(DEFAULT_REFRESH_TIME);
         }
 
-        builder.setUrl(ad.getString(CREATIVE_URL));
-        builder.setActionType(ad.getString(ACTION_TYPE));
-        builder.setActionPath(ad.getString(ACTION_PATH));
-
-        if (AdActionType.handlesContent(builder.getActionType())) {
-            builder.setPayload(parseAdContent(ad));
+        List<AddToListItem> payload = new ArrayList<>();
+        if (AdActionType.INSTANCE.handlesContent(ad.getString(ACTION_TYPE))) {
+            payload = parseAdContent(ad);
         }
 
-        builder.setTrackingHtml(ad.getString(TRACKING_HTML));
+        final Ad newAd = new Ad(
+                ad.getString(AD_ID),
+                zoneId,
+                ad.getString(IMPRESSION_ID),
+                ad.getString(CREATIVE_URL),
+                ad.getString(ACTION_TYPE),
+                ad.getString(ACTION_PATH),
+                payload,
+                parsedRefreshTime,
+                ad.getString(TRACKING_HTML));
 
-        return builder.build();
+        return newAd;
     }
 
     private List<AddToListItem> parseAdContent(final JSONObject ad) throws JSONException{

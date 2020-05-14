@@ -28,7 +28,7 @@ public class PopupJavascriptBridge {
         params.put("ad_id", ad.getId());
         AppEventClient.trackSdkEvent("popup_content_clicked", params);
 
-        final AdContent content = AdContent.createAddToListContent(ad);
+        final AdContent content = AdContent.CREATOR.createAddToListContent(ad);
         AdditContentPublisher.getInstance().publishAdContent(content);
     }
 
