@@ -3,7 +3,7 @@ package com.adadapted.android.sdk.core.ad
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
-class ImpressionIdCounter private constructor() {
+class ImpressionIdCounter private constructor(): Counter {
     private val idCounts: MutableMap<String, Int?>
     private val counterLock: Lock = ReentrantLock()
     private fun initCountFor(impressionId: String) {
@@ -11,7 +11,7 @@ class ImpressionIdCounter private constructor() {
     }
 
     @Synchronized
-    fun getIncrementedCountFor(impressionId: String): Int {
+    override fun getIncrementedCountFor(impressionId: String): Int {
         counterLock.lock()
         return try {
             if (idCounts.containsKey(impressionId)) {
@@ -29,7 +29,7 @@ class ImpressionIdCounter private constructor() {
     }
 
     @Synchronized
-    fun getCurrentCountFor(impressionId: String): Int {
+    override fun getCurrentCountFor(impressionId: String): Int {
         counterLock.lock()
         return try {
             if (idCounts.containsKey(impressionId)) {

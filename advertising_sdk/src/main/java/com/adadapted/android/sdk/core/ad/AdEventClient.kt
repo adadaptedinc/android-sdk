@@ -1,12 +1,17 @@
 package com.adadapted.android.sdk.core.ad
 
-import com.adadapted.android.sdk.core.concurrency.ThreadPoolInteractorExecuter
+import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
-class AdEventClient private constructor(private val adEventSink: AdEventSink) : SessionClient.Listener {
+class AdEventClient private constructor(
+        private val adEventSink: AdEventSink,
+        private val transporter: TransporterCoroutineScope,
+        private val impressionIdCounter: Counter
+) : SessionClient.Listener {
+
     interface Listener {
         fun onAdEventTracked(event: AdEvent?)
     }
@@ -99,85 +104,66 @@ class AdEventClient private constructor(private val adEventSink: AdEventSink) : 
     override fun onSessionInitFailed() {}
 
     companion object {
-        private var instance: AdEventClient? = null
+        private lateinit var instance: AdEventClient
 
-        fun createInstance(adEventSink: AdEventSink) {
-            if (instance == null) {
-                instance = AdEventClient(adEventSink)
-            }
+        fun createInstance(adEventSink: AdEventSink, transporter: TransporterCoroutineScope, impressionIdCounter: Counter) {
+            this.instance = AdEventClient(adEventSink, transporter, impressionIdCounter)
         }
 
         @Synchronized
         fun addListener(listener: Listener) {
-            instance?.performAddListener(listener)
+            instance.performAddListener(listener)
         }
 
         @Synchronized
         fun removeListener(listener: Listener) {
-            instance?.performRemoveListener(listener)
+            instance.performRemoveListener(listener)
         }
 
         @Synchronized
         fun trackImpression(ad: Ad) {
-            if (instance == null) {
-                return
-            }
-            ThreadPoolInteractorExecuter.getInstance().executeInBackground {
-                val count = ImpressionIdCounter.instance?.getIncrementedCountFor(ad.impressionId) ?: 0
-                instance?.fileEvent(ad, AdEvent.Types.IMPRESSION, count)
+            instance.transporter.dispatchToBackground {
+                val count = instance.impressionIdCounter.getIncrementedCountFor(ad.impressionId)
+                instance.fileEvent(ad, AdEvent.Types.IMPRESSION, count)
             }
         }
 
         @Synchronized
         fun trackImpressionEnd(ad: Ad) {
-            if (instance == null) {
-                return
-            }
-            ThreadPoolInteractorExecuter.getInstance().executeInBackground {
-                val count = ImpressionIdCounter.instance?.getCurrentCountFor(ad.impressionId) ?: 0
-                instance?.fileEvent(ad, AdEvent.Types.IMPRESSION_END, count)
+            instance.transporter.dispatchToBackground {
+                val count = instance.impressionIdCounter.getCurrentCountFor(ad.impressionId)
+                instance.fileEvent(ad, AdEvent.Types.IMPRESSION_END, count)
             }
         }
 
         @Synchronized
         fun trackInteraction(ad: Ad) {
-            if (instance == null) {
-                return
-            }
-            ThreadPoolInteractorExecuter.getInstance().executeInBackground {
-                val count = ImpressionIdCounter.instance?.getCurrentCountFor(ad.impressionId) ?: 0
-                instance?.fileEvent(ad, AdEvent.Types.INTERACTION, count)
+            instance.transporter.dispatchToBackground {
+                val count = instance.impressionIdCounter.getCurrentCountFor(ad.impressionId)
+                instance.fileEvent(ad, AdEvent.Types.INTERACTION, count)
             }
         }
 
         @Synchronized
         fun trackPopupBegin(ad: Ad) {
-            if (instance == null) {
-                return
-            }
-            ThreadPoolInteractorExecuter.getInstance().executeInBackground {
-                val count = ImpressionIdCounter.instance?.getCurrentCountFor(ad.impressionId) ?: 0
-                instance?.fileEvent(ad, AdEvent.Types.POPUP_BEGIN, count)
+            instance.transporter.dispatchToBackground {
+                val count = instance.impressionIdCounter.getCurrentCountFor(ad.impressionId)
+                instance.fileEvent(ad, AdEvent.Types.POPUP_BEGIN, count)
             }
         }
 
         @Synchronized
         fun trackPopupEnd(ad: Ad) {
-            if (instance == null) {
-                return
-            }
-            ThreadPoolInteractorExecuter.getInstance().executeInBackground {
-                val count = ImpressionIdCounter.instance?.getCurrentCountFor(ad.impressionId) ?: 0
-                instance?.fileEvent(ad, AdEvent.Types.POPUP_END, count)
+            instance.transporter.dispatchToBackground {
+                val count = instance.impressionIdCounter.getCurrentCountFor(ad.impressionId)
+                instance.fileEvent(ad, AdEvent.Types.POPUP_END, count)
             }
         }
 
         @Synchronized
         fun publishEvents() {
-            if (instance == null) {
-                return
-            }
-            ThreadPoolInteractorExecuter.getInstance().executeInBackground { instance?.performPublishEvents() }
+            instance.transporter.dispatchToBackground {
+                instance.performPublishEvents() }
         }
     }
 

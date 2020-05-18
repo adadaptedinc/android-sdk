@@ -4,7 +4,9 @@ import android.content.Context
 import android.util.Log
 import com.adadapted.android.sdk.config.Config
 import com.adadapted.android.sdk.core.ad.AdEventClient
+import com.adadapted.android.sdk.core.ad.ImpressionIdCounter
 import com.adadapted.android.sdk.core.addit.PayloadClient
+import com.adadapted.android.sdk.core.concurrency.Transporter
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.intercept.InterceptClient
 import com.adadapted.android.sdk.core.session.Session
@@ -73,7 +75,7 @@ object AdAdapted {
             return
         }
         hasStarted = true
-        setupServerUrls(context)
+        setupClients(context)
         SdkEventPublisher.getInstance().setListener(eventListener)
         AdditContentPublisher.getInstance().addListener(contentListener)
         PayloadClient.pickupPayloads { content ->
@@ -104,13 +106,13 @@ object AdAdapted {
         Log.i(LOG_TAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", BuildConfig.VERSION_NAME))
     }
 
-    private fun setupServerUrls(context: Context) {
+    private fun setupClients(context: Context) {
         Config.init(isProd)
         HttpRequestManager.createQueue(context.applicationContext)
 
         SessionClient.createInstance(HttpSessionAdapter(Config.getInitSessionUrl(), Config.getRefreshAdsUrl()))
         AppEventClient.createInstance(HttpAppEventSink(Config.getAppEventsUrl(), Config.getAppErrorsUrl()))
-        AdEventClient.createInstance(HttpAdEventSink(Config.getAdsEventUrl()))
+        ImpressionIdCounter.instance?.let { AdEventClient.createInstance(HttpAdEventSink(Config.getAdsEventUrl()), Transporter(), it) }
         InterceptClient.createInstance(HttpInterceptAdapter(Config.getRetrieveInterceptsUrl(), Config.getInterceptEventsUrl()))
         PayloadClient.createInstance(HttpPayloadAdapter(Config.getPickupPayloadsUrl(), Config.getTrackingPayloadUrl()))
     }

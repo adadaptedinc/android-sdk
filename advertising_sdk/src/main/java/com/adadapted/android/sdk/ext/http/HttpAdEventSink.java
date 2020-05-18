@@ -38,8 +38,7 @@ public class HttpAdEventSink implements AdEventSink {
                 batchUrl, json, new Response.Listener<JSONObject>(){
 
             @Override
-            public void onResponse(JSONObject response) {
-            }
+            public void onResponse(JSONObject response) {}
 
         }, new Response.ErrorListener() {
 
