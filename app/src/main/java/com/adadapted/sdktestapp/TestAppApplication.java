@@ -16,8 +16,6 @@ import com.adadapted.sdktestapp.core.todo.TodoList;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;
 import com.adadapted.sdktestapp.ui.todo.activity.TodoListsActivity;
 
-import com.flurry.android.FlurryAgent;
-
 import com.squareup.leakcanary.LeakCanary;
 
 import java.util.List;
@@ -41,15 +39,8 @@ public class TestAppApplication extends Application {
         }
         LeakCanary.install(this);
 
-        FlurryAgent.setLogEnabled(false);
-        FlurryAgent.init(this, getString(R.string.flurry_api_id));
-
-        //NewRelic.withApplicationToken(getString(R.string.newrelic_api_id)).start(this);
-
-        String apiKey = getResources().getString(R.string.adadapted_api_key);
-
         AdAdapted.INSTANCE
-            .withAppId(apiKey)
+            .withAppId("YOUR_API_KEY") // #YOUR API KEY GOES HERE#
             .inEnv(AdAdapted.Env.DEV)
             .setSdkSessionListener(new AaSdkSessionListener() {
                 @Override

@@ -9,14 +9,6 @@
         <item>Recipes</item>
     </string-array>
 
-    <string name="adadapted_api_key">NTU3NZQ2ZTG2YTBK</string>
-    <bool name="adadapted_prod">false</bool>
-    <string-array name="adadapted_zones">
-        <item>100680</item>
-        <item>100681</item>
-        <item>100682</item>
-    </string-array>
-
     <string name="title_activity_item_detail">ItemDetailActivity</string>
     <string name="title_activity_todo_lists">Lists</string>
     <string name="title_activity_todo_list">Lists</string>
@@ -29,8 +21,6 @@
     <string name="title_activity_recipe_detail">RecipeDetailActivity</string>
 
     <string name="filter_title_viewadditintercept" />
-    <string name="newrelic_api_id">AAabde692c32523732801586d2c793895d9dae5e0d</string>
-    <string name="flurry_api_id">HGS9SYKW6Y2WSF2425BN</string>
 
     <array name="list_of_groceries">
         <item>Air Freshener</item>
