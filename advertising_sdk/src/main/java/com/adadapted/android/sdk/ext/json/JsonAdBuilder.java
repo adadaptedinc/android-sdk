@@ -55,7 +55,7 @@ public class JsonAdBuilder {
                     ads.add(buildAd(zoneId, ad));
                 }
                 else {
-                    AppEventClient.trackError(
+                    AppEventClient.Companion.getInstance().trackError(
                         "AD_PAYLOAD_PARSE_FAILED",
                         "Ad " + ad.getString(AD_ID) + " has unsupported ad_type: " + ad.getString(TYPE)
                     );
@@ -66,7 +66,7 @@ public class JsonAdBuilder {
                 errorParams.put("bad_json", jsonAds.toString());
                 errorParams.put("exception", ex.getMessage());
 
-                AppEventClient.trackError(
+                AppEventClient.Companion.getInstance().trackError(
                     "AD_PAYLOAD_PARSE_FAILED",
                     "Problem parsing Ad JSON.",
                     errorParams
@@ -83,7 +83,7 @@ public class JsonAdBuilder {
             parsedRefreshTime = Integer.parseInt(ad.getString(REFRESH_TIME));
         }
         catch(NumberFormatException ex) {
-            AppEventClient.trackError(
+            AppEventClient.Companion.getInstance().trackError(
                     "AD_PAYLOAD_PARSE_FAILED",
                     "Ad " + ad.get(AD_ID) + " has an improperly set refresh_time."
             );
@@ -123,7 +123,7 @@ public class JsonAdBuilder {
             if(item.has(PRODUCT_TITLE)) {
                 builder.setTitle(item.getString(PRODUCT_TITLE));
             } else {
-                AppEventClient.trackError(
+                AppEventClient.Companion.getInstance().trackError(
                     "SESSION_AD_PAYLOAD_PARSE_FAILED",
                     "Detailed List Items payload should always have a product title."
                 );

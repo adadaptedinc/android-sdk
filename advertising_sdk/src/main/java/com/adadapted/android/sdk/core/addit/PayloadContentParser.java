@@ -36,7 +36,7 @@ public class PayloadContentParser {
         } catch (JSONException ex) {
             final Map<String, String> errorParams = new HashMap<>();
             errorParams.put("exception_message", ex.getMessage());
-            AppEventClient.trackError(
+            AppEventClient.Companion.getInstance().trackError(
                     "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
                     "Problem parsing Payload JSON payload",
                     errorParams
@@ -63,7 +63,7 @@ public class PayloadContentParser {
         else {
             final Map<String, String> errorParams = new HashMap<>();
             errorParams.put("payload_id", payloadId);
-            AppEventClient.trackError(
+            AppEventClient.Companion.getInstance().trackError(
                 "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
                 "Missing Detailed List Items.",
                 errorParams
@@ -95,7 +95,7 @@ public class PayloadContentParser {
             final Map<String, String> errorParams = new HashMap<>();
             errorParams.put("exception_message", ex.getMessage());
             errorParams.put("field_name", fieldName);
-            AppEventClient.trackError(
+            AppEventClient.Companion.getInstance().trackError(
                 "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
                 "Problem parsing Payload JSON input field " + fieldName,
                 errorParams

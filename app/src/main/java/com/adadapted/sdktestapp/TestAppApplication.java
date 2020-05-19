@@ -100,10 +100,5 @@ public class TestAppApplication extends Application {
                 }
             })
             .start(this);
-
-        AdAdapted.INSTANCE
-            .withAppId(apiKey)
-            .inEnv(AdAdapted.Env.DEV)
-            .start(this);
     }
 }

@@ -305,7 +305,7 @@ public class SessionClient implements SessionAdapter.Listener {
         try {
             if (currentSession.hasExpired()) {
                 Log.i(LOGTAG, "Session has expired. Expired at: " + currentSession.getExpiresAt());
-                AppEventClient.trackSdkEvent("session_expired");
+                AppEventClient.Companion.getInstance().trackSdkEvent("session_expired");
 
                 performReinitialize();
             } else {
@@ -416,8 +416,8 @@ public class SessionClient implements SessionAdapter.Listener {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                AdEventClient.Companion.publishEvents();
-                AppEventClient.publishEvents();
+                AdEventClient.Companion.getInstance().publishEvents();
+                AppEventClient.Companion.getInstance().publishEvents();
                 InterceptClient.publishEvents();
 
                 handler.postDelayed(this, Config.DEFAULT_EVENT_POLLING);

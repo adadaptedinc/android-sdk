@@ -7,6 +7,7 @@ import com.adadapted.android.sdk.core.ad.AdEventClient
 import com.adadapted.android.sdk.core.ad.ImpressionIdCounter
 import com.adadapted.android.sdk.core.addit.PayloadClient
 import com.adadapted.android.sdk.core.concurrency.Transporter
+import com.adadapted.android.sdk.core.event.AdAdaptedEventClient
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.intercept.InterceptClient
 import com.adadapted.android.sdk.core.session.Session
@@ -22,7 +23,6 @@ import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener
 import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener
 import com.adadapted.android.sdk.ui.messaging.AdditContentPublisher
 import com.adadapted.android.sdk.ui.messaging.SdkEventPublisher
-import java.util.*
 
 object AdAdapted {
 
@@ -70,7 +70,7 @@ object AdAdapted {
         if (hasStarted) {
             if (!isProd) {
                 Log.w(LOG_TAG, "AdAdapted Android Advertising SDK has already been started")
-                AppEventClient.trackError("MULTIPLE_SDK_STARTS", "App has attempted to start the SDK Multiple times")
+                AppEventClient.getInstance().trackError("MULTIPLE_SDK_STARTS", "App has attempted to start the SDK Multiple times")
             }
             return
         }
@@ -102,7 +102,7 @@ object AdAdapted {
                 isProd,
                 params,
                 startListener)
-        AppEventClient.trackSdkEvent("app_opened")
+        AppEventClient.getInstance().trackSdkEvent("app_opened")
         Log.i(LOG_TAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", BuildConfig.VERSION_NAME))
     }
 
@@ -111,10 +111,11 @@ object AdAdapted {
         HttpRequestManager.createQueue(context.applicationContext)
 
         SessionClient.createInstance(HttpSessionAdapter(Config.getInitSessionUrl(), Config.getRefreshAdsUrl()))
-        AppEventClient.createInstance(HttpAppEventSink(Config.getAppEventsUrl(), Config.getAppErrorsUrl()))
+        AppEventClient.createInstance(HttpAppEventSink(Config.getAppEventsUrl(), Config.getAppErrorsUrl()), Transporter())
         ImpressionIdCounter.instance?.let { AdEventClient.createInstance(HttpAdEventSink(Config.getAdsEventUrl()), Transporter(), it) }
         InterceptClient.createInstance(HttpInterceptAdapter(Config.getRetrieveInterceptsUrl(), Config.getInterceptEventsUrl()))
         PayloadClient.createInstance(HttpPayloadAdapter(Config.getPickupPayloadsUrl(), Config.getTrackingPayloadUrl()))
+        AdAdaptedEventClient.createInstance(AdEventClient.getInstance(), AppEventClient.getInstance())
     }
 
     init {

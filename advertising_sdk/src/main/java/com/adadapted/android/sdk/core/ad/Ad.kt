@@ -68,8 +68,9 @@ class Ad : Parcelable {
     val isEmpty: Boolean
         get() = id.isEmpty()
 
-    val content: AdContent
-        get() = AdContent.createAddToListContent(this)
+    val content: AdContent by lazy {
+        AdContent.createAddToListContent(this)
+    }
 
     companion object CREATOR : Parcelable.Creator<Ad> {
         override fun createFromParcel(parcel: Parcel): Ad {

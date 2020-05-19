@@ -72,7 +72,7 @@ public class HttpInterceptAdapter implements InterceptAdapter {
                         params.put("url", initUrl);
                         params.put("status_code", Integer.toString(statusCode));
                         params.put("data", data);
-                        AppEventClient.trackError(
+                        AppEventClient.Companion.getInstance().trackError(
                             "KI_SESSION_REQUEST_FAILED",
                             error.getMessage(),
                             params
@@ -106,7 +106,7 @@ public class HttpInterceptAdapter implements InterceptAdapter {
                         params.put("url", eventUrl);
                         params.put("status_code", Integer.toString(statusCode));
                         params.put("data", data);
-                        AppEventClient.trackError(
+                        AppEventClient.Companion.getInstance().trackError(
                             "KI_EVENT_REQUEST_FAILED",
                             error.getMessage(),
                             params

@@ -27,7 +27,7 @@ public class AdditInterceptActivity extends AppCompatActivity {
 
         PayloadClient.deeplinkInProgress();
 
-        AppEventClient.trackSdkEvent("addit_app_opened");
+        AppEventClient.Companion.getInstance().trackSdkEvent("addit_app_opened");
 
         try {
             final Intent additIntent = getIntent();
@@ -45,7 +45,7 @@ public class AdditInterceptActivity extends AppCompatActivity {
 
             final Map<String, String> errorParams = new HashMap<>();
             errorParams.put("exception_message", ex.getMessage());
-            AppEventClient.trackError(
+            AppEventClient.Companion.getInstance().trackError(
                 "ADDIT_DEEPLINK_HANDLING_ERROR",
                 "Problem handling deeplink",
                 errorParams
