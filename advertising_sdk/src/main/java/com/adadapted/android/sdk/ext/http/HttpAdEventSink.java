@@ -54,7 +54,7 @@ public class HttpAdEventSink implements AdEventSink {
                         params.put("url", batchUrl);
                         params.put("status_code", Integer.toString(statusCode));
                         params.put("data", data);
-                        AppEventClient.trackError(
+                        AppEventClient.Companion.getInstance().trackError(
                                 "AD_EVENT_TRACK_REQUEST_FAILED",
                                 error.getMessage(),
                                 params

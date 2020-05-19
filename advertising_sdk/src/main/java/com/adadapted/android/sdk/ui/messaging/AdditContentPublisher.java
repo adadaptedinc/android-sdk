@@ -53,7 +53,7 @@ public class AdditContentPublisher {
         lock.lock();
         try {
             if (listener == null) {
-                AppEventClient.trackError(
+                AppEventClient.Companion.getInstance().trackError(
                     "NO_ADDIT_CONTENT_LISTENER",
                     "App did not register an Addit Content listener"
                 );
@@ -81,7 +81,7 @@ public class AdditContentPublisher {
         lock.lock();
         try {
             if (listener == null) {
-                AppEventClient.trackError(
+                AppEventClient.Companion.getInstance().trackError(
                         "NO_ADDIT_CONTENT_LISTENER",
                         "App did not register an Addit Content listener"
                 );
@@ -103,7 +103,7 @@ public class AdditContentPublisher {
         lock.lock();
         try {
             if (listener == null) {
-                AppEventClient.trackError(
+                AppEventClient.Companion.getInstance().trackError(
                     "NO_ADDIT_CONTENT_LISTENER",
                     "App did not register an Addit Content listener"
                 );

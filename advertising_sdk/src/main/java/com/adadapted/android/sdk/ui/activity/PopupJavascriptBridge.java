@@ -26,7 +26,7 @@ public class PopupJavascriptBridge {
     public void deliverAdContent() {
         final HashMap<String, String> params = new HashMap<>();
         params.put("ad_id", ad.getId());
-        AppEventClient.trackSdkEvent("popup_content_clicked", params);
+        AppEventClient.Companion.getInstance().trackSdkEvent("popup_content_clicked", params);
 
         final AdContent content = AdContent.CREATOR.createAddToListContent(ad);
         AdditContentPublisher.getInstance().publishAdContent(content);
@@ -44,7 +44,7 @@ public class PopupJavascriptBridge {
                        final String productImage) {
         final HashMap<String, String> params = new HashMap<>();
         params.put("tracking_id", trackingId);
-        AppEventClient.trackSdkEvent("popup_atl_clicked", params);
+        AppEventClient.Companion.getInstance().trackSdkEvent("popup_atl_clicked", params);
 
         final List<AddToListItem> items = new ArrayList<>();
         items.add(new AddToListItem(

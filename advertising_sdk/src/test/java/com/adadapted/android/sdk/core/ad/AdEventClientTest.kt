@@ -1,6 +1,7 @@
 package com.adadapted.android.sdk.core.ad
 
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
+import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.ext.http.HttpAdEventSink
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.any
@@ -38,14 +39,14 @@ class AdEventClientTest {
         assertNotNull(testAdEventClient)
     }
 
+    // TODO needs session client refactor first for all of the other tests
     @Test
     fun addListener() {
 //        val mockListener = mock<AdEventClient.Listener>()
-//        testAdEventClient.addListener(mockListener)
+//        testAdEventClient.getInstance().addListener(mock())
 //        testAdEventClient.trackImpression(testAd)
 //
 //        verify(mockListener).onAdEventTracked(any())
-        // TODO needs session client refactor first
     }
 
     @Test

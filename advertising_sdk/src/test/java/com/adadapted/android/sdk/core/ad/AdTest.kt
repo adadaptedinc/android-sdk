@@ -3,14 +3,23 @@ package com.adadapted.android.sdk.core.ad
 import android.os.Parcel
 import com.adadapted.android.sdk.config.Config
 import com.adadapted.android.sdk.core.atl.AddToListItem
+import com.adadapted.android.sdk.core.event.AdAdaptedEventClient
+import com.nhaarman.mockitokotlin2.mock
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertNotNull
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class AdTest {
+
+    @Before
+    fun setup() {
+        AdAdaptedEventClient.createInstance(mock(), mock())
+    }
+
     @Test
     fun defaultAdIsCreated() {
         val mockAd = Ad()

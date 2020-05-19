@@ -68,7 +68,7 @@ public class HttpSessionAdapter implements SessionAdapter {
                         params.put("url", initUrl);
                         params.put("status_code", Integer.toString(statusCode));
                         params.put("data", data);
-                        AppEventClient.trackError(
+                        AppEventClient.Companion.getInstance().trackError(
                                 "SESSION_REQUEST_FAILED",
                                 error.getMessage(),
                                 params
@@ -116,7 +116,7 @@ public class HttpSessionAdapter implements SessionAdapter {
                             params.put("url", refreshUrl);
                             params.put("status_code", Integer.toString(statusCode));
                             params.put("data", data);
-                            AppEventClient.trackError(
+                            AppEventClient.Companion.getInstance().trackError(
                                     "AD_GET_REQUEST_FAILED",
                                     error.getMessage(),
                                     params

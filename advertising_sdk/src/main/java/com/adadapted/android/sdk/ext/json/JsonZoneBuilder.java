@@ -50,7 +50,7 @@ public class JsonZoneBuilder {
                 errorParams.put("bad_json", jsonZones.toString());
                 errorParams.put("exception", ex.getMessage());
 
-                AppEventClient.trackError(
+                AppEventClient.Companion.getInstance().trackError(
                     "SESSION_ZONE_PAYLOAD_PARSE_FAILED",
                     "Failed to parse Session Zone payload for processing.",
                     errorParams

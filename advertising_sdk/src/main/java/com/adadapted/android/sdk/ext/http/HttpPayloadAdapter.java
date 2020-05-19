@@ -66,7 +66,7 @@ public class HttpPayloadAdapter implements PayloadAdapter {
                         params.put("url", pickupUrl);
                         params.put("status_code", Integer.toString(statusCode));
                         params.put("data", data);
-                        AppEventClient.trackError(
+                        AppEventClient.Companion.getInstance().trackError(
                                 "PAYLOAD_PICKUP_REQUEST_FAILED",
                                 error.getMessage(),
                                 params
@@ -100,7 +100,7 @@ public class HttpPayloadAdapter implements PayloadAdapter {
                         params.put("url", trackUrl);
                         params.put("status_code", Integer.toString(statusCode));
                         params.put("data", data);
-                        AppEventClient.trackError(
+                        AppEventClient.Companion.getInstance().trackError(
                                 "PAYLOAD_EVENT_REQUEST_FAILED",
                                 error.getMessage(),
                                 params

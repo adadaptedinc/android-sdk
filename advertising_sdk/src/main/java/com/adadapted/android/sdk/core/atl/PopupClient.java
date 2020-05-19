@@ -14,7 +14,7 @@ class PopupClient {
                 final Map<String, String> params = new HashMap<>();
                 params.put("payload_id", content.getPayloadId());
 
-                AppEventClient.trackSdkEvent("popup_added_to_list", params);
+                AppEventClient.Companion.getInstance().trackSdkEvent("popup_added_to_list", params);
             }
         });
     }
@@ -28,7 +28,7 @@ class PopupClient {
                 params.put("tracking_id", item.getTrackingId());
                 params.put("item_name", item.getTitle());
 
-                AppEventClient.trackSdkEvent("popup_item_added_to_list", params);
+                AppEventClient.Companion.getInstance().trackSdkEvent("popup_item_added_to_list", params);
             }
         });
     }
@@ -40,7 +40,7 @@ class PopupClient {
                 final Map<String, String> eventParams = new HashMap<>();
                 eventParams.put("payload_id", content.getPayloadId());
 
-                AppEventClient.trackError("POPUP_CONTENT_FAILED", message, eventParams);
+                AppEventClient.Companion.getInstance().trackError("POPUP_CONTENT_FAILED", message, eventParams);
             }
         });
     }
@@ -53,7 +53,7 @@ class PopupClient {
                 eventParams.put("payload_id", content.getPayloadId());
                 eventParams.put("tracking_id", item.getTrackingId());
 
-                AppEventClient.trackError("POPUP_CONTENT_ITEM_FAILED", message, eventParams);
+                AppEventClient.Companion.getInstance().trackError("POPUP_CONTENT_ITEM_FAILED", message, eventParams);
             }
         });
     }

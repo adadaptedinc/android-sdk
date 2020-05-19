@@ -59,7 +59,7 @@ public class JsonSessionBuilder {
             final Map<String, String> params = new HashMap<>();
             params.put("exception", ex.getMessage());
             params.put("bad_json", response.toString());
-            AppEventClient.trackError(
+            AppEventClient.Companion.getInstance().trackError(
                 "SESSION_PAYLOAD_PARSE_FAILED",
                 "Failed to parse Session payload for processing.",
                 params

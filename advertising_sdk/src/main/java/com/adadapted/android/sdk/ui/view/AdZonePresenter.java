@@ -8,7 +8,9 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.ad.Ad;
 import com.adadapted.android.sdk.core.ad.AdActionType;
 import com.adadapted.android.sdk.core.ad.AdEventClient;
+import com.adadapted.android.sdk.core.event.AdAdaptedEventClient;
 import com.adadapted.android.sdk.core.event.AppEventClient;
+import com.adadapted.android.sdk.core.event.BaseEventClient;
 import com.adadapted.android.sdk.core.session.Session;
 import com.adadapted.android.sdk.core.session.SessionClient;
 import com.adadapted.android.sdk.core.zone.Zone;
@@ -55,10 +57,11 @@ class AdZonePresenter implements SessionClient.Listener {
     private boolean timerRunning;
     private final Lock timerLock = new ReentrantLock();
     private final Timer timer;
+    private final BaseEventClient adAdaptedEvenClient;
 
     AdZonePresenter(final Context context) {
         this.context = context.getApplicationContext();
-
+        adAdaptedEvenClient = AdAdaptedEventClient.Companion.getInstance();
         pixelWebView = new PixelWebView(context.getApplicationContext());
 
         attached = false;
@@ -76,7 +79,7 @@ class AdZonePresenter implements SessionClient.Listener {
 
             final Map<String, String> params = new HashMap<>();
             params.put("zone_id", zoneId);
-            AppEventClient.trackSdkEvent("zone_loaded", params);
+            AppEventClient.Companion.getInstance().trackSdkEvent("zone_loaded", params);
         }
     }
 
@@ -177,7 +180,7 @@ class AdZonePresenter implements SessionClient.Listener {
             zoneLock.lock();
             try {
                 adCompleted = true;
-                AdEventClient.Companion.trackImpressionEnd(currentAd);
+                AdEventClient.Companion.getInstance().trackImpressionEnd(currentAd);
             }
             finally {
                 zoneLock.unlock();
@@ -189,7 +192,7 @@ class AdZonePresenter implements SessionClient.Listener {
         zoneLock.lock();
         try {
             adStarted = true;
-            AdEventClient.Companion.trackImpression(ad);
+            AdEventClient.Companion.getInstance().trackImpression(ad);
             pixelWebView.loadData(ad.getTrackingHtml(), "text/html", null);
 
             startZoneTimer();
@@ -261,27 +264,23 @@ class AdZonePresenter implements SessionClient.Listener {
 
         switch(actionType) {
             case AdActionType.CONTENT:
-                AppEventClient.trackSdkEvent("atl_ad_clicked", params);
-
+                AppEventClient.Companion.getInstance().trackSdkEvent("atl_ad_clicked", params);
                 handleContentAction(ad);
                 break;
 
             case AdActionType.LINK:
             case AdActionType.EXTERNAL_LINK:
-                AdEventClient.Companion.trackInteraction(ad);
-
+                adAdaptedEvenClient.trackInteraction(ad);
                 handleLinkAction(ad);
                 break;
 
             case AdActionType.POPUP:
-                AdEventClient.Companion.trackInteraction(ad);
-
+                adAdaptedEvenClient.trackInteraction(ad);
                 handlePopupAction(ad);
                 break;
 
             case AdActionType.CONTENT_POPUP:
-                AppEventClient.trackSdkEvent("popup_ad_clicked", params);
-
+                AppEventClient.Companion.getInstance().trackSdkEvent("popup_ad_clicked", params);
                 handlePopupAction(ad);
                 break;
 
