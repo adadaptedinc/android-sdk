@@ -14,6 +14,5 @@ public interface AddToListContent {
     void itemFailed(AddToListItem item, String message);
     String getSource();
     List<AddToListItem> getItems();
-    boolean hasItems();
     boolean hasNoItems();
 }

@@ -64,7 +64,7 @@ public class AaWebViewPopupActivity extends Activity {
         if(url.startsWith("http")) {
             loadPopup(ad.getActionPath());
         } else {
-            AppEventClient.trackError(
+            AppEventClient.Companion.getInstance().trackError(
                 "POPUP_URL_MALFORMED",
                 "Incorrect Action Path URL supplied for Ad: " + ad.getId()
             );
@@ -74,12 +74,12 @@ public class AaWebViewPopupActivity extends Activity {
     @Override
     public void onStart() {
         super.onStart();
-        AdEventClient.trackPopupBegin(ad);
+        AdEventClient.Companion.getInstance().trackPopupBegin(ad);
     }
 
     public void onPause() {
         super.onPause();
-        AdEventClient.trackPopupEnd(ad);
+        AdEventClient.Companion.getInstance().trackPopupEnd(ad);
     }
 
     @Override
@@ -120,7 +120,7 @@ public class AaWebViewPopupActivity extends Activity {
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", url);
                 params.put("error", error.toString());
-                AppEventClient.trackError(
+                AppEventClient.Companion.getInstance().trackError(
                     "POPUP_URL_LOAD_FAILED",
                     "Problem loading popup url",
                     params
@@ -139,7 +139,7 @@ public class AaWebViewPopupActivity extends Activity {
                 final Map<String, String> params = new HashMap<>();
                 params.put("url", url);
                 params.put("error", errorResponse.getReasonPhrase());
-                AppEventClient.trackError(
+                AppEventClient.Companion.getInstance().trackError(
                     "POPUP_URL_LOAD_FAILED",
                     "Problem loading popup url",
                     params

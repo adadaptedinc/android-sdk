@@ -51,7 +51,7 @@ public class JsonInterceptBuilder {
             final Map<String, String> params = new HashMap<>();
             params.put("error", ex.getMessage());
             params.put("payload", json.toString());
-            AppEventClient.trackError(
+            AppEventClient.Companion.getInstance().trackError(
                 "KI_PAYLOAD_PARSE_FAILED",
                 "Failed to parse KI payload for processing.",
                 params

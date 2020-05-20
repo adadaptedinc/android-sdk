@@ -74,7 +74,7 @@ public class HttpAppEventSink implements AppEventSink {
                         params.put("url", eventUrl);
                         params.put("status_code", Integer.toString(statusCode));
                         params.put("data", data);
-                        AppEventClient.trackError(
+                        AppEventClient.Companion.getInstance().trackError(
                                 "APP_EVENT_REQUEST_FAILED",
                                 error.getMessage(),
                                 params

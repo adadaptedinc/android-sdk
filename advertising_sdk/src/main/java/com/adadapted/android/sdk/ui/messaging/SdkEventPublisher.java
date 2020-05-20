@@ -32,7 +32,7 @@ public class SdkEventPublisher implements AdEventClient.Listener {
     private final Lock lock = new ReentrantLock();
 
     private SdkEventPublisher() {
-        AdEventClient.addListener(this);
+        AdEventClient.Companion.getInstance().addListener(this);
     }
 
     public void setListener(final AaSdkEventListener listener) {

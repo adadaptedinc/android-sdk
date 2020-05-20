@@ -187,7 +187,7 @@ public class DeviceInfoClient {
         catch (GooglePlayServicesNotAvailableException | GooglePlayServicesRepairableException | IOException ex) {
             Log.w(LOGTAG, "Problem retrieving Google Play Advertiser Info");
 
-            AppEventClient.trackError("GAID_UNAVAILABLE", ex.getMessage());
+            AppEventClient.Companion.getInstance().trackError("GAID_UNAVAILABLE", ex.getMessage());
         }
 
         return null;

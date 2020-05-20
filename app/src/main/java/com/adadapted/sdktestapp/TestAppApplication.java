@@ -6,28 +6,21 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.adadapted.android.sdk.AdAdapted;
-import com.adadapted.android.sdk.core.addit.AdditContent;
 import com.adadapted.android.sdk.core.atl.AddToListContent;
 import com.adadapted.android.sdk.core.atl.AddToListItem;
 import com.adadapted.android.sdk.ui.messaging.AaSdkAdditContentListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener;
 import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener;
 
-import com.adadapted.android.sdk.core.ad.AdContent;
 import com.adadapted.sdktestapp.core.todo.TodoList;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;
 import com.adadapted.sdktestapp.ui.todo.activity.TodoListsActivity;
-
-import com.flurry.android.FlurryAgent;
 
 import com.squareup.leakcanary.LeakCanary;
 
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Created by chrisweeden on 3/16/15.
- */
 public class TestAppApplication extends Application {
     private static final String TAG = TestAppApplication.class.getName();
 
@@ -46,15 +39,8 @@ public class TestAppApplication extends Application {
         }
         LeakCanary.install(this);
 
-        FlurryAgent.setLogEnabled(false);
-        FlurryAgent.init(this, getString(R.string.flurry_api_id));
-
-        //NewRelic.withApplicationToken(getString(R.string.newrelic_api_id)).start(this);
-
-        String apiKey = getResources().getString(R.string.adadapted_api_key);
-
-        AdAdapted.init()
-            .withAppId(apiKey)
+        AdAdapted.INSTANCE
+            .withAppId("YOUR_API_KEY") // #YOUR API KEY GOES HERE#
             .inEnv(AdAdapted.Env.DEV)
             .setSdkSessionListener(new AaSdkSessionListener() {
                 @Override
@@ -104,11 +90,6 @@ public class TestAppApplication extends Application {
                     }
                 }
             })
-            .start(this);
-
-        AdAdapted.init()
-            .withAppId(apiKey)
-            .inEnv(AdAdapted.Env.DEV)
             .start(this);
     }
 }

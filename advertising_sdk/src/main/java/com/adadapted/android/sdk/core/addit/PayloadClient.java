@@ -86,7 +86,7 @@ public class PayloadClient {
             eventParams.put("payload_id", content.getPayloadId());
             eventParams.put("source", content.getAdditSource());
 
-            AppEventClient.trackSdkEvent("addit_added_to_list", eventParams);
+            AppEventClient.Companion.getInstance().trackSdkEvent("addit_added_to_list", eventParams);
 
             if(content.isPayloadSource()) {
                 getInstance().trackPayload(content, "delivered");
@@ -106,7 +106,7 @@ public class PayloadClient {
             eventParams.put("item_name", item.getTitle());
             eventParams.put("source", content.getAdditSource());
 
-            AppEventClient.trackSdkEvent("addit_item_added_to_list", eventParams);
+            AppEventClient.Companion.getInstance().trackSdkEvent("addit_item_added_to_list", eventParams);
             }
         });
     }
@@ -118,7 +118,7 @@ public class PayloadClient {
                 final Map<String, String> eventParams = new HashMap<>();
                 eventParams.put("payload_id", content.getPayloadId());
 
-                AppEventClient.trackSdkEvent("addit_duplicate_payload", eventParams);
+                AppEventClient.Companion.getInstance().trackSdkEvent("addit_duplicate_payload", eventParams);
 
                 if(content.isPayloadSource()) {
                     getInstance().trackPayload(content, "duplicate");
@@ -135,7 +135,7 @@ public class PayloadClient {
                 final Map<String, String> eventParams = new HashMap<>();
                 eventParams.put("payload_id", content.getPayloadId());
 
-                AppEventClient.trackError("ADDIT_CONTENT_FAILED", message, eventParams);
+                AppEventClient.Companion.getInstance().trackError("ADDIT_CONTENT_FAILED", message, eventParams);
 
                 if(content.isPayloadSource()) {
                     getInstance().trackPayload(content, "rejected");
@@ -154,7 +154,7 @@ public class PayloadClient {
             eventParams.put("payload_id", content.getPayloadId());
             eventParams.put("tracking_id", item.getTrackingId());
 
-            AppEventClient.trackError("ADDIT_CONTENT_ITEM_FAILED", message, eventParams);
+            AppEventClient.Companion.getInstance().trackError("ADDIT_CONTENT_ITEM_FAILED", message, eventParams);
             }
         });
     }
@@ -169,7 +169,7 @@ public class PayloadClient {
         DeviceInfoClient.getDeviceInfo(new DeviceInfoClient.Callback() {
             @Override
             public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
-                AppEventClient.trackSdkEvent("payload_pickup_attempt");
+                AppEventClient.Companion.getInstance().trackSdkEvent("payload_pickup_attempt");
 
                 adapter.pickup(deviceInfo, new PayloadAdapter.Callback() {
                     @Override

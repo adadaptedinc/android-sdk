@@ -52,7 +52,7 @@ public class AdditContent implements AddToListContent, Parcelable {
         final List<AddToListItem> items
     ) {
         if (items.size() == 0) {
-            AppEventClient.trackError(
+            AppEventClient.Companion.getInstance().trackError(
                 "ADDIT_PAYLOAD_IS_EMPTY",
                 String.format(Locale.ENGLISH, "Payload %s has empty payload", payloadId)
             );
