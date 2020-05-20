@@ -46,6 +46,11 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.4"
 }
 
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
 tasks.withType(Test) {
     testLogging {
         events TestLogEvent.FAILED,
@@ -78,8 +83,4 @@ tasks.withType(Test) {
             }
         }
     }
-}
-repositories {
-    mavenCentral()
-    jcenter()
 }
