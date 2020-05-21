@@ -6,6 +6,8 @@ Development is done using Android Studio. Updating the public facing API should 
 
 Documentation for integrating the SDK with and App can be found at [https://dev.adadapted.com/android/index.html](https://dev.adadapted.com/android/index.html)
 
+A valid API key is required to be able to run the SDK which can be dropped into the testing application in TestApplication.java.
+
 ### Prerequisites
 
 * Android Studio with recent Android SDK versions installed
