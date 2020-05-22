@@ -14,7 +14,21 @@ A valid API key is required to be able to run the SDK which can be dropped into 
 
 ### Installing
 
-Project should be checked out from version control through Android Studio. Project can also be manually checked out and manually opened/imported into Android Studio.
+Step 1. Add the JitPack repository to your build file
+
+Add it in your root build.gradle at the **end** of repositories:
+
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+Step 2. Add the dependency (based on latest release version)
+
+	dependencies {
+	        implementation 'com.gitlab.adadapted:android_sdk:2.1.0'
+	}
 
 ## Running the tests
 
