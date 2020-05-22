@@ -68,11 +68,17 @@ public class HttpSessionAdapter implements SessionAdapter {
                         params.put("url", initUrl);
                         params.put("status_code", Integer.toString(statusCode));
                         params.put("data", data);
-                        AppEventClient.Companion.getInstance().trackError(
-                                "SESSION_REQUEST_FAILED",
-                                error.getMessage(),
-                                params
-                        );
+
+                        try {
+                            AppEventClient.Companion.getInstance().trackError(
+                                    "SESSION_REQUEST_FAILED",
+                                    error.getMessage(),
+                                    params
+                            );
+                        }
+                        catch(IllegalArgumentException illegalArg) {
+                            Log.e(LOGTAG, "AppEventClient was not initialized, is your API key valid? -DETAIL: " + illegalArg.getMessage());
+                        }
                     }
                 }
 
