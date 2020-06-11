@@ -7,5 +7,4 @@ interface BaseAppEventClient {
     fun trackError(code: String, message: String)
     fun trackAppEvent(name: String, params: Map<String, String>)
     fun trackAppEvent(name: String)
-    fun publishEvents()
 }

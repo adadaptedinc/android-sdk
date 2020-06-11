@@ -3,10 +3,12 @@ package com.adadapted.android.sdk.core.event
 import android.util.Log
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
+import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.core.session.SessionListener
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
-class AppEventClient private constructor(private val sink: AppEventSink, private val transporter: TransporterCoroutineScope): BaseAppEventClient {
+class AppEventClient private constructor(private val sink: AppEventSink, private val transporter: TransporterCoroutineScope): SessionListener(), BaseAppEventClient {
     private object Types {
         const val SDK = "sdk"
         const val APP = "app"
@@ -99,16 +101,9 @@ class AppEventClient private constructor(private val sink: AppEventSink, private
         trackAppEvent(name, HashMap())
     }
 
-    @Synchronized
-    override fun publishEvents() {
-        instance.transporter.dispatchToBackground {
-            instance.performPublishEvents()
-            instance.performPublishErrors()
-        }
-    }
-
     companion object {
         private val LOGTAG = AppEventClient::class.java.name
+        private const val EXPIRED_EVENT = "session_expired"
         private lateinit var instance: AppEventClient
 
         fun createInstance(sink: AppEventSink, transporter: TransporterCoroutineScope) {
@@ -128,5 +123,17 @@ class AppEventClient private constructor(private val sink: AppEventSink, private
                 sink.generateWrappers(deviceInfo)
             }
         }
+        SessionClient.getInstance().addListener(this)
+    }
+
+    override fun onPublishEvents() {
+        instance.transporter.dispatchToBackground {
+            instance.performPublishEvents()
+            instance.performPublishErrors()
+        }
+    }
+
+    override fun onSessionExpired() {
+        trackSdkEvent(EXPIRED_EVENT)
     }
 }

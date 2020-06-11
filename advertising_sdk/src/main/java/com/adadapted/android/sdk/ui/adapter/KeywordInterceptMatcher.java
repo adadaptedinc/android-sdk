@@ -6,6 +6,7 @@ import com.adadapted.android.sdk.core.session.Session;
 import com.adadapted.android.sdk.core.session.SessionClient;
 import com.adadapted.android.sdk.core.intercept.Term;
 import com.adadapted.android.sdk.core.intercept.Intercept;
+import com.adadapted.android.sdk.core.session.SessionListener;
 import com.adadapted.android.sdk.ui.model.Suggestion;
 
 import java.util.HashSet;
@@ -14,7 +15,7 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class KeywordInterceptMatcher implements SessionClient.Listener, InterceptClient.Listener {
+public class KeywordInterceptMatcher extends SessionListener implements InterceptClient.Listener {
     @SuppressWarnings("unused")
     private static final String LOGTAG = KeywordInterceptMatcher.class.getName();
 
@@ -36,7 +37,7 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, Intercep
 
     public KeywordInterceptMatcher() {
         intercept = Intercept.empty();
-        SessionClient.getSession(this);
+        SessionClient.Companion.getInstance().getSession(this);
     }
 
     public Set<Suggestion> match(final CharSequence constraint) {
@@ -142,7 +143,4 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, Intercep
             InterceptClient.initialize(session, this);
         }
     }
-
-    @Override
-    public void onSessionInitFailed() {}
 }

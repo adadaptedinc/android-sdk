@@ -12,6 +12,7 @@ import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.intercept.InterceptClient
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.core.session.SessionListener
 import com.adadapted.android.sdk.ext.http.HttpAdEventSink
 import com.adadapted.android.sdk.ext.http.HttpAppEventSink
 import com.adadapted.android.sdk.ext.http.HttpInterceptAdapter
@@ -83,7 +84,7 @@ object AdAdapted {
                 AdditContentPublisher.getInstance().publishAdditContent(content[0])
             }
         }
-        val startListener: SessionClient.Listener = object : SessionClient.Listener {
+        val startListener: SessionListener = object : SessionListener() {
             override fun onSessionAvailable(session: Session) {
                 sessionListener?.onHasAdsToServe(session.hasActiveCampaigns())
             }
@@ -96,7 +97,7 @@ object AdAdapted {
                 sessionListener?.onHasAdsToServe(false)
             }
         }
-        SessionClient.start(
+        SessionClient.getInstance().start(
                 context.applicationContext,
                 apiKey,
                 isProd,
@@ -110,7 +111,7 @@ object AdAdapted {
         Config.init(isProd)
         HttpRequestManager.createQueue(context.applicationContext)
 
-        SessionClient.createInstance(HttpSessionAdapter(Config.getInitSessionUrl(), Config.getRefreshAdsUrl()))
+        SessionClient.createInstance(HttpSessionAdapter(Config.getInitSessionUrl(), Config.getRefreshAdsUrl()), Transporter())
         AppEventClient.createInstance(HttpAppEventSink(Config.getAppEventsUrl(), Config.getAppErrorsUrl()), Transporter())
         ImpressionIdCounter.instance?.let { AdEventClient.createInstance(HttpAdEventSink(Config.getAdsEventUrl()), Transporter(), it) }
         InterceptClient.createInstance(HttpInterceptAdapter(Config.getRetrieveInterceptsUrl(), Config.getInterceptEventsUrl()))

@@ -4,6 +4,7 @@ import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.event.BaseAdEventClient
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.core.session.SessionListener
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
@@ -11,7 +12,7 @@ class AdEventClient private constructor(
         private val adEventSink: AdEventSink,
         private val transporter: TransporterCoroutineScope,
         private val impressionIdCounter: Counter
-) : SessionClient.Listener, BaseAdEventClient {
+) : SessionListener(), BaseAdEventClient {
 
     interface Listener {
         fun onAdEventTracked(event: AdEvent?)
@@ -22,6 +23,7 @@ class AdEventClient private constructor(
     private val events: MutableSet<AdEvent>
     private val eventLock: Lock = ReentrantLock()
     private var session: Session? = null
+
     private fun fileEvent(ad: Ad, eventType: String, count: Int) {
         if (session == null) {
             return
@@ -84,6 +86,11 @@ class AdEventClient private constructor(
         }
     }
 
+    override fun onPublishEvents() {
+        transporter.dispatchToBackground {
+            performPublishEvents() }
+    }
+
     override fun onSessionAvailable(session: Session) {
         eventLock.lock()
         try {
@@ -101,8 +108,6 @@ class AdEventClient private constructor(
             eventLock.unlock()
         }
     }
-
-    override fun onSessionInitFailed() {}
 
     @Synchronized
     override fun addListener(listener: Listener) {
@@ -154,12 +159,6 @@ class AdEventClient private constructor(
         }
     }
 
-    @Synchronized
-    override fun publishEvents() {
-        transporter.dispatchToBackground {
-            performPublishEvents() }
-    }
-
     companion object {
         private lateinit var instance: AdEventClient
 
@@ -178,6 +177,6 @@ class AdEventClient private constructor(
     init {
         events = HashSet()
         listeners = HashSet()
-        SessionClient.addListener(this)
+        SessionClient.getInstance().addListener(this)
     }
 }

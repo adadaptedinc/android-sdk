@@ -1,16 +1,15 @@
 package com.adadapted.android.sdk.core.intercept;
 
 import com.adadapted.android.sdk.core.concurrency.ThreadPoolInteractorExecuter;
-import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.session.Session;
 import com.adadapted.android.sdk.core.session.SessionClient;
-
+import com.adadapted.android.sdk.core.session.SessionListener;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class InterceptClient implements SessionClient.Listener {
+public class InterceptClient extends SessionListener {
     @SuppressWarnings("unused")
     private static final String LOGTAG = InterceptClient.class.getName();
 
@@ -94,15 +93,6 @@ public class InterceptClient implements SessionClient.Listener {
         });
     }
 
-    public static synchronized void publishEvents() {
-        ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
-            @Override
-            public void run() {
-                getInstance().performPublishEvents();
-            }
-        });
-    }
-
     private final InterceptAdapter adapter;
 
     private final Set<InterceptEvent> events;
@@ -113,12 +103,11 @@ public class InterceptClient implements SessionClient.Listener {
     private InterceptClient(final InterceptAdapter adapter) {
         this.adapter = adapter;
 
-        SessionClient.addListener(this);
+        SessionClient.Companion.getInstance().addListener(this);
         this.events = new HashSet<>();
     }
 
-    private void performInitialize(final Session session,
-                                   final Listener listener) {
+    private void performInitialize(final Session session, final Listener listener) {
         if(session == null || listener == null) {
             return;
         }
@@ -131,6 +120,7 @@ public class InterceptClient implements SessionClient.Listener {
                 }
             }
         });
+        SessionClient.Companion.getInstance().addListener(this);
     }
 
     private void fileEvent(final InterceptEvent event) {
@@ -192,8 +182,12 @@ public class InterceptClient implements SessionClient.Listener {
     }
 
     @Override
-    public void onAdsAvailable(final Session session) { }
-
-    @Override
-    public void onSessionInitFailed() { }
+    public void onPublishEvents() {
+        ThreadPoolInteractorExecuter.getInstance().executeInBackground(new Runnable() {
+            @Override
+            public void run() {
+                getInstance().performPublishEvents();
+            }
+        });
+    }
 }
