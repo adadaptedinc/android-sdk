@@ -13,6 +13,7 @@ import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.event.BaseEventClient;
 import com.adadapted.android.sdk.core.session.Session;
 import com.adadapted.android.sdk.core.session.SessionClient;
+import com.adadapted.android.sdk.core.session.SessionListener;
 import com.adadapted.android.sdk.core.zone.Zone;
 import com.adadapted.android.sdk.ui.activity.AaWebViewPopupActivity;
 import com.adadapted.android.sdk.ui.messaging.AdContentPublisher;
@@ -24,7 +25,7 @@ import java.util.TimerTask;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-class AdZonePresenter implements SessionClient.Listener {
+class AdZonePresenter extends SessionListener {
     private static final String LOGTAG = AdZonePresenter.class.getName();
 
     interface Listener {
@@ -110,7 +111,7 @@ class AdZonePresenter implements SessionClient.Listener {
 
                 this.listener = l;
 
-                SessionClient.addPresenter(this);
+                SessionClient.Companion.getInstance().addPresenter(this);
             }
 
             setNextAd();
@@ -129,7 +130,7 @@ class AdZonePresenter implements SessionClient.Listener {
                 this.listener = null;
 
                 completeCurrentAd();
-                SessionClient.removePresenter(this);
+                SessionClient.Companion.getInstance().removePresenter(this);
             }
         }
         finally {
@@ -361,10 +362,6 @@ class AdZonePresenter implements SessionClient.Listener {
             setNextAd();
         }
     }
-
-    /*
-     * Overrides SessionClient.Listener
-     */
 
     @Override
     public void onSessionAvailable(final Session session) {

@@ -11,5 +11,4 @@ interface BaseAdEventClient {
     fun trackImpressionEnd(ad: Ad)
     fun trackPopupBegin(ad: Ad)
     fun trackPopupEnd(ad: Ad)
-    fun publishEvents()
 }

@@ -1,7 +1,5 @@
 package com.adadapted.android.sdk.ext.http;
 
-import android.util.Log;
-
 import com.adadapted.android.sdk.core.ad.AdEvent;
 import com.adadapted.android.sdk.core.ad.AdEventSink;
 import com.adadapted.android.sdk.core.event.AppEventClient;
