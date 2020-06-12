@@ -5,8 +5,7 @@ import android.os.Parcelable
 import com.adadapted.android.sdk.core.atl.AddToListContent
 import com.adadapted.android.sdk.core.atl.AddToListContent.Sources
 import com.adadapted.android.sdk.core.atl.AddToListItem
-import com.adadapted.android.sdk.core.event.AdAdaptedEventClient
-import com.adadapted.android.sdk.core.event.BaseEventClient
+import com.adadapted.android.sdk.core.event.AppEventClient
 import java.util.Locale
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
@@ -18,14 +17,16 @@ class AdContent : AddToListContent, Parcelable {
     private val items: List<AddToListItem>
     private var isHandled: Boolean
     private val lock: Lock = ReentrantLock()
-    private val adAdaptedEventClient: BaseEventClient
+    private var adEventClient: AdEventClient
+    private var appEventClient: AppEventClient
 
-    private constructor(parcel: Parcel, eventClient: BaseEventClient = AdAdaptedEventClient.getInstance()) {
+    private constructor(parcel: Parcel, adClient: AdEventClient = AdEventClient.getInstance(), appClient: AppEventClient = AppEventClient.getInstance()) {
         ad = parcel.readParcelable(Ad::class.java.classLoader)
         type = parcel.readInt()
         items = parcel.createTypedArrayList(AddToListItem.CREATOR)
         isHandled = parcel.readByte().toInt() != 0
-        adAdaptedEventClient = eventClient
+        adEventClient = adClient
+        appEventClient = appClient
     }
 
     override fun describeContents(): Int {
@@ -39,14 +40,15 @@ class AdContent : AddToListContent, Parcelable {
         parcel.writeByte((if (isHandled) 1 else 0).toByte())
     }
 
-    private constructor(ad: Ad, type: Int, items: List<AddToListItem>, adAdaptedEventClient: BaseEventClient = AdAdaptedEventClient.getInstance()) {
+    private constructor(ad: Ad, type: Int, items: List<AddToListItem>, adClient: AdEventClient = AdEventClient.getInstance(), appClient: AppEventClient = AppEventClient.getInstance()) {
         if (ad.payload.isEmpty()) {
-            adAdaptedEventClient.trackError("AD_PAYLOAD_IS_EMPTY", String.format(Locale.ENGLISH, "Ad %s has empty payload", ad.id))
+            appClient.trackError("AD_PAYLOAD_IS_EMPTY", String.format(Locale.ENGLISH, "Ad %s has empty payload", ad.id))
         }
         this.ad = ad
         this.type = type
         this.items = items
-        this.adAdaptedEventClient = adAdaptedEventClient
+        this.adEventClient = adClient
+        this.appEventClient = appClient
         isHandled = false
     }
 
@@ -58,7 +60,7 @@ class AdContent : AddToListContent, Parcelable {
                 return
             }
             isHandled = true
-            adAdaptedEventClient.trackInteraction(ad)
+            adEventClient.trackInteraction(ad)
         } finally {
             lock.unlock()
         }
@@ -70,7 +72,7 @@ class AdContent : AddToListContent, Parcelable {
         try {
             if (!isHandled) {
                 isHandled = true
-                adAdaptedEventClient.trackInteraction(ad)
+                adEventClient.trackInteraction(ad)
             }
             trackItem(item.title)
         } finally {
@@ -83,7 +85,7 @@ class AdContent : AddToListContent, Parcelable {
         val params: MutableMap<String, String> = HashMap()
         params["ad_id"] = ad.id
         params["item_name"] = itemName
-        adAdaptedEventClient.trackSdkEvent("atl_item_added_to_list", params)
+        appEventClient.trackSdkEvent("atl_item_added_to_list", params)
     }
 
     @Synchronized
@@ -96,7 +98,7 @@ class AdContent : AddToListContent, Parcelable {
             isHandled = true
             val params: MutableMap<String, String> = HashMap()
             params["ad_id"] = ad.id
-            adAdaptedEventClient.trackError("ATL_ADDED_TO_LIST_FAILED",
+            appEventClient.trackError("ATL_ADDED_TO_LIST_FAILED",
                     if (message.isEmpty()) "Unknown Reason" else message,
                     params)
         } finally {
@@ -111,7 +113,7 @@ class AdContent : AddToListContent, Parcelable {
             val params: MutableMap<String, String> = HashMap()
             params["ad_id"] = ad.id
             params["item"] = item.title
-            adAdaptedEventClient.trackError("ATL_ADDED_TO_LIST_ITEM_FAILED",
+            appEventClient.trackError("ATL_ADDED_TO_LIST_ITEM_FAILED",
                     if (message.isEmpty()) "Unknown Reason" else message,
                     params)
         } finally {

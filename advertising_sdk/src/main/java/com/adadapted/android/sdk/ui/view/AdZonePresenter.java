@@ -8,9 +8,7 @@ import android.util.Log;
 import com.adadapted.android.sdk.core.ad.Ad;
 import com.adadapted.android.sdk.core.ad.AdActionType;
 import com.adadapted.android.sdk.core.ad.AdEventClient;
-import com.adadapted.android.sdk.core.event.AdAdaptedEventClient;
 import com.adadapted.android.sdk.core.event.AppEventClient;
-import com.adadapted.android.sdk.core.event.BaseEventClient;
 import com.adadapted.android.sdk.core.session.Session;
 import com.adadapted.android.sdk.core.session.SessionClient;
 import com.adadapted.android.sdk.core.session.SessionListener;
@@ -58,11 +56,13 @@ class AdZonePresenter extends SessionListener {
     private boolean timerRunning;
     private final Lock timerLock = new ReentrantLock();
     private final Timer timer;
-    private final BaseEventClient adAdaptedEvenClient;
+    private final AdEventClient adEventClient;
+    private final AppEventClient appEventClient;
 
     AdZonePresenter(final Context context) {
         this.context = context.getApplicationContext();
-        adAdaptedEvenClient = AdAdaptedEventClient.Companion.getInstance();
+        adEventClient = AdEventClient.Companion.getInstance();
+        appEventClient = AppEventClient.Companion.getInstance();
         pixelWebView = new PixelWebView(context.getApplicationContext());
 
         attached = false;
@@ -80,7 +80,7 @@ class AdZonePresenter extends SessionListener {
 
             final Map<String, String> params = new HashMap<>();
             params.put("zone_id", zoneId);
-            AppEventClient.Companion.getInstance().trackSdkEvent("zone_loaded", params);
+            appEventClient.trackSdkEvent("zone_loaded", params);
         }
     }
 
@@ -265,23 +265,23 @@ class AdZonePresenter extends SessionListener {
 
         switch(actionType) {
             case AdActionType.CONTENT:
-                AppEventClient.Companion.getInstance().trackSdkEvent("atl_ad_clicked", params);
+                appEventClient.trackSdkEvent("atl_ad_clicked", params);
                 handleContentAction(ad);
                 break;
 
             case AdActionType.LINK:
             case AdActionType.EXTERNAL_LINK:
-                adAdaptedEvenClient.trackInteraction(ad);
+                adEventClient.trackInteraction(ad);
                 handleLinkAction(ad);
                 break;
 
             case AdActionType.POPUP:
-                adAdaptedEvenClient.trackInteraction(ad);
+                adEventClient.trackInteraction(ad);
                 handlePopupAction(ad);
                 break;
 
             case AdActionType.CONTENT_POPUP:
-                AppEventClient.Companion.getInstance().trackSdkEvent("popup_ad_clicked", params);
+                appEventClient.trackSdkEvent("popup_ad_clicked", params);
                 handlePopupAction(ad);
                 break;
 

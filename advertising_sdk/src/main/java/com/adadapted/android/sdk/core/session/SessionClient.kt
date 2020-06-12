@@ -1,6 +1,5 @@
 package com.adadapted.android.sdk.core.session
 
-import android.content.Context
 import android.os.Handler
 import android.util.Log
 import com.adadapted.android.sdk.config.Config
@@ -305,20 +304,15 @@ class SessionClient private constructor(private val adapter: SessionAdapter, pri
     }
 
     @Synchronized
-    fun start(context: Context,
-              appId: String,
-              isProd: Boolean,
-              params: Map<String, String>,
-              listener: SessionListener) {
+    fun start(listener: SessionListener) {
         addListener(listener)
-        DeviceInfoClient.collectDeviceInfo(context, appId, isProd, params) { deviceInfo -> initialize(deviceInfo) }
-    }
-
-    @Synchronized
-    private fun initialize(deviceInfo: DeviceInfo) {
-        transporter.dispatchToBackground {
-            performInitialize(deviceInfo)
-        }
+        DeviceInfoClient.getInstance().getDeviceInfo(object: DeviceInfoClient.Callback {
+            override fun onDeviceInfoCollected(deviceInfo: DeviceInfo) {
+                transporter.dispatchToBackground {
+                    performInitialize(deviceInfo)
+                }
+            }
+        })
     }
 
     @Synchronized
