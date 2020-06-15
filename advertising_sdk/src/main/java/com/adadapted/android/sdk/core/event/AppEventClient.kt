@@ -1,6 +1,7 @@
 package com.adadapted.android.sdk.core.event
 
 import android.util.Log
+import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
@@ -104,7 +105,6 @@ class AppEventClient private constructor(private val sink: AppEventSink, private
 
     companion object {
         private val LOGTAG = AppEventClient::class.java.name
-        private const val EXPIRED_EVENT = "session_expired"
         private lateinit var instance: AppEventClient
 
         fun createInstance(sink: AppEventSink, transporter: TransporterCoroutineScope) {
@@ -137,6 +137,6 @@ class AppEventClient private constructor(private val sink: AppEventSink, private
     }
 
     override fun onSessionExpired() {
-        trackSdkEvent(EXPIRED_EVENT)
+        trackSdkEvent(EventStrings.EXPIRED_EVENT)
     }
 }

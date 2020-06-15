@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.core.addit;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.atl.AddToListItem;
 import com.adadapted.android.sdk.core.concurrency.ThreadPoolInteractorExecuter;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
@@ -86,7 +87,7 @@ public class PayloadClient {
             eventParams.put("payload_id", content.getPayloadId());
             eventParams.put("source", content.getAdditSource());
 
-            AppEventClient.Companion.getInstance().trackSdkEvent("addit_added_to_list", eventParams);
+            AppEventClient.Companion.getInstance().trackSdkEvent(EventStrings.ADDIT_ADDED_TO_LIST, eventParams);
 
             if(content.isPayloadSource()) {
                 getInstance().trackPayload(content, "delivered");
@@ -106,7 +107,7 @@ public class PayloadClient {
             eventParams.put("item_name", item.getTitle());
             eventParams.put("source", content.getAdditSource());
 
-            AppEventClient.Companion.getInstance().trackSdkEvent("addit_item_added_to_list", eventParams);
+            AppEventClient.Companion.getInstance().trackSdkEvent(EventStrings.ADDIT_ITEM_ADDED_TO_LIST, eventParams);
             }
         });
     }
@@ -118,7 +119,7 @@ public class PayloadClient {
                 final Map<String, String> eventParams = new HashMap<>();
                 eventParams.put("payload_id", content.getPayloadId());
 
-                AppEventClient.Companion.getInstance().trackSdkEvent("addit_duplicate_payload", eventParams);
+                AppEventClient.Companion.getInstance().trackSdkEvent(EventStrings.ADDIT_DUPLICATE_PAYLOAD, eventParams);
 
                 if(content.isPayloadSource()) {
                     getInstance().trackPayload(content, "duplicate");
@@ -135,7 +136,7 @@ public class PayloadClient {
                 final Map<String, String> eventParams = new HashMap<>();
                 eventParams.put("payload_id", content.getPayloadId());
 
-                AppEventClient.Companion.getInstance().trackError("ADDIT_CONTENT_FAILED", message, eventParams);
+                AppEventClient.Companion.getInstance().trackError(EventStrings.ADDIT_CONTENT_FAILED, message, eventParams);
 
                 if(content.isPayloadSource()) {
                     getInstance().trackPayload(content, "rejected");
@@ -154,7 +155,7 @@ public class PayloadClient {
             eventParams.put("payload_id", content.getPayloadId());
             eventParams.put("tracking_id", item.getTrackingId());
 
-            AppEventClient.Companion.getInstance().trackError("ADDIT_CONTENT_ITEM_FAILED", message, eventParams);
+            AppEventClient.Companion.getInstance().trackError(EventStrings.ADDIT_CONTENT_ITEM_FAILED, message, eventParams);
             }
         });
     }
@@ -169,7 +170,7 @@ public class PayloadClient {
         DeviceInfoClient.Companion.getInstance().getDeviceInfo(new DeviceInfoClient.Callback() {
             @Override
             public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
-                AppEventClient.Companion.getInstance().trackSdkEvent("payload_pickup_attempt");
+                AppEventClient.Companion.getInstance().trackSdkEvent(EventStrings.PAYLOAD_PICKUP_ATTEMPT);
 
                 adapter.pickup(deviceInfo, new PayloadAdapter.Callback() {
                     @Override

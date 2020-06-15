@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.ext.http;
 
 import android.util.Log;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.event.AppError;
 import com.adadapted.android.sdk.core.event.AppEvent;
@@ -75,7 +76,7 @@ public class HttpAppEventSink implements AppEventSink {
                         params.put("status_code", Integer.toString(statusCode));
                         params.put("data", data);
                         AppEventClient.Companion.getInstance().trackError(
-                                "APP_EVENT_REQUEST_FAILED",
+                                EventStrings.APP_EVENT_REQUEST_FAILED,
                                 error.getMessage(),
                                 params
                         );

@@ -7,6 +7,7 @@ import android.os.Build
 import android.provider.Settings
 import android.telephony.TelephonyManager
 import android.util.Log
+import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
@@ -142,7 +143,7 @@ class DeviceInfoClient private constructor(
 
     private fun trackGooglePlayAdError(ex: Exception) {
         Log.w(LOGTAG, GooglePlayAdError)
-        ex.message?.let { AppEventClient.getInstance().trackError(GaidError, it) }
+        ex.message?.let { AppEventClient.getInstance().trackError(EventStrings.GAID_UNAVAILABLE, it) }
     }
 
     @Synchronized
@@ -156,7 +157,6 @@ class DeviceInfoClient private constructor(
         private val LOGTAG = DeviceInfoClient::class.java.name
         private const val AdvertisingIdClientName = "com.google.android.gms.ads.identifier.AdvertisingIdClient"
         private const val GooglePlayAdError = "Problem retrieving Google Play Advertiser Info"
-        private const val GaidError = "GAID_UNAVAILABLE"
         private const val NetworkOperatorDefault = "None"
         private lateinit var instance: DeviceInfoClient
 

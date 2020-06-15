@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.ext.http;
 
 import android.util.Log;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.addit.AdditContent;
 import com.adadapted.android.sdk.core.addit.PayloadAdapter;
 import com.adadapted.android.sdk.core.addit.PayloadContentParser;
@@ -68,7 +69,7 @@ public class HttpPayloadAdapter implements PayloadAdapter {
                         params.put("data", data);
                         try {
                             AppEventClient.Companion.getInstance().trackError(
-                                    "PAYLOAD_PICKUP_REQUEST_FAILED",
+                                    EventStrings.PAYLOAD_PICKUP_REQUEST_FAILED,
                                     error.getMessage(),
                                     params
                             );
@@ -106,7 +107,7 @@ public class HttpPayloadAdapter implements PayloadAdapter {
                         params.put("status_code", Integer.toString(statusCode));
                         params.put("data", data);
                         AppEventClient.Companion.getInstance().trackError(
-                                "PAYLOAD_EVENT_REQUEST_FAILED",
+                                EventStrings.PAYLOAD_EVENT_REQUEST_FAILED,
                                 error.getMessage(),
                                 params
                         );
