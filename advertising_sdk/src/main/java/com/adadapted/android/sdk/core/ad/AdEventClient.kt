@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.core.ad
 
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.event.BaseAdEventClient
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.session.SessionListener
@@ -12,7 +11,7 @@ class AdEventClient private constructor(
         private val adEventSink: AdEventSink,
         private val transporter: TransporterCoroutineScope,
         private val impressionIdCounter: Counter
-) : SessionListener(), BaseAdEventClient {
+) : SessionListener() {
 
     interface Listener {
         fun onAdEventTracked(event: AdEvent?)
@@ -110,17 +109,17 @@ class AdEventClient private constructor(
     }
 
     @Synchronized
-    override fun addListener(listener: Listener) {
+    fun addListener(listener: Listener) {
         performAddListener(listener)
     }
 
     @Synchronized
-    override fun removeListener(listener: Listener) {
+    fun removeListener(listener: Listener) {
         performRemoveListener(listener)
     }
 
     @Synchronized
-    override fun trackImpression(ad: Ad) {
+    fun trackImpression(ad: Ad) {
         transporter.dispatchToBackground {
             val count = impressionIdCounter.getIncrementedCountFor(ad.impressionId)
             fileEvent(ad, AdEvent.Types.IMPRESSION, count)
@@ -128,7 +127,7 @@ class AdEventClient private constructor(
     }
 
     @Synchronized
-    override fun trackInteraction(ad: Ad) {
+    fun trackInteraction(ad: Ad) {
         transporter.dispatchToBackground {
             val count = impressionIdCounter.getCurrentCountFor(ad.impressionId)
             fileEvent(ad, AdEvent.Types.INTERACTION, count)
@@ -136,7 +135,7 @@ class AdEventClient private constructor(
     }
 
     @Synchronized
-    override fun trackImpressionEnd(ad: Ad) {
+    fun trackImpressionEnd(ad: Ad) {
         transporter.dispatchToBackground {
             val count = impressionIdCounter.getCurrentCountFor(ad.impressionId)
             fileEvent(ad, AdEvent.Types.IMPRESSION_END, count)
@@ -144,7 +143,7 @@ class AdEventClient private constructor(
     }
 
     @Synchronized
-    override fun trackPopupBegin(ad: Ad) {
+    fun trackPopupBegin(ad: Ad) {
         transporter.dispatchToBackground {
             val count = impressionIdCounter.getCurrentCountFor(ad.impressionId)
             fileEvent(ad, AdEvent.Types.POPUP_BEGIN, count)
@@ -152,7 +151,7 @@ class AdEventClient private constructor(
     }
 
     @Synchronized
-    override fun trackPopupEnd(ad: Ad) {
+    fun trackPopupEnd(ad: Ad) {
         transporter.dispatchToBackground {
             val count = impressionIdCounter.getCurrentCountFor(ad.impressionId)
             fileEvent(ad, AdEvent.Types.POPUP_END, count)

@@ -2,12 +2,13 @@ package com.adadapted.android.sdk
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import com.adadapted.android.sdk.config.Config
 import com.adadapted.android.sdk.core.ad.AdEventClient
 import com.adadapted.android.sdk.core.ad.ImpressionIdCounter
 import com.adadapted.android.sdk.core.addit.PayloadClient
 import com.adadapted.android.sdk.core.concurrency.Transporter
-import com.adadapted.android.sdk.core.event.AdAdaptedEventClient
+import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.intercept.InterceptClient
 import com.adadapted.android.sdk.core.session.Session
@@ -66,7 +67,7 @@ object AdAdapted {
     fun start(context: Context) {
         if (apiKey.isEmpty()) {
             Log.e(LOG_TAG, "The Api Key cannot be NULL")
-            return
+            Toast.makeText(context, "AdAdapted API Key Is Missing", Toast.LENGTH_SHORT).show()
         }
         if (hasStarted) {
             if (!isProd) {
@@ -97,12 +98,7 @@ object AdAdapted {
                 sessionListener?.onHasAdsToServe(false)
             }
         }
-        SessionClient.getInstance().start(
-                context.applicationContext,
-                apiKey,
-                isProd,
-                params,
-                startListener)
+        SessionClient.getInstance().start(startListener)
         AppEventClient.getInstance().trackSdkEvent("app_opened")
         Log.i(LOG_TAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", BuildConfig.VERSION_NAME))
     }
@@ -111,12 +107,12 @@ object AdAdapted {
         Config.init(isProd)
         HttpRequestManager.createQueue(context.applicationContext)
 
+        DeviceInfoClient.createInstance(context.applicationContext, apiKey, isProd, params, transporter = Transporter())
         SessionClient.createInstance(HttpSessionAdapter(Config.getInitSessionUrl(), Config.getRefreshAdsUrl()), Transporter())
         AppEventClient.createInstance(HttpAppEventSink(Config.getAppEventsUrl(), Config.getAppErrorsUrl()), Transporter())
         ImpressionIdCounter.instance?.let { AdEventClient.createInstance(HttpAdEventSink(Config.getAdsEventUrl()), Transporter(), it) }
         InterceptClient.createInstance(HttpInterceptAdapter(Config.getRetrieveInterceptsUrl(), Config.getInterceptEventsUrl()))
         PayloadClient.createInstance(HttpPayloadAdapter(Config.getPickupPayloadsUrl(), Config.getTrackingPayloadUrl()))
-        AdAdaptedEventClient.createInstance(AdEventClient.getInstance(), AppEventClient.getInstance())
     }
 
     init {

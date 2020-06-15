@@ -1,7 +1,10 @@
 package com.adadapted.android.sdk.core.session
 
+import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
+import com.adadapted.android.sdk.core.device.DeviceInfoClient
+import com.adadapted.android.sdk.tools.TestAdvertisingIdClientWrapper
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -10,25 +13,38 @@ import com.nhaarman.mockitokotlin2.whenever
 import junit.framework.Assert.assertNotNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class SessionClientTest {
 
     var testTransporter = TestCoroutineDispatcher()
     val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
     var testSessionClient = SessionClient
     var mockSessionAdapter = mock<SessionAdapter>()
+    var testAdvertisingIdClientWrapper = TestAdvertisingIdClientWrapper()
 
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
+        DeviceInfoClient.createInstance(InstrumentationRegistry.getInstrumentation().targetContext,"", false, HashMap(), testAdvertisingIdClientWrapper, testTransporterScope)
         whenever(mockSessionAdapter.sendInit(any(), any())).then {}
         whenever(mockSessionAdapter.sendRefreshAds(any(), any())).then {}
 
         testSessionClient.createInstance(mockSessionAdapter, testTransporterScope)
         testSessionClient.getInstance().onSessionInitialized(SessionTest().buildTestSession())
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+        testTransporter.cleanupTestCoroutines()
     }
 
     @Test
@@ -38,7 +54,10 @@ class SessionClientTest {
 
     @Test
     fun start() {
-        // Needs DeviceInfoClient Refactor
+        val testListener = TestSessionClientListener()
+        testSessionClient.getInstance().start(testListener)
+        assert(testListener.getTrackedSession()?.id == "SessionAvailable")
+        verify(mockSessionAdapter).sendInit(any(), any())
     }
 
     @Test
@@ -86,7 +105,10 @@ class SessionClientTest {
 
     @Test
     fun onSessionInitializeFailed() {
-        // Needs DeviceInfoClient Refactor
+        val testListener = TestSessionClientListener()
+        testSessionClient.getInstance().start(testListener)
+        testSessionClient.getInstance().onSessionInitializeFailed()
+        assert(testListener.getTrackedSession()?.id == "SessionFailed")
     }
 
     @Test
@@ -99,7 +121,10 @@ class SessionClientTest {
 
     @Test
     fun onNewAdsLoadFailed() {
-        // Needs DeviceInfoClient Refactor
+        val testListener = TestSessionClientListener()
+        testSessionClient.getInstance().start(testListener)
+        testSessionClient.getInstance().onNewAdsLoadFailed()
+        assert(testListener.getTrackedSession()?.id == "AdsAvailable")
     }
 }
 
@@ -123,6 +148,6 @@ class TestSessionClientListener: SessionListener() {
     }
 
     override fun onSessionInitFailed() {
-        trackedSession = Session(DeviceInfo.empty(),"SessionFailedId")
+        trackedSession = Session(DeviceInfo.empty(),"SessionFailed")
     }
 }

@@ -166,7 +166,7 @@ public class PayloadClient {
     }
 
     private void performPickupPayload(final Callback callback) {
-        DeviceInfoClient.getDeviceInfo(new DeviceInfoClient.Callback() {
+        DeviceInfoClient.Companion.getInstance().getDeviceInfo(new DeviceInfoClient.Callback() {
             @Override
             public void onDeviceInfoCollected(final DeviceInfo deviceInfo) {
                 AppEventClient.Companion.getInstance().trackSdkEvent("payload_pickup_attempt");
