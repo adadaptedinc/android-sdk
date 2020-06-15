@@ -3,6 +3,7 @@ package com.adadapted.android.sdk.core.addit;
 import android.net.Uri;
 import android.util.Base64;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.atl.AddToListItem;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 
@@ -22,7 +23,7 @@ public class DeeplinkContentParser {
     public AdditContent parse(final Uri uri) throws Exception {
         if(uri == null) {
             AppEventClient.Companion.getInstance().trackError(
-                "ADDIT_NO_DEEPLINK_RECEIVED",
+                EventStrings.ADDIT_NO_DEEPLINK_RECEIVED,
                 "Did not receive a deeplink url."
             );
 
@@ -62,7 +63,7 @@ public class DeeplinkContentParser {
             final Map<String, String> errorParams = new HashMap<>();
             errorParams.put("url", uri.toString());
             AppEventClient.Companion.getInstance().trackError(
-                "ADDIT_UNKNOWN_PAYLOAD_TYPE",
+                EventStrings.ADDIT_UNKNOWN_PAYLOAD_TYPE,
                 "Unknown payload type: " + uri.getPath(),
                 errorParams
             );
@@ -74,7 +75,7 @@ public class DeeplinkContentParser {
             errorParams.put("payload", "{\"raw\":\""+data+"\", \"parsed\":\""+jsonString+"\"}");
             errorParams.put("exception_message", ex.getMessage());
             AppEventClient.Companion.getInstance().trackError(
-                "ADDIT_PAYLOAD_PARSE_FAILED",
+                EventStrings.ADDIT_PAYLOAD_PARSE_FAILED,
                 "Problem parsing Deeplink JSON input",
                 errorParams
             );
@@ -106,7 +107,7 @@ public class DeeplinkContentParser {
             errorParams.put("exception_message", ex.getMessage());
             errorParams.put("field_name", fieldName);
             AppEventClient.Companion.getInstance().trackError(
-                "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
+                    EventStrings.ADDIT_PAYLOAD_FIELD_PARSE_FAILED,
                 "Problem parsing Deeplink JSON input field " + fieldName,
                 errorParams
             );

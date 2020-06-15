@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.core.addit;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.atl.AddToListItem;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 
@@ -37,7 +38,7 @@ public class PayloadContentParser {
             final Map<String, String> errorParams = new HashMap<>();
             errorParams.put("exception_message", ex.getMessage());
             AppEventClient.Companion.getInstance().trackError(
-                    "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
+                    EventStrings.ADDIT_PAYLOAD_FIELD_PARSE_FAILED,
                     "Problem parsing Payload JSON payload",
                     errorParams
             );
@@ -64,7 +65,7 @@ public class PayloadContentParser {
             final Map<String, String> errorParams = new HashMap<>();
             errorParams.put("payload_id", payloadId);
             AppEventClient.Companion.getInstance().trackError(
-                "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
+                EventStrings.ADDIT_PAYLOAD_FIELD_PARSE_FAILED,
                 "Missing Detailed List Items.",
                 errorParams
             );
@@ -96,7 +97,7 @@ public class PayloadContentParser {
             errorParams.put("exception_message", ex.getMessage());
             errorParams.put("field_name", fieldName);
             AppEventClient.Companion.getInstance().trackError(
-                "ADDIT_PAYLOAD_FIELD_PARSE_FAILED",
+                EventStrings.ADDIT_PAYLOAD_FIELD_PARSE_FAILED,
                 "Problem parsing Payload JSON input field " + fieldName,
                 errorParams
             );

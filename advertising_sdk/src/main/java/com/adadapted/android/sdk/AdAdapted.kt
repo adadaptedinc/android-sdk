@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import com.adadapted.android.sdk.config.Config
+import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.ad.AdEventClient
 import com.adadapted.android.sdk.core.ad.ImpressionIdCounter
 import com.adadapted.android.sdk.core.addit.PayloadClient
@@ -72,7 +73,7 @@ object AdAdapted {
         if (hasStarted) {
             if (!isProd) {
                 Log.w(LOG_TAG, "AdAdapted Android Advertising SDK has already been started")
-                AppEventClient.getInstance().trackError("MULTIPLE_SDK_STARTS", "App has attempted to start the SDK Multiple times")
+                AppEventClient.getInstance().trackError(EventStrings.MULTIPLE_SDK_STARTS, "App has attempted to start the SDK Multiple times")
             }
             return
         }
@@ -99,7 +100,7 @@ object AdAdapted {
             }
         }
         SessionClient.getInstance().start(startListener)
-        AppEventClient.getInstance().trackSdkEvent("app_opened")
+        AppEventClient.getInstance().trackSdkEvent(EventStrings.APP_OPENED)
         Log.i(LOG_TAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", BuildConfig.VERSION_NAME))
     }
 

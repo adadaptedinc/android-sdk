@@ -3,6 +3,7 @@ package com.adadapted.android.sdk.core.addit;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.atl.AddToListContent;
 import com.adadapted.android.sdk.core.atl.AddToListItem;
 import com.adadapted.android.sdk.core.event.AppEventClient;
@@ -53,7 +54,7 @@ public class AdditContent implements AddToListContent, Parcelable {
     ) {
         if (items.size() == 0) {
             AppEventClient.Companion.getInstance().trackError(
-                "ADDIT_PAYLOAD_IS_EMPTY",
+                    EventStrings.ADDIT_PAYLOAD_IS_EMPTY,
                 String.format(Locale.ENGLISH, "Payload %s has empty payload", payloadId)
             );
         }

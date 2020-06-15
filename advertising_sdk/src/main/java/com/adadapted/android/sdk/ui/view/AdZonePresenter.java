@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.ad.Ad;
 import com.adadapted.android.sdk.core.ad.AdActionType;
 import com.adadapted.android.sdk.core.ad.AdEventClient;
@@ -80,7 +81,7 @@ class AdZonePresenter extends SessionListener {
 
             final Map<String, String> params = new HashMap<>();
             params.put("zone_id", zoneId);
-            appEventClient.trackSdkEvent("zone_loaded", params);
+            appEventClient.trackSdkEvent(EventStrings.ZONE_LOADED, params);
         }
     }
 
@@ -265,7 +266,7 @@ class AdZonePresenter extends SessionListener {
 
         switch(actionType) {
             case AdActionType.CONTENT:
-                appEventClient.trackSdkEvent("atl_ad_clicked", params);
+                appEventClient.trackSdkEvent(EventStrings.ATL_AD_CLICKED, params);
                 handleContentAction(ad);
                 break;
 
@@ -281,7 +282,7 @@ class AdZonePresenter extends SessionListener {
                 break;
 
             case AdActionType.CONTENT_POPUP:
-                appEventClient.trackSdkEvent("popup_ad_clicked", params);
+                appEventClient.trackSdkEvent(EventStrings.POPUP_AD_CLICKED, params);
                 handlePopupAction(ad);
                 break;
 

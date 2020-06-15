@@ -2,6 +2,7 @@ package com.adadapted.android.sdk;
 
 import android.util.Log;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 
 import java.util.HashMap;
@@ -26,7 +27,7 @@ public class AdAdaptedListManager {
         params.put(LIST_NAME, list);
         params.put(ITEM_NAME, item);
 
-        AppEventClient.Companion.getInstance().trackAppEvent("user_added_to_list", params);
+        AppEventClient.Companion.getInstance().trackAppEvent(EventStrings.USER_ADDED_TO_LIST, params);
 
         Log.i(LOGTAG, String.format("%s was added to %s", item, list));
     }
@@ -44,7 +45,7 @@ public class AdAdaptedListManager {
         params.put(LIST_NAME, list);
         params.put(ITEM_NAME, item);
 
-        AppEventClient.Companion.getInstance().trackAppEvent("user_crossed_off_list", params);
+        AppEventClient.Companion.getInstance().trackAppEvent(EventStrings.USER_CROSSED_OFF_LIST, params);
 
         Log.i(LOGTAG, String.format("%s was crossed off %s", item, list));
     }
@@ -62,7 +63,7 @@ public class AdAdaptedListManager {
         params.put(LIST_NAME, list);
         params.put(ITEM_NAME, item);
 
-        AppEventClient.Companion.getInstance().trackAppEvent("user_deleted_from_list", params);
+        AppEventClient.Companion.getInstance().trackAppEvent(EventStrings.USER_DELETED_FROM_LIST, params);
 
         Log.i(LOGTAG, String.format("%s was deleted from %s", item, list));
     }

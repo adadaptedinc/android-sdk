@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.ext.http;
 
 import android.util.Log;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.device.DeviceInfo;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.session.SessionAdapter;
@@ -71,7 +72,7 @@ public class HttpSessionAdapter implements SessionAdapter {
 
                         try {
                             AppEventClient.Companion.getInstance().trackError(
-                                    "SESSION_REQUEST_FAILED",
+                                    EventStrings.SESSION_REQUEST_FAILED,
                                     error.getMessage(),
                                     params
                             );
@@ -123,7 +124,7 @@ public class HttpSessionAdapter implements SessionAdapter {
                             params.put("status_code", Integer.toString(statusCode));
                             params.put("data", data);
                             AppEventClient.Companion.getInstance().trackError(
-                                    "AD_GET_REQUEST_FAILED",
+                                    EventStrings.AD_GET_REQUEST_FAILED,
                                     error.getMessage(),
                                     params
                             );

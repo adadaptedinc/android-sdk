@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.ext.http;
 
 import android.util.Log;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.intercept.InterceptAdapter;
 import com.adadapted.android.sdk.core.intercept.InterceptEvent;
@@ -73,7 +74,7 @@ public class HttpInterceptAdapter implements InterceptAdapter {
                         params.put("status_code", Integer.toString(statusCode));
                         params.put("data", data);
                         AppEventClient.Companion.getInstance().trackError(
-                            "KI_SESSION_REQUEST_FAILED",
+                                EventStrings.KI_SESSION_REQUEST_FAILED,
                             error.getMessage(),
                             params
                         );
@@ -107,7 +108,7 @@ public class HttpInterceptAdapter implements InterceptAdapter {
                         params.put("status_code", Integer.toString(statusCode));
                         params.put("data", data);
                         AppEventClient.Companion.getInstance().trackError(
-                            "KI_EVENT_REQUEST_FAILED",
+                            EventStrings.KI_EVENT_REQUEST_FAILED,
                             error.getMessage(),
                             params
                         );

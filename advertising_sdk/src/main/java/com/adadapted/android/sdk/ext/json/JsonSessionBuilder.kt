@@ -1,6 +1,7 @@
 package com.adadapted.android.sdk.ext.json
 
 import android.util.Log
+import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.event.AppEventClient.Companion.getInstance
 import com.adadapted.android.sdk.core.session.Session
@@ -37,7 +38,7 @@ class JsonSessionBuilder(private val deviceInfo: DeviceInfo) {
             params["exception"] = ex.message ?: ""
             params["bad_json"] = response.toString()
             getInstance().trackError(
-                    "SESSION_PAYLOAD_PARSE_FAILED",
+                    EventStrings.SESSION_PAYLOAD_PARSE_FAILED,
                     "Failed to parse Session payload for processing.",
                     params.toMap()
             )

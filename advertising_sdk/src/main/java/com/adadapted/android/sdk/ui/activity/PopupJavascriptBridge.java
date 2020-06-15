@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.ui.activity;
 
 import android.webkit.JavascriptInterface;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.ad.Ad;
 import com.adadapted.android.sdk.core.atl.AddToListItem;
 import com.adadapted.android.sdk.core.atl.PopupContent;
@@ -26,7 +27,7 @@ public class PopupJavascriptBridge {
     public void deliverAdContent() {
         final HashMap<String, String> params = new HashMap<>();
         params.put("ad_id", ad.getId());
-        AppEventClient.Companion.getInstance().trackSdkEvent("popup_content_clicked", params);
+        AppEventClient.Companion.getInstance().trackSdkEvent(EventStrings.POPUP_CONTENT_CLICKED, params);
 
         final AdContent content = AdContent.CREATOR.createAddToListContent(ad);
         AdditContentPublisher.getInstance().publishAdContent(content);
@@ -44,7 +45,7 @@ public class PopupJavascriptBridge {
                        final String productImage) {
         final HashMap<String, String> params = new HashMap<>();
         params.put("tracking_id", trackingId);
-        AppEventClient.Companion.getInstance().trackSdkEvent("popup_atl_clicked", params);
+        AppEventClient.Companion.getInstance().trackSdkEvent(EventStrings.POPUP_ATL_CLICKED, params);
 
         final List<AddToListItem> items = new ArrayList<>();
         items.add(new AddToListItem(

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.addit.AdditContent;
 import com.adadapted.android.sdk.core.addit.DeeplinkContentParser;
 import com.adadapted.android.sdk.core.addit.PayloadClient;
@@ -27,7 +28,7 @@ public class AdditInterceptActivity extends AppCompatActivity {
 
         PayloadClient.deeplinkInProgress();
 
-        AppEventClient.Companion.getInstance().trackSdkEvent("addit_app_opened");
+        AppEventClient.Companion.getInstance().trackSdkEvent(EventStrings.ADDIT_APP_OPENED);
 
         try {
             final Intent additIntent = getIntent();
@@ -46,7 +47,7 @@ public class AdditInterceptActivity extends AppCompatActivity {
             final Map<String, String> errorParams = new HashMap<>();
             errorParams.put("exception_message", ex.getMessage());
             AppEventClient.Companion.getInstance().trackError(
-                "ADDIT_DEEPLINK_HANDLING_ERROR",
+                EventStrings.ADDIT_DEEPLINK_HANDLING_ERROR,
                 "Problem handling deeplink",
                 errorParams
             );

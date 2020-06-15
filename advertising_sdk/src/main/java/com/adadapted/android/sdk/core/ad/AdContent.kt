@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.core.ad
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.atl.AddToListContent
 import com.adadapted.android.sdk.core.atl.AddToListContent.Sources
 import com.adadapted.android.sdk.core.atl.AddToListItem
@@ -42,7 +43,7 @@ class AdContent : AddToListContent, Parcelable {
 
     private constructor(ad: Ad, type: Int, items: List<AddToListItem>, adClient: AdEventClient = AdEventClient.getInstance(), appClient: AppEventClient = AppEventClient.getInstance()) {
         if (ad.payload.isEmpty()) {
-            appClient.trackError("AD_PAYLOAD_IS_EMPTY", String.format(Locale.ENGLISH, "Ad %s has empty payload", ad.id))
+            appClient.trackError(EventStrings.AD_PAYLOAD_IS_EMPTY, String.format(Locale.ENGLISH, "Ad %s has empty payload", ad.id))
         }
         this.ad = ad
         this.type = type
@@ -85,7 +86,7 @@ class AdContent : AddToListContent, Parcelable {
         val params: MutableMap<String, String> = HashMap()
         params["ad_id"] = ad.id
         params["item_name"] = itemName
-        appEventClient.trackSdkEvent("atl_item_added_to_list", params)
+        appEventClient.trackSdkEvent(EventStrings.ATL_ITEM_ADDED_TO_LIST, params)
     }
 
     @Synchronized
@@ -98,7 +99,7 @@ class AdContent : AddToListContent, Parcelable {
             isHandled = true
             val params: MutableMap<String, String> = HashMap()
             params["ad_id"] = ad.id
-            appEventClient.trackError("ATL_ADDED_TO_LIST_FAILED",
+            appEventClient.trackError(EventStrings.ATL_ADDED_TO_LIST_FAILED,
                     if (message.isEmpty()) "Unknown Reason" else message,
                     params)
         } finally {
@@ -113,7 +114,7 @@ class AdContent : AddToListContent, Parcelable {
             val params: MutableMap<String, String> = HashMap()
             params["ad_id"] = ad.id
             params["item"] = item.title
-            appEventClient.trackError("ATL_ADDED_TO_LIST_ITEM_FAILED",
+            appEventClient.trackError(EventStrings.ATL_ADDED_TO_LIST_ITEM_FAILED,
                     if (message.isEmpty()) "Unknown Reason" else message,
                     params)
         } finally {

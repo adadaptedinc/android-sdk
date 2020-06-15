@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.ui.adapter;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.intercept.InterceptClient;
 import com.adadapted.android.sdk.core.session.Session;
@@ -118,7 +119,7 @@ public class KeywordInterceptMatcher extends SessionListener implements Intercep
 
     @Override
     public void onKeywordInterceptInitialized(final Intercept intercept) {
-        AppEventClient.Companion.getInstance().trackSdkEvent("ki_initialized");
+        AppEventClient.Companion.getInstance().trackSdkEvent(EventStrings.KI_INITIALIZED);
 
         interceptLock.lock();
         try {
