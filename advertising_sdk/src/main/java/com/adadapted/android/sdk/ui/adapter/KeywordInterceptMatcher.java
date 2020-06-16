@@ -37,7 +37,7 @@ public class KeywordInterceptMatcher extends SessionListener implements Intercep
     }
 
     public KeywordInterceptMatcher() {
-        intercept = Intercept.empty();
+        intercept = new Intercept();
         SessionClient.Companion.getInstance().getSession(this);
     }
 
@@ -134,14 +134,14 @@ public class KeywordInterceptMatcher extends SessionListener implements Intercep
     @Override
     public void onSessionAvailable(final Session session) {
         if(!session.getId().isEmpty()) {
-            InterceptClient.initialize(session, this);
+            InterceptClient.Companion.getInstance().initialize(session, this);
         }
     }
 
     @Override
     public void onAdsAvailable(final Session session) {
         if(!session.getId().isEmpty()) {
-            InterceptClient.initialize(session, this);
+            InterceptClient.Companion.getInstance().initialize(session, this);
         }
     }
 }

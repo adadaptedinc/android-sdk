@@ -74,7 +74,7 @@ public class SuggestionTracker {
             items.put(lcTerm, lcUserInput);
             replacements.put(lcReplacement, lcTerm);
 
-            InterceptClient.trackMatched(searchId, termId, lcTerm, lcUserInput);
+            InterceptClient.Companion.getInstance().trackMatched(searchId, termId, lcTerm, lcUserInput);
         }
         finally {
             matcherLock.unlock();
@@ -92,7 +92,7 @@ public class SuggestionTracker {
                 final String term = replacements.get(lcReplacement);
                 final String userInput = items.get(term);
 
-                InterceptClient.trackPresented(searchId, termId,  term, userInput);
+                InterceptClient.Companion.getInstance().trackPresented(searchId, termId,  term, userInput);
             }
         }
         finally {
@@ -111,7 +111,7 @@ public class SuggestionTracker {
                 final String term = replacements.get(lcReplacement);
                 final String userInput = items.get(term);
 
-                InterceptClient.trackSelected(searchId, termId, term, userInput);
+                InterceptClient.Companion.getInstance().trackSelected(searchId, termId, term, userInput);
             }
         }
             finally {
@@ -124,7 +124,7 @@ public class SuggestionTracker {
         matcherLock.lock();
         try {
             final String lcUserInput = convertToLowerCase(userInput);
-            InterceptClient.trackNotMatched(searchId, lcUserInput);
+            InterceptClient.Companion.getInstance().trackNotMatched(searchId, lcUserInput);
         }
         finally {
             matcherLock.unlock();

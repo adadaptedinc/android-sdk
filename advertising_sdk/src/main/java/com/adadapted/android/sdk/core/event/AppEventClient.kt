@@ -69,38 +69,36 @@ class AppEventClient private constructor(private val sink: AppEventSink, private
         }
     }
 
+    override fun onPublishEvents() {
+        transporter.dispatchToBackground {
+            performPublishEvents()
+            performPublishErrors()
+        }
+    }
+
+    override fun onSessionExpired() {
+        trackSdkEvent(EventStrings.EXPIRED_EVENT)
+    }
+
+    @JvmOverloads
     @Synchronized
-    fun trackSdkEvent(name: String, params: Map<String, String>) {
+    fun trackSdkEvent(name: String, params: Map<String, String> = HashMap()) {
         transporter.dispatchToBackground { performTrackEvent(Types.SDK, name, params) }
     }
 
+    @JvmOverloads
     @Synchronized
-    fun trackSdkEvent(name: String) {
-        trackSdkEvent(name, HashMap())
-    }
-
-    @Synchronized
-    fun trackError(code: String, message: String, params: Map<String, String>) {
+    fun trackError(code: String, message: String, params: Map<String, String> = HashMap()) {
         transporter.dispatchToBackground {
-            instance.performTrackError(code, message, params)
+            performTrackError(code, message, params)
         }
     }
 
     @Synchronized
-    fun trackError(code: String, message: String) {
-        trackError(code, message, HashMap())
-    }
-
-    @Synchronized
-    fun trackAppEvent(name: String, params: Map<String, String>) {
-        instance.transporter.dispatchToBackground {
-            instance.performTrackEvent(Types.APP, name, params)
+    fun trackAppEvent(name: String, params: Map<String, String> = HashMap()) {
+        transporter.dispatchToBackground {
+            performTrackEvent(Types.APP, name, params)
         }
-    }
-
-    @Synchronized
-    fun trackAppEvent(name: String) {
-        trackAppEvent(name, HashMap())
     }
 
     companion object {
@@ -127,16 +125,5 @@ class AppEventClient private constructor(private val sink: AppEventSink, private
         })
 
         SessionClient.getInstance().addListener(this)
-    }
-
-    override fun onPublishEvents() {
-        instance.transporter.dispatchToBackground {
-            instance.performPublishEvents()
-            instance.performPublishErrors()
-        }
-    }
-
-    override fun onSessionExpired() {
-        trackSdkEvent(EventStrings.EXPIRED_EVENT)
     }
 }

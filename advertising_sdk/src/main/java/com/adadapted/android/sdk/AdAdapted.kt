@@ -26,6 +26,7 @@ import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener
 import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener
 import com.adadapted.android.sdk.ui.messaging.AdditContentPublisher
 import com.adadapted.android.sdk.ui.messaging.SdkEventPublisher
+import com.google.android.gms.ads.identifier.AdvertisingIdClient
 
 object AdAdapted {
 
@@ -108,11 +109,11 @@ object AdAdapted {
         Config.init(isProd)
         HttpRequestManager.createQueue(context.applicationContext)
 
-        DeviceInfoClient.createInstance(context.applicationContext, apiKey, isProd, params, transporter = Transporter())
+        DeviceInfoClient.createInstance(context.applicationContext, apiKey, isProd, params, (AdvertisingIdClient::getAdvertisingIdInfo), transporter = Transporter())
         SessionClient.createInstance(HttpSessionAdapter(Config.getInitSessionUrl(), Config.getRefreshAdsUrl()), Transporter())
         AppEventClient.createInstance(HttpAppEventSink(Config.getAppEventsUrl(), Config.getAppErrorsUrl()), Transporter())
         ImpressionIdCounter.instance?.let { AdEventClient.createInstance(HttpAdEventSink(Config.getAdsEventUrl()), Transporter(), it) }
-        InterceptClient.createInstance(HttpInterceptAdapter(Config.getRetrieveInterceptsUrl(), Config.getInterceptEventsUrl()))
+        InterceptClient.createInstance(HttpInterceptAdapter(Config.getRetrieveInterceptsUrl(), Config.getInterceptEventsUrl()), Transporter())
         PayloadClient.createInstance(HttpPayloadAdapter(Config.getPickupPayloadsUrl(), Config.getTrackingPayloadUrl()))
     }
 

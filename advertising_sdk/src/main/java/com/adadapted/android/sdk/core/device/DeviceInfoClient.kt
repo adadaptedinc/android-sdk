@@ -25,7 +25,7 @@ class DeviceInfoClient private constructor(
         appId: String,
         isProd: Boolean,
         params: Map<String, String>,
-        private val advertisingIdClientWrapper: AdvertisingIdClientWrapper,
+        private val getAdvertisingId: (context: Context) -> AdvertisingIdClient.Info?,
         private val transporter: TransporterCoroutineScope) {
 
     interface Callback {
@@ -123,7 +123,7 @@ class DeviceInfoClient private constructor(
 
     private fun getAdvertisingIdClientInfo(context: Context): AdvertisingIdClient.Info? {
         try {
-            return advertisingIdClientWrapper.requestAdvertisingIdInfo(context)
+            return getAdvertisingId(context)
         } catch (ex: GooglePlayServicesNotAvailableException) {
             trackGooglePlayAdError(ex)
         } catch (ex: GooglePlayServicesRepairableException) {
@@ -164,9 +164,9 @@ class DeviceInfoClient private constructor(
                            appId: String,
                            isProd: Boolean,
                            params: Map<String, String>,
-                           advertisingIdClientWrapper: AdvertisingIdClientWrapper = AdvertisingIdClientWrapper(),
+                           getAdvertisingId: (context: Context) -> AdvertisingIdClient.Info?,
                            transporter: TransporterCoroutineScope) {
-            instance = DeviceInfoClient(context, appId, isProd, params, advertisingIdClientWrapper, transporter)
+            instance = DeviceInfoClient(context, appId, isProd, params, getAdvertisingId, transporter)
         }
 
         fun getInstance(): DeviceInfoClient {

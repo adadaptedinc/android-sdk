@@ -1,9 +1,10 @@
 package com.adadapted.android.sdk.core.device
 
+import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.tools.TestAdvertisingIdClientWrapper
 import com.adadapted.android.sdk.tools.TestTransporter
+import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertNull
 import kotlinx.coroutines.Dispatchers
@@ -17,13 +18,12 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class DeviceInfoClientTest {
     var testTransporter = TestCoroutineDispatcher()
-    val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
-    val testAdvertisingIdClientWrapper = TestAdvertisingIdClientWrapper()
+    private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
 
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(InstrumentationRegistry.getInstrumentation().targetContext,"", false, HashMap(), testAdvertisingIdClientWrapper, testTransporterScope)
+        DeviceInfoClient.createInstance(InstrumentationRegistry.getInstrumentation().targetContext,"", false, HashMap(), ::requestAdvertisingIdInfo, testTransporterScope)
     }
 
     @Test
@@ -38,5 +38,11 @@ class DeviceInfoClientTest {
         })
 
         assertEquals("unknown robolectric", deviceInfoResult.device)
+    }
+
+    companion object {
+        fun requestAdvertisingIdInfo(context: Context?): AdvertisingIdClient.Info? {
+            return null
+        }
     }
 }

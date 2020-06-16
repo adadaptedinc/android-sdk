@@ -4,7 +4,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.tools.TestAdvertisingIdClientWrapper
+import com.adadapted.android.sdk.core.device.DeviceInfoClientTest
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -23,17 +23,15 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class SessionClientTest {
-
-    var testTransporter = TestCoroutineDispatcher()
-    val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
-    var testSessionClient = SessionClient
-    var mockSessionAdapter = mock<SessionAdapter>()
-    var testAdvertisingIdClientWrapper = TestAdvertisingIdClientWrapper()
+    private var testTransporter = TestCoroutineDispatcher()
+    private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
+    private var testSessionClient = SessionClient
+    private var mockSessionAdapter = mock<SessionAdapter>()
 
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(InstrumentationRegistry.getInstrumentation().targetContext,"", false, HashMap(), testAdvertisingIdClientWrapper, testTransporterScope)
+        DeviceInfoClient.createInstance(InstrumentationRegistry.getInstrumentation().targetContext,"", false, HashMap(), DeviceInfoClientTest.Companion::requestAdvertisingIdInfo, testTransporterScope)
         whenever(mockSessionAdapter.sendInit(any(), any())).then {}
         whenever(mockSessionAdapter.sendRefreshAds(any(), any())).then {}
 

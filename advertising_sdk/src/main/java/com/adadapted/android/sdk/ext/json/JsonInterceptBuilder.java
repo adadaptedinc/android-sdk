@@ -34,7 +34,7 @@ public class JsonInterceptBuilder {
     private static final String PRIORITY = "priority";
 
     public Intercept build(final JSONObject json) {
-        if(json == null) { return Intercept.empty(); }
+        if(json == null) { return new Intercept(); }
 
         try {
             final String searchId = json.has(SEARCH_ID) ? json.getString(SEARCH_ID) : "";
@@ -59,7 +59,7 @@ public class JsonInterceptBuilder {
             );
         }
 
-        return Intercept.empty();
+        return new Intercept();
     }
 
     private List<Term> parseIntercepts(final JSONArray json) throws JSONException {
