@@ -82,13 +82,11 @@ class InterceptClientTest {
 class TestInterceptAdapter: InterceptAdapter {
     var testEvents = mutableSetOf<InterceptEvent>()
 
-    override fun retrieve(session: Session?, callback: InterceptAdapter.Callback?) {
-        callback?.onSuccess(Intercept())
+    override fun retrieve(session: Session, callback: InterceptAdapter.Callback) {
+        callback.onSuccess(Intercept())
     }
 
-    override fun sendEvents(session: Session?, events: MutableSet<InterceptEvent>?) {
-        if (events != null) {
-            testEvents = events
-        }
+    override fun sendEvents(session: Session, events: MutableSet<InterceptEvent>) {
+        testEvents = events
     }
 }

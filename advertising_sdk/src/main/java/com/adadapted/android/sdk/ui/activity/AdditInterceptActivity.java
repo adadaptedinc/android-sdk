@@ -26,7 +26,7 @@ public class AdditInterceptActivity extends AppCompatActivity {
 
         Log.i(LOGTAG, "Addit Intercept Activity Launched.");
 
-        PayloadClient.deeplinkInProgress();
+        PayloadClient.Companion.getInstance().deeplinkInProgress();
 
         AppEventClient.Companion.getInstance().trackSdkEvent(EventStrings.ADDIT_APP_OPENED);
 
@@ -45,7 +45,7 @@ public class AdditInterceptActivity extends AppCompatActivity {
             Log.w(LOGTAG, "Problem dealing with Addit content. Recovering. " + ex.getMessage());
 
             final Map<String, String> errorParams = new HashMap<>();
-            errorParams.put("exception_message", ex.getMessage());
+            errorParams.put(EventStrings.EXCEPTION_MESSAGE, ex.getMessage());
             AppEventClient.Companion.getInstance().trackError(
                 EventStrings.ADDIT_DEEPLINK_HANDLING_ERROR,
                 "Problem handling deeplink",
@@ -58,7 +58,7 @@ public class AdditInterceptActivity extends AppCompatActivity {
             startActivity(mainActivityIntent);
         }
 
-        PayloadClient.deeplinkCompleted();
+        PayloadClient.Companion.getInstance().deeplinkCompleted();
 
         finish();
     }
