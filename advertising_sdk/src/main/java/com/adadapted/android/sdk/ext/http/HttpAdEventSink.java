@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.ext.http;
 
-import android.util.Log;
-
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.ad.AdEvent;
 import com.adadapted.android.sdk.core.ad.AdEventSink;
 import com.adadapted.android.sdk.core.event.AppEventClient;
@@ -55,7 +54,7 @@ public class HttpAdEventSink implements AdEventSink {
                         params.put("status_code", Integer.toString(statusCode));
                         params.put("data", data);
                         AppEventClient.Companion.getInstance().trackError(
-                                "AD_EVENT_TRACK_REQUEST_FAILED",
+                                EventStrings.AD_EVENT_TRACK_REQUEST_FAILED,
                                 error.getMessage(),
                                 params
                         );

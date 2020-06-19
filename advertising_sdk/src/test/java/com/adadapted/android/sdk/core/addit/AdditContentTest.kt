@@ -2,7 +2,9 @@ package com.adadapted.android.sdk.core.addit
 
 import com.adadapted.android.sdk.core.atl.AddToListContent
 import com.adadapted.android.sdk.core.atl.AddToListItem
+import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.AppEventClient
+import com.adadapted.android.sdk.core.session.SessionClient
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.Assert
 import org.junit.Before
@@ -12,7 +14,10 @@ import java.util.LinkedList
 class AdditContentTest {
     @Before
     fun setup() {
+        DeviceInfoClient.createInstance(mock(), "", false, mock(), mock(), mock())
+        SessionClient.createInstance(mock(), mock())
         AppEventClient.createInstance(mock(),mock())
+        PayloadClient.createInstance(mock(), AppEventClient.getInstance(), mock())
     }
 
     @Test

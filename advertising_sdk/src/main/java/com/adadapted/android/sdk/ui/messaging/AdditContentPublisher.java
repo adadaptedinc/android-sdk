@@ -3,6 +3,7 @@ package com.adadapted.android.sdk.ui.messaging;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.addit.AdditContent;
 import com.adadapted.android.sdk.core.atl.AddToListContent;
 import com.adadapted.android.sdk.core.atl.PopupContent;
@@ -54,7 +55,7 @@ public class AdditContentPublisher {
         try {
             if (listener == null) {
                 AppEventClient.Companion.getInstance().trackError(
-                    "NO_ADDIT_CONTENT_LISTENER",
+                        EventStrings.NO_ADDIT_CONTENT_LISTENER,
                     "App did not register an Addit Content listener"
                 );
                 return;
@@ -82,7 +83,7 @@ public class AdditContentPublisher {
         try {
             if (listener == null) {
                 AppEventClient.Companion.getInstance().trackError(
-                        "NO_ADDIT_CONTENT_LISTENER",
+                        EventStrings.NO_ADDIT_CONTENT_LISTENER,
                         "App did not register an Addit Content listener"
                 );
                 return;
@@ -104,7 +105,7 @@ public class AdditContentPublisher {
         try {
             if (listener == null) {
                 AppEventClient.Companion.getInstance().trackError(
-                    "NO_ADDIT_CONTENT_LISTENER",
+                    EventStrings.NO_ADDIT_CONTENT_LISTENER,
                     "App did not register an Addit Content listener"
                 );
                 return;

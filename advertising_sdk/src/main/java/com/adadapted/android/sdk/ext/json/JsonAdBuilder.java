@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.ext.json;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.ad.AdActionType;
 import com.adadapted.android.sdk.core.ad.Ad;
 import com.adadapted.android.sdk.core.ad.AdDisplayType;
@@ -56,7 +57,7 @@ public class JsonAdBuilder {
                 }
                 else {
                     AppEventClient.Companion.getInstance().trackError(
-                        "AD_PAYLOAD_PARSE_FAILED",
+                        EventStrings.AD_PAYLOAD_PARSE_FAILED,
                         "Ad " + ad.getString(AD_ID) + " has unsupported ad_type: " + ad.getString(TYPE)
                     );
                 }
@@ -67,7 +68,7 @@ public class JsonAdBuilder {
                 errorParams.put("exception", ex.getMessage());
 
                 AppEventClient.Companion.getInstance().trackError(
-                    "AD_PAYLOAD_PARSE_FAILED",
+                        EventStrings.AD_PAYLOAD_PARSE_FAILED,
                     "Problem parsing Ad JSON.",
                     errorParams
                 );
@@ -84,7 +85,7 @@ public class JsonAdBuilder {
         }
         catch(NumberFormatException ex) {
             AppEventClient.Companion.getInstance().trackError(
-                    "AD_PAYLOAD_PARSE_FAILED",
+                    EventStrings.AD_PAYLOAD_PARSE_FAILED,
                     "Ad " + ad.get(AD_ID) + " has an improperly set refresh_time."
             );
         }
@@ -124,7 +125,7 @@ public class JsonAdBuilder {
                 builder.setTitle(item.getString(PRODUCT_TITLE));
             } else {
                 AppEventClient.Companion.getInstance().trackError(
-                    "SESSION_AD_PAYLOAD_PARSE_FAILED",
+                    EventStrings.SESSION_AD_PAYLOAD_PARSE_FAILED,
                     "Detailed List Items payload should always have a product title."
                 );
 

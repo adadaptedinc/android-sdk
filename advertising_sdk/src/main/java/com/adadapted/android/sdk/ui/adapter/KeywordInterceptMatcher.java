@@ -1,11 +1,13 @@
 package com.adadapted.android.sdk.ui.adapter;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.intercept.InterceptClient;
 import com.adadapted.android.sdk.core.session.Session;
 import com.adadapted.android.sdk.core.session.SessionClient;
 import com.adadapted.android.sdk.core.intercept.Term;
 import com.adadapted.android.sdk.core.intercept.Intercept;
+import com.adadapted.android.sdk.core.session.SessionListener;
 import com.adadapted.android.sdk.ui.model.Suggestion;
 
 import java.util.HashSet;
@@ -14,7 +16,7 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class KeywordInterceptMatcher implements SessionClient.Listener, InterceptClient.Listener {
+public class KeywordInterceptMatcher extends SessionListener implements InterceptClient.Listener {
     @SuppressWarnings("unused")
     private static final String LOGTAG = KeywordInterceptMatcher.class.getName();
 
@@ -35,8 +37,8 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, Intercep
     }
 
     public KeywordInterceptMatcher() {
-        intercept = Intercept.empty();
-        SessionClient.getSession(this);
+        intercept = new Intercept();
+        SessionClient.Companion.getInstance().getSession(this);
     }
 
     public Set<Suggestion> match(final CharSequence constraint) {
@@ -117,7 +119,7 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, Intercep
 
     @Override
     public void onKeywordInterceptInitialized(final Intercept intercept) {
-        AppEventClient.Companion.getInstance().trackSdkEvent("ki_initialized");
+        AppEventClient.Companion.getInstance().trackSdkEvent(EventStrings.KI_INITIALIZED);
 
         interceptLock.lock();
         try {
@@ -132,17 +134,14 @@ public class KeywordInterceptMatcher implements SessionClient.Listener, Intercep
     @Override
     public void onSessionAvailable(final Session session) {
         if(!session.getId().isEmpty()) {
-            InterceptClient.initialize(session, this);
+            InterceptClient.Companion.getInstance().initialize(session, this);
         }
     }
 
     @Override
     public void onAdsAvailable(final Session session) {
         if(!session.getId().isEmpty()) {
-            InterceptClient.initialize(session, this);
+            InterceptClient.Companion.getInstance().initialize(session, this);
         }
     }
-
-    @Override
-    public void onSessionInitFailed() {}
 }

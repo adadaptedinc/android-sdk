@@ -2,16 +2,20 @@ package com.adadapted.android.sdk
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import com.adadapted.android.sdk.config.Config
+import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.ad.AdEventClient
 import com.adadapted.android.sdk.core.ad.ImpressionIdCounter
+import com.adadapted.android.sdk.core.addit.AdditContent
 import com.adadapted.android.sdk.core.addit.PayloadClient
 import com.adadapted.android.sdk.core.concurrency.Transporter
-import com.adadapted.android.sdk.core.event.AdAdaptedEventClient
+import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.intercept.InterceptClient
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.core.session.SessionListener
 import com.adadapted.android.sdk.ext.http.HttpAdEventSink
 import com.adadapted.android.sdk.ext.http.HttpAppEventSink
 import com.adadapted.android.sdk.ext.http.HttpInterceptAdapter
@@ -23,6 +27,7 @@ import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener
 import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener
 import com.adadapted.android.sdk.ui.messaging.AdditContentPublisher
 import com.adadapted.android.sdk.ui.messaging.SdkEventPublisher
+import com.google.android.gms.ads.identifier.AdvertisingIdClient
 
 object AdAdapted {
 
@@ -65,12 +70,12 @@ object AdAdapted {
     fun start(context: Context) {
         if (apiKey.isEmpty()) {
             Log.e(LOG_TAG, "The Api Key cannot be NULL")
-            return
+            Toast.makeText(context, "AdAdapted API Key Is Missing", Toast.LENGTH_SHORT).show()
         }
         if (hasStarted) {
             if (!isProd) {
                 Log.w(LOG_TAG, "AdAdapted Android Advertising SDK has already been started")
-                AppEventClient.getInstance().trackError("MULTIPLE_SDK_STARTS", "App has attempted to start the SDK Multiple times")
+                AppEventClient.getInstance().trackError(EventStrings.MULTIPLE_SDK_STARTS, "App has attempted to start the SDK Multiple times")
             }
             return
         }
@@ -78,12 +83,15 @@ object AdAdapted {
         setupClients(context)
         SdkEventPublisher.getInstance().setListener(eventListener)
         AdditContentPublisher.getInstance().addListener(contentListener)
-        PayloadClient.pickupPayloads { content ->
-            if (content.size > 0) {
-                AdditContentPublisher.getInstance().publishAdditContent(content[0])
+        PayloadClient.getInstance().pickupPayloads(object : PayloadClient.Callback {
+            override fun onPayloadAvailable(content: List<AdditContent>) {
+                if (content.isNotEmpty()) {
+                    AdditContentPublisher.getInstance().publishAdditContent(content[0])
+                }
             }
-        }
-        val startListener: SessionClient.Listener = object : SessionClient.Listener {
+        })
+
+        val startListener: SessionListener = object : SessionListener() {
             override fun onSessionAvailable(session: Session) {
                 sessionListener?.onHasAdsToServe(session.hasActiveCampaigns())
             }
@@ -96,13 +104,8 @@ object AdAdapted {
                 sessionListener?.onHasAdsToServe(false)
             }
         }
-        SessionClient.start(
-                context.applicationContext,
-                apiKey,
-                isProd,
-                params,
-                startListener)
-        AppEventClient.getInstance().trackSdkEvent("app_opened")
+        SessionClient.getInstance().start(startListener)
+        AppEventClient.getInstance().trackSdkEvent(EventStrings.APP_OPENED)
         Log.i(LOG_TAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", BuildConfig.VERSION_NAME))
     }
 
@@ -110,12 +113,12 @@ object AdAdapted {
         Config.init(isProd)
         HttpRequestManager.createQueue(context.applicationContext)
 
-        SessionClient.createInstance(HttpSessionAdapter(Config.getInitSessionUrl(), Config.getRefreshAdsUrl()))
+        DeviceInfoClient.createInstance(context.applicationContext, apiKey, isProd, params, (AdvertisingIdClient::getAdvertisingIdInfo), transporter = Transporter())
+        SessionClient.createInstance(HttpSessionAdapter(Config.getInitSessionUrl(), Config.getRefreshAdsUrl()), Transporter())
         AppEventClient.createInstance(HttpAppEventSink(Config.getAppEventsUrl(), Config.getAppErrorsUrl()), Transporter())
         ImpressionIdCounter.instance?.let { AdEventClient.createInstance(HttpAdEventSink(Config.getAdsEventUrl()), Transporter(), it) }
-        InterceptClient.createInstance(HttpInterceptAdapter(Config.getRetrieveInterceptsUrl(), Config.getInterceptEventsUrl()))
-        PayloadClient.createInstance(HttpPayloadAdapter(Config.getPickupPayloadsUrl(), Config.getTrackingPayloadUrl()))
-        AdAdaptedEventClient.createInstance(AdEventClient.getInstance(), AppEventClient.getInstance())
+        InterceptClient.createInstance(HttpInterceptAdapter(Config.getRetrieveInterceptsUrl(), Config.getInterceptEventsUrl()), Transporter())
+        PayloadClient.createInstance(HttpPayloadAdapter(Config.getPickupPayloadsUrl(), Config.getTrackingPayloadUrl()), AppEventClient.getInstance(), Transporter())
     }
 
     init {

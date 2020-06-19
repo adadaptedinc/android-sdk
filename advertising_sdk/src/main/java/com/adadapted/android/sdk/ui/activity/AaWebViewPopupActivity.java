@@ -16,6 +16,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.ad.Ad;
 import com.adadapted.android.sdk.core.ad.AdEventClient;
 import com.adadapted.android.sdk.core.event.AppEventClient;
@@ -65,7 +66,7 @@ public class AaWebViewPopupActivity extends Activity {
             loadPopup(ad.getActionPath());
         } else {
             AppEventClient.Companion.getInstance().trackError(
-                "POPUP_URL_MALFORMED",
+                EventStrings.POPUP_URL_MALFORMED,
                 "Incorrect Action Path URL supplied for Ad: " + ad.getId()
             );
         }
@@ -121,7 +122,7 @@ public class AaWebViewPopupActivity extends Activity {
                 params.put("url", url);
                 params.put("error", error.toString());
                 AppEventClient.Companion.getInstance().trackError(
-                    "POPUP_URL_LOAD_FAILED",
+                    EventStrings.POPUP_URL_LOAD_FAILED,
                     "Problem loading popup url",
                     params
                 );
@@ -140,7 +141,7 @@ public class AaWebViewPopupActivity extends Activity {
                 params.put("url", url);
                 params.put("error", errorResponse.getReasonPhrase());
                 AppEventClient.Companion.getInstance().trackError(
-                    "POPUP_URL_LOAD_FAILED",
+                    EventStrings.POPUP_URL_LOAD_FAILED,
                     "Problem loading popup url",
                     params
                 );

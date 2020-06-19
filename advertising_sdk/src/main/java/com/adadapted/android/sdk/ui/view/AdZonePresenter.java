@@ -5,14 +5,14 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.ad.Ad;
 import com.adadapted.android.sdk.core.ad.AdActionType;
 import com.adadapted.android.sdk.core.ad.AdEventClient;
-import com.adadapted.android.sdk.core.event.AdAdaptedEventClient;
 import com.adadapted.android.sdk.core.event.AppEventClient;
-import com.adadapted.android.sdk.core.event.BaseEventClient;
 import com.adadapted.android.sdk.core.session.Session;
 import com.adadapted.android.sdk.core.session.SessionClient;
+import com.adadapted.android.sdk.core.session.SessionListener;
 import com.adadapted.android.sdk.core.zone.Zone;
 import com.adadapted.android.sdk.ui.activity.AaWebViewPopupActivity;
 import com.adadapted.android.sdk.ui.messaging.AdContentPublisher;
@@ -24,7 +24,7 @@ import java.util.TimerTask;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-class AdZonePresenter implements SessionClient.Listener {
+class AdZonePresenter extends SessionListener {
     private static final String LOGTAG = AdZonePresenter.class.getName();
 
     interface Listener {
@@ -57,11 +57,13 @@ class AdZonePresenter implements SessionClient.Listener {
     private boolean timerRunning;
     private final Lock timerLock = new ReentrantLock();
     private final Timer timer;
-    private final BaseEventClient adAdaptedEvenClient;
+    private final AdEventClient adEventClient;
+    private final AppEventClient appEventClient;
 
     AdZonePresenter(final Context context) {
         this.context = context.getApplicationContext();
-        adAdaptedEvenClient = AdAdaptedEventClient.Companion.getInstance();
+        adEventClient = AdEventClient.Companion.getInstance();
+        appEventClient = AppEventClient.Companion.getInstance();
         pixelWebView = new PixelWebView(context.getApplicationContext());
 
         attached = false;
@@ -79,7 +81,7 @@ class AdZonePresenter implements SessionClient.Listener {
 
             final Map<String, String> params = new HashMap<>();
             params.put("zone_id", zoneId);
-            AppEventClient.Companion.getInstance().trackSdkEvent("zone_loaded", params);
+            appEventClient.trackSdkEvent(EventStrings.ZONE_LOADED, params);
         }
     }
 
@@ -110,7 +112,7 @@ class AdZonePresenter implements SessionClient.Listener {
 
                 this.listener = l;
 
-                SessionClient.addPresenter(this);
+                SessionClient.Companion.getInstance().addPresenter(this);
             }
 
             setNextAd();
@@ -129,7 +131,7 @@ class AdZonePresenter implements SessionClient.Listener {
                 this.listener = null;
 
                 completeCurrentAd();
-                SessionClient.removePresenter(this);
+                SessionClient.Companion.getInstance().removePresenter(this);
             }
         }
         finally {
@@ -264,23 +266,23 @@ class AdZonePresenter implements SessionClient.Listener {
 
         switch(actionType) {
             case AdActionType.CONTENT:
-                AppEventClient.Companion.getInstance().trackSdkEvent("atl_ad_clicked", params);
+                appEventClient.trackSdkEvent(EventStrings.ATL_AD_CLICKED, params);
                 handleContentAction(ad);
                 break;
 
             case AdActionType.LINK:
             case AdActionType.EXTERNAL_LINK:
-                adAdaptedEvenClient.trackInteraction(ad);
+                adEventClient.trackInteraction(ad);
                 handleLinkAction(ad);
                 break;
 
             case AdActionType.POPUP:
-                adAdaptedEvenClient.trackInteraction(ad);
+                adEventClient.trackInteraction(ad);
                 handlePopupAction(ad);
                 break;
 
             case AdActionType.CONTENT_POPUP:
-                AppEventClient.Companion.getInstance().trackSdkEvent("popup_ad_clicked", params);
+                appEventClient.trackSdkEvent(EventStrings.POPUP_AD_CLICKED, params);
                 handlePopupAction(ad);
                 break;
 
@@ -361,10 +363,6 @@ class AdZonePresenter implements SessionClient.Listener {
             setNextAd();
         }
     }
-
-    /*
-     * Overrides SessionClient.Listener
-     */
 
     @Override
     public void onSessionAvailable(final Session session) {

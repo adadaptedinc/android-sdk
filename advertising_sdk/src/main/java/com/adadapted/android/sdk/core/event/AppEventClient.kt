@@ -1,12 +1,16 @@
 package com.adadapted.android.sdk.core.event
 
 import android.util.Log
+import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
+import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
+import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.core.session.SessionListener
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
-class AppEventClient private constructor(private val sink: AppEventSink, private val transporter: TransporterCoroutineScope): BaseAppEventClient {
+class AppEventClient private constructor(private val sink: AppEventSink, private val transporter: TransporterCoroutineScope): SessionListener() {
     private object Types {
         const val SDK = "sdk"
         const val APP = "app"
@@ -42,7 +46,7 @@ class AppEventClient private constructor(private val sink: AppEventSink, private
     private fun performPublishEvents() {
         eventLock.lock()
         try {
-            if (!events.isEmpty()) {
+            if (events.isNotEmpty()) {
                 val currentEvents: Set<AppEvent> = HashSet(events)
                 events.clear()
                 sink.publishEvent(currentEvents)
@@ -55,7 +59,7 @@ class AppEventClient private constructor(private val sink: AppEventSink, private
     private fun performPublishErrors() {
         errorLock.lock()
         try {
-            if (!errors.isEmpty()) {
+            if (errors.isNotEmpty()) {
                 val currentErrors: Set<AppError> = HashSet(errors)
                 errors.clear()
                 sink.publishError(currentErrors)
@@ -65,45 +69,35 @@ class AppEventClient private constructor(private val sink: AppEventSink, private
         }
     }
 
+    override fun onPublishEvents() {
+        transporter.dispatchToBackground {
+            performPublishEvents()
+            performPublishErrors()
+        }
+    }
+
+    override fun onSessionExpired() {
+        trackSdkEvent(EventStrings.EXPIRED_EVENT)
+    }
+
+    @JvmOverloads
     @Synchronized
-    override fun trackSdkEvent(name: String, params: Map<String, String>) {
+    fun trackSdkEvent(name: String, params: Map<String, String> = HashMap()) {
         transporter.dispatchToBackground { performTrackEvent(Types.SDK, name, params) }
     }
 
+    @JvmOverloads
     @Synchronized
-    override fun trackSdkEvent(name: String) {
-        trackSdkEvent(name, HashMap())
-    }
-
-    @Synchronized
-    override fun trackError(code: String, message: String, params: Map<String, String>) {
+    fun trackError(code: String, message: String, params: Map<String, String> = HashMap()) {
         transporter.dispatchToBackground {
-            instance.performTrackError(code, message, params)
+            performTrackError(code, message, params)
         }
     }
 
     @Synchronized
-    override fun trackError(code: String, message: String) {
-        trackError(code, message, HashMap())
-    }
-
-    @Synchronized
-    override fun trackAppEvent(name: String, params: Map<String, String>) {
-        instance.transporter.dispatchToBackground {
-            instance.performTrackEvent(Types.APP, name, params)
-        }
-    }
-
-    @Synchronized
-    override fun trackAppEvent(name: String) {
-        trackAppEvent(name, HashMap())
-    }
-
-    @Synchronized
-    override fun publishEvents() {
-        instance.transporter.dispatchToBackground {
-            instance.performPublishEvents()
-            instance.performPublishErrors()
+    fun trackAppEvent(name: String, params: Map<String, String> = HashMap()) {
+        transporter.dispatchToBackground {
+            performTrackEvent(Types.APP, name, params)
         }
     }
 
@@ -123,10 +117,13 @@ class AppEventClient private constructor(private val sink: AppEventSink, private
     init {
         events = HashSet()
         errors = HashSet()
-        DeviceInfoClient.getDeviceInfo { deviceInfo ->
-            if (deviceInfo != null) {
+
+        DeviceInfoClient.getInstance().getDeviceInfo(object: DeviceInfoClient.Callback {
+            override fun onDeviceInfoCollected(deviceInfo: DeviceInfo) {
                 sink.generateWrappers(deviceInfo)
             }
-        }
+        })
+
+        SessionClient.getInstance().addListener(this)
     }
 }

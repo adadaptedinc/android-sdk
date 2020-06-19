@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.ext.json;
 
 import android.util.Log;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.common.Dimension;
 import com.adadapted.android.sdk.core.common.DimensionConverter;
 import com.adadapted.android.sdk.core.event.AppEventClient;
@@ -51,7 +52,7 @@ public class JsonZoneBuilder {
                 errorParams.put("exception", ex.getMessage());
 
                 AppEventClient.Companion.getInstance().trackError(
-                    "SESSION_ZONE_PAYLOAD_PARSE_FAILED",
+                        EventStrings.SESSION_ZONE_PAYLOAD_PARSE_FAILED,
                     "Failed to parse Session Zone payload for processing.",
                     errorParams
                 );

@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.ext.json;
 
 import android.util.Log;
 
+import com.adadapted.android.sdk.config.EventStrings;
 import com.adadapted.android.sdk.core.event.AppEventClient;
 import com.adadapted.android.sdk.core.intercept.Term;
 import com.adadapted.android.sdk.core.intercept.Intercept;
@@ -33,7 +34,7 @@ public class JsonInterceptBuilder {
     private static final String PRIORITY = "priority";
 
     public Intercept build(final JSONObject json) {
-        if(json == null) { return Intercept.empty(); }
+        if(json == null) { return new Intercept(); }
 
         try {
             final String searchId = json.has(SEARCH_ID) ? json.getString(SEARCH_ID) : "";
@@ -52,13 +53,13 @@ public class JsonInterceptBuilder {
             params.put("error", ex.getMessage());
             params.put("payload", json.toString());
             AppEventClient.Companion.getInstance().trackError(
-                "KI_PAYLOAD_PARSE_FAILED",
+                    EventStrings.KI_PAYLOAD_PARSE_FAILED,
                 "Failed to parse KI payload for processing.",
                 params
             );
         }
 
-        return Intercept.empty();
+        return new Intercept();
     }
 
     private List<Term> parseIntercepts(final JSONArray json) throws JSONException {
