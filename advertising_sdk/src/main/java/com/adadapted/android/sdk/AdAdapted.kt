@@ -7,6 +7,7 @@ import com.adadapted.android.sdk.config.Config
 import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.ad.AdEventClient
 import com.adadapted.android.sdk.core.ad.ImpressionIdCounter
+import com.adadapted.android.sdk.core.addit.AdditContent
 import com.adadapted.android.sdk.core.addit.PayloadClient
 import com.adadapted.android.sdk.core.concurrency.Transporter
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
@@ -82,11 +83,14 @@ object AdAdapted {
         setupClients(context)
         SdkEventPublisher.getInstance().setListener(eventListener)
         AdditContentPublisher.getInstance().addListener(contentListener)
-        PayloadClient.pickupPayloads { content ->
-            if (content.size > 0) {
-                AdditContentPublisher.getInstance().publishAdditContent(content[0])
+        PayloadClient.getInstance().pickupPayloads(object : PayloadClient.Callback {
+            override fun onPayloadAvailable(content: List<AdditContent>) {
+                if (content.isNotEmpty()) {
+                    AdditContentPublisher.getInstance().publishAdditContent(content[0])
+                }
             }
-        }
+        })
+
         val startListener: SessionListener = object : SessionListener() {
             override fun onSessionAvailable(session: Session) {
                 sessionListener?.onHasAdsToServe(session.hasActiveCampaigns())
@@ -114,7 +118,7 @@ object AdAdapted {
         AppEventClient.createInstance(HttpAppEventSink(Config.getAppEventsUrl(), Config.getAppErrorsUrl()), Transporter())
         ImpressionIdCounter.instance?.let { AdEventClient.createInstance(HttpAdEventSink(Config.getAdsEventUrl()), Transporter(), it) }
         InterceptClient.createInstance(HttpInterceptAdapter(Config.getRetrieveInterceptsUrl(), Config.getInterceptEventsUrl()), Transporter())
-        PayloadClient.createInstance(HttpPayloadAdapter(Config.getPickupPayloadsUrl(), Config.getTrackingPayloadUrl()))
+        PayloadClient.createInstance(HttpPayloadAdapter(Config.getPickupPayloadsUrl(), Config.getTrackingPayloadUrl()), AppEventClient.getInstance(), Transporter())
     }
 
     init {

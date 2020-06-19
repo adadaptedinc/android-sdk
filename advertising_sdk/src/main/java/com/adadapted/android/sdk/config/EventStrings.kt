@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.config
 
 object EventStrings {
     const val EXPIRED_EVENT = "session_expired"
+    const val EXCEPTION_MESSAGE = "exception_message"
     const val APP_OPENED = "app_opened"
     const val MULTIPLE_SDK_STARTS = "MULTIPLE_SDK_STARTS"
     const val GAID_UNAVAILABLE = "GAID_UNAVAILABLE"

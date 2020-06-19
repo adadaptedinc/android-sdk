@@ -17,6 +17,7 @@ class AdditContentTest {
         DeviceInfoClient.createInstance(mock(), "", false, mock(), mock(), mock())
         SessionClient.createInstance(mock(), mock())
         AppEventClient.createInstance(mock(),mock())
+        PayloadClient.createInstance(mock(), AppEventClient.getInstance(), mock())
     }
 
     @Test
