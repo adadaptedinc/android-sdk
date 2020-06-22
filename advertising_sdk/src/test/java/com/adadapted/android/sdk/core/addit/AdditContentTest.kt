@@ -33,8 +33,8 @@ class AdditContentTest {
         Assert.assertEquals("message", content.message)
         Assert.assertEquals("image", content.image)
         Assert.assertEquals(AdditContent.AdditSources.DEEPLINK, content.additSource)
-        Assert.assertEquals(AddToListContent.Sources.OUT_OF_APP, content.source)
-        Assert.assertEquals(0, content.items.size.toLong())
+        Assert.assertEquals(AddToListContent.Sources.OUT_OF_APP, content.getSource())
+        Assert.assertEquals(0, content.getItems().size.toLong())
     }
 
     @Test
@@ -50,8 +50,8 @@ class AdditContentTest {
         Assert.assertEquals("message", content.message)
         Assert.assertEquals("image", content.image)
         Assert.assertEquals(AdditContent.AdditSources.IN_APP, content.additSource)
-        Assert.assertEquals(AddToListContent.Sources.IN_APP, content.source)
-        Assert.assertEquals(0, content.items.size.toLong())
+        Assert.assertEquals(AddToListContent.Sources.IN_APP, content.getSource())
+        Assert.assertEquals(0, content.getItems().size.toLong())
     }
 
     @Test
@@ -67,8 +67,8 @@ class AdditContentTest {
         Assert.assertEquals("message", content.message)
         Assert.assertEquals("image", content.image)
         Assert.assertEquals(AdditContent.AdditSources.PAYLOAD, content.additSource)
-        Assert.assertEquals(AddToListContent.Sources.OUT_OF_APP, content.source)
-        Assert.assertEquals(0, content.items.size.toLong())
+        Assert.assertEquals(AddToListContent.Sources.OUT_OF_APP, content.getSource())
+        Assert.assertEquals(0, content.getItems().size.toLong())
     }
 
     @Test

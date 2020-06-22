@@ -79,14 +79,14 @@ class AdTest {
 
         val addToListContent = testAd.content
 
-        assertEquals(addToListContent.items.first().trackingId, "TestTrackingId")
-        assertEquals(addToListContent.items.first().title, "TestTitle")
-        assertEquals(addToListContent.items.first().brand, "TestBrand")
-        assertEquals(addToListContent.items.first().category, "TestCategory")
-        assertEquals(addToListContent.items.first().productUpc, "TestUPC")
-        assertEquals(addToListContent.items.first().retailerSku, "TestSKU")
-        assertEquals(addToListContent.items.first().discount, "TestDiscount")
-        assertEquals(addToListContent.items.first().productImage, "TestImage")
+        assertEquals(addToListContent.getItems().first().trackingId, "TestTrackingId")
+        assertEquals(addToListContent.getItems().first().title, "TestTitle")
+        assertEquals(addToListContent.getItems().first().brand, "TestBrand")
+        assertEquals(addToListContent.getItems().first().category, "TestCategory")
+        assertEquals(addToListContent.getItems().first().productUpc, "TestUPC")
+        assertEquals(addToListContent.getItems().first().retailerSku, "TestSKU")
+        assertEquals(addToListContent.getItems().first().discount, "TestDiscount")
+        assertEquals(addToListContent.getItems().first().productImage, "TestImage")
     }
 
     private fun getTestAd(payload: List<AddToListItem> = arrayListOf()): Ad {

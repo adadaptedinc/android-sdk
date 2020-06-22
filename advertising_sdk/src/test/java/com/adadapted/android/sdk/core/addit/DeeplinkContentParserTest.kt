@@ -39,8 +39,8 @@ class DeeplinkContentParserTest {
         Assert.assertEquals("Sample Product", content.message)
         Assert.assertEquals("", content.image)
         Assert.assertEquals(AdditContent.AdditSources.DEEPLINK, content.additSource)
-        Assert.assertEquals(AddToListContent.Sources.OUT_OF_APP, content.source)
-        Assert.assertEquals(1, content.items.size.toLong())
+        Assert.assertEquals(AddToListContent.Sources.OUT_OF_APP, content.getSource())
+        Assert.assertEquals(1, content.getItems().size.toLong())
     }
 
     companion object {
