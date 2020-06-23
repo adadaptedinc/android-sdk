@@ -59,7 +59,7 @@ public class PopupJavascriptBridge {
                 productImage
         ));
 
-        final PopupContent content = PopupContent.createPopupContent(
+        final PopupContent content = PopupContent.CREATOR.createPopupContent(
                 payloadId,
                 items
         );
