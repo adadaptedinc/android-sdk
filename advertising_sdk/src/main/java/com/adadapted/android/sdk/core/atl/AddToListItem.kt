@@ -72,6 +72,11 @@ class AddToListItem : Parcelable {
                 '}'
     }
 
+    @Deprecated("Use ProductUpc field instead.", ReplaceWith("productUpc"))
+    fun getBarCode(): String {
+        return productUpc
+    }
+
     class Builder {
         private var trackingId = ""
         private var title = ""

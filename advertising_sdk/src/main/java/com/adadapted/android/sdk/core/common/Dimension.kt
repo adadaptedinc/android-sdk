@@ -1,13 +1,10 @@
 package com.adadapted.android.sdk.core.common
 
-class Dimension {
+class Dimension(var height: Int = 0, var width: Int = 0) {
     object Orientation {
         const val LAND = "land"
         const val PORT = "port"
     }
-
-    var height: Int = 0
-    var width: Int = 0
 
     companion object {
         const val MATCH_PARENT = -1
