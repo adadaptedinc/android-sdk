@@ -30,10 +30,10 @@ public class AaWebViewPopupActivity extends Activity {
 
     private static final String EXTRA_POPUP_AD = AaWebViewPopupActivity.class.getName() + ".EXTRA_POPUP_AD";
 
-    public static Intent createActivity(final Context context,
-                                        final Ad ad) {
+    public Intent createActivity(final Context context, final Ad ad) {
         Intent intent = new Intent(context.getApplicationContext(), AaWebViewPopupActivity.class);
         intent.putExtra(AaWebViewPopupActivity.EXTRA_POPUP_AD, ad);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         return intent;
     }

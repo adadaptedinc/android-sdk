@@ -36,10 +36,10 @@ class Session(val deviceInfo: DeviceInfo,
 
     fun getZone(zoneId: String): Zone {
         if (zones.containsKey(zoneId)) {
-            return zones[zoneId] ?: Zone.emptyZone()
+            return zones[zoneId] ?: Zone()
             }
 
-        return Zone.emptyZone()
+        return Zone()
     }
 
     fun setZones(zones: Map<String, Zone>) {
