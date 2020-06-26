@@ -1,6 +1,7 @@
 package com.adadapted.android.sdk.core.zone
 
 import android.content.Context
+import android.content.Intent
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
@@ -19,6 +20,7 @@ import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.session.SessionTest
 import com.adadapted.android.sdk.ext.http.HttpAdEventSink
 import com.adadapted.android.sdk.tools.TestTransporter
+import com.adadapted.android.sdk.ui.activity.AaWebViewPopupActivity
 import com.adadapted.android.sdk.ui.view.AdZonePresenter
 import com.adadapted.android.sdk.ui.view.PixelWebView
 import com.nhaarman.mockitokotlin2.any
@@ -31,6 +33,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import java.util.Date
 import kotlin.collections.HashMap
@@ -42,6 +45,7 @@ class AdZonePresenterTest {
     private var testContext = InstrumentationRegistry.getInstrumentation().targetContext
     private var mockContext = mock<Context>()
     private lateinit var testAdZonePresenter: AdZonePresenter
+    private lateinit var testAaWebViewPopupActivity: AaWebViewPopupActivity
     private var testTransporter = TestCoroutineDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
     private var testAppEventSink = TestAppEventSink()
@@ -60,7 +64,16 @@ class AdZonePresenterTest {
         AdEventClient.createInstance(mockAdEventSink, testTransporterScope, mockImpressionIdCounter)
         AdEventClient.getInstance().onSessionAvailable(mockSession)
         AppEventClient.createInstance(testAppEventSink, testTransporterScope)
-        testAdZonePresenter = AdZonePresenter(mockContext, PixelWebView(testContext), mock())
+
+        val testIntent = Intent(testContext, AaWebViewPopupActivity::class.java)
+        testIntent.putExtra(AaWebViewPopupActivity::class.java.name + ".EXTRA_POPUP_AD", Ad())
+        testIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        testAaWebViewPopupActivity = Robolectric.buildActivity<AaWebViewPopupActivity>(AaWebViewPopupActivity::class.java, testIntent)
+                .create()
+                .resume()
+                .get()
+
+        testAdZonePresenter = AdZonePresenter(testContext, PixelWebView(testContext), testAaWebViewPopupActivity)
     }
 
     @Test
@@ -136,6 +149,7 @@ class AdZonePresenterTest {
 
     @Test
     fun testOnAdClickedLink() {
+        testAdZonePresenter = AdZonePresenter(mockContext, PixelWebView(testContext), testAaWebViewPopupActivity)
         testAdZonePresenter.init("testZoneId")
         val testAd = Ad("TestAdId", "zoneId", "impressionId", "url", AdActionType.LINK)
         val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", hashMapOf(), listOf(testAd))))
