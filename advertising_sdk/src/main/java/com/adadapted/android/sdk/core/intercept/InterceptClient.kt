@@ -15,6 +15,7 @@ class InterceptClient private constructor(private val adapter: InterceptAdapter,
     private val events: MutableSet<InterceptEvent>
     private val eventLock: Lock = ReentrantLock()
     private lateinit var currentSession: Session
+
     private fun performInitialize(session: Session?, listener: Listener?) {
         if (session == null || listener == null) {
             return
