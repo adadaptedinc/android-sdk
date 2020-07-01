@@ -36,7 +36,7 @@ object AdAdapted {
     private var hasStarted = false
     private var apiKey: String = ""
     private var isProd = false
-    private val params: Map<String, String>
+    private val params: Map<String, String> = HashMap()
     private var sessionListener: AaSdkSessionListener? = null
     private var eventListener: AaSdkEventListener? = null
     private var contentListener: AaSdkAdditContentListener? = null
@@ -81,8 +81,8 @@ object AdAdapted {
         }
         hasStarted = true
         setupClients(context)
-        SdkEventPublisher.getInstance().setListener(eventListener)
-        AdditContentPublisher.getInstance().addListener(contentListener)
+        eventListener?.let { SdkEventPublisher.getInstance().setListener(it) }
+        contentListener?.let { AdditContentPublisher.getInstance().addListener(it) }
         PayloadClient.getInstance().pickupPayloads(object : PayloadClient.Callback {
             override fun onPayloadAvailable(content: List<AdditContent>) {
                 if (content.isNotEmpty()) {
@@ -119,9 +119,5 @@ object AdAdapted {
         ImpressionIdCounter.instance?.let { AdEventClient.createInstance(HttpAdEventSink(Config.getAdsEventUrl()), Transporter(), it) }
         InterceptClient.createInstance(HttpInterceptAdapter(Config.getRetrieveInterceptsUrl(), Config.getInterceptEventsUrl()), Transporter())
         PayloadClient.createInstance(HttpPayloadAdapter(Config.getPickupPayloadsUrl(), Config.getTrackingPayloadUrl()), AppEventClient.getInstance(), Transporter())
-    }
-
-    init {
-        params = HashMap()
     }
 }
