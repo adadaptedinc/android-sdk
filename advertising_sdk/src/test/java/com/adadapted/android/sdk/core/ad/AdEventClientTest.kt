@@ -4,7 +4,7 @@ import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.ext.http.HttpAdEventSink
+import com.adadapted.android.sdk.tools.TestAdEventSink
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -21,7 +21,7 @@ import java.util.Date
 
 class AdEventClientTest {
 
-    var mockAdEventSink = mock<HttpAdEventSink>()
+    var mockAdEventSink = mock<TestAdEventSink>()
     var testTransporter = TestCoroutineDispatcher()
     val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
     var mockImpressionIdCounter = mock<Counter>()

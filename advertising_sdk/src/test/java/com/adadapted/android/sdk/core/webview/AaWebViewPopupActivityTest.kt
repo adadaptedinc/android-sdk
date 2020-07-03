@@ -15,7 +15,7 @@ import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.zone.TestAdEventClientListener
-import com.adadapted.android.sdk.ext.http.HttpAdEventSink
+import com.adadapted.android.sdk.tools.TestAdEventSink
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.adadapted.android.sdk.ui.activity.AaWebViewPopupActivity
 import com.nhaarman.mockitokotlin2.any
@@ -38,7 +38,7 @@ class AaWebViewPopupActivityTest {
 
     private lateinit var testAaWebViewPopupActivity: AaWebViewPopupActivity
     private var mockImpressionIdCounter = mock<Counter>()
-    private var mockAdEventSink = mock<HttpAdEventSink>()
+    private var mockAdEventSink = mock<TestAdEventSink>()
     private var testContext = InstrumentationRegistry.getInstrumentation().targetContext
     private var testTransporter = TestCoroutineDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
