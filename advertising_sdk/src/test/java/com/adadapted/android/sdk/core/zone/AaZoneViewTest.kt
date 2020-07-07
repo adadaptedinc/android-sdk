@@ -13,7 +13,7 @@ import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.event.TestAppEventSink
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.ext.http.HttpAdEventSink
+import com.adadapted.android.sdk.tools.TestAdEventSink
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.adadapted.android.sdk.ui.view.AaZoneView
 import com.nhaarman.mockitokotlin2.any
@@ -33,7 +33,7 @@ import kotlin.collections.HashMap
 @RunWith(RobolectricTestRunner::class)
 class AaZoneViewTest {
     private var mockImpressionIdCounter = mock<Counter>()
-    private var mockAdEventSink = mock<HttpAdEventSink>()
+    private var mockAdEventSink = mock<TestAdEventSink>()
     private var testContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var testAaZoneView: AaZoneView
     private var testTransporter = TestCoroutineDispatcher()

@@ -20,9 +20,7 @@ class AppEventClient private constructor(private val sink: AppEventSink, private
     private val eventLock: Lock = ReentrantLock()
     private val errors: MutableSet<AppError>
     private val errorLock: Lock = ReentrantLock()
-    private fun performTrackEvent(type: String,
-                                  name: String,
-                                  params: Map<String, String>) {
+    private fun performTrackEvent(type: String, name: String, params: Map<String, String>) {
         eventLock.lock()
         try {
             events.add(AppEvent(type, name, params))
@@ -31,9 +29,7 @@ class AppEventClient private constructor(private val sink: AppEventSink, private
         }
     }
 
-    private fun performTrackError(code: String,
-                                  message: String,
-                                  params: Map<String, String>) {
+    private fun performTrackError(code: String, message: String, params: Map<String, String>) {
         Log.w(LOGTAG, "App Error: $code - $message")
         errorLock.lock()
         try {

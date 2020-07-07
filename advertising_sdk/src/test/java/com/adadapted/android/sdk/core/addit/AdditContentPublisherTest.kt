@@ -17,7 +17,7 @@ import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.event.TestAppEventSink
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.ext.http.HttpAdEventSink
+import com.adadapted.android.sdk.tools.TestAdEventSink
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.adadapted.android.sdk.ui.messaging.AaSdkAdditContentListener
 import com.adadapted.android.sdk.ui.messaging.AdditContentPublisher
@@ -37,7 +37,7 @@ import kotlin.collections.HashMap
 class AdditContentPublisherTest {
 
     private var mockImpressionIdCounter = mock<Counter>()
-    private var mockAdEventSink = mock<HttpAdEventSink>()
+    private var mockAdEventSink = mock<TestAdEventSink>()
     private var testContext = InstrumentationRegistry.getInstrumentation().targetContext
     private var testTransporter = TestCoroutineDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
