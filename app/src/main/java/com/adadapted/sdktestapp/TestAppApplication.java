@@ -40,7 +40,7 @@ public class TestAppApplication extends Application {
         LeakCanary.install(this);
 
         AdAdapted.INSTANCE
-            .withAppId("") // #YOUR API KEY GOES HERE#
+            .withAppId("NTU3NZQ2ZTG2YTBK") // #YOUR API KEY GOES HERE#
             .inEnv(AdAdapted.Env.DEV)
             .setSdkSessionListener(new AaSdkSessionListener() {
                 @Override

@@ -7,12 +7,7 @@ import com.adadapted.android.sdk.core.session.SessionListener
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
-class AdEventClient private constructor(
-        private val adEventSink: AdEventSink,
-        private val transporter: TransporterCoroutineScope,
-        private val impressionIdCounter: Counter
-) : SessionListener() {
-
+class AdEventClient private constructor(private val adEventSink: AdEventSink, private val transporter: TransporterCoroutineScope) : SessionListener() {
     interface Listener {
         fun onAdEventTracked(event: AdEvent?)
     }
@@ -23,7 +18,7 @@ class AdEventClient private constructor(
     private val eventLock: Lock = ReentrantLock()
     private var session: Session? = null
 
-    private fun fileEvent(ad: Ad, eventType: String, count: Int) {
+    private fun fileEvent(ad: Ad, eventType: String) {
         if (session == null) {
             return
         }
@@ -32,7 +27,7 @@ class AdEventClient private constructor(
             val event = AdEvent(
                     ad.id,
                     ad.zoneId,
-                    ad.impressionId + "::" + count,
+                    ad.impressionId,
                     eventType
             )
             events.add(event)
@@ -121,51 +116,43 @@ class AdEventClient private constructor(
     @Synchronized
     fun trackImpression(ad: Ad) {
         transporter.dispatchToBackground {
-            val count = impressionIdCounter.getIncrementedCountFor(ad.impressionId)
-            fileEvent(ad, AdEvent.Types.IMPRESSION, count)
+            fileEvent(ad, AdEvent.Types.IMPRESSION)
         }
     }
 
     @Synchronized
     fun trackInteraction(ad: Ad) {
         transporter.dispatchToBackground {
-            val count = impressionIdCounter.getCurrentCountFor(ad.impressionId)
-            fileEvent(ad, AdEvent.Types.INTERACTION, count)
+            fileEvent(ad, AdEvent.Types.INTERACTION)
         }
     }
 
     @Synchronized
     fun trackImpressionEnd(ad: Ad) {
         transporter.dispatchToBackground {
-            val count = impressionIdCounter.getCurrentCountFor(ad.impressionId)
-            fileEvent(ad, AdEvent.Types.IMPRESSION_END, count)
+            fileEvent(ad, AdEvent.Types.IMPRESSION_END)
         }
     }
 
     @Synchronized
     fun trackPopupBegin(ad: Ad) {
         transporter.dispatchToBackground {
-            val count = impressionIdCounter.getCurrentCountFor(ad.impressionId)
-            fileEvent(ad, AdEvent.Types.POPUP_BEGIN, count)
+            fileEvent(ad, AdEvent.Types.POPUP_BEGIN)
         }
     }
 
     @Synchronized
     fun trackPopupEnd(ad: Ad) {
         transporter.dispatchToBackground {
-            val count = impressionIdCounter.getCurrentCountFor(ad.impressionId)
-            fileEvent(ad, AdEvent.Types.POPUP_END, count)
+            fileEvent(ad, AdEvent.Types.POPUP_END)
         }
     }
 
     companion object {
         private lateinit var instance: AdEventClient
 
-        fun createInstance(
-                adEventSink: AdEventSink,
-                transporter: TransporterCoroutineScope,
-                impressionIdCounter: Counter) {
-            this.instance = AdEventClient(adEventSink, transporter, impressionIdCounter)
+        fun createInstance(adEventSink: AdEventSink, transporter: TransporterCoroutineScope) {
+            this.instance = AdEventClient(adEventSink, transporter)
         }
 
         fun getInstance(): AdEventClient {

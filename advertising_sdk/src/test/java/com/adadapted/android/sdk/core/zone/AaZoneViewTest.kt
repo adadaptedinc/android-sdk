@@ -4,7 +4,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdEventClient
-import com.adadapted.android.sdk.core.ad.Counter
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
@@ -32,7 +31,6 @@ import kotlin.collections.HashMap
 
 @RunWith(RobolectricTestRunner::class)
 class AaZoneViewTest {
-    private var mockImpressionIdCounter = mock<Counter>()
     private var mockAdEventSink = mock<TestAdEventSink>()
     private var testContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var testAaZoneView: AaZoneView
@@ -45,12 +43,11 @@ class AaZoneViewTest {
     @Before
     fun setup() {
         whenever(mockAdEventSink.sendBatch(any(), any())).then { }
-        whenever(mockImpressionIdCounter.getCurrentCountFor(any())).thenReturn(1)
 
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance(testContext,"", false, HashMap(), DeviceInfoClientTest.Companion::requestAdvertisingIdInfo, testTransporterScope)
         SessionClient.createInstance(mock(), mock())
-        AdEventClient.createInstance(mockAdEventSink, testTransporterScope, mockImpressionIdCounter)
+        AdEventClient.createInstance(mockAdEventSink, testTransporterScope)
         AdEventClient.getInstance().onSessionAvailable(mockSession)
         AppEventClient.createInstance(testAppEventSink, testTransporterScope)
         testAaZoneView = AaZoneView(testContext)

@@ -30,7 +30,6 @@ import java.util.Date
 @RunWith(RobolectricTestRunner::class)
 class AdContentPublisherTest {
 
-    private var mockImpressionIdCounter = mock<Counter>()
     private var mockAdEventSink = mock<TestAdEventSink>()
     private var testContext = InstrumentationRegistry.getInstrumentation().targetContext
     private var testTransporter = TestCoroutineDispatcher()
@@ -43,7 +42,7 @@ class AdContentPublisherTest {
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance(testContext,"", false, HashMap(), DeviceInfoClientTest.Companion::requestAdvertisingIdInfo, testTransporterScope)
         SessionClient.createInstance(mock(), mock())
-        AdEventClient.createInstance(mockAdEventSink, testTransporterScope, mockImpressionIdCounter)
+        AdEventClient.createInstance(mockAdEventSink, testTransporterScope)
         AdEventClient.getInstance().onSessionAvailable(mockSession)
         AppEventClient.createInstance(testAppEventSink, testTransporterScope)
     }

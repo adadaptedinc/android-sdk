@@ -26,7 +26,6 @@ import kotlin.collections.HashMap
 
 @RunWith(RobolectricTestRunner::class)
 class SdkEventPublisherTest {
-
     private var testContext = InstrumentationRegistry.getInstrumentation().targetContext
     private var testTransporter = TestCoroutineDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
@@ -38,7 +37,7 @@ class SdkEventPublisherTest {
         DeviceInfoClient.createInstance(testContext,"", false, HashMap(), DeviceInfoClientTest.Companion::requestAdvertisingIdInfo, testTransporterScope)
         SessionClient.createInstance(mock(), mock())
         AppEventClient.createInstance(mock(), mock())
-        AdEventClient.createInstance(mock(), testTransporterScope, mock())
+        AdEventClient.createInstance(mock(), testTransporterScope)
         AdEventClient.getInstance().onSessionAvailable(mockSession)
     }
 
