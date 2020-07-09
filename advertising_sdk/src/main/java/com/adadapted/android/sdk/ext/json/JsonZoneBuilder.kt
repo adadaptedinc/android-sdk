@@ -10,8 +10,8 @@ import org.json.JSONException
 import org.json.JSONObject
 
 class JsonZoneBuilder(deviceScale: Float) {
-    private val mAdBuilder: JsonAdBuilder = JsonAdBuilder()
-    private val mDimensionConverter: DimensionConverter = DimensionConverter(deviceScale)
+    private val jsonAdBuilder: JsonAdBuilder = JsonAdBuilder()
+    private val dimensionConverter: DimensionConverter = DimensionConverter(deviceScale)
 
     fun buildZones(jsonZones: JSONObject): Map<String, Zone> {
         val zones: MutableMap<String, Zone> = HashMap()
@@ -27,11 +27,7 @@ class JsonZoneBuilder(deviceScale: Float) {
                 val errorParams: MutableMap<String, String> = HashMap()
                 errorParams["bad_json"] = jsonZones.toString()
                 ex.message?.let { errorParams["exception"] = it }
-                getInstance().trackError(
-                        EventStrings.SESSION_ZONE_PAYLOAD_PARSE_FAILED,
-                        "Failed to parse Session Zone payload for processing.",
-                        errorParams
-                )
+                getInstance().trackError(EventStrings.SESSION_ZONE_PAYLOAD_PARSE_FAILED, "Failed to parse Session Zone payload for processing.", errorParams)
             }
         }
         return zones
@@ -43,48 +39,26 @@ class JsonZoneBuilder(deviceScale: Float) {
 
         if (jsonZone.has(PORT_ZONE_HEIGHT) && jsonZone.has(PORT_ZONE_WIDTH)) {
             val portDimension = Dimension()
-
-            if (jsonZone.has(PORT_ZONE_HEIGHT)) {
-                portDimension.height = calculateDimensionValue(jsonZone.getString(PORT_ZONE_HEIGHT))
-            } else {
-                portDimension.height = Dimension.WRAP_CONTENT
-            }
-
-            if (jsonZone.has(PORT_ZONE_WIDTH)) {
-                portDimension.width = calculateDimensionValue(jsonZone.getString(PORT_ZONE_WIDTH))
-            } else {
-                portDimension.width = Dimension.MATCH_PARENT
-            }
-
+            portDimension.height = calculateDimensionValue(jsonZone.getString(PORT_ZONE_HEIGHT))
+            portDimension.width = calculateDimensionValue(jsonZone.getString(PORT_ZONE_WIDTH))
             newZone.setDimension(Dimension.Orientation.PORT, portDimension)
         }
 
         if (jsonZone.has(LAND_ZONE_HEIGHT) && jsonZone.has(LAND_ZONE_WIDTH)) {
             val landDimension = Dimension()
-
-            if (jsonZone.has(LAND_ZONE_HEIGHT)) {
-                landDimension.height = calculateDimensionValue(jsonZone.getString(LAND_ZONE_HEIGHT))
-            } else {
-                landDimension.height = Dimension.WRAP_CONTENT
-            }
-
-            if (jsonZone.has(LAND_ZONE_WIDTH)) {
-                landDimension.width = calculateDimensionValue(jsonZone.getString(LAND_ZONE_WIDTH))
-            } else {
-                landDimension.width = Dimension.MATCH_PARENT
-            }
-
+            landDimension.height = calculateDimensionValue(jsonZone.getString(LAND_ZONE_HEIGHT))
+            landDimension.width = calculateDimensionValue(jsonZone.getString(LAND_ZONE_WIDTH))
             newZone.setDimension(Dimension.Orientation.LAND, landDimension)
         }
 
         val jsonAds = jsonZone.getJSONArray(ADS)
-        newZone.ads = mAdBuilder.buildAds(zoneId, jsonAds)
+        newZone.ads = jsonAdBuilder.buildAds(zoneId, jsonAds)
         return newZone
     }
 
     @Throws(NumberFormatException::class)
     private fun calculateDimensionValue(value: String): Int {
-        return mDimensionConverter.convertDpToPx(value.toInt())
+        return dimensionConverter.convertDpToPx(value.toInt())
     }
 
     companion object {

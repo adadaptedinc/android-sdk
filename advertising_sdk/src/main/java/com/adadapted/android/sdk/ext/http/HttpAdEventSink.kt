@@ -13,7 +13,7 @@ class HttpAdEventSink(private val batchUrl: String, private val httpQueueManager
     private val LOGTAG = HttpAdEventSink::class.java.name
     private val builder: JsonAdEventBuilder = JsonAdEventBuilder()
 
-    override fun sendBatch(session: Session?, events: Set<AdEvent?>?) {
+    override fun sendBatch(session: Session, events: Set<AdEvent>) {
         val json = builder.marshalEvents(session, events)
 
         val jsonRequest = JsonObjectRequest(Request.Method.POST, batchUrl, json, Response.Listener {}, Response.ErrorListener { error ->

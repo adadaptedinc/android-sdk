@@ -50,7 +50,7 @@ class AdEventClient private constructor(
         try {
             val currentEvents: Set<AdEvent> = HashSet(events)
             events.clear()
-            adEventSink.sendBatch(session, currentEvents)
+            session?.let { adEventSink.sendBatch(it, currentEvents) }
         } finally {
             eventLock.unlock()
         }
