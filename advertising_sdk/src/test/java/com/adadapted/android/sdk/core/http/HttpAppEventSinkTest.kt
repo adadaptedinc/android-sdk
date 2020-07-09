@@ -89,6 +89,8 @@ class HttpAppEventSinkTest {
             deviceInfo.carrier = "testCarrier"
             deviceInfo.density = 0
             deviceInfo.deviceUdid = "DeviceUdId"
+            deviceInfo.device = "testDevice"
+            deviceInfo.udid = "testUdid"
             deviceInfo.setAllowRetargeting(true)
             deviceInfo.osv = "testOsv"
             deviceInfo.dw = 0
