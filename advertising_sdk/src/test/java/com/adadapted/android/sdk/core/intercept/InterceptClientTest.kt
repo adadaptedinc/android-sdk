@@ -24,12 +24,12 @@ class InterceptClientTest {
     private var testInterceptClient = InterceptClient
     private var testInterceptAdapter = TestInterceptAdapter()
     private val testEvent = InterceptEvent("testId", "testTermId", "testTerm", "testInput")
-    var mockSession = Session(DeviceInfo(), "testId", willServeAds = true, hasAds = true, refreshTime = 30, expiresAt = Date(), zones = mutableMapOf())
+    private var mockSession = Session(DeviceInfo(), "testId", willServeAds = true, hasAds = true, refreshTime = 30, expiresAt = Date(), zones = mutableMapOf())
 
     @Before
     fun setup() {
-        SessionClient.createInstance(mock(), mock())
         Dispatchers.setMain(testTransporter)
+        SessionClient.createInstance(mock(), mock())
         testInterceptClient.createInstance(testInterceptAdapter, testTransporterScope)
         testInterceptClient.getInstance().onSessionAvailable(mockSession)
     }

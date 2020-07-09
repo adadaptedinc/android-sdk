@@ -30,7 +30,7 @@ class SessionTest {
         val session = buildTestSession()
         assert(session.getZone("testZone").id == "")
 
-        val zones = mapOf<String, Zone>().plus(Pair("testZone", Zone("zoneId", null, null)))
+        val zones = mapOf<String, Zone>().plus(Pair("testZone", Zone("zoneId", hashMapOf(), listOf())))
         session.setZones(zones)
 
         assert(session.getZone("testZone").id == "zoneId")
