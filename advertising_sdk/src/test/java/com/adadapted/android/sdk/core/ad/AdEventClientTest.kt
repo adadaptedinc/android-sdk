@@ -24,7 +24,6 @@ class AdEventClientTest {
     var mockAdEventSink = mock<TestAdEventSink>()
     var testTransporter = TestCoroutineDispatcher()
     val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
-    var mockImpressionIdCounter = mock<Counter>()
     var testAdEventClient = AdEventClient
     var mockSession = Session(DeviceInfo(), "testId", true, true, 30, Date(1907245044), mutableMapOf())
     var testAd = Ad("adId", "zoneId", "impId")
@@ -34,9 +33,8 @@ class AdEventClientTest {
         SessionClient.createInstance(mock(), mock())
         Dispatchers.setMain(testTransporter)
         whenever(mockAdEventSink.sendBatch(any(),any())).then { }
-        whenever(mockImpressionIdCounter.getCurrentCountFor(any())).thenReturn(1)
 
-        testAdEventClient.createInstance(mockAdEventSink, testTransporterScope, mockImpressionIdCounter)
+        testAdEventClient.createInstance(mockAdEventSink, testTransporterScope)
         testAdEventClient.getInstance().onSessionAvailable(mockSession)
         testAdEventClient.getInstance().onAdsAvailable(mockSession)
     }
