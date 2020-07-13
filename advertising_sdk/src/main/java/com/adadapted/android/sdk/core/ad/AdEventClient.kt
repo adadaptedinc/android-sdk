@@ -128,23 +128,9 @@ class AdEventClient private constructor(private val adEventSink: AdEventSink, pr
     }
 
     @Synchronized
-    fun trackImpressionEnd(ad: Ad) {
-        transporter.dispatchToBackground {
-            fileEvent(ad, AdEvent.Types.IMPRESSION_END)
-        }
-    }
-
-    @Synchronized
     fun trackPopupBegin(ad: Ad) {
         transporter.dispatchToBackground {
             fileEvent(ad, AdEvent.Types.POPUP_BEGIN)
-        }
-    }
-
-    @Synchronized
-    fun trackPopupEnd(ad: Ad) {
-        transporter.dispatchToBackground {
-            fileEvent(ad, AdEvent.Types.POPUP_END)
         }
     }
 
