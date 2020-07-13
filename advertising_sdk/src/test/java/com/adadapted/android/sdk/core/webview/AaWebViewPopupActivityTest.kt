@@ -77,14 +77,6 @@ class AaWebViewPopupActivityTest {
     }
 
     @Test
-    fun testOnPause() {
-        val testAdEventListener = TestAdEventClientListener()
-        AdEventClient.getInstance().addListener(testAdEventListener)
-        testAaWebViewPopupActivity.onPause()
-        assertEquals(AdEvent.Types.POPUP_END, testAdEventListener.testAdEvent?.eventType)
-    }
-
-    @Test
     fun testOnKeyDown() {
         val result = testAaWebViewPopupActivity.onKeyDown(KeyEvent.KEYCODE_BACK, KeyEvent(KeyEvent.KEYCODE_BACK,0))
         assert(result)

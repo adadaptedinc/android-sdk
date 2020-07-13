@@ -65,14 +65,6 @@ class AdEventClientTest {
     }
 
     @Test
-    fun trackImpressionEnd() {
-        val mockListener = TestAdEventClientListener()
-        testAdEventClient.getInstance().addListener(mockListener)
-        testAdEventClient.getInstance().trackImpressionEnd(testAd)
-        assert(mockListener.getTrackedEvent()?.eventType == AdEvent.Types.IMPRESSION_END)
-    }
-
-    @Test
     fun trackInteraction() {
         val mockListener = TestAdEventClientListener()
         testAdEventClient.getInstance().addListener(mockListener)
@@ -86,14 +78,6 @@ class AdEventClientTest {
         testAdEventClient.getInstance().addListener(mockListener)
         testAdEventClient.getInstance().trackPopupBegin(testAd)
         assert(mockListener.getTrackedEvent()?.eventType == AdEvent.Types.POPUP_BEGIN)
-    }
-
-    @Test
-    fun trackPopupEnd() {
-        val mockListener = TestAdEventClientListener()
-        testAdEventClient.getInstance().addListener(mockListener)
-        testAdEventClient.getInstance().trackPopupEnd(testAd)
-        assert(mockListener.getTrackedEvent()?.eventType == AdEvent.Types.POPUP_END)
     }
 
     @Test

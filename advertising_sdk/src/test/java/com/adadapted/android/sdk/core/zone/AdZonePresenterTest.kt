@@ -110,7 +110,7 @@ class AdZonePresenterTest {
         testAdZonePresenter.onAdDisplayed(Ad("TestAdId"))
         testAdZonePresenter.onDetach()
 
-        assertEquals(AdEvent.Types.IMPRESSION_END, testAdEventListener.testAdEvent?.eventType)
+        assertEquals("", testListener.testZone.id)
     }
 
     @Test

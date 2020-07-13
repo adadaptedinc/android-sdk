@@ -124,7 +124,6 @@ internal class AdZonePresenter(context: Context, private val pixelWebView: Pixel
             zoneLock.lock()
             try {
                 adCompleted = true
-                adEventClient.trackImpressionEnd(currentAd)
             } finally {
                 zoneLock.unlock()
             }

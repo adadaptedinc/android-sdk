@@ -44,7 +44,6 @@ class Ad : Parcelable {
         parcel.writeString(trackingHtml)
     }
 
-    @JvmOverloads
     constructor(id: String = "",
                 zoneId: String = "",
                 impressionId: String = "",
