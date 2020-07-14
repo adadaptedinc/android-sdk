@@ -146,7 +146,6 @@ class DeviceInfoClient private constructor(
         ex.message?.let { AppEventClient.getInstance().trackError(EventStrings.GAID_UNAVAILABLE, it) }
     }
 
-    @Synchronized
     fun getDeviceInfo(callback: Callback) {
         transporter.dispatchToBackground {
             performGetInfo(callback)

@@ -16,20 +16,30 @@ class HttpPayloadAdapter(private val pickupUrl: String, private val trackUrl: St
 
     override fun pickup(deviceInfo: DeviceInfo, callback: PayloadAdapter.Callback) {
         val json = builder.buildRequest(deviceInfo)
-        val request = JsonObjectRequest(Request.Method.POST, pickupUrl, json, Response.Listener { response ->
-            val content = parser.parse(response)
-            callback.onSuccess(content)
-        }, Response.ErrorListener { error ->
-            HttpErrorTracker.trackHttpError(error, pickupUrl, EventStrings.PAYLOAD_PICKUP_REQUEST_FAILED, LOGTAG)
-        })
+        val request = JsonObjectRequest(
+                Request.Method.POST,
+                pickupUrl,
+                json,
+                Response.Listener { response ->
+                    val content = parser.parse(response)
+                    callback.onSuccess(content)
+                },
+                Response.ErrorListener { error ->
+                    HttpErrorTracker.trackHttpError(error, pickupUrl, EventStrings.PAYLOAD_PICKUP_REQUEST_FAILED, LOGTAG)
+                })
         httpQueueManager.queueRequest(request)
     }
 
     override fun publishEvent(event: PayloadEvent) {
         val json = builder.buildEvent(event)
-        val request = JsonObjectRequest(Request.Method.POST, trackUrl, json, Response.Listener { }, Response.ErrorListener { error ->
-            HttpErrorTracker.trackHttpError(error, trackUrl, EventStrings.PAYLOAD_EVENT_REQUEST_FAILED, LOGTAG)
-        })
+        val request = JsonObjectRequest(
+                Request.Method.POST,
+                trackUrl,
+                json,
+                Response.Listener { },
+                Response.ErrorListener { error ->
+                    HttpErrorTracker.trackHttpError(error, trackUrl, EventStrings.PAYLOAD_EVENT_REQUEST_FAILED, LOGTAG)
+                })
         httpQueueManager.queueRequest(request)
     }
 

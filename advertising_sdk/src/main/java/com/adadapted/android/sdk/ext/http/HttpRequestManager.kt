@@ -6,7 +6,7 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
 
-object HttpRequestManager: HttpQueueManager {
+object HttpRequestManager : HttpQueueManager {
     private val LOGTAG = HttpRequestManager::class.java.name
     private lateinit var requestQueue: RequestQueue
 
