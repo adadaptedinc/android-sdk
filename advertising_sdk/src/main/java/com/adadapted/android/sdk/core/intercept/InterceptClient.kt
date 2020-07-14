@@ -81,7 +81,6 @@ class InterceptClient private constructor(private val adapter: InterceptAdapter,
         }
     }
 
-    @Synchronized
     fun initialize(session: Session?, listener: Listener?) {
         transporter.dispatchToBackground {
             performInitialize(session, listener)

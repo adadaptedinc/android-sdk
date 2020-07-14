@@ -19,23 +19,30 @@ class HttpInterceptAdapter(private val initUrl: String, private val eventUrl: St
         if (session.id.isEmpty()) {
             return
         }
-        val url = initUrl+String.format("?aid=%s", session.deviceInfo.appId) + String.format("&uid=%s", session.deviceInfo.udid) + String.format("&sid=%s", session.id) + String.format("&sdk=%s", session.deviceInfo.sdkVersion)
+        val url = initUrl + String.format("?aid=%s", session.deviceInfo.appId) + String.format("&uid=%s", session.deviceInfo.udid) + String.format("&sid=%s", session.id) + String.format("&sdk=%s", session.deviceInfo.sdkVersion)
         val jsonRequest = JsonObjectRequest(
                 Request.Method.GET,
                 url,
                 null,
-                Response.Listener { response -> callback.onSuccess(kiBuilder.build(response)) }, Response.ErrorListener { error ->
-            HttpErrorTracker.trackHttpError(error, initUrl, EventStrings.KI_SESSION_REQUEST_FAILED, LOGTAG)
-        })
+                Response.Listener { response ->
+                    callback.onSuccess(kiBuilder.build(response))
+                },
+                Response.ErrorListener { error ->
+                    HttpErrorTracker.trackHttpError(error, initUrl, EventStrings.KI_SESSION_REQUEST_FAILED, LOGTAG)
+                })
         httpQueueManager.queueRequest(jsonRequest)
     }
 
     override fun sendEvents(session: Session, events: MutableSet<InterceptEvent>) {
         val json = eventBuilder.marshalEvents(session, events)
-        val jsonRequest = JsonObjectRequest(Request.Method.POST,
-                eventUrl, json, Response.Listener {}, Response.ErrorListener { error ->
-            HttpErrorTracker.trackHttpError(error, eventUrl, EventStrings.KI_EVENT_REQUEST_FAILED, LOGTAG)
-        })
+        val jsonRequest = JsonObjectRequest(
+                Request.Method.POST,
+                eventUrl,
+                json,
+                Response.Listener {},
+                Response.ErrorListener { error ->
+                    HttpErrorTracker.trackHttpError(error, eventUrl, EventStrings.KI_EVENT_REQUEST_FAILED, LOGTAG)
+                })
         httpQueueManager.queueRequest(jsonRequest)
     }
 }

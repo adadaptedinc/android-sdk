@@ -110,6 +110,6 @@ class KeywordInterceptMatcher : SessionListener(), InterceptClient.Listener {
     }
 
     init {
-        SessionClient.getInstance().getSession(this)
+        SessionClient.getInstance().addListener(this)
     }
 }

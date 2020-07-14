@@ -95,13 +95,6 @@ class SessionClientTest {
     }
 
     @Test
-    fun onSessionInitialized() {
-        val testListener = TestSessionClientListener()
-        testSessionClient.getInstance().getSession(testListener)
-        assert(testListener.getTrackedSession()?.id == "SessionAvailable")
-    }
-
-    @Test
     fun onSessionInitializeFailed() {
         val testListener = TestSessionClientListener()
         testSessionClient.getInstance().start(testListener)

@@ -1,6 +1,7 @@
 package com.adadapted.sdktestapp.ui.todo.activity;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -45,6 +46,11 @@ public class TodoListsActivity extends SpinnerActionBarActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+
+        if (id == R.id.deeplink_test) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(this.getString(R.string.test_deeplink)));
+            startActivity(browserIntent);
         }
 
         return super.onOptionsItemSelected(item);
