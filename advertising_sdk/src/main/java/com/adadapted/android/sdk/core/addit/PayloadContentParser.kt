@@ -27,11 +27,7 @@ class PayloadContentParser {
         } catch (ex: JSONException) {
             val errorParams: MutableMap<String, String> = HashMap()
             ex.message?.let { errorParams.put(EventStrings.EXCEPTION_MESSAGE, it) }
-            getInstance().trackError(
-                    EventStrings.ADDIT_PAYLOAD_FIELD_PARSE_FAILED,
-                    "Problem parsing Payload JSON payload",
-                    errorParams
-            )
+            getInstance().trackError(EventStrings.ADDIT_PAYLOAD_FIELD_PARSE_FAILED, "Problem parsing Payload JSON payload", errorParams)
         }
         return content
     }
@@ -42,6 +38,7 @@ class PayloadContentParser {
         val message = if (json.has(JsonFields.PayloadMessage)) json.getString(JsonFields.PayloadMessage) else ""
         val image = if (json.has(JsonFields.PayloadImage)) json.getString(JsonFields.PayloadImage) else ""
         val payload: MutableList<AddToListItem> = ArrayList()
+
         if (json.has(JsonFields.DetailedListItems)) {
             val detailListItems = json.getJSONArray(JsonFields.DetailedListItems)
             for (i in 0 until detailListItems.length()) {
@@ -51,11 +48,7 @@ class PayloadContentParser {
         } else {
             val errorParams: MutableMap<String, String> = HashMap()
             errorParams["payload_id"] = payloadId
-            getInstance().trackError(
-                    EventStrings.ADDIT_PAYLOAD_FIELD_PARSE_FAILED,
-                    "Missing Detailed List Items.",
-                    errorParams
-            )
+            getInstance().trackError(EventStrings.ADDIT_PAYLOAD_FIELD_PARSE_FAILED, "Missing Detailed List Items.", errorParams)
         }
         return AdditContent.createPayloadContent(payloadId, message, image, ContentTypes.ADD_TO_LIST_ITEMS, payload)
     }
@@ -80,11 +73,7 @@ class PayloadContentParser {
             val errorParams: MutableMap<String, String> = HashMap()
             ex.message?.let { errorParams.put(EventStrings.EXCEPTION_MESSAGE, it) }
             errorParams["field_name"] = fieldName
-            getInstance().trackError(
-                    EventStrings.ADDIT_PAYLOAD_FIELD_PARSE_FAILED,
-                    "Problem parsing Payload JSON input field $fieldName",
-                    errorParams
-            )
+            getInstance().trackError(EventStrings.ADDIT_PAYLOAD_FIELD_PARSE_FAILED, "Problem parsing Payload JSON input field $fieldName", errorParams)
             ""
         }
     }

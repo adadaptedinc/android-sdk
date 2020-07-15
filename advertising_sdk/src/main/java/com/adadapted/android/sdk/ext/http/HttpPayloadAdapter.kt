@@ -11,6 +11,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 
 class HttpPayloadAdapter(private val pickupUrl: String, private val trackUrl: String, private val httpQueueManager: HttpQueueManager = HttpRequestManager) : PayloadAdapter {
+    private val LOGTAG = HttpPayloadAdapter::class.java.name
     private val builder: JsonPayloadBuilder = JsonPayloadBuilder()
     private val parser: PayloadContentParser = PayloadContentParser()
 
@@ -41,9 +42,5 @@ class HttpPayloadAdapter(private val pickupUrl: String, private val trackUrl: St
                     HttpErrorTracker.trackHttpError(error, trackUrl, EventStrings.PAYLOAD_EVENT_REQUEST_FAILED, LOGTAG)
                 })
         httpQueueManager.queueRequest(request)
-    }
-
-    companion object {
-        private val LOGTAG = HttpPayloadAdapter::class.java.name
     }
 }

@@ -135,9 +135,7 @@ class DeviceInfoClient private constructor(
     }
 
     private fun captureAndroidId(context: Context): String {
-        @SuppressLint("HardwareIds") val androidId = Settings.Secure.getString(
-                context.contentResolver,
-                Settings.Secure.ANDROID_ID)
+        @SuppressLint("HardwareIds") val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
         return androidId ?: ""
     }
 

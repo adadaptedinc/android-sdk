@@ -13,6 +13,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 
 class HttpSessionAdapter(private val initUrl: String, private val refreshUrl: String, private var sessionBuilder: JsonSessionBuilder? = null, private val httpQueueManager: HttpQueueManager = HttpRequestManager) : SessionAdapter {
+    private val LOGTAG = HttpSessionAdapter::class.java.name
 
     override fun sendInit(deviceInfo: DeviceInfo, listener: SessionInitListener) {
         val requestBuilder = JsonSessionRequestBuilder()
@@ -51,9 +52,5 @@ class HttpSessionAdapter(private val initUrl: String, private val refreshUrl: St
                 }
         )
         httpQueueManager.queueRequest(request)
-    }
-
-    companion object {
-        private val LOGTAG = HttpSessionAdapter::class.java.name
     }
 }

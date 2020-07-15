@@ -48,8 +48,4 @@ class PopupJavascriptBridge internal constructor(private val ad: Ad) {
         val content = createPopupContent(payloadId, items)
         AdditContentPublisher.getInstance().publishPopupContent(content)
     }
-
-    companion object {
-        private val TAG = PopupJavascriptBridge::class.java.name
-    }
 }

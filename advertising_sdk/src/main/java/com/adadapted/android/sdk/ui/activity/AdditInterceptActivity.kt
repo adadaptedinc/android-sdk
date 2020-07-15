@@ -10,6 +10,7 @@ import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.ui.messaging.AdditContentPublisher
 
 class AdditInterceptActivity : AppCompatActivity() {
+    private val LOGTAG = AdditInterceptActivity::class.java.name
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,9 +31,5 @@ class AdditInterceptActivity : AppCompatActivity() {
         }
         PayloadClient.getInstance().deeplinkCompleted()
         finish()
-    }
-
-    companion object {
-        private val LOGTAG = AdditInterceptActivity::class.java.name
     }
 }
