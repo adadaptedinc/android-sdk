@@ -11,13 +11,13 @@ import com.adadapted.android.sdk.core.ad.AdEventClient
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.core.device.DeviceInfoClientTest
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.event.TestAppEventSink
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.session.SessionTest
 import com.adadapted.android.sdk.tools.TestAdEventSink
+import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.adadapted.android.sdk.ui.activity.AaWebViewPopupActivity
 import com.adadapted.android.sdk.ui.view.AdZonePresenter
@@ -56,7 +56,7 @@ class AdZonePresenterTest {
         whenever(mockContext.applicationContext).thenReturn(mock())
 
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(testContext,"", false, HashMap(), DeviceInfoClientTest.Companion::requestAdvertisingIdInfo, testTransporterScope)
+        DeviceInfoClient.createInstance(testContext,"", false, HashMap(), TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
         AdEventClient.createInstance(mockAdEventSink, testTransporterScope)
         AdEventClient.getInstance().onSessionAvailable(mockSession)

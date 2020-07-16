@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.core.zone
 
+import android.os.Looper
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
@@ -7,12 +8,12 @@ import com.adadapted.android.sdk.core.ad.AdEventClient
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.core.device.DeviceInfoClientTest
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.event.TestAppEventSink
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.tools.TestAdEventSink
+import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.adadapted.android.sdk.ui.view.AaZoneView
 import com.nhaarman.mockitokotlin2.any
@@ -26,6 +27,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.Shadows
 import java.util.Date
 import kotlin.collections.HashMap
 
@@ -45,7 +47,7 @@ class AaZoneViewTest {
         whenever(mockAdEventSink.sendBatch(any(), any())).then { }
 
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(testContext,"", false, HashMap(), DeviceInfoClientTest.Companion::requestAdvertisingIdInfo, testTransporterScope)
+        DeviceInfoClient.createInstance(testContext,"", false, HashMap(), TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
         AdEventClient.createInstance(mockAdEventSink, testTransporterScope)
         AdEventClient.getInstance().onSessionAvailable(mockSession)
@@ -68,6 +70,7 @@ class AaZoneViewTest {
         testAaZoneView.onStart(testListener)
         testAaZoneView.onAdAvailable(testAd)
         testAaZoneView.onAdLoaded(testAd)
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals(testListener.adLoaded, true)
     }
@@ -90,6 +93,7 @@ class AaZoneViewTest {
         testAaZoneView.init("TestZoneId")
         testAaZoneView.onStart(testListener)
         testAaZoneView.onZoneAvailable(Zone("TestZoneId",ads = listOf(Ad("NewZoneAdId"))))
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals(testListener.zoneHasAds, true)
     }
@@ -100,6 +104,7 @@ class AaZoneViewTest {
         testAaZoneView.init("TestZoneId")
         testAaZoneView.onStart(testListener)
         testAaZoneView.onAdsRefreshed(Zone("TestZoneId",ads = listOf(Ad("NewZoneAdId"))))
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals(testListener.zoneHasAds, true)
     }
@@ -110,6 +115,7 @@ class AaZoneViewTest {
         testAaZoneView.init("TestZoneId")
         testAaZoneView.onStart(testListener)
         testAaZoneView.onAdLoaded(Ad("NewAdId"))
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals(testListener.adLoaded, true)
     }
@@ -120,6 +126,7 @@ class AaZoneViewTest {
         testAaZoneView.init("TestZoneId")
         testAaZoneView.onStart(testListener)
         testAaZoneView.onAdLoadFailed()
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals(testListener.adFailed, true)
     }

@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.core.addit
 
+import android.os.Looper
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
@@ -11,12 +12,12 @@ import com.adadapted.android.sdk.core.atl.PopupContent
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.core.device.DeviceInfoClientTest
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.event.TestAppEventSink
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.tools.TestAdEventSink
+import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.adadapted.android.sdk.ui.messaging.AaSdkAdditContentListener
 import com.adadapted.android.sdk.ui.messaging.AdditContentPublisher
@@ -29,6 +30,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.Shadows
 import java.util.Date
 import kotlin.collections.HashMap
 
@@ -45,7 +47,7 @@ class AdditContentPublisherTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(testContext,"", false, HashMap(), DeviceInfoClientTest.Companion::requestAdvertisingIdInfo, testTransporterScope)
+        DeviceInfoClient.createInstance(testContext,"", false, HashMap(), TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
         AdEventClient.createInstance(mockAdEventSink, testTransporterScope)
         AdEventClient.getInstance().onSessionAvailable(mockSession)
@@ -106,6 +108,7 @@ class AdditContentPublisherTest {
         val testListener = TestAaSdkAdditContentListener()
         AdditContentPublisher.getInstance().addListener(testListener)
         AdditContentPublisher.getInstance().publishAdditContent(testAdditContent)
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
         assertEquals("payloadId", (testListener.resultContent as AdditContent).payloadId)
     }
 
@@ -114,6 +117,7 @@ class AdditContentPublisherTest {
         val testListener = TestAaSdkAdditContentListener()
         AdditContentPublisher.getInstance().addListener(testListener)
         AdditContentPublisher.getInstance().publishPopupContent(PopupContent.createPopupContent("payloadId", listOf(AddToListItem("trackId", "title", "brand", "cat", "upc", "sku", "disc", "img"))))
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
         assertEquals("payloadId", (testListener.resultContent as PopupContent).payloadId)
     }
 
@@ -126,6 +130,7 @@ class AdditContentPublisherTest {
                 "adZoneId",
                 payload = listOf(
                         AddToListItem("track", "title", "brand", "cat", "upc", "sku", "discount", "image")))))
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
         assertEquals("adZoneId", (testListener.resultContent as AdContent).zoneId)
     }
 }

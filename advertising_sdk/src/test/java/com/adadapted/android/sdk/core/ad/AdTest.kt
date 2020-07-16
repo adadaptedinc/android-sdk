@@ -4,9 +4,9 @@ import android.os.Parcel
 import com.adadapted.android.sdk.config.Config
 import com.adadapted.android.sdk.core.atl.AddToListItem
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.core.device.DeviceInfoClientTest
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.nhaarman.mockitokotlin2.mock
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertNotNull
@@ -20,7 +20,7 @@ class AdTest {
 
     @Before
     fun setup() {
-        DeviceInfoClient.createInstance(mock(), "", false, mock(), DeviceInfoClientTest.Companion::requestAdvertisingIdInfo, mock())
+        DeviceInfoClient.createInstance(mock(), "", false, mock(), TestDeviceInfoExtractor(), mock())
         SessionClient.createInstance(mock(), mock())
         AdEventClient.createInstance(mock(), mock())
         AppEventClient.createInstance(mock(), mock())
