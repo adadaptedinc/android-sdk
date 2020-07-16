@@ -105,10 +105,6 @@ class KeywordInterceptMatcher : SessionListener(), InterceptClient.Listener {
         }
     }
 
-    companion object {
-        private val LOGTAG = KeywordInterceptMatcher::class.java.name
-    }
-
     init {
         SessionClient.getInstance().addListener(this)
     }

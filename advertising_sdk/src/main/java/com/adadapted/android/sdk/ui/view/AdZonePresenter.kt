@@ -191,6 +191,7 @@ internal class AdZonePresenter(context: Context, private val pixelWebView: Pixel
         val actionType = ad.actionType
         val params: MutableMap<String, String> = HashMap()
         params["ad_id"] = ad.id
+
         when (actionType) {
             AdActionType.CONTENT -> {
                 appEventClient.trackSdkEvent(EventStrings.ATL_AD_CLICKED, params)

@@ -32,7 +32,7 @@ class AdditContentPublisher private constructor() {
         lock.lock()
         try {
             if (listener == null) {
-                AppEventClient.getInstance().trackError(EventStrings.NO_ADDIT_CONTENT_LISTENER, "App did not register an Addit Content listener")
+                AppEventClient.getInstance().trackError(EventStrings.NO_ADDIT_CONTENT_LISTENER, LISTENER_REGISTRATION_ERROR)
                 return
             }
             if (publishedContent.containsKey(content.payloadId)) {
@@ -53,7 +53,7 @@ class AdditContentPublisher private constructor() {
         lock.lock()
         try {
             if (listener == null) {
-                AppEventClient.getInstance().trackError(EventStrings.NO_ADDIT_CONTENT_LISTENER, "App did not register an Addit Content listener")
+                AppEventClient.getInstance().trackError(EventStrings.NO_ADDIT_CONTENT_LISTENER, LISTENER_REGISTRATION_ERROR)
                 return
             }
             notifyContentAvailable(content)
@@ -69,7 +69,7 @@ class AdditContentPublisher private constructor() {
         lock.lock()
         try {
             if (listener == null) {
-                AppEventClient.getInstance().trackError(EventStrings.NO_ADDIT_CONTENT_LISTENER, "App did not register an Addit Content listener")
+                AppEventClient.getInstance().trackError(EventStrings.NO_ADDIT_CONTENT_LISTENER, LISTENER_REGISTRATION_ERROR)
                 return
             }
             notifyContentAvailable(content)
@@ -83,7 +83,7 @@ class AdditContentPublisher private constructor() {
     }
 
     companion object {
-        private val LOGTAG = AdditContentPublisher::class.java.name
+        private const val LISTENER_REGISTRATION_ERROR = "App did not register an Addit Content listener"
         private lateinit var instance: AdditContentPublisher
 
         fun getInstance(): AdditContentPublisher {

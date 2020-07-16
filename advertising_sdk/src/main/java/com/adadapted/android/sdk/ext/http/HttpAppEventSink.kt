@@ -13,6 +13,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import org.json.JSONObject
 
 class HttpAppEventSink(private val eventUrl: String, private val errorUrl: String, private val httpQueueManager: HttpQueueManager = HttpRequestManager) : AppEventSink {
+    private val LOGTAG = HttpAppEventSink::class.java.name
     private val eventBuilder: JsonAppEventBuilder = JsonAppEventBuilder()
     private var eventWrapper: JSONObject? = null
     private var errorWrapper: JSONObject? = null
@@ -58,9 +59,5 @@ class HttpAppEventSink(private val eventUrl: String, private val errorUrl: Strin
                     }
                 })
         httpQueueManager.queueRequest(jsonRequest)
-    }
-
-    companion object {
-        private val LOGTAG = HttpAppEventSink::class.java.name
     }
 }

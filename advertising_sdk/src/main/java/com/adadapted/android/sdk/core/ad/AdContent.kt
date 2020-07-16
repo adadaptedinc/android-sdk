@@ -84,8 +84,8 @@ class AdContent : AddToListContent, Parcelable {
     @Synchronized
     private fun trackItem(itemName: String) {
         val params: MutableMap<String, String> = HashMap()
-        params["ad_id"] = ad.id
-        params["item_name"] = itemName
+        params[AD_ID] = ad.id
+        params[ITEM_NAME] = itemName
         appEventClient.trackSdkEvent(EventStrings.ATL_ITEM_ADDED_TO_LIST, params)
     }
 
@@ -98,9 +98,9 @@ class AdContent : AddToListContent, Parcelable {
             }
             isHandled = true
             val params: MutableMap<String, String> = HashMap()
-            params["ad_id"] = ad.id
+            params[AD_ID] = ad.id
             appEventClient.trackError(EventStrings.ATL_ADDED_TO_LIST_FAILED,
-                    if (message.isEmpty()) "Unknown Reason" else message,
+                    if (message.isEmpty()) UNKNOWN_REASON else message,
                     params)
         } finally {
             lock.unlock()
@@ -112,10 +112,10 @@ class AdContent : AddToListContent, Parcelable {
         try {
             isHandled = true
             val params: MutableMap<String, String> = HashMap()
-            params["ad_id"] = ad.id
-            params["item"] = item.title
+            params[AD_ID] = ad.id
+            params[ITEM] = item.title
             appEventClient.trackError(EventStrings.ATL_ADDED_TO_LIST_ITEM_FAILED,
-                    if (message.isEmpty()) "Unknown Reason" else message,
+                    if (message.isEmpty()) UNKNOWN_REASON else message,
                     params)
         } finally {
             lock.unlock()
@@ -139,6 +139,10 @@ class AdContent : AddToListContent, Parcelable {
 
     companion object CREATOR : Parcelable.Creator<AdContent> {
         private const val ADD_TO_LIST = 0
+        private const val AD_ID = "ad_id"
+        private const val ITEM_NAME = "item_name"
+        private const val ITEM = "item"
+        private const val UNKNOWN_REASON = "Unknown Reason"
 
         override fun createFromParcel(parcel: Parcel): AdContent {
             return AdContent(parcel)

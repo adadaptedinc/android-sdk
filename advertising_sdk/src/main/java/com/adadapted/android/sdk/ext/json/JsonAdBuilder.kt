@@ -98,7 +98,6 @@ class JsonAdBuilder {
     }
 
     companion object {
-        private val LOGTAG = JsonAdBuilder::class.java.name
         private const val DEFAULT_REFRESH_TIME = 90
         private const val AD_ID = "ad_id"
         private const val IMPRESSION_ID = "impression_id"

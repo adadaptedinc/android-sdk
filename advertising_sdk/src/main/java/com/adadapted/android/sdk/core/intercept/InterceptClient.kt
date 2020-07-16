@@ -137,7 +137,6 @@ class InterceptClient private constructor(private val adapter: InterceptAdapter,
     }
 
     companion object {
-        private val LOGTAG = InterceptClient::class.java.name
         private lateinit var instance: InterceptClient
 
         fun getInstance(): InterceptClient {

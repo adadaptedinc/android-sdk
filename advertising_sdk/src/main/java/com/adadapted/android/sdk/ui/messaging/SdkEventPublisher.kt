@@ -44,7 +44,6 @@ class SdkEventPublisher private constructor() : AdEventClient.Listener {
     }
 
     companion object {
-        private val LOGTAG = SdkEventPublisher::class.java.name
         private lateinit var instance: SdkEventPublisher
 
         fun getInstance(): SdkEventPublisher {

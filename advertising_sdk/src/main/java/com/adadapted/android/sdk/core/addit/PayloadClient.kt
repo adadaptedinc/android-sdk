@@ -117,7 +117,6 @@ class PayloadClient private constructor(private val adapter: PayloadAdapter, pri
     }
 
     companion object {
-        private val LOGTAG = PayloadClient::class.java.name
         private const val PAYLOAD_ID = "payload_id"
         private const val TRACKING_ID = "tracking_id"
         private const val SOURCE = "source"
@@ -134,5 +133,4 @@ class PayloadClient private constructor(private val adapter: PayloadAdapter, pri
             instance = PayloadClient(adapter, appEventClient, transporter)
         }
     }
-
 }

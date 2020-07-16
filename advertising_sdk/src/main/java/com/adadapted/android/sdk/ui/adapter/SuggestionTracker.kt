@@ -6,7 +6,6 @@ import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
 object SuggestionTracker {
-    private val LOGTAG = SuggestionTracker::class.java.name
     private val matcherLock: Lock = ReentrantLock()
     private val items: MutableMap<String, String> = HashMap()
     private val replacements: MutableMap<String, String> = HashMap()
