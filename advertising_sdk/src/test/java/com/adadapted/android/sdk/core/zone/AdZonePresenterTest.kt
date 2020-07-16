@@ -8,7 +8,6 @@ import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdActionType
 import com.adadapted.android.sdk.core.ad.AdEvent
 import com.adadapted.android.sdk.core.ad.AdEventClient
-import com.adadapted.android.sdk.core.ad.Counter
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
@@ -40,7 +39,6 @@ import kotlin.collections.HashMap
 
 @RunWith(RobolectricTestRunner::class)
 class AdZonePresenterTest {
-    private var mockImpressionIdCounter = mock<Counter>()
     private var mockAdEventSink = mock<TestAdEventSink>()
     private var testContext = InstrumentationRegistry.getInstrumentation().targetContext
     private var mockContext = mock<Context>()
@@ -55,13 +53,12 @@ class AdZonePresenterTest {
     @Before
     fun setup() {
         whenever(mockAdEventSink.sendBatch(any(),any())).then { }
-        whenever(mockImpressionIdCounter.getCurrentCountFor(any())).thenReturn(1)
         whenever(mockContext.applicationContext).thenReturn(mock())
 
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance(testContext,"", false, HashMap(), DeviceInfoClientTest.Companion::requestAdvertisingIdInfo, testTransporterScope)
         SessionClient.createInstance(mock(), mock())
-        AdEventClient.createInstance(mockAdEventSink, testTransporterScope, mockImpressionIdCounter)
+        AdEventClient.createInstance(mockAdEventSink, testTransporterScope)
         AdEventClient.getInstance().onSessionAvailable(mockSession)
         AppEventClient.createInstance(testAppEventSink, testTransporterScope)
 
@@ -113,7 +110,7 @@ class AdZonePresenterTest {
         testAdZonePresenter.onAdDisplayed(Ad("TestAdId"))
         testAdZonePresenter.onDetach()
 
-        assertEquals(AdEvent.Types.IMPRESSION_END, testAdEventListener.testAdEvent?.eventType)
+        assertEquals("", testListener.testZone.id)
     }
 
     @Test

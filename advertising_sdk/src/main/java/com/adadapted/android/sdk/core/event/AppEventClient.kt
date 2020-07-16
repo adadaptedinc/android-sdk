@@ -76,21 +76,16 @@ class AppEventClient private constructor(private val sink: AppEventSink, private
         trackSdkEvent(EventStrings.EXPIRED_EVENT)
     }
 
-    @JvmOverloads
-    @Synchronized
     fun trackSdkEvent(name: String, params: Map<String, String> = HashMap()) {
         transporter.dispatchToBackground { performTrackEvent(Types.SDK, name, params) }
     }
 
-    @JvmOverloads
-    @Synchronized
     fun trackError(code: String, message: String, params: Map<String, String> = HashMap()) {
         transporter.dispatchToBackground {
             performTrackError(code, message, params)
         }
     }
 
-    @Synchronized
     fun trackAppEvent(name: String, params: Map<String, String> = HashMap()) {
         transporter.dispatchToBackground {
             performTrackEvent(Types.APP, name, params)

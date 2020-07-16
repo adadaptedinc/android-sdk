@@ -22,7 +22,7 @@ class AdTest {
     fun setup() {
         DeviceInfoClient.createInstance(mock(), "", false, mock(), DeviceInfoClientTest.Companion::requestAdvertisingIdInfo, mock())
         SessionClient.createInstance(mock(), mock())
-        AdEventClient.createInstance(mock(), mock(), mock())
+        AdEventClient.createInstance(mock(), mock())
         AppEventClient.createInstance(mock(), mock())
     }
 

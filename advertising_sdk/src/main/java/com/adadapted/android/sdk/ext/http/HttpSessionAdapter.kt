@@ -13,15 +13,20 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 
 class HttpSessionAdapter(private val initUrl: String, private val refreshUrl: String, private var sessionBuilder: JsonSessionBuilder? = null, private val httpQueueManager: HttpQueueManager = HttpRequestManager) : SessionAdapter {
+    private val LOGTAG = HttpSessionAdapter::class.java.name
 
     override fun sendInit(deviceInfo: DeviceInfo, listener: SessionInitListener) {
         val requestBuilder = JsonSessionRequestBuilder()
         sessionBuilder = JsonSessionBuilder(deviceInfo)
         val json = requestBuilder.buildSessionInitRequest(deviceInfo)
-        val jsonRequest = JsonObjectRequest(Request.Method.POST, initUrl, json, Response.Listener { response ->
-            val session = sessionBuilder?.buildSession(response)
-            session?.let { listener.onSessionInitialized(it) }
-        }, Response.ErrorListener { error ->
+        val jsonRequest = JsonObjectRequest(
+                Request.Method.POST,
+                initUrl,
+                json,
+                Response.Listener { response ->
+                    val session = sessionBuilder?.buildSession(response)
+                    session?.let { listener.onSessionInitialized(it) }
+                }, Response.ErrorListener { error ->
             HttpErrorTracker.trackHttpError(error, initUrl, EventStrings.SESSION_REQUEST_FAILED, LOGTAG)
             listener.onSessionInitializeFailed()
         })
@@ -32,8 +37,11 @@ class HttpSessionAdapter(private val initUrl: String, private val refreshUrl: St
         if (sessionBuilder == null) {
             return
         }
-        val url = refreshUrl+String.format("?aid=%s", session.deviceInfo.appId) + String.format("&uid=%s", session.deviceInfo.udid) + String.format("&sid=%s", session.id) + String.format("&sdk=%s", session.deviceInfo.sdkVersion)
-        val request = JsonObjectRequest(Request.Method.GET, url, null,
+        val url = refreshUrl + String.format("?aid=%s", session.deviceInfo.appId) + String.format("&uid=%s", session.deviceInfo.udid) + String.format("&sid=%s", session.id) + String.format("&sdk=%s", session.deviceInfo.sdkVersion)
+        val request = JsonObjectRequest(
+                Request.Method.GET,
+                url,
+                null,
                 Response.Listener { response ->
                     val responseSession = sessionBuilder?.buildSession(response)
                     responseSession?.let { listener.onNewAdsLoaded(it) }
@@ -44,9 +52,5 @@ class HttpSessionAdapter(private val initUrl: String, private val refreshUrl: St
                 }
         )
         httpQueueManager.queueRequest(request)
-    }
-
-    companion object {
-        private val LOGTAG = HttpSessionAdapter::class.java.name
     }
 }

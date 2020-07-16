@@ -135,9 +135,7 @@ class DeviceInfoClient private constructor(
     }
 
     private fun captureAndroidId(context: Context): String {
-        @SuppressLint("HardwareIds") val androidId = Settings.Secure.getString(
-                context.contentResolver,
-                Settings.Secure.ANDROID_ID)
+        @SuppressLint("HardwareIds") val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
         return androidId ?: ""
     }
 
@@ -146,7 +144,6 @@ class DeviceInfoClient private constructor(
         ex.message?.let { AppEventClient.getInstance().trackError(EventStrings.GAID_UNAVAILABLE, it) }
     }
 
-    @Synchronized
     fun getDeviceInfo(callback: Callback) {
         transporter.dispatchToBackground {
             performGetInfo(callback)

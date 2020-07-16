@@ -151,14 +151,14 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
      */
     override fun onAdLoaded(ad: Ad) {
         if (presenter != null) {
-            presenter!!.onAdDisplayed(ad)
+            presenter?.onAdDisplayed(ad)
             notifyAdLoaded()
         }
     }
 
     override fun onAdLoadFailed() {
         if (presenter != null) {
-            presenter!!.onAdDisplayFailed()
+            presenter?.onAdDisplayFailed()
             notifyAdLoadFailed()
         }
     }
@@ -188,9 +188,5 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
     private fun setInvisible() {
         isVisible = false
         presenter?.onDetach()
-    }
-
-    companion object {
-        private val LOGTAG = AaZoneView::class.java.name
     }
 }

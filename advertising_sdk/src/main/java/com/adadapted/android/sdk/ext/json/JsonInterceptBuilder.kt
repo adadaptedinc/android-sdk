@@ -24,7 +24,7 @@ class JsonInterceptBuilder {
             val intercepts = sortIntercepts(parseIntercepts(terms))
             return Intercept(searchId, refreshTime, minMatchLength, intercepts)
         } catch (ex: JSONException) {
-            Log.w(TAG, "Problem parsing JSON", ex)
+            Log.w(LOGTAG, "Problem parsing JSON", ex)
             val params: MutableMap<String, String> = HashMap()
             params["error"] = ex.message ?: ""
             params["payload"] = json.toString()
@@ -54,7 +54,7 @@ class JsonInterceptBuilder {
     }
 
     companion object {
-        private val TAG = JsonInterceptBuilder::class.java.name
+        private val LOGTAG = JsonInterceptBuilder::class.java.name
         private const val SEARCH_ID = "search_id"
         private const val REFRESH_TIME = "refresh_time"
         private const val MIN_MATCH_LENGTH = "min_match_length"

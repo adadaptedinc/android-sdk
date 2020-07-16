@@ -13,6 +13,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import org.json.JSONObject
 
 class HttpAppEventSink(private val eventUrl: String, private val errorUrl: String, private val httpQueueManager: HttpQueueManager = HttpRequestManager) : AppEventSink {
+    private val LOGTAG = HttpAppEventSink::class.java.name
     private val eventBuilder: JsonAppEventBuilder = JsonAppEventBuilder()
     private var eventWrapper: JSONObject? = null
     private var errorWrapper: JSONObject? = null
@@ -28,10 +29,14 @@ class HttpAppEventSink(private val eventUrl: String, private val errorUrl: Strin
             return
         }
         val json = eventBuilder.buildEventItem(eventWrapper, events)
-        val jsonRequest = JsonObjectRequest(Request.Method.POST,
-                eventUrl, json, Response.Listener { }, Response.ErrorListener { error ->
-            HttpErrorTracker.trackHttpError(error, eventUrl, EventStrings.APP_EVENT_REQUEST_FAILED, LOGTAG)
-        })
+        val jsonRequest = JsonObjectRequest(
+                Request.Method.POST,
+                eventUrl,
+                json,
+                Response.Listener { },
+                Response.ErrorListener { error ->
+                    HttpErrorTracker.trackHttpError(error, eventUrl, EventStrings.APP_EVENT_REQUEST_FAILED, LOGTAG)
+                })
         httpQueueManager.queueRequest(jsonRequest)
     }
 
@@ -41,18 +46,18 @@ class HttpAppEventSink(private val eventUrl: String, private val errorUrl: Strin
             return
         }
         val json = eventBuilder.buildErrorItem(errorWrapper, errors)
-        val jsonRequest = JsonObjectRequest(Request.Method.POST,
-                errorUrl, json, Response.Listener { }, Response.ErrorListener { error ->
-            if (error?.networkResponse != null) {
-                val statusCode = error.networkResponse.statusCode
-                val data = String(error.networkResponse.data)
-                Log.e(LOGTAG, "App Error Request Failed: $statusCode - $data", error)
-            }
-        })
+        val jsonRequest = JsonObjectRequest(
+                Request.Method.POST,
+                errorUrl,
+                json,
+                Response.Listener { },
+                Response.ErrorListener { error ->
+                    if (error?.networkResponse != null) {
+                        val statusCode = error.networkResponse.statusCode
+                        val data = String(error.networkResponse.data)
+                        Log.e(LOGTAG, "App Error Request Failed: $statusCode - $data", error)
+                    }
+                })
         httpQueueManager.queueRequest(jsonRequest)
-    }
-
-    companion object {
-        private val LOGTAG = HttpAppEventSink::class.java.name
     }
 }

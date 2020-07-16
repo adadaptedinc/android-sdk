@@ -62,8 +62,4 @@ class AutoCompleteAdapter(context: Context, resource: Int, items: List<String>) 
             notifyDataSetChanged()
         }
     }
-
-    companion object {
-        private val LOGTAG = AutoCompleteAdapter::class.java.name
-    }
 }

@@ -86,10 +86,6 @@ internal class AdWebView @SuppressLint("SetJavaScriptEnabled") constructor(conte
         }
     }
 
-    companion object {
-        private val LOGTAG = AdWebView::class.java.name
-    }
-
     init {
         setLayerType(View.LAYER_TYPE_SOFTWARE, null)
         setBackgroundColor(Color.TRANSPARENT)

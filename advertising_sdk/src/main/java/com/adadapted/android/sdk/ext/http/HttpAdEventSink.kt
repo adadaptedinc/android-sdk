@@ -16,9 +16,14 @@ class HttpAdEventSink(private val batchUrl: String, private val httpQueueManager
     override fun sendBatch(session: Session, events: Set<AdEvent>) {
         val json = builder.marshalEvents(session, events)
 
-        val jsonRequest = JsonObjectRequest(Request.Method.POST, batchUrl, json, Response.Listener {}, Response.ErrorListener { error ->
-            HttpErrorTracker.trackHttpError(error, batchUrl, EventStrings.AD_EVENT_TRACK_REQUEST_FAILED, LOGTAG)
-        })
+        val jsonRequest = JsonObjectRequest(
+                Request.Method.POST,
+                batchUrl,
+                json,
+                Response.Listener {},
+                Response.ErrorListener { error ->
+                    HttpErrorTracker.trackHttpError(error, batchUrl, EventStrings.AD_EVENT_TRACK_REQUEST_FAILED, LOGTAG)
+                })
         httpQueueManager.queueRequest(jsonRequest)
     }
 }

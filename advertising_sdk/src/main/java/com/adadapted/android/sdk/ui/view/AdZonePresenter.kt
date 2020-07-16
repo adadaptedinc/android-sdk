@@ -124,7 +124,6 @@ internal class AdZonePresenter(context: Context, private val pixelWebView: Pixel
             zoneLock.lock()
             try {
                 adCompleted = true
-                adEventClient.trackImpressionEnd(currentAd)
             } finally {
                 zoneLock.unlock()
             }
@@ -192,6 +191,7 @@ internal class AdZonePresenter(context: Context, private val pixelWebView: Pixel
         val actionType = ad.actionType
         val params: MutableMap<String, String> = HashMap()
         params["ad_id"] = ad.id
+
         when (actionType) {
             AdActionType.CONTENT -> {
                 appEventClient.trackSdkEvent(EventStrings.ATL_AD_CLICKED, params)

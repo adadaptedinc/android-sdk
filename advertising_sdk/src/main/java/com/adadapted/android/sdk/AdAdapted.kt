@@ -6,7 +6,6 @@ import android.widget.Toast
 import com.adadapted.android.sdk.config.Config
 import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.ad.AdEventClient
-import com.adadapted.android.sdk.core.ad.ImpressionIdCounter
 import com.adadapted.android.sdk.core.addit.AdditContent
 import com.adadapted.android.sdk.core.addit.PayloadClient
 import com.adadapted.android.sdk.core.concurrency.Transporter
@@ -75,7 +74,6 @@ object AdAdapted {
         if (hasStarted) {
             if (!isProd) {
                 Log.w(LOG_TAG, "AdAdapted Android Advertising SDK has already been started")
-                AppEventClient.getInstance().trackError(EventStrings.MULTIPLE_SDK_STARTS, "App has attempted to start the SDK Multiple times")
             }
             return
         }
@@ -113,10 +111,10 @@ object AdAdapted {
         Config.init(isProd)
         HttpRequestManager.createQueue(context.applicationContext)
 
-        DeviceInfoClient.createInstance(context.applicationContext, apiKey, isProd, params, (AdvertisingIdClient::getAdvertisingIdInfo), transporter = Transporter())
+        DeviceInfoClient.createInstance(context.applicationContext, apiKey, isProd, params, (AdvertisingIdClient::getAdvertisingIdInfo), Transporter())
         SessionClient.createInstance(HttpSessionAdapter(Config.getInitSessionUrl(), Config.getRefreshAdsUrl()), Transporter())
         AppEventClient.createInstance(HttpAppEventSink(Config.getAppEventsUrl(), Config.getAppErrorsUrl()), Transporter())
-        ImpressionIdCounter.instance?.let { AdEventClient.createInstance(HttpAdEventSink(Config.getAdsEventUrl()), Transporter(), it) }
+        AdEventClient.createInstance(HttpAdEventSink(Config.getAdsEventUrl()), Transporter())
         InterceptClient.createInstance(HttpInterceptAdapter(Config.getRetrieveInterceptsUrl(), Config.getInterceptEventsUrl()), Transporter())
         PayloadClient.createInstance(HttpPayloadAdapter(Config.getPickupPayloadsUrl(), Config.getTrackingPayloadUrl()), AppEventClient.getInstance(), Transporter())
     }

@@ -60,11 +60,6 @@ class AaWebViewPopupActivity : Activity() {
         AdEventClient.getInstance().trackPopupBegin(ad)
     }
 
-    public override fun onPause() {
-        super.onPause()
-        AdEventClient.getInstance().trackPopupEnd(ad)
-    }
-
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK && popupWebView.canGoBack()) {
             popupWebView.goBack()

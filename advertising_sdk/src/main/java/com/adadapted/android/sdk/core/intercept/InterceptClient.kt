@@ -81,7 +81,6 @@ class InterceptClient private constructor(private val adapter: InterceptAdapter,
         }
     }
 
-    @Synchronized
     fun initialize(session: Session?, listener: Listener?) {
         transporter.dispatchToBackground {
             performInitialize(session, listener)
@@ -138,7 +137,6 @@ class InterceptClient private constructor(private val adapter: InterceptAdapter,
     }
 
     companion object {
-        private val LOGTAG = InterceptClient::class.java.name
         private lateinit var instance: InterceptClient
 
         fun getInstance(): InterceptClient {

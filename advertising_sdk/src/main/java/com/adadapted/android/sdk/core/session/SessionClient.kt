@@ -315,33 +315,24 @@ class SessionClient private constructor(private val adapter: SessionAdapter, pri
         })
     }
 
-    @Synchronized
-    fun getSession(listener: SessionListener) {
-        addListener(listener)
-    }
-
-    @Synchronized
     fun addListener(listener: SessionListener) {
         transporter.dispatchToBackground {
             performAddListener(listener)
         }
     }
 
-    @Synchronized
     fun removeListener(listener: SessionListener) {
         transporter.dispatchToBackground {
             performRemoveListener(listener)
         }
     }
 
-    @Synchronized
     fun addPresenter(listener: SessionListener) {
         transporter.dispatchToBackground {
             performAddPresenter(listener)
         }
     }
 
-    @Synchronized
     fun removePresenter(listener: SessionListener) {
         transporter.dispatchToBackground {
             performRemovePresenter(listener)

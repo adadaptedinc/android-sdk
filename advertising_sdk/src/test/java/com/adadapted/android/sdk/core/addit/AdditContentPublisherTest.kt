@@ -5,7 +5,6 @@ import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdContent
 import com.adadapted.android.sdk.core.ad.AdEventClient
-import com.adadapted.android.sdk.core.ad.Counter
 import com.adadapted.android.sdk.core.atl.AddToListContent
 import com.adadapted.android.sdk.core.atl.AddToListItem
 import com.adadapted.android.sdk.core.atl.PopupContent
@@ -35,8 +34,6 @@ import kotlin.collections.HashMap
 
 @RunWith(RobolectricTestRunner::class)
 class AdditContentPublisherTest {
-
-    private var mockImpressionIdCounter = mock<Counter>()
     private var mockAdEventSink = mock<TestAdEventSink>()
     private var testContext = InstrumentationRegistry.getInstrumentation().targetContext
     private var testTransporter = TestCoroutineDispatcher()
@@ -50,7 +47,7 @@ class AdditContentPublisherTest {
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance(testContext,"", false, HashMap(), DeviceInfoClientTest.Companion::requestAdvertisingIdInfo, testTransporterScope)
         SessionClient.createInstance(mock(), mock())
-        AdEventClient.createInstance(mockAdEventSink, testTransporterScope, mockImpressionIdCounter)
+        AdEventClient.createInstance(mockAdEventSink, testTransporterScope)
         AdEventClient.getInstance().onSessionAvailable(mockSession)
         AppEventClient.createInstance(testAppEventSink, testTransporterScope)
         PayloadClient.createInstance(mock(), AppEventClient.getInstance(), testTransporterScope)

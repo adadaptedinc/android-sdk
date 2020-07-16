@@ -6,7 +6,6 @@ import com.adadapted.android.sdk.core.zone.Zone
 import java.util.Date
 import kotlin.collections.HashMap
 
-
 class Session(val deviceInfo: DeviceInfo,
               val id: String = "",
               private val willServeAds: Boolean = false,
@@ -22,7 +21,6 @@ class Session(val deviceInfo: DeviceInfo,
             session.hasActiveCampaigns(),
             session.refreshTime,
             session.expiresAt,
-
             zones ?: HashMap<String, Zone>()
     )
 
@@ -38,7 +36,6 @@ class Session(val deviceInfo: DeviceInfo,
         if (zones.containsKey(zoneId)) {
             return zones[zoneId] ?: Zone()
             }
-
         return Zone()
     }
 

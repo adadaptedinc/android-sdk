@@ -33,7 +33,6 @@ class PayloadClient private constructor(private val adapter: PayloadAdapter, pri
         adapter.publishEvent(event)
     }
 
-    @Synchronized
     fun pickupPayloads(callback: Callback) {
         if (deeplinkInProgress) {
             return
@@ -63,7 +62,6 @@ class PayloadClient private constructor(private val adapter: PayloadAdapter, pri
         }
     }
 
-    @Synchronized
     fun markContentAcknowledged(content: AdditContent) {
         transporter.dispatchToBackground {
             val eventParams: MutableMap<String, String> = HashMap()
@@ -76,7 +74,6 @@ class PayloadClient private constructor(private val adapter: PayloadAdapter, pri
         }
     }
 
-    @Synchronized
     fun markContentItemAcknowledged(content: AdditContent, item: AddToListItem) {
         transporter.dispatchToBackground {
             val eventParams: MutableMap<String, String> = HashMap()
@@ -88,7 +85,6 @@ class PayloadClient private constructor(private val adapter: PayloadAdapter, pri
         }
     }
 
-    @Synchronized
     fun markContentDuplicate(content: AdditContent) {
         transporter.dispatchToBackground {
             val eventParams: MutableMap<String, String> = HashMap()
@@ -100,7 +96,6 @@ class PayloadClient private constructor(private val adapter: PayloadAdapter, pri
         }
     }
 
-    @Synchronized
     fun markContentFailed(content: AdditContent, message: String) {
         transporter.dispatchToBackground {
             val eventParams: MutableMap<String, String> = HashMap()
@@ -112,7 +107,6 @@ class PayloadClient private constructor(private val adapter: PayloadAdapter, pri
         }
     }
 
-    @Synchronized
     fun markContentItemFailed(content: AdditContent, item: AddToListItem, message: String) {
         transporter.dispatchToBackground {
             val eventParams: MutableMap<String, String> = HashMap()
@@ -123,7 +117,6 @@ class PayloadClient private constructor(private val adapter: PayloadAdapter, pri
     }
 
     companion object {
-        private val LOGTAG = PayloadClient::class.java.name
         private const val PAYLOAD_ID = "payload_id"
         private const val TRACKING_ID = "tracking_id"
         private const val SOURCE = "source"
@@ -140,5 +133,4 @@ class PayloadClient private constructor(private val adapter: PayloadAdapter, pri
             instance = PayloadClient(adapter, appEventClient, transporter)
         }
     }
-
 }

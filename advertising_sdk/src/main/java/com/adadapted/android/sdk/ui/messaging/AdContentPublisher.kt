@@ -45,7 +45,6 @@ class AdContentPublisher private constructor() {
     }
 
     companion object {
-        private val LOGTAG = AdContentPublisher::class.java.name
         private lateinit var instance: AdContentPublisher
 
         fun getInstance(): AdContentPublisher {
