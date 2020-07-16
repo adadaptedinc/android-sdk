@@ -45,7 +45,7 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
     }
 
     private fun setup(context: Context) {
-        presenter = AdZonePresenter(context.applicationContext)
+        presenter = AdZonePresenter(this.context)
         webView = AdWebView(context.applicationContext, this)
         Handler(Looper.getMainLooper()).post { addView(webView) }
     }

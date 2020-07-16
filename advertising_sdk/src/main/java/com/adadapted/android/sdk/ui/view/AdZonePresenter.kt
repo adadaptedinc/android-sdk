@@ -20,7 +20,7 @@ import java.util.TimerTask
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
-internal class AdZonePresenter(context: Context, private val pixelWebView: PixelWebView = PixelWebView(context.applicationContext), private val aaWebViewPopupActivity: AaWebViewPopupActivity = AaWebViewPopupActivity())
+internal class AdZonePresenter(private val context: Context, private val pixelWebView: PixelWebView = PixelWebView(context.applicationContext), private val aaWebViewPopupActivity: AaWebViewPopupActivity = AaWebViewPopupActivity())
     : SessionListener() {
     internal interface Listener {
         fun onZoneAvailable(zone: Zone)
@@ -31,7 +31,6 @@ internal class AdZonePresenter(context: Context, private val pixelWebView: Pixel
 
     private var currentAd: Ad = Ad()
     private var zoneId: String? = null
-    private val context: Context = context.applicationContext
     private var listener: Listener? = null
     private var attached: Boolean
     private val zoneLock: Lock = ReentrantLock()
