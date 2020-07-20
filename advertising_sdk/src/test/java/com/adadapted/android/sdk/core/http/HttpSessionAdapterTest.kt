@@ -74,7 +74,7 @@ class HttpSessionAdapterTest {
         testHttpSessionAdapter.sendInit(HttpAppEventSinkTest.generateMockDeviceInfo(), testInitListener)
         testHttpSessionAdapter.sendRefreshAds(mockSession, testListener)
         assert(testHttpRequestManager.queueWasCreated)
-        assertEquals("refreshUrl?aid=testAppId&uid=testUdId&sid=testSessionId&sdk=2.1.0", testHttpRequestManager.queuedRequest?.url)
+        assertEquals("refreshUrl?aid=testAppId&uid=testUdId&sid=testSessionId&sdk=2.2.0", testHttpRequestManager.queuedRequest?.url)
     }
 
     @Test
@@ -85,7 +85,7 @@ class HttpSessionAdapterTest {
         AppEventClient.getInstance().onPublishEvents()
         assertEquals(EventStrings.AD_GET_REQUEST_FAILED, testAppEventSink.testErrors.first().code)
         assert(testHttpRequestManager.queueWasCreated)
-        assertEquals("refreshUrl?aid=testAppId&uid=testUdId&sid=testSessionId&sdk=2.1.0", testHttpRequestManager.queuedRequest?.url)
+        assertEquals("refreshUrl?aid=testAppId&uid=testUdId&sid=testSessionId&sdk=2.2.0", testHttpRequestManager.queuedRequest?.url)
     }
 }
 
