@@ -6,7 +6,7 @@ image: openjdk:8-jdk
 
 variables:
   ANDROID_COMPILE_SDK: "28"
-  ANDROID_BUILD_TOOLS: "28.0.2"
+  ANDROID_BUILD_TOOLS: "29.0.2"
   ANDROID_SDK_TOOLS: "4333796"
 
 before_script:
@@ -45,7 +45,5 @@ assembleDebug:
 debugTests:
   stage: test
   script:
-    - ./gradlew test
-  artifacts:
-    reports:
-      junit: build/test-results/**/TEST-*.xml
+    - ./gradlew testDebugUnitTestCoverage
+  coverage: '/Line Coverage: \d+\.\d+/'

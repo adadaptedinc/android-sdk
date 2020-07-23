@@ -2,8 +2,7 @@ apply plugin:  'jacoco'
 
 jacoco {
     toolVersion = "0.8.5"
-    // Custom reports directory can be specfied like this:
-    // reportsDir = file("$buildDir/customJacocoReportDir")
+    reportsDir = file("$buildDir/coverage")
 }
 
 tasks.withType(Test) {
