@@ -48,8 +48,36 @@ class SdkEventPublisherTest {
         SdkEventPublisher.getInstance().setListener(testListener)
         SdkEventPublisher.getInstance().onAdEventTracked(AdEvent("adId", "adZoneId", "impressionId", AdEvent.Types.IMPRESSION))
         Shadows.shadowOf(Looper.getMainLooper()).idle()
-        assertEquals(AdEvent.Types.IMPRESSION, testListener.resultEventType)
+        assertEquals("impression", testListener.resultEventType)
         assertEquals("adZoneId", testListener.resultZoneId)
+    }
+
+    @Test
+    fun addListenerAndPublishAdEventInteractionTracked() {
+        val testListener = TestAaSdkEventListener()
+        SdkEventPublisher.getInstance().setListener(testListener)
+        SdkEventPublisher.getInstance().onAdEventTracked(AdEvent("adId", "adZoneId", "impressionId", AdEvent.Types.INTERACTION))
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+        assertEquals("click", testListener.resultEventType)
+        assertEquals("adZoneId", testListener.resultZoneId)
+    }
+
+    @Test
+    fun addListenerAndPublishAdEventListenerNullNotTracked() {
+        val testListener = TestAaSdkEventListener()
+        SdkEventPublisher.getInstance().onAdEventTracked(AdEvent("adId", "adZoneId", "impressionId", AdEvent.Types.IMPRESSION))
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+        assertEquals("", testListener.resultEventType)
+        assertEquals("", testListener.resultZoneId)
+    }
+    @Test
+    fun addListenerAndPublishAdEventNullNotTracked() {
+        val testListener = TestAaSdkEventListener()
+        SdkEventPublisher.getInstance().setListener(testListener)
+        SdkEventPublisher.getInstance().onAdEventTracked(null)
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+        assertEquals("", testListener.resultEventType)
+        assertEquals("", testListener.resultZoneId)
     }
 }
 

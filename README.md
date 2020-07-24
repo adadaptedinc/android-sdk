@@ -4,7 +4,7 @@ The Android SDK integrates AdAdapted services with partner Android apps.
 
 Development is done using Android Studio. Updating the public facing API should be done with care since those changes will require more than a drop-in update from partners.
 
-Documentation for integrating the SDK with and App can be found at [https://dev.adadapted.com/android/index.html](https://dev.adadapted.com/android/index.html)
+Documentation for integrating the SDK with and App can be found at [https://docs.adadapted.com/#/docs/android-getting-started](https://docs.adadapted.com/#/docs/android-getting-started)
 
 A valid API key is required to be able to run the SDK which can be dropped into the testing application in TestApplication.java.
 
@@ -32,11 +32,12 @@ Step 2. Add the dependency (based on latest release version)
 
 ## Running the tests
 
-There are a minimal set of Unit Tests. Typically testing is done through verification in the companion app which acts a reference integration.
+Unit tests can be run within the IDE and will report coverage on the gradle logs / merge request details. There is also a test app that can run basic implementation and verification of features.
 
 ## Deployment
 
-Once the master branch is built the resulting .apk file is uploaded to the documentation website along with change log information and any documentation updates that may be necessary.
+To create a new release, a new tag must be created first and named as only the version number (i.e. 1.0.0). Once the new tag is made, a release can be made off of it by simply
+adding release notes and it will immediately be available through the Jitpack repository.
 
 ## Built With
 
@@ -46,7 +47,7 @@ Once the master branch is built the resulting .apk file is uploaded to the docum
 
 ## Versioning
 
-SDK version is maintained in the BuildConfig. Each new rounds of updates should increment the appropriate values based on the significance of the update
+SDK version is maintained in the BuildConfig and Build.Gralde. Each new rounds of updates should increment the appropriate values based on the significance of the update
 
 The value is updated from right to left based on this loose criteria:
 * Bug fixes and minor tweaks
