@@ -4,7 +4,6 @@ object EventStrings {
     const val EXPIRED_EVENT = "session_expired"
     const val EXCEPTION_MESSAGE = "exception_message"
     const val APP_OPENED = "app_opened"
-    const val MULTIPLE_SDK_STARTS = "MULTIPLE_SDK_STARTS"
     const val GAID_UNAVAILABLE = "GAID_UNAVAILABLE"
     const val APP_EVENT_REQUEST_FAILED = "APP_EVENT_REQUEST_FAILED"
     const val ZONE_LOADED = "zone_loaded"
