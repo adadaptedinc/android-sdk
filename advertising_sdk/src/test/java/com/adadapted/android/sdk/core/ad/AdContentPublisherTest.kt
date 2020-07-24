@@ -1,17 +1,17 @@
 package com.adadapted.android.sdk.core.ad
 
-import androidx.test.platform.app.InstrumentationRegistry
+import android.os.Looper.getMainLooper
 import com.adadapted.android.sdk.core.atl.AddToListContent
 import com.adadapted.android.sdk.core.atl.AddToListItem
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.core.device.DeviceInfoClientTest
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.event.TestAppEventSink
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.tools.TestAdEventSink
+import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.adadapted.android.sdk.ui.messaging.AdContentListener
 import com.adadapted.android.sdk.ui.messaging.AdContentPublisher
@@ -25,13 +25,13 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.Shadows
 import java.util.Date
 
 @RunWith(RobolectricTestRunner::class)
 class AdContentPublisherTest {
 
     private var mockAdEventSink = mock<TestAdEventSink>()
-    private var testContext = InstrumentationRegistry.getInstrumentation().targetContext
     private var testTransporter = TestCoroutineDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
     private var testAppEventSink = TestAppEventSink()
@@ -40,7 +40,7 @@ class AdContentPublisherTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(testContext,"", false, HashMap(), DeviceInfoClientTest.Companion::requestAdvertisingIdInfo, testTransporterScope)
+        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
         AdEventClient.createInstance(mockAdEventSink, testTransporterScope)
         AdEventClient.getInstance().onSessionAvailable(mockSession)
@@ -58,6 +58,7 @@ class AdContentPublisherTest {
                         "adZoneId",
                         payload = listOf(
                                 AddToListItem("track", "title", "brand", "cat", "upc", "sku", "discount", "image")))))
+        Shadows.shadowOf(getMainLooper()).idle()
         assertEquals("testZoneId", testListener.resultZoneId)
         assertEquals("adZoneId", (testListener.resultContent as AdContent).zoneId)
     }

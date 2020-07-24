@@ -10,6 +10,7 @@ import com.adadapted.android.sdk.core.addit.AdditContent
 import com.adadapted.android.sdk.core.addit.PayloadClient
 import com.adadapted.android.sdk.core.concurrency.Transporter
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
+import com.adadapted.android.sdk.core.device.DeviceInfoExtractor
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.intercept.InterceptClient
 import com.adadapted.android.sdk.core.session.Session
@@ -111,7 +112,7 @@ object AdAdapted {
         Config.init(isProd)
         HttpRequestManager.createQueue(context.applicationContext)
 
-        DeviceInfoClient.createInstance(context.applicationContext, apiKey, isProd, params, (AdvertisingIdClient::getAdvertisingIdInfo), Transporter())
+        DeviceInfoClient.createInstance(context.applicationContext, apiKey, isProd, params, DeviceInfoExtractor(), Transporter())
         SessionClient.createInstance(HttpSessionAdapter(Config.getInitSessionUrl(), Config.getRefreshAdsUrl()), Transporter())
         AppEventClient.createInstance(HttpAppEventSink(Config.getAppEventsUrl(), Config.getAppErrorsUrl()), Transporter())
         AdEventClient.createInstance(HttpAdEventSink(Config.getAdsEventUrl()), Transporter())

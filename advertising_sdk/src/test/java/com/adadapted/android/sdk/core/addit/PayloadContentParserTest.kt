@@ -1,11 +1,10 @@
 package com.adadapted.android.sdk.core.addit
 
-import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.core.device.DeviceInfoClientTest
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.Dispatchers
@@ -15,10 +14,7 @@ import org.json.JSONObject
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
 class PayloadContentParserTest {
     private val JSON_STRING = "{\n" +
             "\t\"payloads\": [{\n" +
@@ -46,7 +42,7 @@ class PayloadContentParserTest {
         val testTransporter = TestCoroutineDispatcher()
         val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(InstrumentationRegistry.getInstrumentation().targetContext,"", false, HashMap(), DeviceInfoClientTest.Companion::requestAdvertisingIdInfo, testTransporterScope)
+        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
         AppEventClient.createInstance(mock(), mock())
         PayloadClient.createInstance(mock(), AppEventClient.getInstance(), mock())
