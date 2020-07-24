@@ -33,13 +33,13 @@ project.afterEvaluate {
                     '**/*Test*.*',
                     'android/**/*.*',
                     'jdk.internal.*',
-                    '**/EventStrings',
-                    '**/Transporter',
-                    '**/DeviceInfoExtractor',
-                    '**/BuildConfig',
-                    '**/AdAdapted',
-                    '**/JsonFields',
-                    '**/ContentTypes'
+                    '**/Transporter.*',
+                    '**/EventStrings.*',
+                    '**/DeviceInfoExtractor.*',
+                    '**/BuildConfig.*',
+                    '**/AdAdapted.*',
+                    '**/JsonFields.*',
+                    '**/ContentTypes.*'
             ]
             def javaClasses = fileTree(dir: variant.javaCompiler.destinationDir, excludes: excludes)
             def kotlinClasses = fileTree(dir: "${buildDir}/tmp/kotlin-classes/${variantName}", excludes: excludes)

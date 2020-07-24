@@ -47,7 +47,7 @@ adding release notes and it will immediately be available through the Jitpack re
 
 ## Versioning
 
-SDK version is maintained in the BuildConfig and Build.Gralde. Each new rounds of updates should increment the appropriate values based on the significance of the update
+SDK version is maintained in the BuildConfig and Build.Gradle. Each new rounds of updates should increment the appropriate values based on the significance of the update
 
 The value is updated from right to left based on this loose criteria:
 * Bug fixes and minor tweaks
