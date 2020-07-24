@@ -43,6 +43,7 @@ class AdditContentPublisherTest {
     private var testAppEventSink = TestAppEventSink()
     private var mockSession = Session(DeviceInfo(), "testId", true, true, 30, Date(1907245044), mutableMapOf())
     private lateinit var testAdditContent: AdditContent
+    private lateinit var testAdditContentDupe: AdditContent
 
     @Before
     fun setup() {
@@ -54,6 +55,7 @@ class AdditContentPublisherTest {
         AppEventClient.createInstance(testAppEventSink, testTransporterScope)
         PayloadClient.createInstance(mock(), AppEventClient.getInstance(), testTransporterScope)
         testAdditContent = AdditContent("payloadId", "msg", "image", 1, "src", "additSrc", listOf(AddToListItem("trackId", "title", "brand", "cat", "upc", "sku", "disc", "img")))
+        testAdditContentDupe = AdditContent("dupePayloadId", "msg", "image", 1, "src", "additSrc", listOf(AddToListItem("trackId", "title", "brand", "cat", "upc", "sku", "disc", "img")))
     }
 
     @Test
@@ -132,6 +134,18 @@ class AdditContentPublisherTest {
                         AddToListItem("track", "title", "brand", "cat", "upc", "sku", "discount", "image")))))
         Shadows.shadowOf(Looper.getMainLooper()).idle()
         assertEquals("adZoneId", (testListener.resultContent as AdContent).zoneId)
+    }
+
+    @Test
+    fun addListenerAndPublishAdditContentDuplicate() {
+        val testListener = TestAaSdkAdditContentListener()
+        AdditContentPublisher.getInstance().addListener(testListener)
+        AdditContentPublisher.getInstance().publishAdditContent(testAdditContentDupe)
+        AdditContentPublisher.getInstance().publishAdditContent(testAdditContentDupe)
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+        assertEquals("dupePayloadId", (testListener.resultContent as AdditContent).payloadId)
+        AppEventClient.getInstance().onPublishEvents()
+        assertEquals(EventStrings.ADDIT_DUPLICATE_PAYLOAD, testAppEventSink.testEvents.first().name)
     }
 }
 
