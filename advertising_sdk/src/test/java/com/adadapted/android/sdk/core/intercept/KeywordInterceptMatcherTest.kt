@@ -1,4 +1,4 @@
-package com.adadapted.android.sdk.core.adapter
+package com.adadapted.android.sdk.core.intercept
 
 import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
@@ -6,16 +6,10 @@ import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.event.TestAppEventSink
-import com.adadapted.android.sdk.core.intercept.Intercept
-import com.adadapted.android.sdk.core.intercept.InterceptClient
-import com.adadapted.android.sdk.core.intercept.InterceptEvent
-import com.adadapted.android.sdk.core.intercept.Term
-import com.adadapted.android.sdk.core.intercept.TestInterceptAdapter
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestTransporter
-import com.adadapted.android.sdk.core.intercept.KeywordInterceptMatcher
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.TestCoroutineDispatcher
@@ -42,7 +36,9 @@ class KeywordInterceptMatcherTest {
         AppEventClient.createInstance(testAppEventSink, testTransporterScope)
         InterceptClient.createInstance(testInterceptAdapter, testTransporterScope)
         InterceptClient.getInstance().onSessionAvailable(mockSession)
-        val testIntercept = Intercept("test_searchId", 5, 3, listOf(Term("testTermId", "testTerm", "replacementTerm", "testIcon", "testTagLine", 1)))
+        val testIntercept = Intercept("test_searchId", 5, 3, listOf(
+                Term("testTermId", "testTerm", "replacementTerm", "testIcon", "testTagLine", 1),
+                Term("testTermTwoId", "testTermTwo", "replacementTermTwo", "testIcon", "testTagLine", 2)))
         keywordInterceptMatcher = KeywordInterceptMatcher()
         keywordInterceptMatcher.onKeywordInterceptInitialized(testIntercept)
     }
