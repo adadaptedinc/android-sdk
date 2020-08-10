@@ -1,13 +1,11 @@
-package com.adadapted.android.sdk.ui.adapter
+package com.adadapted.android.sdk.core.intercept
 
 import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.event.AppEventClient
-import com.adadapted.android.sdk.core.intercept.Intercept
-import com.adadapted.android.sdk.core.intercept.InterceptClient
-import com.adadapted.android.sdk.core.intercept.Term
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.session.SessionListener
+import com.adadapted.android.sdk.ui.adapter.SuggestionTracker
 import com.adadapted.android.sdk.ui.model.Suggestion
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock

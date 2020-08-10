@@ -15,7 +15,7 @@ import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestTransporter
-import com.adadapted.android.sdk.ui.adapter.KeywordInterceptMatcher
+import com.adadapted.android.sdk.core.intercept.KeywordInterceptMatcher
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.TestCoroutineDispatcher
