@@ -13,6 +13,7 @@ import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.device.DeviceInfoExtractor
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.intercept.InterceptClient
+import com.adadapted.android.sdk.core.intercept.KeywordInterceptMatcher
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.session.SessionListener
@@ -27,7 +28,6 @@ import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener
 import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener
 import com.adadapted.android.sdk.ui.messaging.AdditContentPublisher
 import com.adadapted.android.sdk.ui.messaging.SdkEventPublisher
-import com.google.android.gms.ads.identifier.AdvertisingIdClient
 
 object AdAdapted {
 
@@ -105,6 +105,7 @@ object AdAdapted {
         }
         SessionClient.getInstance().start(startListener)
         AppEventClient.getInstance().trackSdkEvent(EventStrings.APP_OPENED)
+        KeywordInterceptMatcher.match("INIT") //init the matcher
         Log.i(LOG_TAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", BuildConfig.VERSION_NAME))
     }
 

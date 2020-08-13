@@ -10,7 +10,7 @@ import com.adadapted.android.sdk.ui.model.Suggestion
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
-class KeywordInterceptMatcher : SessionListener(), InterceptClient.Listener {
+class KeywordInterceptMatcher private constructor() : SessionListener(), InterceptClient.Listener {
     private val interceptLock: Lock = ReentrantLock()
     private var intercept: Intercept = Intercept()
     private var mLoaded = false
@@ -21,7 +21,7 @@ class KeywordInterceptMatcher : SessionListener(), InterceptClient.Listener {
         var term: Term? = null
     }
 
-    fun match(constraint: CharSequence): Set<Suggestion> {
+    private fun matchKeyword(constraint: CharSequence): Set<Suggestion> {
         val suggestions: MutableSet<Suggestion> = HashSet()
         interceptLock.lock()
         try {
@@ -100,6 +100,19 @@ class KeywordInterceptMatcher : SessionListener(), InterceptClient.Listener {
     override fun onAdsAvailable(session: Session) {
         if (session.id.isNotEmpty()) {
             InterceptClient.getInstance().initialize(session, this)
+        }
+    }
+
+    companion object {
+        private lateinit var instance: KeywordInterceptMatcher
+
+        fun match(constraint: CharSequence): Set<Suggestion> {
+            return if (this::instance.isInitialized) {
+                instance.matchKeyword(constraint)
+            } else {
+                instance = KeywordInterceptMatcher()
+                emptySet()
+            }
         }
     }
 
