@@ -3,10 +3,10 @@ package com.adadapted.android.sdk.ui.adapter
 import android.content.Context
 import android.widget.ArrayAdapter
 import android.widget.Filter
+import com.adadapted.android.sdk.core.intercept.KeywordInterceptMatcher
 import com.adadapted.android.sdk.ui.model.Suggestion
 
 class AutoCompleteAdapter(context: Context, resource: Int, items: List<String>) : ArrayAdapter<String>(context.applicationContext, resource, items) {
-    private val matcher: KeywordInterceptMatcher = KeywordInterceptMatcher()
     private val allItems: List<String> = ArrayList(items)
     private val currentSuggestions: MutableSet<Suggestion> = HashSet()
 
@@ -27,7 +27,7 @@ class AutoCompleteAdapter(context: Context, resource: Int, items: List<String>) 
             val filterResults = FilterResults()
             val listItems: MutableList<String> = ArrayList()
             currentSuggestions.clear()
-            currentSuggestions.addAll(matcher.match(constraint))
+            currentSuggestions.addAll(KeywordInterceptMatcher.match(constraint))
 
             for (suggestion in currentSuggestions) {
                 listItems.add(suggestion.name)
