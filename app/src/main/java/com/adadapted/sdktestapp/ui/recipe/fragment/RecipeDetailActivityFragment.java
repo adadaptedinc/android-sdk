@@ -55,7 +55,7 @@ public class RecipeDetailActivityFragment extends Fragment implements AaZoneView
         View view = inflater.inflate(R.layout.fragment_recipe_detail, container, false);
 
         aaZoneView = (AaZoneView)view.findViewById(R.id.recipeDetail_aaZoneView);
-        aaZoneView.init("100681");
+        aaZoneView.init("101930");
 
         return view;
     }
