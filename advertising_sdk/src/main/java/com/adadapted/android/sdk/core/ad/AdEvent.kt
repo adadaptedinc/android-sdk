@@ -14,6 +14,5 @@ internal constructor(val adId: String,
         const val IMPRESSION = "impression"
         const val INTERACTION = "interaction"
         const val POPUP_BEGIN = "popup_begin"
-        const val CUSTOM = "custom"
     }
 }
