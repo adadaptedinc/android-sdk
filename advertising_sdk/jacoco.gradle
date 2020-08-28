@@ -36,7 +36,7 @@ project.afterEvaluate {
                     '**/Transporter.*',
                     '**/EventStrings.*',
                     '**/DeviceInfoExtractor.*',
-                    '**/BuildConfig.*',
+                    '**/Config.*',
                     '**/AdAdapted.*',
                     '**/JsonFields.*',
                     '**/ContentTypes.*'
