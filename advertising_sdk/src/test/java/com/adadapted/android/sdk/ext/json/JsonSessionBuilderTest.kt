@@ -1,6 +1,15 @@
 package com.adadapted.android.sdk.ext.json
 
+import com.adadapted.android.sdk.config.EventStrings
+import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
+import com.adadapted.android.sdk.core.device.DeviceInfoClient
+import com.adadapted.android.sdk.core.event.AppEventClient
+import com.adadapted.android.sdk.core.event.TestAppEventSink
+import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.tools.TestTransporter
+import com.nhaarman.mockitokotlin2.mock
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -11,8 +20,15 @@ class JsonSessionBuilderTest {
     private var mockDeviceInfo = DeviceInfo()
     private lateinit var testJsonSessionBuilder: JsonSessionBuilder
 
+    private var testAppEventSink = TestAppEventSink()
+    private var testTransporter = TestCoroutineDispatcher()
+    private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
+
     @Before
     fun setup() {
+        DeviceInfoClient.createInstance(mock(), "", false, mock(), mock(), mock())
+        SessionClient.createInstance(mock(), mock())
+        AppEventClient.createInstance(testAppEventSink, testTransporterScope)
         testJsonSessionBuilder = JsonSessionBuilder(mockDeviceInfo)
     }
 
@@ -28,6 +44,21 @@ class JsonSessionBuilderTest {
         val sessionResult = testJsonSessionBuilder.buildSession(testJsonObject)
 
         assertEquals("testSessionId", sessionResult.id)
+    }
+
+    @Test
+    fun buildSessionFail() {
+        val testJsonObject = JSONObject()
+        testJsonObject.put("session_id", "testSessionId")
+                .put("will_serve_ads_fail", "true")
+                .put("active_campaigns", "true")
+                .put("polling_interval_ms", "5")
+                .put("session_expires_at", "10000")
+
+        testJsonSessionBuilder.buildSession(testJsonObject)
+
+        AppEventClient.getInstance().onPublishEvents()
+        assertEquals(EventStrings.SESSION_PAYLOAD_PARSE_FAILED, testAppEventSink.testErrors.first().code)
     }
 
     @Test
