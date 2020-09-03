@@ -36,6 +36,8 @@ project.afterEvaluate {
                     '**/Transporter.*',
                     '**/EventStrings.*',
                     '**/DeviceInfoExtractor.*',
+                    '**/AdditInterceptActivity.*',
+                    '**/AdWebView.*',
                     '**/Config.*',
                     '**/AdAdapted.*',
                     '**/JsonFields.*',
