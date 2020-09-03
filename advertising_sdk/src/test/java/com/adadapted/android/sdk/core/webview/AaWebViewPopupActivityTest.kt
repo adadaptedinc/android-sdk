@@ -39,7 +39,7 @@ class AaWebViewPopupActivityTest {
     private var testTransporter = TestCoroutineDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
     var mockSession = Session(DeviceInfo(), "testId", true, true, 30, Date(1907245044), mutableMapOf())
-    private var testAd = Ad("TestAdId", "zone", "imp", "url", "type", "path", listOf(), 5, "html")
+    private var testAd = Ad("TestAdId", "zone", "imp", "url", "type", "http://example.com", listOf(), 5, "html")
 
     @Before
     fun setup() {
@@ -55,7 +55,7 @@ class AaWebViewPopupActivityTest {
         val testIntent = Intent(testContext, AaWebViewPopupActivity::class.java)
         testIntent.putExtra(AaWebViewPopupActivity::class.java.name + ".EXTRA_POPUP_AD", testAd)
         testIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        testAaWebViewPopupActivity = Robolectric.buildActivity<AaWebViewPopupActivity>(AaWebViewPopupActivity::class.java, testIntent)
+        testAaWebViewPopupActivity = Robolectric.buildActivity(AaWebViewPopupActivity::class.java, testIntent)
                 .create()
                 .resume()
                 .get()

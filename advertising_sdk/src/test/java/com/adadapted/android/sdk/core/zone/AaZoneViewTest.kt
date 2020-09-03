@@ -1,6 +1,7 @@
 package com.adadapted.android.sdk.core.zone
 
 import android.os.Looper
+import android.view.View
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
@@ -129,6 +130,34 @@ class AaZoneViewTest {
         Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals(testListener.adFailed, true)
+    }
+
+    @Test
+    fun onVisibilityChanged() {
+        val testListener = TestAaZoneViewListener()
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(testListener)
+        testAaZoneView.visibility = View.GONE
+        testAaZoneView.visibility = View.VISIBLE
+        testAaZoneView.onAdLoaded(Ad("NewAdId"))
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(testListener.adLoaded, true)
+    }
+
+    @Test
+    fun testOnAdClicked() {
+        val testListener = TestAaZoneViewListener()
+        val testAd = Ad("NewAdId", actionType = "c")
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(testListener)
+        testAaZoneView.onAdLoaded(testAd)
+        testAaZoneView.onAdClicked(testAd)
+        AppEventClient.getInstance().onPublishEvents()
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(testListener.adLoaded, true)
+        assert(testAppEventSink.testEvents.any { event -> event.name == EventStrings.ATL_AD_CLICKED })
     }
 }
 
