@@ -63,6 +63,10 @@ repositories {
     jcenter()
 }
 
+kotlin {
+    explicitApi()
+}
+
 tasks.withType(Test) {
     testLogging {
         events TestLogEvent.FAILED,
