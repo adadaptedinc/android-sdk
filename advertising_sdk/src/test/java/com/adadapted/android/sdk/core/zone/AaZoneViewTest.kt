@@ -77,6 +77,18 @@ class AaZoneViewTest {
     }
 
     @Test
+    fun testNoAdStart() {
+        val testListener = TestAaZoneViewListener()
+        val testAd = (Ad("NewAdId"))
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(testListener)
+        testAaZoneView.onNoAdAvailable()
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(testListener.adLoaded, false)
+    }
+
+    @Test
     fun testShutdown() {
         val testListener = TestAaZoneViewListener()
         testAaZoneView.init("TestZoneId")
@@ -130,6 +142,17 @@ class AaZoneViewTest {
         Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals(testListener.adFailed, true)
+    }
+
+    @Test
+    fun testOnBlankAdDisplayed() {
+        val testListener = TestAaZoneViewListener()
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(testListener)
+        testAaZoneView.onBlankLoaded()
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(testListener.adLoaded, false)
     }
 
     @Test

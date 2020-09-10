@@ -29,6 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -231,6 +232,18 @@ class AdZonePresenterTest {
         testAdZonePresenter.onSessionInitFailed()
 
         assertEquals("NoAdAvail", testListener.testAd.id)
+    }
+
+    @Test
+    fun testNullListener() {
+        testAdZonePresenter.init("testZoneId")
+        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", hashMapOf(), listOf(Ad("TestAdId")))))
+        testSession.setZones(zones)
+
+        testAdZonePresenter.onSessionAvailable(testSession)
+        testAdZonePresenter.onAttach(null)
+
+        assertNotNull(testAdZonePresenter)
     }
 }
 
