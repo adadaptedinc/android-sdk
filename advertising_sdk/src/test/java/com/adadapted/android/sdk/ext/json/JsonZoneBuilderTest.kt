@@ -30,9 +30,26 @@ class JsonZoneBuilderTest {
         DeviceInfoClient.createInstance(mock(),"", false, HashMap(), TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
         AppEventClient.createInstance(testAppEventSink, testTransporterScope)
+    }
 
+
+    @Test
+    fun buildPortZones() {
+        setupZone("port_height", "port_width")
+        val resultZoneMap = testJsonZoneBuilder.buildZones(testJsonZones)
+        assertEquals("zone1", resultZoneMap["zone1"]?.id)
+    }
+
+    @Test
+    fun buildLandZones() {
+        setupZone("land_height", "land_width")
+        val resultZoneMap = testJsonZoneBuilder.buildZones(testJsonZones)
+        assertEquals("zone1", resultZoneMap["zone1"]?.id)
+    }
+
+    private fun setupZone(heightName: String, widthName: String) {
         val zoneJsonObject = JSONObject()
-        zoneJsonObject.put("port_height", "180").put("port_width", "80")
+        zoneJsonObject.put(heightName, "180").put(widthName, "80")
 
         val payloadItemJson = JSONObject()
                 .put("product_title", "testProduct")
@@ -59,12 +76,5 @@ class JsonZoneBuilderTest {
 
         testJsonZones.put("zone1", zoneJsonObject)
         testJsonZoneBuilder = JsonZoneBuilder(5f)
-    }
-
-
-    @Test
-    fun buildZones() {
-        val resultZoneMap = testJsonZoneBuilder.buildZones(testJsonZones)
-        assertEquals("zone1", resultZoneMap["zone1"]?.id)
     }
 }
