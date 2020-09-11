@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.core.http
 
+import com.adadapted.android.sdk.BuildConfig
 import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
@@ -70,7 +71,7 @@ class HttpSessionAdapterTest {
         testHttpSessionAdapter.sendInit(HttpAppEventSinkTest.generateMockDeviceInfo(), testInitListener)
         testHttpSessionAdapter.sendRefreshAds(mockSession, testListener)
         assert(testHttpRequestManager.queueWasCreated)
-        assertEquals("refreshUrl?aid=testAppId&uid=testUdId&sid=testSessionId&sdk=2.2.1", testHttpRequestManager.queuedRequest?.url)
+        assertEquals("refreshUrl?aid=testAppId&uid=testUdId&sid=testSessionId&sdk=" + BuildConfig.VERSION_NAME, testHttpRequestManager.queuedRequest?.url)
     }
 
     @Test
@@ -81,7 +82,7 @@ class HttpSessionAdapterTest {
         AppEventClient.getInstance().onPublishEvents()
         assertEquals(EventStrings.AD_GET_REQUEST_FAILED, testAppEventSink.testErrors.first().code)
         assert(testHttpRequestManager.queueWasCreated)
-        assertEquals("refreshUrl?aid=testAppId&uid=testUdId&sid=testSessionId&sdk=2.2.1", testHttpRequestManager.queuedRequest?.url)
+        assertEquals("refreshUrl?aid=testAppId&uid=testUdId&sid=testSessionId&sdk=" + BuildConfig.VERSION_NAME, testHttpRequestManager.queuedRequest?.url)
     }
 }
 

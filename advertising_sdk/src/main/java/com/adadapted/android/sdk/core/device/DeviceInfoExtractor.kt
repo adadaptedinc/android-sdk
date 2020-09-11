@@ -76,7 +76,6 @@ class DeviceInfoExtractor: InfoExtractor {
     private fun getAdvertisingIdClientInfo(context: Context): AdvertisingIdClient.Info? {
         try {
             return AdvertisingIdClient.getAdvertisingIdInfo(context.applicationContext)
-            //return getAdvertisingId(context)
         } catch (ex: GooglePlayServicesNotAvailableException) {
             trackGooglePlayAdError(ex)
         } catch (ex: GooglePlayServicesRepairableException) {
@@ -89,7 +88,6 @@ class DeviceInfoExtractor: InfoExtractor {
 
     private fun trackGooglePlayAdError(ex: Exception) {
         Log.w(LOGTAG, GooglePlayAdError)
-        ex.message?.let { AppEventClient.getInstance().trackError(EventStrings.GAID_UNAVAILABLE, it) }
     }
 
     companion object {

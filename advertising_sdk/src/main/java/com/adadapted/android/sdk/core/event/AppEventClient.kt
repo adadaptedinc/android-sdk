@@ -112,6 +112,9 @@ class AppEventClient private constructor(private val sink: AppEventSink, private
         DeviceInfoClient.getInstance().getDeviceInfo(object: DeviceInfoClient.Callback {
             override fun onDeviceInfoCollected(deviceInfo: DeviceInfo) {
                 sink.generateWrappers(deviceInfo)
+                if (!deviceInfo.isAllowRetargetingEnabled) {
+                    trackError(EventStrings.GAID_UNAVAILABLE, "GAID and/or tracking has been disabled for this device.")
+                }
             }
         })
 
