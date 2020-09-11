@@ -1,23 +1,58 @@
 package com.adadapted.android.sdk.core.addit
 
+import android.os.Parcel
+import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.atl.AddToListContent
 import com.adadapted.android.sdk.core.atl.AddToListItem
+import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.AppEventClient
+import com.adadapted.android.sdk.core.event.TestAppEventSink
 import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.mock
-import org.junit.Assert
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 import java.util.LinkedList
 
+@RunWith(RobolectricTestRunner::class)
 class AdditContentTest {
+    private var testAppEventSink = TestAppEventSink()
+    private var testTransporter = TestCoroutineDispatcher()
+    private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
+    private var testPayloadAdapter = TestPayloadAdapter()
+
     @Before
     fun setup() {
         DeviceInfoClient.createInstance(mock(), "", false, mock(), mock(), mock())
         SessionClient.createInstance(mock(), mock())
-        AppEventClient.createInstance(mock(),mock())
-        PayloadClient.createInstance(mock(), AppEventClient.getInstance(), mock())
+        AppEventClient.createInstance(testAppEventSink, testTransporterScope)
+        PayloadClient.createInstance(testPayloadAdapter, AppEventClient.getInstance(), testTransporterScope)
+        testAppEventSink.testEvents.clear()
+        testAppEventSink.testErrors.clear()
+    }
+
+    @Test
+    fun createAddItContentFromParcel() {
+        val content = AdditContent.createInAppContent(
+                "payloadId",
+                "message",
+                "image",
+                ContentTypes.ADD_TO_LIST_ITEMS,
+                LinkedList()
+        )
+        val parcel = Parcel.obtain()
+
+        content.writeToParcel(parcel, 0)
+        parcel.setDataPosition(0)
+
+        val addItContentFromParcel = AdditContent.createFromParcel(parcel)
+
+        assertEquals("payloadId", addItContentFromParcel.payloadId)
     }
 
     @Test
@@ -29,12 +64,12 @@ class AdditContentTest {
                 ContentTypes.ADD_TO_LIST_ITEMS,
                 LinkedList()
         )
-        Assert.assertEquals("payloadId", content.payloadId)
-        Assert.assertEquals("message", content.message)
-        Assert.assertEquals("image", content.image)
-        Assert.assertEquals(AdditContent.AdditSources.DEEPLINK, content.additSource)
-        Assert.assertEquals(AddToListContent.Sources.OUT_OF_APP, content.getSource())
-        Assert.assertEquals(0, content.getItems().size.toLong())
+        assertEquals("payloadId", content.payloadId)
+        assertEquals("message", content.message)
+        assertEquals("image", content.image)
+        assertEquals(AdditContent.AdditSources.DEEPLINK, content.additSource)
+        assertEquals(AddToListContent.Sources.OUT_OF_APP, content.getSource())
+        assertEquals(0, content.getItems().size.toLong())
     }
 
     @Test
@@ -46,12 +81,12 @@ class AdditContentTest {
                 ContentTypes.ADD_TO_LIST_ITEMS,
                 LinkedList()
         )
-        Assert.assertEquals("payloadId", content.payloadId)
-        Assert.assertEquals("message", content.message)
-        Assert.assertEquals("image", content.image)
-        Assert.assertEquals(AdditContent.AdditSources.IN_APP, content.additSource)
-        Assert.assertEquals(AddToListContent.Sources.IN_APP, content.getSource())
-        Assert.assertEquals(0, content.getItems().size.toLong())
+        assertEquals("payloadId", content.payloadId)
+        assertEquals("message", content.message)
+        assertEquals("image", content.image)
+        assertEquals(AdditContent.AdditSources.IN_APP, content.additSource)
+        assertEquals(AddToListContent.Sources.IN_APP, content.getSource())
+        assertEquals(0, content.getItems().size.toLong())
     }
 
     @Test
@@ -63,12 +98,12 @@ class AdditContentTest {
                 ContentTypes.ADD_TO_LIST_ITEMS,
                 LinkedList()
         )
-        Assert.assertEquals("payloadId", content.payloadId)
-        Assert.assertEquals("message", content.message)
-        Assert.assertEquals("image", content.image)
-        Assert.assertEquals(AdditContent.AdditSources.PAYLOAD, content.additSource)
-        Assert.assertEquals(AddToListContent.Sources.OUT_OF_APP, content.getSource())
-        Assert.assertEquals(0, content.getItems().size.toLong())
+        assertEquals("payloadId", content.payloadId)
+        assertEquals("message", content.message)
+        assertEquals("image", content.image)
+        assertEquals(AdditContent.AdditSources.PAYLOAD, content.additSource)
+        assertEquals(AddToListContent.Sources.OUT_OF_APP, content.getSource())
+        assertEquals(0, content.getItems().size.toLong())
     }
 
     @Test
@@ -83,7 +118,10 @@ class AdditContentTest {
                 LinkedList()
         )
         content.acknowledge()
-        Assert.assertTrue(true)
+        content.acknowledge()
+        AppEventClient.getInstance().onPublishEvents()
+        assertEquals(EventStrings.ADDIT_ADDED_TO_LIST, testAppEventSink.testEvents.first().name)
+        assertEquals(1, testAppEventSink.testEvents.count())
     }
 
     @Test
@@ -97,7 +135,8 @@ class AdditContentTest {
                 AdditContent.AdditSources.IN_APP,
                 LinkedList()
         )
-        content.itemAcknowledge(AddToListItem(
+
+        val addToListItem = AddToListItem(
                 "trackingId",
                 "title",
                 "brand",
@@ -106,8 +145,11 @@ class AdditContentTest {
                 "retailerSku",
                 "discount",
                 "productImage"
-        ))
-        Assert.assertTrue(true)
+        )
+
+        content.itemAcknowledge(addToListItem)
+        AppEventClient.getInstance().onPublishEvents()
+        assert(testAppEventSink.testEvents.any { event -> event.name == EventStrings.ADDIT_ITEM_ADDED_TO_LIST })
     }
 
     @Test
@@ -122,7 +164,8 @@ class AdditContentTest {
                 LinkedList()
         )
         content.duplicate()
-        Assert.assertTrue(true)
+        AppEventClient.getInstance().onPublishEvents()
+        assert(testAppEventSink.testEvents.any { event -> event.name == EventStrings.ADDIT_DUPLICATE_PAYLOAD })
     }
 
     @Test
@@ -137,7 +180,8 @@ class AdditContentTest {
                 LinkedList()
         )
         content.failed("test failed message")
-        Assert.assertTrue(true)
+        AppEventClient.getInstance().onPublishEvents()
+        assert(testAppEventSink.testErrors.any { event -> event.code == EventStrings.ADDIT_CONTENT_FAILED })
     }
 
     @Test
@@ -161,6 +205,7 @@ class AdditContentTest {
                 "discount",
                 "productImage"
         ), "test failed message")
-        Assert.assertTrue(true)
+        AppEventClient.getInstance().onPublishEvents()
+        assert(testAppEventSink.testErrors.any { event -> event.code == EventStrings.ADDIT_CONTENT_ITEM_FAILED })
     }
 }

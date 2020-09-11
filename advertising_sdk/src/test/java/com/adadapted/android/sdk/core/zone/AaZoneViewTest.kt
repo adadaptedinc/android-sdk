@@ -1,10 +1,14 @@
 package com.adadapted.android.sdk.core.zone
 
 import android.os.Looper
+import android.view.View
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
+import com.adadapted.android.sdk.core.ad.AdContent
 import com.adadapted.android.sdk.core.ad.AdEventClient
+import com.adadapted.android.sdk.core.ad.TestAdContentListener
+import com.adadapted.android.sdk.core.atl.AddToListItem
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
@@ -15,6 +19,7 @@ import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.tools.TestAdEventSink
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestTransporter
+import com.adadapted.android.sdk.ui.messaging.AdContentPublisher
 import com.adadapted.android.sdk.ui.view.AaZoneView
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -52,12 +57,19 @@ class AaZoneViewTest {
         AdEventClient.createInstance(mockAdEventSink, testTransporterScope)
         AdEventClient.getInstance().onSessionAvailable(mockSession)
         AppEventClient.createInstance(testAppEventSink, testTransporterScope)
+        AdContentPublisher.createInstance()
         testAaZoneView = AaZoneView(testContext)
     }
 
     @Test
     fun testInit() {
         testAaZoneView.init("TestZoneId")
+        AppEventClient.getInstance().onPublishEvents()
+        assertEquals(EventStrings.ZONE_LOADED, testAppEventSink.testEvents.first().name)
+    }
+    @Test
+    fun testInitWithResourceId() {
+        testAaZoneView.init("TestZoneId", 0)
         AppEventClient.getInstance().onPublishEvents()
         assertEquals(EventStrings.ZONE_LOADED, testAppEventSink.testEvents.first().name)
     }
@@ -73,6 +85,70 @@ class AaZoneViewTest {
         Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals(testListener.adLoaded, true)
+    }
+
+    @Test
+    fun testStartContentListener() {
+        val testAdContentListener = TestAdContentListener()
+        val testAd = (Ad("NewAdId"))
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(testAdContentListener)
+        testAaZoneView.onAdAvailable(testAd)
+        testAaZoneView.onAdLoaded(testAd)
+        AdContentPublisher.getInstance().publishContent("TestZoneId", AdContent.createAddToListContent(Ad(payload = listOf(AddToListItem("trackId", "title", "brand", "cat", "upc", "sku", "disc", "image")))))
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals("TestZoneId", testAdContentListener.resultZoneId)
+    }
+
+    @Test
+    fun testStartBothListeners() {
+        val testListener = TestAaZoneViewListener()
+        val testAdContentListener = TestAdContentListener()
+        val testAd = (Ad("NewAdId"))
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(testListener, testAdContentListener)
+        testAaZoneView.onAdAvailable(testAd)
+        testAaZoneView.onAdLoaded(testAd)
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(testListener.adLoaded, true)
+    }
+
+    @Test
+    fun testNoAdStart() {
+        val testListener = TestAaZoneViewListener()
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(testListener)
+        testAaZoneView.onNoAdAvailable()
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(testListener.adLoaded, false)
+    }
+
+    @Test
+    fun testOnStop() {
+        val testListener = TestAaZoneViewListener()
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(testListener)
+        testAaZoneView.onAdsRefreshed(Zone("TestZoneId",ads = listOf(Ad("NewZoneAdId"))))
+        testAaZoneView.onStop()
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(testListener.zoneHasAds, false)
+    }
+
+    @Test
+    fun testOnStopWithContentListener() {
+        val testListener = TestAaZoneViewListener()
+        val testAdContentListener = TestAdContentListener()
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(testListener, testAdContentListener)
+        testAaZoneView.onAdsRefreshed(Zone("TestZoneId",ads = listOf(Ad("NewZoneAdId"))))
+        testAaZoneView.onStop(testAdContentListener)
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(testListener.zoneHasAds, false)
     }
 
     @Test
@@ -129,6 +205,45 @@ class AaZoneViewTest {
         Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals(testListener.adFailed, true)
+    }
+
+    @Test
+    fun testOnBlankAdDisplayed() {
+        val testListener = TestAaZoneViewListener()
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(testListener)
+        testAaZoneView.onBlankLoaded()
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(testListener.adLoaded, false)
+    }
+
+    @Test
+    fun onVisibilityChanged() {
+        val testListener = TestAaZoneViewListener()
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(testListener)
+        testAaZoneView.visibility = View.GONE
+        testAaZoneView.visibility = View.VISIBLE
+        testAaZoneView.onAdLoaded(Ad("NewAdId"))
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(testListener.adLoaded, true)
+    }
+
+    @Test
+    fun testOnAdClicked() {
+        val testListener = TestAaZoneViewListener()
+        val testAd = Ad("NewAdId", actionType = "c")
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(testListener)
+        testAaZoneView.onAdLoaded(testAd)
+        testAaZoneView.onAdClicked(testAd)
+        AppEventClient.getInstance().onPublishEvents()
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(testListener.adLoaded, true)
+        assert(testAppEventSink.testEvents.any { event -> event.name == EventStrings.ATL_AD_CLICKED })
     }
 }
 

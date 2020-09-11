@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.core.session
 
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.zone.Zone
+import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertFalse
 import org.junit.Assert
 import org.junit.Test
@@ -13,6 +14,15 @@ class SessionTest {
         val deviceInfo = DeviceInfo.empty()
         val session = Session(deviceInfo)
         Assert.assertEquals("", session.id)
+    }
+
+    @Test
+    fun constructSession() {
+        val deviceInfo = DeviceInfo.empty()
+        val session = Session(deviceInfo)
+        val constructedSession = Session(session, mapOf())
+
+        assertEquals(constructedSession.id, session.id)
     }
 
     @Test

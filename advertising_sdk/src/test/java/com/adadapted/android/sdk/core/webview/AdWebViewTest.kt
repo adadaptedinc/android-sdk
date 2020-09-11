@@ -21,10 +21,6 @@ class AdWebViewTest {
     }
 
     @Test
-    fun loadAdTest() {
-    }
-
-    @Test
     fun adClickedTest() {
         val testAd = Ad("TestAdId", url = "http://www.example.com")
         testAdWebView.loadAd(testAd)

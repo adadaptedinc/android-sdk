@@ -28,4 +28,13 @@ class DimensionConverterTest {
         assertEquals("land", Dimension.Orientation.LAND)
         assertEquals("port", Dimension.Orientation.PORT)
     }
+
+    @Test
+    fun defaultDimensionIsCorrect() {
+        val dimension = Dimension()
+        assertEquals(0, dimension.height)
+        assertEquals(0, dimension.width)
+        assertEquals("land", Dimension.Orientation.LAND)
+        assertEquals("port", Dimension.Orientation.PORT)
+    }
 }
