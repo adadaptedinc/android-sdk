@@ -22,7 +22,9 @@ class InterceptClient private constructor(private val adapter: InterceptAdapter,
         }
         adapter.retrieve(session, object : InterceptAdapter.Callback {
             override fun onSuccess(intercept: Intercept) {
-                listener.onKeywordInterceptInitialized(intercept)
+                if (session.id.isNotEmpty()) {
+                    listener.onKeywordInterceptInitialized(intercept)
+                }
             }
         })
         SessionClient.getInstance().addListener(this)
