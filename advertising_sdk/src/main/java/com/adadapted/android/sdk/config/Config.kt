@@ -5,7 +5,7 @@ object Config {
 
     const val DEFAULT_AD_POLLING = 300000L // If the new Ad polling isn't set it will default to every 5 minutes
     const val DEFAULT_EVENT_POLLING = 2500L // Events will be pushed to the server every 2.5 seconds
-    const val DEFAULT_AD_REFRESH = 60L // If an Ad does not have a refresh time it will default to 60 seconds
+    const val DEFAULT_AD_REFRESH = 6000L // If an Ad does not have a refresh time it will default to 60 seconds
 
     private const val AD_SERVER_VERSION = "/v/0.9.5/"
     private const val TRACKING_SERVER_VERSION = "/v/1/"
