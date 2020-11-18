@@ -39,15 +39,15 @@ class JsonZoneBuilder(deviceScale: Float) {
 
         if (jsonZone.has(PORT_ZONE_HEIGHT) && jsonZone.has(PORT_ZONE_WIDTH)) {
             val portDimension = Dimension()
-            portDimension.height = calculateDimensionValue(jsonZone.getString(PORT_ZONE_HEIGHT))
-            portDimension.width = calculateDimensionValue(jsonZone.getString(PORT_ZONE_WIDTH))
+            portDimension.height = calculateDimensionValue(tryGetIntFromJson(jsonZone, PORT_ZONE_HEIGHT))
+            portDimension.width = calculateDimensionValue(tryGetIntFromJson(jsonZone, PORT_ZONE_WIDTH))
             newZone.setDimension(Dimension.Orientation.PORT, portDimension)
         }
 
         if (jsonZone.has(LAND_ZONE_HEIGHT) && jsonZone.has(LAND_ZONE_WIDTH)) {
             val landDimension = Dimension()
-            landDimension.height = calculateDimensionValue(jsonZone.getString(LAND_ZONE_HEIGHT))
-            landDimension.width = calculateDimensionValue(jsonZone.getString(LAND_ZONE_WIDTH))
+            landDimension.height = calculateDimensionValue(tryGetIntFromJson(jsonZone, LAND_ZONE_HEIGHT))
+            landDimension.width = calculateDimensionValue(tryGetIntFromJson(jsonZone, LAND_ZONE_WIDTH))
             newZone.setDimension(Dimension.Orientation.LAND, landDimension)
         }
 
@@ -56,9 +56,17 @@ class JsonZoneBuilder(deviceScale: Float) {
         return newZone
     }
 
+    private fun tryGetIntFromJson(json: JSONObject, value: String): Int {
+        return try {
+            json.getInt(value)
+        } catch (ex: java.lang.Exception) {
+            -1
+        }
+    }
+
     @Throws(NumberFormatException::class)
-    private fun calculateDimensionValue(value: String): Int {
-        return dimensionConverter.convertDpToPx(value.toInt())
+    private fun calculateDimensionValue(value: Int): Int {
+        return dimensionConverter.convertDpToPx(value)
     }
 
     companion object {

@@ -15,7 +15,7 @@ class KeywordInterceptMatcher private constructor() : SessionListener(), Interce
     private var intercept: Intercept = Intercept()
     private var mLoaded = false
 
-    private class Matcher internal constructor() {
+    private class Matcher() {
         var found = false
         var input = ""
         var term: Term? = null
