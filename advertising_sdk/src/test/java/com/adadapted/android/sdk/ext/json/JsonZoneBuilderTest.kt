@@ -32,24 +32,44 @@ class JsonZoneBuilderTest {
         AppEventClient.createInstance(testAppEventSink, testTransporterScope)
     }
 
-
     @Test
     fun buildPortZones() {
-        setupZone("port_height", "port_width")
+        setupZone("port_height", 150, "port_width", -1)
         val resultZoneMap = testJsonZoneBuilder.buildZones(testJsonZones)
         assertEquals("zone1", resultZoneMap["zone1"]?.id)
     }
 
     @Test
     fun buildLandZones() {
-        setupZone("land_height", "land_width")
+        setupZone("land_height", 150, "land_width", -1)
         val resultZoneMap = testJsonZoneBuilder.buildZones(testJsonZones)
         assertEquals("zone1", resultZoneMap["zone1"]?.id)
     }
 
-    private fun setupZone(heightName: String, widthName: String) {
+    @Test
+    fun buildBadPortZones() {
+        setupZone("port_height", "badval1", "port_width", "badval2")
+        val resultZoneMap = testJsonZoneBuilder.buildZones(testJsonZones)
+        assertEquals("zone1", resultZoneMap["zone1"]?.id)
+    }
+
+    @Test
+    fun buildBadLandZones() {
+        setupZone("land_height", "badval1", "land_width", "badval2")
+        val resultZoneMap = testJsonZoneBuilder.buildZones(testJsonZones)
+        assertEquals("zone1", resultZoneMap["zone1"]?.id)
+    }
+
+    @Test
+    fun buildReallyBadPortZones() {
+        setupZone("port_height", 9.0045, "port_width", " ")
+        val resultZoneMap = testJsonZoneBuilder.buildZones(testJsonZones)
+        assertEquals("zone1", resultZoneMap["zone1"]?.id)
+    }
+
+    private fun setupZone(heightName: String, heightValue: Any, widthName: String, widthValue: Any) {
         val zoneJsonObject = JSONObject()
-        zoneJsonObject.put(heightName, "180").put(widthName, "80")
+        zoneJsonObject.put(heightName, heightValue).put(widthName, widthValue)
 
         val payloadItemJson = JSONObject()
                 .put("product_title", "testProduct")
