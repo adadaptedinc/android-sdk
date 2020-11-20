@@ -7,7 +7,7 @@ import org.junit.Before
 import org.junit.Test
 
 class JsonInterceptBuilderTest {
-    private var testJsonInterceptBuilder =JsonInterceptBuilder()
+    private var testJsonInterceptBuilder = JsonInterceptBuilder()
     private var testJsonObject = JSONObject()
 
     @Before
@@ -21,6 +21,16 @@ class JsonInterceptBuilderTest {
         testJsonArray.put(JSONObject().put("term_id", "term3").put("term", "eggs").put("replacement", "fake eggs").put("icon", "icon").put("tagline", "tag").put("priority", "1"))
         testJsonArray.put(JSONObject().put("term_id", "term4").put("term", "eggs").put("replacement", "rotten eggs").put("icon", "icon").put("tagline", "tag").put("priority", "0"))
         testJsonObject.put("terms", testJsonArray)
+    }
+
+    @Test
+    fun buildAndParseBadJson() {
+        val badJson = JSONObject()
+        badJson.put("search_id", "badSearchId")
+        badJson.put("refresh_time", 80)
+
+        val intercept = testJsonInterceptBuilder.build(badJson)
+        assertEquals(80L, intercept.refreshTime)
     }
 
     @Test

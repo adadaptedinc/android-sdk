@@ -18,8 +18,8 @@ class JsonInterceptBuilder {
         }
         try {
             val searchId = if (json.has(SEARCH_ID)) json.getString(SEARCH_ID) else ""
-            val refreshTime = if (json.has(REFRESH_TIME)) json.getString(REFRESH_TIME).toLong() else 0L
-            val minMatchLength = if (json.has(MIN_MATCH_LENGTH)) json.getString(MIN_MATCH_LENGTH).toInt() else 2
+            val refreshTime = if (json.has(REFRESH_TIME)) JsonHelper.tryGetLongFromJson(json, REFRESH_TIME) else 0L
+            val minMatchLength = if (json.has(MIN_MATCH_LENGTH)) JsonHelper.tryGetIntFromJson(json, MIN_MATCH_LENGTH, 2) else 2
             val terms = if (json.has(TERMS)) json.getJSONArray(TERMS) else JSONArray()
             val intercepts = sortIntercepts(parseIntercepts(terms))
             return Intercept(searchId, refreshTime, minMatchLength, intercepts)
