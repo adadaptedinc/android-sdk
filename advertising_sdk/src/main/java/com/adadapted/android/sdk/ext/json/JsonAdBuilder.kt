@@ -36,8 +36,8 @@ class JsonAdBuilder {
     fun buildAd(zoneId: String, ad: JSONObject): Ad {
         var parsedRefreshTime = DEFAULT_REFRESH_TIME
         try {
-            parsedRefreshTime = ad.getString(REFRESH_TIME).toInt()
-        } catch (ex: NumberFormatException) {
+            parsedRefreshTime = JsonHelper.tryGetLongFromJson(ad, REFRESH_TIME)
+        } catch (ex: JSONException) {
             getInstance().trackError(EventStrings.AD_PAYLOAD_PARSE_FAILED, "Ad " + ad[AD_ID] + " has an improperly set refresh_time.")
         }
         var payload: List<AddToListItem> = ArrayList()
@@ -52,7 +52,7 @@ class JsonAdBuilder {
                 ad.getString(ACTION_TYPE),
                 ad.getString(ACTION_PATH),
                 payload,
-                parsedRefreshTime.toLong(),
+                parsedRefreshTime,
                 ad.getString(TRACKING_HTML))
     }
 
@@ -98,7 +98,7 @@ class JsonAdBuilder {
     }
 
     companion object {
-        private const val DEFAULT_REFRESH_TIME = 90
+        private const val DEFAULT_REFRESH_TIME = 90L
         private const val AD_ID = "ad_id"
         private const val IMPRESSION_ID = "impression_id"
         private const val REFRESH_TIME = "refresh_time"
