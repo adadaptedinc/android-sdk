@@ -16,7 +16,7 @@ class JsonHelper {
             return try {
                 json.getLong(value)
             } catch (ex: java.lang.Exception) {
-                0L
+                90L
             }
         }
     }
