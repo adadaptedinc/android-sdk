@@ -6,7 +6,7 @@ import com.android.volley.VolleyError
 
 object HttpErrorTracker {
 
-    fun trackHttpError(volleyError: VolleyError?, url: String, eventString: String, logTag: String) {
+    fun trackHttpError(volleyError: VolleyError?, url: String, eventString: String, logTag: String, extraLogging: String = "") {
         if (volleyError?.networkResponse != null) {
             val statusCode = volleyError.networkResponse.statusCode
             if (statusCode >= 400) {
@@ -15,6 +15,7 @@ object HttpErrorTracker {
                 params["url"] = url
                 params["status_code"] = statusCode.toString()
                 params["data"] = data
+                params["extra"] = extraLogging
                 try {
                     AppEventClient.getInstance().trackError(eventString, volleyError.message ?: "", params)
                 } catch (illegalArg: IllegalArgumentException) {
