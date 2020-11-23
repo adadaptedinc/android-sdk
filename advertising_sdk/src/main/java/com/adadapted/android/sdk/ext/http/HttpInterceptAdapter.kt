@@ -28,7 +28,7 @@ class HttpInterceptAdapter(private val initUrl: String, private val eventUrl: St
                     callback.onSuccess(kiBuilder.build(response))
                 },
                 Response.ErrorListener { error ->
-                    HttpErrorTracker.trackHttpError(error, initUrl, EventStrings.KI_SESSION_REQUEST_FAILED, LOGTAG, url)
+                    HttpErrorTracker.trackHttpError(error, initUrl, EventStrings.KI_SESSION_REQUEST_FAILED, LOGTAG)
                 })
         httpQueueManager.queueRequest(jsonRequest)
     }

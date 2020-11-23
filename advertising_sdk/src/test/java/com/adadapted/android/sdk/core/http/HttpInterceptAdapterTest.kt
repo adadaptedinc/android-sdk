@@ -69,7 +69,6 @@ class HttpInterceptAdapterTest {
         AppEventClient.getInstance().onPublishEvents()
         assert(testHttpRequestManager.queueWasCreated)
         assertEquals(EventStrings.KI_SESSION_REQUEST_FAILED, testAppEventSink.testErrors.first().code)
-        assertEquals("testInitUrl?aid=testAppId&uid=testUdId&sid=testSessionId&sdk=" + BuildConfig.VERSION_NAME, testAppEventSink.testErrors.first().params["extra"])
         assertEquals("testInitUrl", testAppEventSink.testErrors.first().params["url"])
         assertEquals("testInitUrl?aid=testAppId&uid=testUdId&sid=testSessionId&sdk=" + BuildConfig.VERSION_NAME, testHttpRequestManager.queuedRequest?.url)
     }
