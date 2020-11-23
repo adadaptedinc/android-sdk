@@ -97,12 +97,6 @@ class KeywordInterceptMatcher private constructor() : SessionListener(), Interce
         }
     }
 
-    override fun onAdsAvailable(session: Session) {
-        if (session.id.isNotEmpty()) {
-            InterceptClient.getInstance().initialize(session, this)
-        }
-    }
-
     companion object {
         private lateinit var instance: KeywordInterceptMatcher
 

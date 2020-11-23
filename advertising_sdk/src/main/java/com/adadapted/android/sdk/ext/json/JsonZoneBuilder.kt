@@ -39,29 +39,21 @@ class JsonZoneBuilder(deviceScale: Float) {
 
         if (jsonZone.has(PORT_ZONE_HEIGHT) && jsonZone.has(PORT_ZONE_WIDTH)) {
             val portDimension = Dimension()
-            portDimension.height = calculateDimensionValue(tryGetIntFromJson(jsonZone, PORT_ZONE_HEIGHT))
-            portDimension.width = calculateDimensionValue(tryGetIntFromJson(jsonZone, PORT_ZONE_WIDTH))
+            portDimension.height = calculateDimensionValue(JsonHelper.tryGetIntFromJson(jsonZone, PORT_ZONE_HEIGHT))
+            portDimension.width = calculateDimensionValue(JsonHelper.tryGetIntFromJson(jsonZone, PORT_ZONE_WIDTH))
             newZone.setDimension(Dimension.Orientation.PORT, portDimension)
         }
 
         if (jsonZone.has(LAND_ZONE_HEIGHT) && jsonZone.has(LAND_ZONE_WIDTH)) {
             val landDimension = Dimension()
-            landDimension.height = calculateDimensionValue(tryGetIntFromJson(jsonZone, LAND_ZONE_HEIGHT))
-            landDimension.width = calculateDimensionValue(tryGetIntFromJson(jsonZone, LAND_ZONE_WIDTH))
+            landDimension.height = calculateDimensionValue(JsonHelper.tryGetIntFromJson(jsonZone, LAND_ZONE_HEIGHT))
+            landDimension.width = calculateDimensionValue(JsonHelper.tryGetIntFromJson(jsonZone, LAND_ZONE_WIDTH))
             newZone.setDimension(Dimension.Orientation.LAND, landDimension)
         }
 
         val jsonAds = jsonZone.getJSONArray(ADS)
         newZone.ads = jsonAdBuilder.buildAds(zoneId, jsonAds)
         return newZone
-    }
-
-    private fun tryGetIntFromJson(json: JSONObject, value: String): Int {
-        return try {
-            json.getInt(value)
-        } catch (ex: java.lang.Exception) {
-            -1
-        }
     }
 
     @Throws(NumberFormatException::class)
