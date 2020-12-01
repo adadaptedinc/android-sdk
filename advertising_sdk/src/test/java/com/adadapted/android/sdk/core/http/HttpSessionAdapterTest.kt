@@ -31,9 +31,7 @@ class HttpSessionAdapterTest {
     private var testAppEventSink = TestAppEventSink()
     private var testHttpRequestManager = TestHttpRequestManager()
     private lateinit var testHttpSessionAdapter: HttpSessionAdapter
-    private var mockSession = Session(
-            DeviceInfo().apply { appId = "testAppId" }.apply { udid = "testUdId" },
-            "testSessionId", true, true, 30, Date(1907245044), mutableMapOf())
+    private var mockSession = Session("testSessionId", true, true, 30, 1907245044, mutableMapOf())
 
     @Before
     fun setup() {

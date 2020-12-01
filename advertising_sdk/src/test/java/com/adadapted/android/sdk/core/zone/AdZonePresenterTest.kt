@@ -16,6 +16,7 @@ import com.adadapted.android.sdk.core.event.TestAppEventSink
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.session.SessionTest
+import com.adadapted.android.sdk.ext.models.Payload
 import com.adadapted.android.sdk.tools.TestAdEventSink
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestTransporter
@@ -49,7 +50,7 @@ class AdZonePresenterTest {
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
     private var testAppEventSink = TestAppEventSink()
     private var testSession = SessionTest().buildTestSession()
-    private var mockSession = Session(DeviceInfo(), "testId", true, true, 30, Date(1907245044), mutableMapOf())
+    private var mockSession = Session("testId", true, true, 30, 1907245044, mutableMapOf())
 
     @Before
     fun setup() {
@@ -64,7 +65,7 @@ class AdZonePresenterTest {
         AppEventClient.createInstance(testAppEventSink, testTransporterScope)
 
         val testIntent = Intent(testContext, AaWebViewPopupActivity::class.java)
-        testIntent.putExtra(AaWebViewPopupActivity::class.java.name + ".EXTRA_POPUP_AD", Ad())
+        //testIntent.putExtra(AaWebViewPopupActivity::class.java.name + ".EXTRA_POPUP_AD", Ad())
         testIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         testAaWebViewPopupActivity = Robolectric.buildActivity<AaWebViewPopupActivity>(AaWebViewPopupActivity::class.java, testIntent)
                 .create()
@@ -84,7 +85,7 @@ class AdZonePresenterTest {
     @Test
     fun testOnAttach() {
         testAdZonePresenter.init("testZoneId")
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", hashMapOf(), listOf(Ad("TestAdId")))))
+        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(Ad("TestAdId")))))
         testSession.setZones(zones)
 
         val testListener = TestAdZonePresenterListener()
@@ -97,7 +98,7 @@ class AdZonePresenterTest {
     @Test
     fun testOnDetach() {
         testAdZonePresenter.init("testZoneId")
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", hashMapOf(), listOf(Ad("TestAdId")))))
+        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(Ad("TestAdId")))))
         testSession.setZones(zones)
 
         val testListener = TestAdZonePresenterListener()
@@ -117,7 +118,7 @@ class AdZonePresenterTest {
     @Test
     fun testOnAdDisplayed() {
         testAdZonePresenter.init("testZoneId")
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", hashMapOf(), listOf(Ad("TestAdId")))))
+        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(Ad("TestAdId")))))
         testSession.setZones(zones)
         testAdZonePresenter.onSessionAvailable(testSession)
 
@@ -132,7 +133,7 @@ class AdZonePresenterTest {
    fun testOnAdClickedContent() {
        testAdZonePresenter.init("testZoneId")
        val testAd = Ad("TestAdId", "zoneId", "impressionId", "url", AdActionType.CONTENT)
-       val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", hashMapOf(), listOf(testAd))))
+       val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(testAd))))
        testSession.setZones(zones)
        testAdZonePresenter.onSessionAvailable(testSession)
 
@@ -150,7 +151,7 @@ class AdZonePresenterTest {
         testAdZonePresenter = AdZonePresenter(mockContext, PixelWebView(testContext), testAaWebViewPopupActivity)
         testAdZonePresenter.init("testZoneId")
         val testAd = Ad("TestAdId", "zoneId", "impressionId", "url", AdActionType.LINK)
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", hashMapOf(), listOf(testAd))))
+        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(testAd))))
         testSession.setZones(zones)
         testAdZonePresenter.onSessionAvailable(testSession)
 
@@ -166,7 +167,7 @@ class AdZonePresenterTest {
     fun testOnAdClickedPopup() {
         testAdZonePresenter.init("testZoneId")
         val testAd = Ad("TestAdId", "zoneId", "impressionId", "url", AdActionType.POPUP)
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", hashMapOf(), listOf(testAd))))
+        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(testAd))))
         testSession.setZones(zones)
         testAdZonePresenter.onSessionAvailable(testSession)
 
@@ -182,7 +183,7 @@ class AdZonePresenterTest {
     fun testOnAdClickedContentPopup() {
         testAdZonePresenter.init("testZoneId")
         val testAd = Ad("TestAdId", "zoneId", "impressionId", "url", AdActionType.CONTENT_POPUP)
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", hashMapOf(), listOf(testAd))))
+        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(testAd))))
         testSession.setZones(zones)
         testAdZonePresenter.onSessionAvailable(testSession)
 
@@ -198,7 +199,7 @@ class AdZonePresenterTest {
     @Test
     fun testOnSessionAvailable() {
         testAdZonePresenter.init("testZoneId")
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", hashMapOf(), listOf(Ad("TestAdId")))))
+        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(Ad("TestAdId")))))
         testSession.setZones(zones)
 
         val testListener = TestAdZonePresenterListener()
@@ -211,7 +212,7 @@ class AdZonePresenterTest {
     @Test
     fun testOnAdsAvailable() {
         testAdZonePresenter.init("testZoneId")
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", hashMapOf(), listOf(Ad("TestAdId")))))
+        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(Ad("TestAdId")))))
         testSession.setZones(zones)
 
         val testListener = TestAdZonePresenterListener()
@@ -224,7 +225,7 @@ class AdZonePresenterTest {
     @Test
     fun testOnSessioninitFailed() {
         testAdZonePresenter.init("testZoneId")
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", hashMapOf(), listOf(Ad("TestAdId")))))
+        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(Ad("TestAdId")))))
         testSession.setZones(zones)
 
         val testListener = TestAdZonePresenterListener()
@@ -237,7 +238,7 @@ class AdZonePresenterTest {
     @Test
     fun testNullListener() {
         testAdZonePresenter.init("testZoneId")
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", hashMapOf(), listOf(Ad("TestAdId")))))
+        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(Ad("TestAdId")))))
         testSession.setZones(zones)
 
         testAdZonePresenter.onSessionAvailable(testSession)

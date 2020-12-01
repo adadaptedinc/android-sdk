@@ -9,7 +9,7 @@ import org.junit.Test
 import java.util.Date
 
 class JsonInterceptEventBuilderTest {
-    private var mockSession = Session(DeviceInfo(), "testId", true, true, 30, Date(1907245044), mutableMapOf())
+    private var mockSession = Session("testId", true, true, 30, 1907245044, mutableMapOf())
     private var testJsonInterceptEventBuilder = JsonInterceptEventBuilder()
 
     @Test

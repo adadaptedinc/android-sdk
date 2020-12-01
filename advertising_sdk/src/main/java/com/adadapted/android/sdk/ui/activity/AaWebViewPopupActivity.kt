@@ -24,7 +24,7 @@ class AaWebViewPopupActivity : Activity() {
 
     fun createActivity(context: Context, ad: Ad): Intent {
         val intent = Intent(context.applicationContext, AaWebViewPopupActivity::class.java)
-        intent.putExtra(EXTRA_POPUP_AD, ad)
+        //intent.putExtra(EXTRA_POPUP_AD, ad)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         return intent
     }

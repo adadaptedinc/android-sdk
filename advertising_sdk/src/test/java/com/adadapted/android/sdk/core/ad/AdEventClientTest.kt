@@ -25,7 +25,7 @@ class AdEventClientTest {
     var testTransporter = TestCoroutineDispatcher()
     val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
     var testAdEventClient = AdEventClient
-    var mockSession = Session(DeviceInfo(), "testId", true, true, 30, Date(1907245044), mutableMapOf())
+    var mockSession = Session("testId", true, true, 30, 1907245044, mutableMapOf())
     var testAd = Ad("adId", "zoneId", "impId")
 
     @Before

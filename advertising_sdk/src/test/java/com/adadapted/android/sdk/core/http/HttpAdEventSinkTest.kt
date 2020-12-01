@@ -28,7 +28,7 @@ class HttpAdEventSinkTest {
     private var testAppEventSink = TestAppEventSink()
     private var testHttpRequestManager = TestHttpRequestManager()
     private lateinit var httpAdEventSink: HttpAdEventSink
-    private var mockSession = Session(DeviceInfo(), "testId", true, true, 30, Date(1907245044), mutableMapOf())
+    private var mockSession = Session("testId", true, true, 30, 1907245044, mutableMapOf())
     private var adEvents = setOf(AdEvent("adId", "adZoneId", "impressionId", AdEvent.Types.IMPRESSION))
 
     @Before

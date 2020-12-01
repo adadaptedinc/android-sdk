@@ -2,15 +2,23 @@ package com.adadapted.android.sdk.core.atl
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
 
 class AddToListItem : Parcelable {
     val trackingId: String
+    @SerializedName("product_title")
     val title: String
+    @SerializedName("product_brand")
     val brand: String
+    @SerializedName("product_category")
     val category: String
+    @SerializedName("product_barcode")
     val productUpc: String
+    @SerializedName("product_sku")
     val retailerSku: String
+    @SerializedName("product_discount")
     val discount: String
+    @SerializedName("product_image")
     val productImage: String
 
     constructor(
