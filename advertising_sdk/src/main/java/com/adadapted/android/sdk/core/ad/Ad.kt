@@ -1,60 +1,35 @@
 package com.adadapted.android.sdk.core.ad
 
-import android.os.Parcel
-import android.os.Parcelable
 import com.adadapted.android.sdk.config.Config
-import com.adadapted.android.sdk.core.atl.AddToListItem
+import com.adadapted.android.sdk.ext.models.Payload
+import com.google.gson.annotations.SerializedName
 
-class Ad : Parcelable {
+class Ad {
+    @SerializedName("ad_id")
     val id: String
-    val zoneId: String
+    @SerializedName("impression_id")
     val impressionId: String
+    @SerializedName("creative_url")
     val url: String
+    @SerializedName("action_type")
     val actionType: String
+    @SerializedName("action_path")
     val actionPath: String
-    val payload: List<AddToListItem>
+    val payload: Payload
+    @SerializedName("refresh_time")
     val refreshTime: Long
+    @SerializedName("tracking_html")
     val trackingHtml: String
 
-    private constructor(parcel: Parcel) {
-        id = parcel.readString()
-        zoneId = parcel.readString()
-        impressionId = parcel.readString()
-        url = parcel.readString()
-        actionType = parcel.readString()
-        actionPath = parcel.readString()
-        payload = parcel.createTypedArrayList(AddToListItem.CREATOR)
-        refreshTime = parcel.readLong()
-        trackingHtml = parcel.readString()
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    override fun writeToParcel(parcel: Parcel, i: Int) {
-        parcel.writeString(id)
-        parcel.writeString(zoneId)
-        parcel.writeString(impressionId)
-        parcel.writeString(url)
-        parcel.writeString(actionType)
-        parcel.writeString(actionPath)
-        parcel.writeTypedList(payload)
-        parcel.writeLong(refreshTime)
-        parcel.writeString(trackingHtml)
-    }
-
     constructor(id: String = "",
-                zoneId: String = "",
                 impressionId: String = "",
                 url: String = "",
                 actionType: String = "",
                 actionPath: String = "",
-                payload: List<AddToListItem> = arrayListOf(),
+                payload: Payload = Payload(listOf()),//List<AddToListItem> = arrayListOf(),
                 refreshTime: Long = Config.DEFAULT_AD_REFRESH,
                 trackingHtml: String = "") {
         this.id = id
-        this.zoneId = zoneId
         this.impressionId = impressionId
         this.url = url
         this.actionType = actionType
@@ -67,17 +42,10 @@ class Ad : Parcelable {
     val isEmpty: Boolean
         get() = id.isEmpty()
 
-    val content: AdContent by lazy {
-        AdContent.createAddToListContent(this)
+    fun getContent(): AdContent {
+        return AdContent.createAddToListContent(this)
     }
 
-    companion object CREATOR : Parcelable.Creator<Ad> {
-        override fun createFromParcel(parcel: Parcel): Ad {
-            return Ad(parcel)
-        }
-
-        override fun newArray(size: Int): Array<Ad?> {
-            return arrayOfNulls(size)
-        }
-    }
+    val zoneId: String
+        get() = impressionId.split(":").first()
 }

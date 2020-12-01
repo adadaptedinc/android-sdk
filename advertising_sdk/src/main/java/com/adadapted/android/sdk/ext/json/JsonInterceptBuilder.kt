@@ -61,7 +61,6 @@ class JsonInterceptBuilder {
         private const val TERMS = "terms"
         private const val TERM_ID = "term_id"
         private const val TERM = "term"
-        private const val AUTO_FILL = "autofill"
         private const val REPLACEMENT = "replacement"
         private const val ICON = "icon"
         private const val TAG_LINE = "tagline"

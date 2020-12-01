@@ -214,7 +214,7 @@ internal class AdZonePresenter(private val context: Context, private val pixelWe
 
     private fun handleContentAction(ad: Ad) {
         val zoneId = ad.zoneId
-        AdContentPublisher.getInstance().publishContent(zoneId, ad.content)
+        AdContentPublisher.getInstance().publishContent(zoneId, ad.getContent())
     }
 
     private fun handleLinkAction(ad: Ad) {

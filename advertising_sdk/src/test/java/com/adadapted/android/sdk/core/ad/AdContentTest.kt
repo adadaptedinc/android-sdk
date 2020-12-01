@@ -10,6 +10,7 @@ import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.event.TestAppEventSink
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.ext.models.Payload
 import com.adadapted.android.sdk.tools.TestAdEventSink
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestTransporter
@@ -34,7 +35,7 @@ class AdContentTest {
     private var testAppEventSink = TestAppEventSink()
     private var testTransporter = TestCoroutineDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
-    private var mockSession = Session(DeviceInfo(), "testId", true, true, 30, Date(1907245044), mutableMapOf())
+    private var mockSession = Session("testId", true, true, 30, 1907245044, mutableMapOf())
     private var testAddTolistItems = listOf(AddToListItem("testTrackingId", "title", "brand", "cat", "upc", "sku", "discount", "image"))
 
     @Before
@@ -60,18 +61,18 @@ class AdContentTest {
         assertEquals("testZoneId", testAdContent.zoneId)
     }
 
-    @Test
-    fun createAdContentFromParcel() {
-        val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId"))
-        val parcel = Parcel.obtain()
-
-        testAdContent.writeToParcel(parcel, 0)
-        parcel.setDataPosition(0)
-
-        val adContentFromParcel = AdContent.createFromParcel(parcel)
-
-        assertEquals("testZoneId", adContentFromParcel.zoneId)
-    }
+//    @Test
+//    fun createAdContentFromParcel() {
+//        val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId"))
+//        val parcel = Parcel.obtain()
+//
+//        testAdContent.writeToParcel(parcel, 0)
+//        parcel.setDataPosition(0)
+//
+//        val adContentFromParcel = AdContent.createFromParcel(parcel)
+//
+//        assertEquals("testZoneId", adContentFromParcel.zoneId)
+//    }
 
     @Test
     fun acknowledge() {
@@ -86,7 +87,7 @@ class AdContentTest {
 
     @Test
     fun itemAcknowledge() {
-        val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId", payload = testAddTolistItems))
+        val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId", payload = Payload(testAddTolistItems)))
         testAdEventSink.testEvents = mutableSetOf()
         testAdContent.itemAcknowledge(testAdContent.getItems().first())
         AdEventClient.getInstance().onPublishEvents()
@@ -99,7 +100,7 @@ class AdContentTest {
 
     @Test
     fun failed() {
-        val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId", payload = testAddTolistItems))
+        val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId", payload = Payload(testAddTolistItems)))
         testAppEventSink.testErrors = mutableSetOf()
         testAdContent.failed("adContentFail")
         AppEventClient.getInstance().onPublishEvents()
@@ -109,7 +110,7 @@ class AdContentTest {
 
     @Test
     fun itemFailed() {
-        val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId", payload = testAddTolistItems))
+        val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId", payload = Payload(testAddTolistItems)))
         testAppEventSink.testErrors = mutableSetOf()
         testAdContent.itemFailed(testAddTolistItems.first(), "adContentFail")
         AppEventClient.getInstance().onPublishEvents()

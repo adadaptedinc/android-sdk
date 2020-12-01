@@ -58,7 +58,7 @@ class JsonAdBuilderTest {
     fun buildAds() {
         val testAds = testJsonAdBuilder.buildAds("testZoneId", testJsonArray)
         assertEquals("testAdId", testAds.first().id)
-        assertEquals("testProduct", testAds.first().payload.first().title)
+        assertEquals("testProduct", testAds.first().payload.detailedListItems.first().title)
         assertEquals(5, testAds.first().refreshTime)
     }
 }

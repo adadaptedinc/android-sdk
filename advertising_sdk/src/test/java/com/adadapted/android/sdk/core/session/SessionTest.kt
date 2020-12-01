@@ -12,14 +12,14 @@ class SessionTest {
     @Test
     fun emptySessionCreated() {
         val deviceInfo = DeviceInfo.empty()
-        val session = Session(deviceInfo)
+        val session = Session()
         Assert.assertEquals("", session.id)
     }
 
     @Test
     fun constructSession() {
         val deviceInfo = DeviceInfo.empty()
-        val session = Session(deviceInfo)
+        val session = Session()
         val constructedSession = Session(session, mapOf())
 
         assertEquals(constructedSession.id, session.id)
@@ -40,7 +40,7 @@ class SessionTest {
         val session = buildTestSession()
         assert(session.getZone("testZone").id == "")
 
-        val zones = mapOf<String, Zone>().plus(Pair("testZone", Zone("zoneId", hashMapOf(), listOf())))
+        val zones = mapOf<String, Zone>().plus(Pair("testZone", Zone("zoneId", listOf())))
         session.setZones(zones)
 
         assert(session.getZone("testZone").id == "zoneId")
@@ -58,6 +58,6 @@ class SessionTest {
     }
 
     fun buildTestSession(): Session {
-        return Session(DeviceInfo.empty(), "testId", willServeAds = true, hasAds = true, refreshTime = 1L, expiresAt = Date(Date().time.minus(60)))
+        return Session("testId", willServeAds = true, hasAds = true, refreshTime = 1L, expiration = Date(Date().time.minus(60)).time)
     }
 }

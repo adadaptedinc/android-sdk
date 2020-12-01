@@ -6,6 +6,7 @@ import com.adadapted.android.sdk.core.atl.AddToListItem
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.ext.models.Payload
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.nhaarman.mockitokotlin2.mock
 import junit.framework.Assert.assertEquals
@@ -42,31 +43,31 @@ class AdTest {
         assert(mockAd.isEmpty)
     }
 
-    @Test
-    fun adIsCreatedFromParcel() {
-        val testAd = getTestAd()
-        val parcel = Parcel.obtain()
-
-        testAd.writeToParcel(parcel, 0)
-        parcel.setDataPosition(0)
-
-        val adFromParcel = Ad.createFromParcel(parcel)
-
-        assertEquals("TestId", adFromParcel.id)
-        assertEquals("TestZoneId", adFromParcel.zoneId)
-        assertEquals("TestImpressionId", adFromParcel.impressionId)
-        assertEquals("TestUrl", adFromParcel.url)
-        assertEquals("TestActionType", adFromParcel.actionType)
-        assertEquals("TestActionPath", adFromParcel.actionPath)
-        assertEquals(arrayListOf<AddToListItem>(), adFromParcel.payload)
-        assertEquals(1, adFromParcel.refreshTime)
-        assertEquals("TestTrackingHtml", adFromParcel.trackingHtml)
-    }
+//    @Test
+//    fun adIsCreatedFromParcel() {
+//        val testAd = getTestAd()
+//        val parcel = Parcel.obtain()
+//
+//        testAd.writeToParcel(parcel, 0)
+//        parcel.setDataPosition(0)
+//
+//        val adFromParcel = Ad.createFromParcel(parcel)
+//
+//        assertEquals("TestId", adFromParcel.id)
+//        assertEquals("TestZoneId", adFromParcel.zoneId)
+//        assertEquals("TestImpressionId", adFromParcel.impressionId)
+//        assertEquals("TestUrl", adFromParcel.url)
+//        assertEquals("TestActionType", adFromParcel.actionType)
+//        assertEquals("TestActionPath", adFromParcel.actionPath)
+//        assertEquals(arrayListOf<AddToListItem>(), adFromParcel.payload)
+//        assertEquals(1, adFromParcel.refreshTime)
+//        assertEquals("TestTrackingHtml", adFromParcel.trackingHtml)
+//    }
 
     @Test
     fun addToListContentIsCreated() {
         val testAd = getTestAd(
-                arrayListOf(
+                Payload(arrayListOf(
                         AddToListItem(
                                 "TestTrackingId",
                                 "TestTitle",
@@ -75,9 +76,9 @@ class AdTest {
                                 "TestUPC",
                                 "TestSKU",
                                 "TestDiscount",
-                                "TestImage")))
+                                "TestImage"))))
 
-        val addToListContent = testAd.content
+        val addToListContent = testAd.getContent()
 
         assertEquals(addToListContent.getItems().first().trackingId, "TestTrackingId")
         assertEquals(addToListContent.getItems().first().title, "TestTitle")
@@ -89,10 +90,9 @@ class AdTest {
         assertEquals(addToListContent.getItems().first().productImage, "TestImage")
     }
 
-    private fun getTestAd(payload: List<AddToListItem> = arrayListOf()): Ad {
+    private fun getTestAd(payload: Payload = Payload(arrayListOf())): Ad {
         return Ad(
                 "TestId",
-                "TestZoneId",
                 "TestImpressionId",
                 "TestUrl",
                 "TestActionType",

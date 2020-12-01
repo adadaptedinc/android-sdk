@@ -13,6 +13,7 @@ import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.zone.TestAdEventClientListener
+import com.adadapted.android.sdk.ext.models.Payload
 import com.adadapted.android.sdk.tools.TestAdEventSink
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestTransporter
@@ -38,8 +39,8 @@ class AaWebViewPopupActivityTest {
     private var testContext = InstrumentationRegistry.getInstrumentation().targetContext
     private var testTransporter = TestCoroutineDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
-    var mockSession = Session(DeviceInfo(), "testId", true, true, 30, Date(1907245044), mutableMapOf())
-    private var testAd = Ad("TestAdId", "zone", "imp", "url", "type", "http://example.com", listOf(), 5, "html")
+    var mockSession = Session("testId", true, true, 30, 1907245044, mutableMapOf())
+    private var testAd = Ad("TestAdId", "imp", "url", "type", "http://example.com", Payload(listOf()), 5, "html")
 
     @Before
     fun setup() {
@@ -53,7 +54,7 @@ class AaWebViewPopupActivityTest {
         AdEventClient.getInstance().onSessionAvailable(mockSession)
 
         val testIntent = Intent(testContext, AaWebViewPopupActivity::class.java)
-        testIntent.putExtra(AaWebViewPopupActivity::class.java.name + ".EXTRA_POPUP_AD", testAd)
+        //testIntent.putExtra(AaWebViewPopupActivity::class.java.name + ".EXTRA_POPUP_AD", testAd)
         testIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         testAaWebViewPopupActivity = Robolectric.buildActivity(AaWebViewPopupActivity::class.java, testIntent)
                 .create()

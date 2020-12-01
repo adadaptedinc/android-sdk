@@ -2,34 +2,42 @@ package com.adadapted.android.sdk.ext.json
 
 import android.util.Log
 import com.adadapted.android.sdk.config.EventStrings
+import com.adadapted.android.sdk.core.common.DimensionConverter
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.event.AppEventClient.Companion.getInstance
 import com.adadapted.android.sdk.core.session.Session
+import com.google.gson.GsonBuilder
 import org.json.JSONException
 import org.json.JSONObject
 
 class JsonSessionBuilder(private val deviceInfo: DeviceInfo) {
-    private val zoneBuilder: JsonZoneBuilder = JsonZoneBuilder(deviceInfo.scale)
 
     fun buildSession(response: JSONObject): Session {
         try {
-            val session = Session(
-                    deviceInfo,
-                    response.getString(SESSION_ID),
-                    response.getBoolean(WILL_SERVE_ADS),
-                    response.getBoolean(ACTIVE_CAMPAIGNS),
-                    response.getLong(POLLING_INTERVAL_MS),
-                    Session.convertExpirationToDate(response.getLong(SESSION_EXPIRES_AT)))
 
-            if (session.hasActiveCampaigns()) {
-                if (response.has(ZONES) && response[ZONES].javaClass == JSONObject::class.java) {
-                    val jsonZones = response.getJSONObject(ZONES)
-                    val zones = zoneBuilder.buildZones(jsonZones)
-                    session.setZones(zones)
-                } else {
-                    Log.i(LOGTAG, "No ads returned. Not parsing JSONArray.")
-                }
-            }
+            DimensionConverter.createInstance(deviceInfo.scale)
+            val gson = GsonBuilder().create()
+            val session =  gson.fromJson(response.toString(), Session::class.java)
+            session.setDeviceInfo(deviceInfo)
+
+//            val session = Session(
+//                    deviceInfo,
+//                    response.getString(SESSION_ID),
+//                    response.getBoolean(WILL_SERVE_ADS),
+//                    response.getBoolean(ACTIVE_CAMPAIGNS),
+//                    response.getLong(POLLING_INTERVAL_MS),
+//                    response.getLong(SESSION_EXPIRES_AT))
+                    //Session.convertExpirationToDate(response.getLong(SESSION_EXPIRES_AT)))
+
+//            if (session.hasActiveCampaigns()) {
+//                if (response.has(ZONES) && response[ZONES].javaClass == JSONObject::class.java) {
+//                    val jsonZones = response.getJSONObject(ZONES)
+//                    val zones = zoneBuilder.buildZones(jsonZones)
+//                    session.setZones(zones)
+//                } else {
+//                    Log.i(LOGTAG, "No ads returned. Not parsing JSONArray.")
+//                }
+//            }
             return session
 
         } catch (ex: JSONException) {
@@ -43,7 +51,7 @@ class JsonSessionBuilder(private val deviceInfo: DeviceInfo) {
                     params.toMap()
             )
         }
-        return Session(deviceInfo)
+        return Session()
     }
 
     companion object {

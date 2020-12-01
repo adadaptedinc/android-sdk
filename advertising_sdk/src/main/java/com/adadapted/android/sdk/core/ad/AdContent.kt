@@ -12,46 +12,11 @@ import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.collections.HashMap
 
-class AdContent : AddToListContent, Parcelable {
-    val type: Int
-    private val ad: Ad
-    private val items: List<AddToListItem>
+class AdContent private constructor(private val ad: Ad, val type: Int, private val items: List<AddToListItem>, adClient: AdEventClient = AdEventClient.getInstance(), appClient: AppEventClient = AppEventClient.getInstance()) : AddToListContent {
     private var isHandled: Boolean
     private val lock: Lock = ReentrantLock()
-    private var adEventClient: AdEventClient
-    private var appEventClient: AppEventClient
-
-    private constructor(parcel: Parcel, adClient: AdEventClient = AdEventClient.getInstance(), appClient: AppEventClient = AppEventClient.getInstance()) {
-        ad = parcel.readParcelable(Ad::class.java.classLoader)
-        type = parcel.readInt()
-        items = parcel.createTypedArrayList(AddToListItem.CREATOR)
-        isHandled = parcel.readByte().toInt() != 0
-        adEventClient = adClient
-        appEventClient = appClient
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    override fun writeToParcel(parcel: Parcel, i: Int) {
-        parcel.writeParcelable(ad, i)
-        parcel.writeInt(type)
-        parcel.writeTypedList(items)
-        parcel.writeByte((if (isHandled) 1 else 0).toByte())
-    }
-
-    private constructor(ad: Ad, type: Int, items: List<AddToListItem>, adClient: AdEventClient = AdEventClient.getInstance(), appClient: AppEventClient = AppEventClient.getInstance()) {
-        if (ad.payload.isEmpty()) {
-            appClient.trackError(EventStrings.AD_PAYLOAD_IS_EMPTY, String.format(Locale.ENGLISH, "Ad %s has empty payload", ad.id))
-        }
-        this.ad = ad
-        this.type = type
-        this.items = items
-        this.adEventClient = adClient
-        this.appEventClient = appClient
-        isHandled = false
-    }
+    private var adEventClient: AdEventClient = adClient
+    private var appEventClient: AppEventClient = appClient
 
     @Synchronized
     override fun acknowledge() {
@@ -137,23 +102,22 @@ class AdContent : AddToListContent, Parcelable {
         return Sources.IN_APP
     }
 
-    companion object CREATOR : Parcelable.Creator<AdContent> {
+    companion object {
         private const val ADD_TO_LIST = 0
         private const val AD_ID = "ad_id"
         private const val ITEM_NAME = "item_name"
         private const val ITEM = "item"
         private const val UNKNOWN_REASON = "Unknown Reason"
 
-        override fun createFromParcel(parcel: Parcel): AdContent {
-            return AdContent(parcel)
-        }
-
-        override fun newArray(size: Int): Array<AdContent?> {
-            return arrayOfNulls(size)
-        }
-
         fun createAddToListContent(ad: Ad): AdContent {
-            return AdContent(ad, ADD_TO_LIST, ad.payload)
+            return AdContent(ad, ADD_TO_LIST, ad.payload.detailedListItems)
         }
+    }
+
+    init {
+        if (ad.payload.detailedListItems.isEmpty()) {
+            appClient.trackError(EventStrings.AD_PAYLOAD_IS_EMPTY, String.format(Locale.ENGLISH, "Ad %s has empty payload", ad.id))
+        }
+        isHandled = false
     }
 }
