@@ -219,6 +219,7 @@ internal class AdZonePresenter(private val context: Context, private val pixelWe
 
     private fun handleLinkAction(ad: Ad) {
         val intent = Intent(Intent.ACTION_VIEW)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         intent.data = Uri.parse(ad.actionPath)
         context.startActivity(intent)
     }
