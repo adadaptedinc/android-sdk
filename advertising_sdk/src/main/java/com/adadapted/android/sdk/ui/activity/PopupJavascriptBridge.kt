@@ -5,7 +5,7 @@ import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdContent.Companion.createAddToListContent
 import com.adadapted.android.sdk.core.atl.AddToListItem
-import com.adadapted.android.sdk.core.atl.PopupContent.CREATOR.createPopupContent
+import com.adadapted.android.sdk.core.atl.PopupContent.Companion.createPopupContent
 import com.adadapted.android.sdk.core.event.AppEventClient.Companion.getInstance
 import com.adadapted.android.sdk.ui.messaging.AdditContentPublisher
 

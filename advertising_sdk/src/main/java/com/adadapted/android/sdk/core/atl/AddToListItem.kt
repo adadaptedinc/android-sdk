@@ -1,10 +1,8 @@
 package com.adadapted.android.sdk.core.atl
 
-import android.os.Parcel
-import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 
-class AddToListItem : Parcelable {
+class AddToListItem {
     val trackingId: String
     @SerializedName("product_title")
     val title: String
@@ -39,32 +37,6 @@ class AddToListItem : Parcelable {
         this.retailerSku = retailerSku
         this.discount = discount
         this.productImage = productImage
-    }
-
-    private constructor(parcel: Parcel) {
-        trackingId = parcel.readString()
-        title = parcel.readString()
-        brand = parcel.readString()
-        category = parcel.readString()
-        productUpc = parcel.readString()
-        retailerSku = parcel.readString()
-        discount = parcel.readString()
-        productImage = parcel.readString()
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeString(trackingId)
-        dest.writeString(title)
-        dest.writeString(brand)
-        dest.writeString(category)
-        dest.writeString(productUpc)
-        dest.writeString(retailerSku)
-        dest.writeString(discount)
-        dest.writeString(productImage)
     }
 
     override fun toString(): String {
@@ -146,15 +118,5 @@ class AddToListItem : Parcelable {
                     productImage)
         }
 
-    }
-
-    companion object CREATOR : Parcelable.Creator<AddToListItem> {
-        override fun createFromParcel(parcel: Parcel): AddToListItem {
-            return AddToListItem(parcel)
-        }
-
-        override fun newArray(size: Int): Array<AddToListItem?> {
-            return arrayOfNulls(size)
-        }
     }
 }

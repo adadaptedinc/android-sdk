@@ -54,7 +54,7 @@ class AaWebViewPopupActivityTest {
         AdEventClient.getInstance().onSessionAvailable(mockSession)
 
         val testIntent = Intent(testContext, AaWebViewPopupActivity::class.java)
-        //testIntent.putExtra(AaWebViewPopupActivity::class.java.name + ".EXTRA_POPUP_AD", testAd)
+        testIntent.putExtra(AaWebViewPopupActivity::class.java.name + ".EXTRA_POPUP_AD", testAd)
         testIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         testAaWebViewPopupActivity = Robolectric.buildActivity(AaWebViewPopupActivity::class.java, testIntent)
                 .create()

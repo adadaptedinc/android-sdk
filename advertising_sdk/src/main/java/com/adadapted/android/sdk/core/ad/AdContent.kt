@@ -1,7 +1,5 @@
 package com.adadapted.android.sdk.core.ad
 
-import android.os.Parcel
-import android.os.Parcelable
 import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.atl.AddToListContent
 import com.adadapted.android.sdk.core.atl.AddToListContent.Sources

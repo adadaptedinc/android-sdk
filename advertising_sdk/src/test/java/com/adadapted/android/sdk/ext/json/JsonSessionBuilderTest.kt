@@ -1,6 +1,5 @@
 package com.adadapted.android.sdk.ext.json
 
-import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
@@ -47,18 +46,19 @@ class JsonSessionBuilderTest {
     }
 
     @Test
-    fun buildSessionFail() {
+    fun buildSessionWillNotFail() {
         val testJsonObject = JSONObject()
         testJsonObject.put("session_id", "testSessionId")
-                .put("will_serve_ads_fail", "true")
-                .put("active_campaigns", "true")
-                .put("polling_interval_ms", "5")
-                .put("session_expires_at", "10000")
+                .put("will_serve_ads_fail", "false")
+                .put("active_campaigns", "truebad")
+                .put("polling_interval_ms", 5)
+                .put("session_expires_at", 1000L)
+                .put("-(0)*&", "nonsense")
 
         testJsonSessionBuilder.buildSession(testJsonObject)
 
         AppEventClient.getInstance().onPublishEvents()
-        assertEquals(EventStrings.SESSION_PAYLOAD_PARSE_FAILED, testAppEventSink.testErrors.first().code)
+        assert(testAppEventSink.testErrors.isEmpty())
     }
 
     @Test
@@ -103,6 +103,6 @@ class JsonSessionBuilderTest {
         val sessionResult = testJsonSessionBuilder.buildSession(testJsonObject)
 
         assertEquals("testSessionId", sessionResult.id)
-        assertEquals("zone1", sessionResult.getZone("zone1").id)
+        assertEquals(80, sessionResult.getZone("zone1").portWidth)
     }
 }

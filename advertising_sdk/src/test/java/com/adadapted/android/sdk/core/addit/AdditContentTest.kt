@@ -1,6 +1,5 @@
 package com.adadapted.android.sdk.core.addit
 
-import android.os.Parcel
 import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.atl.AddToListContent
 import com.adadapted.android.sdk.core.atl.AddToListItem
@@ -34,25 +33,6 @@ class AdditContentTest {
         PayloadClient.createInstance(testPayloadAdapter, AppEventClient.getInstance(), testTransporterScope)
         testAppEventSink.testEvents.clear()
         testAppEventSink.testErrors.clear()
-    }
-
-    @Test
-    fun createAddItContentFromParcel() {
-        val content = AdditContent.createInAppContent(
-                "payloadId",
-                "message",
-                "image",
-                ContentTypes.ADD_TO_LIST_ITEMS,
-                LinkedList()
-        )
-        val parcel = Parcel.obtain()
-
-        content.writeToParcel(parcel, 0)
-        parcel.setDataPosition(0)
-
-        val addItContentFromParcel = AdditContent.createFromParcel(parcel)
-
-        assertEquals("payloadId", addItContentFromParcel.payloadId)
     }
 
     @Test

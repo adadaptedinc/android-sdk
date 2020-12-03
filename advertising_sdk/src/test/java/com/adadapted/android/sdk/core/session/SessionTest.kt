@@ -6,6 +6,8 @@ import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertFalse
 import org.junit.Assert
 import org.junit.Test
+import java.time.Instant
+import java.time.LocalDateTime
 import java.util.Date
 
 class SessionTest {
@@ -58,6 +60,6 @@ class SessionTest {
     }
 
     fun buildTestSession(): Session {
-        return Session("testId", willServeAds = true, hasAds = true, refreshTime = 1L, expiration = Date(Date().time.minus(60)).time)
+        return Session("testId", willServeAds = true, hasAds = true, refreshTime = 1L, expiration = Instant.now().epochSecond)
     }
 }

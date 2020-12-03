@@ -1,6 +1,5 @@
 package com.adadapted.android.sdk.core.ad
 
-import android.os.Parcel
 import com.adadapted.android.sdk.config.Config
 import com.adadapted.android.sdk.core.atl.AddToListItem
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
@@ -42,27 +41,6 @@ class AdTest {
         assert(mockAd.trackingHtml.isEmpty())
         assert(mockAd.isEmpty)
     }
-
-//    @Test
-//    fun adIsCreatedFromParcel() {
-//        val testAd = getTestAd()
-//        val parcel = Parcel.obtain()
-//
-//        testAd.writeToParcel(parcel, 0)
-//        parcel.setDataPosition(0)
-//
-//        val adFromParcel = Ad.createFromParcel(parcel)
-//
-//        assertEquals("TestId", adFromParcel.id)
-//        assertEquals("TestZoneId", adFromParcel.zoneId)
-//        assertEquals("TestImpressionId", adFromParcel.impressionId)
-//        assertEquals("TestUrl", adFromParcel.url)
-//        assertEquals("TestActionType", adFromParcel.actionType)
-//        assertEquals("TestActionPath", adFromParcel.actionPath)
-//        assertEquals(arrayListOf<AddToListItem>(), adFromParcel.payload)
-//        assertEquals(1, adFromParcel.refreshTime)
-//        assertEquals("TestTrackingHtml", adFromParcel.trackingHtml)
-//    }
 
     @Test
     fun addToListContentIsCreated() {

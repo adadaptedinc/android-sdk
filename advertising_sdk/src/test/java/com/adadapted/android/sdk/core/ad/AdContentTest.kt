@@ -1,10 +1,8 @@
 package com.adadapted.android.sdk.core.ad
 
-import android.os.Parcel
 import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.atl.AddToListItem
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.event.TestAppEventSink
@@ -60,19 +58,6 @@ class AdContentTest {
         assertEquals(0, testAdContent.type)
         assertEquals("testZoneId", testAdContent.zoneId)
     }
-
-//    @Test
-//    fun createAdContentFromParcel() {
-//        val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId"))
-//        val parcel = Parcel.obtain()
-//
-//        testAdContent.writeToParcel(parcel, 0)
-//        parcel.setDataPosition(0)
-//
-//        val adContentFromParcel = AdContent.createFromParcel(parcel)
-//
-//        assertEquals("testZoneId", adContentFromParcel.zoneId)
-//    }
 
     @Test
     fun acknowledge() {
