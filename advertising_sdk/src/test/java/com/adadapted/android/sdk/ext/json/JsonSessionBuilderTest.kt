@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.ext.json
 
+import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
@@ -14,6 +15,7 @@ import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import java.util.Date
 
 class JsonSessionBuilderTest {
     private var mockDeviceInfo = DeviceInfo()
@@ -59,6 +61,22 @@ class JsonSessionBuilderTest {
 
         AppEventClient.getInstance().onPublishEvents()
         assert(testAppEventSink.testErrors.isEmpty())
+    }
+
+    @Test
+    fun buildSessionWillFail() {
+        val testJsonObject = JSONObject()
+        testJsonObject.put("session_id", "testSessionId")
+                .put("will_serve_ads_fail", "false")
+                .put("active_campaigns", "truebad")
+                .put("polling_interval_ms", 5)
+                .put("session_expires_at", Date())
+                .put("-(0)*&", "nonsense")
+
+        testJsonSessionBuilder.buildSession(testJsonObject)
+
+        AppEventClient.getInstance().onPublishEvents()
+        assertEquals(EventStrings.SESSION_PAYLOAD_PARSE_FAILED, testAppEventSink.testErrors.first().code)
     }
 
     @Test

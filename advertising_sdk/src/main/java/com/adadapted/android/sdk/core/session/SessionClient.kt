@@ -286,9 +286,7 @@ class SessionClient private constructor(private val adapter: SessionAdapter, pri
     }
 
     override fun onSessionInitializeFailed() {
-        val session = Session()
-        session.setDeviceInfo(deviceInfo)
-        updateCurrentSession(session)
+        updateCurrentSession(Session().apply { setDeviceInfo(deviceInfo) })
         notifySessionInitFailed()
         setStatus(Status.OK)
     }
@@ -300,9 +298,7 @@ class SessionClient private constructor(private val adapter: SessionAdapter, pri
     }
 
     override fun onNewAdsLoadFailed() {
-        val session = Session()
-        session.setDeviceInfo(deviceInfo)
-        updateCurrentZones(session)
+        updateCurrentZones(Session().apply { setDeviceInfo(deviceInfo) })
         notifyAdsAvailable()
         setStatus(Status.OK)
     }

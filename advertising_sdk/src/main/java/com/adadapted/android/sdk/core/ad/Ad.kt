@@ -20,6 +20,7 @@ class Ad : Serializable {
 
     @SerializedName("action_path")
     val actionPath: String
+
     val payload: Payload
 
     @SerializedName("refresh_time")

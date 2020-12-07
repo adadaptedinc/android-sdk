@@ -30,7 +30,6 @@ import com.adadapted.android.sdk.ui.messaging.AdditContentPublisher
 import com.adadapted.android.sdk.ui.messaging.SdkEventPublisher
 
 object AdAdapted {
-
     enum class Env { PROD, DEV }
 
     private var hasStarted = false

@@ -11,7 +11,6 @@ import org.json.JSONObject
 import java.lang.Exception
 
 class JsonSessionBuilder(private val deviceInfo: DeviceInfo) {
-
     fun buildSession(response: JSONObject): Session {
         try {
             DimensionConverter.createInstance(deviceInfo.scale)

@@ -7,17 +7,23 @@ import com.google.gson.annotations.SerializedName
 import java.util.Date
 import kotlin.collections.HashMap
 
-class Session(@SerializedName("session_id")
-              val id: String = "",
-              @SerializedName("will_serve_ads")
-              private val willServeAds: Boolean = false,
-              @SerializedName("active_campaigns")
-              val hasAds: Boolean = false,
-              @SerializedName("polling_interval_ms")
-              val refreshTime: Long = Config.DEFAULT_AD_POLLING,
-              @SerializedName("session_expires_at")
-              val expiration: Long = 0,
-              private var zones: Map<String, Zone> = HashMap()) {
+class Session(
+        @SerializedName("session_id")
+        val id: String = "",
+
+        @SerializedName("will_serve_ads")
+        private val willServeAds: Boolean = false,
+
+        @SerializedName("active_campaigns")
+        val hasAds: Boolean = false,
+
+        @SerializedName("polling_interval_ms")
+        val refreshTime: Long = Config.DEFAULT_AD_POLLING,
+
+        @SerializedName("session_expires_at")
+        val expiration: Long = 0,
+
+        private var zones: Map<String, Zone> = HashMap()) {
 
     constructor(session: Session, zones: Map<String, Zone>?) : this(
             session.id,
@@ -45,7 +51,7 @@ class Session(@SerializedName("session_id")
     fun getZone(zoneId: String): Zone {
         if (zones.containsKey(zoneId)) {
             return zones[zoneId] ?: Zone()
-            }
+        }
         return Zone()
     }
 

@@ -10,19 +10,4 @@ class TermTest {
     fun compareToPriority() {
         Assert.assertEquals(1, testTerm.compareTo(Term("termId2", "newTerm", "replacement2", "icon", "tagLane", 0)))
     }
-
-    @Test
-    fun termToString() {
-        val expectedString = "Term{" +
-                "termId='" + "termId" + '\'' +
-                ", term='" + "term" + '\'' +
-                ", replacement='" + "replacement" + '\'' +
-                ", icon='" + "icon" + '\'' +
-                ", tagLine='" + "tagLine" + '\'' +
-                ", priority=" + "1" +
-                '}'
-
-        Assert.assertEquals(expectedString, testTerm.toString())
-    }
-
 }

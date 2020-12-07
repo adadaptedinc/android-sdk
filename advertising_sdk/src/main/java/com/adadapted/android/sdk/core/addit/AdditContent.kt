@@ -9,50 +9,26 @@ import java.util.Locale
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
-class AdditContent : AddToListContent {
+class AdditContent(
+        val payloadId: String,
+        val message: String,
+        val image: String,
+        val type: Int,
+        private val source: String,
+        val additSource: String,
+        private val items: List<AddToListItem>,
+        appEventClient: AppEventClient = AppEventClient.getInstance(),
+        private var payloadClient: PayloadClient = PayloadClient.getInstance())
+    : AddToListContent {
+
     internal object AdditSources {
         const val IN_APP = "in_app"
         const val DEEPLINK = "deeplink"
         const val PAYLOAD = "payload"
     }
 
-    val payloadId: String
-    val message: String
-    val image: String
-    val type: Int
-    private val source: String
-    val additSource: String
-    private val items: List<AddToListItem>
     private var handled: Boolean
     private val lock: Lock = ReentrantLock()
-    private var appEventClient: AppEventClient
-    private var payloadClient: PayloadClient
-
-    constructor(
-            payloadId: String,
-            message: String,
-            image: String,
-            type: Int,
-            source: String,
-            additSource: String,
-            items: List<AddToListItem>,
-            appEventClient: AppEventClient = AppEventClient.getInstance(),
-            payloadClient: PayloadClient = PayloadClient.getInstance()
-    ) {
-        if (items.isEmpty()) {
-            appEventClient.trackError(EventStrings.ADDIT_PAYLOAD_IS_EMPTY, String.format(Locale.ENGLISH, "Payload %s has empty payload", payloadId))
-        }
-        this.payloadId = payloadId
-        this.message = message
-        this.image = image
-        this.type = type
-        this.source = source
-        this.additSource = additSource
-        this.items = items
-        this.appEventClient = appEventClient
-        this.payloadClient = payloadClient
-        handled = false
-    }
 
     @Synchronized
     override fun acknowledge() {
@@ -136,7 +112,6 @@ class AdditContent : AddToListContent {
     }
 
     companion object {
-
         fun createDeeplinkContent(
                 payloadId: String,
                 message: String,
@@ -166,5 +141,12 @@ class AdditContent : AddToListContent {
         ): AdditContent {
             return AdditContent(payloadId, message, image, type, Sources.OUT_OF_APP, AdditSources.PAYLOAD, items)
         }
+    }
+
+    init {
+        if (items.isEmpty()) {
+            appEventClient.trackError(EventStrings.ADDIT_PAYLOAD_IS_EMPTY, String.format(Locale.ENGLISH, "Payload %s has empty payload", payloadId))
+        }
+        handled = false
     }
 }

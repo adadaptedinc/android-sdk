@@ -8,7 +8,6 @@ class DimensionConverter(private val scale: Float) {
     }
 
     companion object {
-        private val LOGTAG = DimensionConverter::class.java.name
         private lateinit var instance: DimensionConverter
 
         fun getInstance(): DimensionConverter {

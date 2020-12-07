@@ -111,21 +111,4 @@ class AdContentTest {
         AppEventClient.getInstance().onPublishEvents()
         assertTrue(testAppEventSink.testErrors.any { event -> event.code == EventStrings.AD_PAYLOAD_IS_EMPTY})
     }
-
-    @Test
-    fun addToListStringIsCorrect() {
-        val testAddToListItem = testAddTolistItems.first()
-        val expected = "AddToListItem{" +
-                "trackingId='" + "testTrackingId" + '\'' +
-                ", title='" + "title" + '\'' +
-                ", brand='" + "brand" + '\'' +
-                ", category='" + "cat" + '\'' +
-                ", productUpc='" + "upc" + '\'' +
-                ", retailerSku='" + "sku" + '\'' +
-                ", discount='" + "discount" + '\'' +
-                ", productImage='" + "image" + '\'' +
-                '}'
-        val actual = testAddToListItem.toString()
-        assertEquals(expected, actual)
-    }
 }
