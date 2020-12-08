@@ -9,6 +9,7 @@ import com.adadapted.android.sdk.core.ad.AdContent
 import com.adadapted.android.sdk.core.ad.AdEventClient
 import com.adadapted.android.sdk.core.ad.TestAdContentListener
 import com.adadapted.android.sdk.core.atl.AddToListItem
+import com.adadapted.android.sdk.core.common.DimensionConverter
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
@@ -16,6 +17,7 @@ import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.event.TestAppEventSink
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.ext.models.Payload
 import com.adadapted.android.sdk.tools.TestAdEventSink
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestTransporter
@@ -44,7 +46,7 @@ class AaZoneViewTest {
     private var testTransporter = TestCoroutineDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
     private var testAppEventSink = TestAppEventSink()
-    private var mockSession = Session(DeviceInfo(), "testId", true, true, 30, Date(1907245044), mutableMapOf())
+    private var mockSession = Session("testId", true, true, 30, 1907245044, mutableMapOf())
 
 
     @Before
@@ -57,6 +59,7 @@ class AaZoneViewTest {
         AdEventClient.createInstance(mockAdEventSink, testTransporterScope)
         AdEventClient.getInstance().onSessionAvailable(mockSession)
         AppEventClient.createInstance(testAppEventSink, testTransporterScope)
+        DimensionConverter.createInstance(0f)
         AdContentPublisher.createInstance()
         testAaZoneView = AaZoneView(testContext)
     }
@@ -95,7 +98,7 @@ class AaZoneViewTest {
         testAaZoneView.onStart(testAdContentListener)
         testAaZoneView.onAdAvailable(testAd)
         testAaZoneView.onAdLoaded(testAd)
-        AdContentPublisher.getInstance().publishContent("TestZoneId", AdContent.createAddToListContent(Ad(payload = listOf(AddToListItem("trackId", "title", "brand", "cat", "upc", "sku", "disc", "image")))))
+        AdContentPublisher.getInstance().publishContent("TestZoneId", AdContent.createAddToListContent(Ad(payload = Payload(listOf(AddToListItem("trackId", "title", "brand", "cat", "upc", "sku", "disc", "image"))))))
         Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals("TestZoneId", testAdContentListener.resultZoneId)

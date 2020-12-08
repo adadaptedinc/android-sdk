@@ -68,7 +68,7 @@ class SessionClientTest {
         assertNotNull(testListener.getTrackedSession())
 
         testSessionClient.getInstance().removeListener(testListener)
-        testSessionClient.getInstance().onNewAdsLoaded(Session(DeviceInfo()))
+        testSessionClient.getInstance().onNewAdsLoaded(Session())
         assert(testListener.getTrackedSession()?.id != "AdsAvailable")
     }
 
@@ -86,7 +86,7 @@ class SessionClientTest {
         assertNotNull(testListener.getTrackedSession())
 
         testSessionClient.getInstance().removePresenter(testListener)
-        testSessionClient.getInstance().onNewAdsLoaded(Session(DeviceInfo()))
+        testSessionClient.getInstance().onNewAdsLoaded(Session())
         assert(testListener.getTrackedSession()?.id != "AdsAvailable")
     }
 
@@ -102,7 +102,7 @@ class SessionClientTest {
     fun onNewAdsLoaded() {
         val testListener = TestSessionClientListener()
         testSessionClient.getInstance().addListener(testListener)
-        testSessionClient.getInstance().onNewAdsLoaded(Session(DeviceInfo()))
+        testSessionClient.getInstance().onNewAdsLoaded(Session())
         assert(testListener.getTrackedSession()?.id == "AdsAvailable")
     }
 
@@ -123,18 +123,18 @@ class TestSessionClientListener: SessionListener() {
     }
 
     override fun onPublishEvents() {
-        trackedSession = Session(DeviceInfo.empty(),"EventsPublished")
+        trackedSession = Session("EventsPublished")
     }
 
     override fun onSessionAvailable(session: Session) {
-        trackedSession = Session(DeviceInfo.empty(),"SessionAvailable")
+        trackedSession = Session("SessionAvailable")
     }
 
     override fun onAdsAvailable(session: Session) {
-        trackedSession = Session(DeviceInfo.empty(),"AdsAvailable")
+        trackedSession = Session("AdsAvailable")
     }
 
     override fun onSessionInitFailed() {
-        trackedSession = Session(DeviceInfo.empty(),"SessionFailed")
+        trackedSession = Session("SessionFailed")
     }
 }

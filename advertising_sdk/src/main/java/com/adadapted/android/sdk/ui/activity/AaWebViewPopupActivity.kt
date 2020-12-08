@@ -4,14 +4,11 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.support.annotation.RequiresApi
 import android.util.Log
 import android.view.KeyEvent
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.RelativeLayout
@@ -21,7 +18,6 @@ import com.adadapted.android.sdk.core.ad.AdEventClient
 import com.adadapted.android.sdk.core.event.AppEventClient
 
 class AaWebViewPopupActivity : Activity() {
-
     fun createActivity(context: Context, ad: Ad): Intent {
         val intent = Intent(context.applicationContext, AaWebViewPopupActivity::class.java)
         intent.putExtra(EXTRA_POPUP_AD, ad)
@@ -45,7 +41,7 @@ class AaWebViewPopupActivity : Activity() {
         title = "Featured"
 
         val intent = intent
-        ad = intent.getParcelableExtra(EXTRA_POPUP_AD)
+        ad = intent.getSerializableExtra(EXTRA_POPUP_AD) as Ad
 
         val url = ad.actionPath
         if (url.startsWith("http")) {
@@ -86,16 +82,6 @@ class AaWebViewPopupActivity : Activity() {
                 val params: MutableMap<String, String> = HashMap()
                 params["url"] = url
                 params["error"] = error.toString()
-                AppEventClient.getInstance().trackError(EventStrings.POPUP_URL_LOAD_FAILED, "Problem loading popup url", params)
-            }
-
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-            override fun onReceivedHttpError(view: WebView, request: WebResourceRequest, errorResponse: WebResourceResponse) {
-                super.onReceivedHttpError(view, request, errorResponse)
-                Log.w(LOGTAG, "onReceivedHttpError: " + errorResponse.statusCode + " " + errorResponse.reasonPhrase)
-                val params: MutableMap<String, String> = HashMap()
-                params["url"] = url
-                params["error"] = errorResponse.reasonPhrase
                 AppEventClient.getInstance().trackError(EventStrings.POPUP_URL_LOAD_FAILED, "Problem loading popup url", params)
             }
         }

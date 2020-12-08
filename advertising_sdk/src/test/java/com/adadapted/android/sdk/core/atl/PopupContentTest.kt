@@ -1,6 +1,5 @@
 package com.adadapted.android.sdk.core.atl
 
-import android.os.Parcel
 import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
@@ -46,19 +45,6 @@ class PopupContentTest {
     fun createPopupContent() {
         val testPopupContent = PopupContent("testPayloadId", testAddTolistItems)
         assertEquals("testPayloadId", testPopupContent.payloadId)
-    }
-
-    @Test
-    fun createPopupContentFromParcel() {
-        val testPopupContent = PopupContent("testPayloadId", testAddTolistItems)
-        val parcel = Parcel.obtain()
-
-        testPopupContent.writeToParcel(parcel, 0)
-        parcel.setDataPosition(0)
-
-        val popupContentFromParcel = PopupContent.createFromParcel(parcel)
-
-        assertEquals("testPayloadId", popupContentFromParcel.payloadId)
     }
 
     @Test

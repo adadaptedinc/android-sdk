@@ -15,6 +15,7 @@ import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import java.util.Date
 
 class JsonSessionBuilderTest {
     private var mockDeviceInfo = DeviceInfo()
@@ -47,13 +48,30 @@ class JsonSessionBuilderTest {
     }
 
     @Test
-    fun buildSessionFail() {
+    fun buildSessionWillNotFail() {
         val testJsonObject = JSONObject()
         testJsonObject.put("session_id", "testSessionId")
-                .put("will_serve_ads_fail", "true")
-                .put("active_campaigns", "true")
-                .put("polling_interval_ms", "5")
-                .put("session_expires_at", "10000")
+                .put("will_serve_ads_fail", "false")
+                .put("active_campaigns", "truebad")
+                .put("polling_interval_ms", 5)
+                .put("session_expires_at", 1000L)
+                .put("-(0)*&", "nonsense")
+
+        testJsonSessionBuilder.buildSession(testJsonObject)
+
+        AppEventClient.getInstance().onPublishEvents()
+        assert(testAppEventSink.testErrors.isEmpty())
+    }
+
+    @Test
+    fun buildSessionWillFail() {
+        val testJsonObject = JSONObject()
+        testJsonObject.put("session_id", "testSessionId")
+                .put("will_serve_ads_fail", "false")
+                .put("active_campaigns", "truebad")
+                .put("polling_interval_ms", 5)
+                .put("session_expires_at", Date())
+                .put("-(0)*&", "nonsense")
 
         testJsonSessionBuilder.buildSession(testJsonObject)
 
@@ -103,6 +121,6 @@ class JsonSessionBuilderTest {
         val sessionResult = testJsonSessionBuilder.buildSession(testJsonObject)
 
         assertEquals("testSessionId", sessionResult.id)
-        assertEquals("zone1", sessionResult.getZone("zone1").id)
+        assertEquals(80, sessionResult.getZone("zone1").portWidth)
     }
 }

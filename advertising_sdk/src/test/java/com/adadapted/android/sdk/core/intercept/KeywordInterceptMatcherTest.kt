@@ -24,7 +24,7 @@ class KeywordInterceptMatcherTest {
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
     private var testAppEventSink = TestAppEventSink()
     private var testInterceptAdapter = TestInterceptAdapter()
-    private var mockSession = Session(DeviceInfo(), "testId", willServeAds = true, hasAds = true, refreshTime = 30, expiresAt = Date(), zones = mutableMapOf())
+    private var mockSession = Session("testId", willServeAds = true, hasAds = true, refreshTime = 30, expiration = Date().time, zones = mutableMapOf())
 
     @Before
     fun setup() {
@@ -39,7 +39,7 @@ class KeywordInterceptMatcherTest {
         InterceptClient.createInstance(testInterceptAdapter, testTransporterScope)
         InterceptClient.getInstance().onSessionAvailable(mockSession)
         KeywordInterceptMatcher.match("INIT")
-        SessionClient.getInstance().onSessionInitialized(Session(DeviceInfo(), "newSessionId", willServeAds = true, hasAds = true, refreshTime = 30, expiresAt = Date(), zones = mutableMapOf()))
+        SessionClient.getInstance().onSessionInitialized(Session("newSessionId", willServeAds = true, hasAds = true, refreshTime = 30, expiration = Date().time, zones = mutableMapOf()))
         clearEvents()
     }
 
@@ -67,7 +67,7 @@ class KeywordInterceptMatcherTest {
 
     @Test
     fun sessionIsNotAvailable() {
-        SessionClient.getInstance().onSessionInitialized(Session(DeviceInfo(), "", willServeAds = true, hasAds = true, refreshTime = 30, expiresAt = Date(), zones = mutableMapOf()))
+        SessionClient.getInstance().onSessionInitialized(Session("", willServeAds = true, hasAds = true, refreshTime = 30, expiration = Date().time, zones = mutableMapOf()))
         KeywordInterceptMatcher.match("tes")
         InterceptClient.getInstance().onPublishEvents()
         AppEventClient.getInstance().onPublishEvents()
@@ -76,7 +76,7 @@ class KeywordInterceptMatcherTest {
 
     @Test
     fun adIsAvailable() {
-        SessionClient.getInstance().onNewAdsLoaded(Session(DeviceInfo(), "newSessionId", willServeAds = true, hasAds = true, refreshTime = 30, expiresAt = Date(), zones = mutableMapOf()))
+        SessionClient.getInstance().onNewAdsLoaded(Session("newSessionId", willServeAds = true, hasAds = true, refreshTime = 30, expiration = Date().time, zones = mutableMapOf()))
         KeywordInterceptMatcher.match("tes")
         InterceptClient.getInstance().onPublishEvents()
         AppEventClient.getInstance().onPublishEvents()

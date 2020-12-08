@@ -12,9 +12,9 @@ class JsonAdEventBuilder {
         val wrapper = JSONObject()
         try {
             wrapper.put(SESSION_ID, session.id)
-            wrapper.put(APP_ID, session.deviceInfo.appId)
-            wrapper.put(UDID, session.deviceInfo.udid)
-            wrapper.put(SDK_VERSION, session.deviceInfo.sdkVersion)
+            wrapper.put(APP_ID, session.getDeviceInfo().appId)
+            wrapper.put(UDID, session.getDeviceInfo().udid)
+            wrapper.put(SDK_VERSION, session.getDeviceInfo().sdkVersion)
             wrapper.put(EVENTS, buildEvents(events))
         } catch (ex: JSONException) {
             Log.w(LOGTAG, "Problem building Intercept Event JSON")

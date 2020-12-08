@@ -37,7 +37,7 @@ class HttpSessionAdapter(private val initUrl: String, private val refreshUrl: St
         if (sessionBuilder == null) {
             return
         }
-        val url = refreshUrl + String.format("?aid=%s", session.deviceInfo.appId) + String.format("&uid=%s", session.deviceInfo.udid) + String.format("&sid=%s", session.id) + String.format("&sdk=%s", session.deviceInfo.sdkVersion)
+        val url = refreshUrl + String.format("?aid=%s", session.getDeviceInfo().appId) + String.format("&uid=%s", session.getDeviceInfo().udid) + String.format("&sid=%s", session.id) + String.format("&sdk=%s", session.getDeviceInfo().sdkVersion)
         val request = JsonObjectRequest(
                 Request.Method.GET,
                 url,

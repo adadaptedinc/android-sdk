@@ -22,7 +22,6 @@ import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import java.util.Date
 import kotlin.collections.HashMap
 
 class HttpSessionAdapterTest {
@@ -31,12 +30,11 @@ class HttpSessionAdapterTest {
     private var testAppEventSink = TestAppEventSink()
     private var testHttpRequestManager = TestHttpRequestManager()
     private lateinit var testHttpSessionAdapter: HttpSessionAdapter
-    private var mockSession = Session(
-            DeviceInfo().apply { appId = "testAppId" }.apply { udid = "testUdId" },
-            "testSessionId", true, true, 30, Date(1907245044), mutableMapOf())
+    private var mockSession = Session("testSessionId", true, true, 30, 1907245044, mutableMapOf())
 
     @Before
     fun setup() {
+        mockSession.setDeviceInfo(DeviceInfo().apply { appId = "testAppId" }.apply { udid = "testUdId" })
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance(mock(),"", false, HashMap(), TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())

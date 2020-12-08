@@ -25,7 +25,7 @@ class SuggestionTrackerTest {
     private var testInterceptClient = InterceptClient
     private var testInterceptAdapter = TestInterceptAdapter()
     private val testEvent = InterceptEvent("testId", "testTermId", "testTerm", "testInput")
-    private var mockSession = Session(DeviceInfo(), "testId", willServeAds = true, hasAds = true, refreshTime = 30, expiresAt = Date(), zones = mutableMapOf())
+    private var mockSession = Session("testId", true, true, 30, Date().time, mutableMapOf())
 
     @Before
     fun setup() {

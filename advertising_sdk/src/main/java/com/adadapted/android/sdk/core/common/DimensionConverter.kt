@@ -6,4 +6,16 @@ class DimensionConverter(private val scale: Float) {
             (dpValue * scale + 0.5f).toInt()
         } else dpValue
     }
+
+    companion object {
+        private lateinit var instance: DimensionConverter
+
+        fun getInstance(): DimensionConverter {
+            return instance
+        }
+
+        fun createInstance(scale: Float) {
+            instance = DimensionConverter(scale)
+        }
+    }
 }
