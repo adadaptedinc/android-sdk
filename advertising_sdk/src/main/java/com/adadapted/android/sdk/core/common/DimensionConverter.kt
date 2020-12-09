@@ -11,7 +11,12 @@ class DimensionConverter(private val scale: Float) {
         private lateinit var instance: DimensionConverter
 
         fun getInstance(): DimensionConverter {
-            return instance
+            return if(this::instance.isInitialized) {
+                instance
+            } else {
+                createInstance(0f)
+                instance
+            }
         }
 
         fun createInstance(scale: Float) {
