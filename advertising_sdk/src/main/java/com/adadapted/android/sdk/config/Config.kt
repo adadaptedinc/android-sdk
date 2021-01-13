@@ -7,6 +7,9 @@ object Config {
     const val DEFAULT_EVENT_POLLING = 2500L // Events will be pushed to the server every 2.5 seconds
     const val DEFAULT_AD_REFRESH = 6000L // If an Ad does not have a refresh time it will default to 60 seconds
 
+    const val AASDK_PREFS_KEY = "AASDK_PREFS"
+    const val AASDK_PREFS_TRACKING_DISABLED_KEY = "TRACKING_DISABLED"
+
     private const val AD_SERVER_VERSION = "/v/0.9.5/"
     private const val TRACKING_SERVER_VERSION = "/v/1/"
     private const val PAYLOAD_SERVER_VERSION = "/v/1/"
