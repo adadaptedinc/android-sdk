@@ -39,6 +39,8 @@ public class TestAppApplication extends Application {
         }
         LeakCanary.install(this);
 
+        //AdAdapted.INSTANCE.disableAdTracking(this); //Disable ad tracking completely
+
         AdAdapted.INSTANCE
             .withAppId("") // #YOUR API KEY GOES HERE#
             .inEnv(AdAdapted.Env.DEV)

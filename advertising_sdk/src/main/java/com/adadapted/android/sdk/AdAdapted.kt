@@ -108,6 +108,22 @@ object AdAdapted {
         Log.i(LOG_TAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", BuildConfig.VERSION_NAME))
     }
 
+    fun disableAdTracking(context: Context) {
+        setAdTracking(context, true)
+    }
+
+    fun enableAdTracking(context: Context) {
+        setAdTracking(context, false)
+    }
+
+    private fun setAdTracking(context: Context, value: Boolean) {
+        val sharedPref = context.getSharedPreferences(Config.AASDK_PREFS_KEY, Context.MODE_PRIVATE) ?: return
+        with (sharedPref.edit()) {
+            putBoolean(Config.AASDK_PREFS_TRACKING_DISABLED_KEY, value)
+            apply()
+        }
+    }
+
     private fun setupClients(context: Context) {
         Config.init(isProd)
         HttpRequestManager.createQueue(context.applicationContext)
