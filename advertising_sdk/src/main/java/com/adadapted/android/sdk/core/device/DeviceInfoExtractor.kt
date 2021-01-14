@@ -7,13 +7,11 @@ import android.os.Build
 import android.provider.Settings
 import android.telephony.TelephonyManager
 import android.util.Log
-import com.adadapted.android.sdk.config.EventStrings
-import com.adadapted.android.sdk.core.event.AppEventClient
+import com.adadapted.android.sdk.config.Config
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
 import java.io.IOException
-import java.lang.Exception
 import java.util.TimeZone
 import java.util.Locale
 
@@ -74,6 +72,10 @@ class DeviceInfoExtractor: InfoExtractor {
     }
 
     private fun getAdvertisingIdClientInfo(context: Context): AdvertisingIdClient.Info? {
+        if (isTrackingDisabled(context)) {
+            return null
+        }
+
         try {
             return AdvertisingIdClient.getAdvertisingIdInfo(context.applicationContext)
         } catch (ex: GooglePlayServicesNotAvailableException) {
@@ -84,6 +86,11 @@ class DeviceInfoExtractor: InfoExtractor {
             trackGooglePlayAdError(ex)
         }
         return null
+    }
+
+    private fun isTrackingDisabled(context: Context): Boolean {
+        val sharedPrefs = context.getSharedPreferences(Config.AASDK_PREFS_KEY, Context.MODE_PRIVATE)
+        return sharedPrefs.getBoolean(Config.AASDK_PREFS_TRACKING_DISABLED_KEY, false)
     }
 
     private fun trackGooglePlayAdError(ex: Exception) {

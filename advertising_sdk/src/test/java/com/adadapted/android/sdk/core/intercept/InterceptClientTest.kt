@@ -24,7 +24,7 @@ class InterceptClientTest {
     private var testInterceptClient = InterceptClient
     private var testInterceptAdapter = TestInterceptAdapter()
     private val testEvent = InterceptEvent("testId", "testTermId", "testTerm", "testInput")
-    private var mockSession = Session(DeviceInfo(), "testId", willServeAds = true, hasAds = true, refreshTime = 30, expiresAt = Date(), zones = mutableMapOf())
+    private var mockSession = Session("testId", willServeAds = true, hasAds = true, refreshTime = 30, expiration = Date().time, zones = mutableMapOf())
 
     @Before
     fun setup() {

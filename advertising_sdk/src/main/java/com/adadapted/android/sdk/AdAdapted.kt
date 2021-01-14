@@ -30,7 +30,6 @@ import com.adadapted.android.sdk.ui.messaging.AdditContentPublisher
 import com.adadapted.android.sdk.ui.messaging.SdkEventPublisher
 
 object AdAdapted {
-
     enum class Env { PROD, DEV }
 
     private var hasStarted = false
@@ -107,6 +106,22 @@ object AdAdapted {
         AppEventClient.getInstance().trackSdkEvent(EventStrings.APP_OPENED)
         KeywordInterceptMatcher.match("INIT") //init the matcher
         Log.i(LOG_TAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", BuildConfig.VERSION_NAME))
+    }
+
+    fun disableAdTracking(context: Context) {
+        setAdTracking(context, true)
+    }
+
+    fun enableAdTracking(context: Context) {
+        setAdTracking(context, false)
+    }
+
+    private fun setAdTracking(context: Context, value: Boolean) {
+        val sharedPref = context.getSharedPreferences(Config.AASDK_PREFS_KEY, Context.MODE_PRIVATE) ?: return
+        with (sharedPref.edit()) {
+            putBoolean(Config.AASDK_PREFS_TRACKING_DISABLED_KEY, value)
+            apply()
+        }
     }
 
     private fun setupClients(context: Context) {

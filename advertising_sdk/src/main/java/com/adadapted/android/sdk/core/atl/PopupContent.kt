@@ -1,7 +1,5 @@
 package com.adadapted.android.sdk.core.atl
 
-import android.os.Parcel
-import android.os.Parcelable
 import com.adadapted.android.sdk.core.atl.AddToListContent.Sources
 import com.adadapted.android.sdk.core.atl.PopupClient.markPopupContentAcknowledged
 import com.adadapted.android.sdk.core.atl.PopupClient.markPopupContentFailed
@@ -10,22 +8,9 @@ import com.adadapted.android.sdk.core.atl.PopupClient.markPopupContentItemFailed
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
-class PopupContent : AddToListContent, Parcelable {
-    val payloadId: String
-    private val items: List<AddToListItem>
+class PopupContent(val payloadId: String, private val items: List<AddToListItem>) : AddToListContent {
     private var handled = false
     private val lock: Lock = ReentrantLock()
-
-    constructor(payloadId: String, items: List<AddToListItem>) {
-        this.payloadId = payloadId
-        this.items = items
-    }
-
-    private constructor(parcel: Parcel) {
-        payloadId = parcel.readString()
-        items = parcel.createTypedArrayList(AddToListItem)
-        handled = parcel.readByte().toInt() != 0
-    }
 
     override fun acknowledge() {
         lock.lock()
@@ -85,27 +70,9 @@ class PopupContent : AddToListContent, Parcelable {
         return items.isEmpty()
     }
 
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    override fun writeToParcel(parcel: Parcel, i: Int) {
-        parcel.writeString(payloadId)
-        parcel.writeTypedList(items)
-        parcel.writeByte((if (handled) 1 else 0).toByte())
-    }
-
-    companion object CREATOR : Parcelable.Creator<PopupContent> {
+    companion object {
         fun createPopupContent(payloadId: String, items: List<AddToListItem>): PopupContent {
             return PopupContent(payloadId, items)
-        }
-
-        override fun createFromParcel(parcel: Parcel): PopupContent {
-            return PopupContent(parcel)
-        }
-
-        override fun newArray(size: Int): Array<PopupContent?> {
-            return arrayOfNulls(size)
         }
     }
 }

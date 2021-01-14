@@ -1,76 +1,23 @@
 package com.adadapted.android.sdk.core.atl
 
-import android.os.Parcel
-import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
 
-class AddToListItem : Parcelable {
-    val trackingId: String
-    val title: String
-    val brand: String
-    val category: String
-    val productUpc: String
-    val retailerSku: String
-    val discount: String
-    val productImage: String
-
-    constructor(
-            trackingId: String,
-            title: String,
-            brand: String,
-            category: String,
-            productUpc: String,
-            retailerSku: String,
-            discount: String,
-            productImage: String
-    ) {
-        this.trackingId = trackingId
-        this.title = title
-        this.brand = brand
-        this.category = category
-        this.productUpc = productUpc
-        this.retailerSku = retailerSku
-        this.discount = discount
-        this.productImage = productImage
-    }
-
-    private constructor(parcel: Parcel) {
-        trackingId = parcel.readString()
-        title = parcel.readString()
-        brand = parcel.readString()
-        category = parcel.readString()
-        productUpc = parcel.readString()
-        retailerSku = parcel.readString()
-        discount = parcel.readString()
-        productImage = parcel.readString()
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeString(trackingId)
-        dest.writeString(title)
-        dest.writeString(brand)
-        dest.writeString(category)
-        dest.writeString(productUpc)
-        dest.writeString(retailerSku)
-        dest.writeString(discount)
-        dest.writeString(productImage)
-    }
-
-    override fun toString(): String {
-        return "AddToListItem{" +
-                "trackingId='" + trackingId + '\'' +
-                ", title='" + title + '\'' +
-                ", brand='" + brand + '\'' +
-                ", category='" + category + '\'' +
-                ", productUpc='" + productUpc + '\'' +
-                ", retailerSku='" + retailerSku + '\'' +
-                ", discount='" + discount + '\'' +
-                ", productImage='" + productImage + '\'' +
-                '}'
-    }
+class AddToListItem(
+        val trackingId: String,
+        @SerializedName("product_title")
+        val title: String,
+        @SerializedName("product_brand")
+        val brand: String,
+        @SerializedName("product_category")
+        val category: String,
+        @SerializedName("product_barcode")
+        val productUpc: String,
+        @SerializedName("product_sku")
+        val retailerSku: String,
+        @SerializedName("product_discount")
+        val discount: String,
+        @SerializedName("product_image")
+        val productImage: String) {
 
     @Deprecated("Use ProductUpc field instead.", ReplaceWith("productUpc"))
     fun getBarCode(): String {
@@ -138,15 +85,5 @@ class AddToListItem : Parcelable {
                     productImage)
         }
 
-    }
-
-    companion object CREATOR : Parcelable.Creator<AddToListItem> {
-        override fun createFromParcel(parcel: Parcel): AddToListItem {
-            return AddToListItem(parcel)
-        }
-
-        override fun newArray(size: Int): Array<AddToListItem?> {
-            return arrayOfNulls(size)
-        }
     }
 }

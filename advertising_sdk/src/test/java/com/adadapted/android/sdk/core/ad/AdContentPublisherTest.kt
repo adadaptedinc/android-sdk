@@ -10,6 +10,7 @@ import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.event.TestAppEventSink
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.ext.models.Payload
 import com.adadapted.android.sdk.tools.TestAdEventSink
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestTransporter
@@ -35,7 +36,7 @@ class AdContentPublisherTest {
     private var testTransporter = TestCoroutineDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
     private var testAppEventSink = TestAppEventSink()
-    private var mockSession = Session(DeviceInfo(), "testId", true, true, 30, Date(1907245044), mutableMapOf())
+    private var mockSession = Session("testId", true, true, 30, 1907245044, mutableMapOf())
 
     @Before
     fun setup() {
@@ -56,8 +57,8 @@ class AdContentPublisherTest {
                 AdContent.createAddToListContent(Ad(
                         "adId",
                         "adZoneId",
-                        payload = listOf(
-                                AddToListItem("track", "title", "brand", "cat", "upc", "sku", "discount", "image")))))
+                        payload = Payload(listOf(
+                                AddToListItem("track", "title", "brand", "cat", "upc", "sku", "discount", "image"))))))
         Shadows.shadowOf(getMainLooper()).idle()
         assertEquals("testZoneId", testListener.resultZoneId)
         assertEquals("adZoneId", (testListener.resultContent as AdContent).zoneId)
@@ -73,8 +74,8 @@ class AdContentPublisherTest {
                 AdContent.createAddToListContent(Ad(
                         "adId",
                         "adZoneId",
-                        payload = listOf(
-                                AddToListItem("track", "title", "brand", "cat", "upc", "sku", "discount", "image")))))
+                        payload = Payload(listOf(
+                                AddToListItem("track", "title", "brand", "cat", "upc", "sku", "discount", "image"))))))
         assertEquals("", testListener.resultZoneId)
         assertNull(testListener.resultContent)
     }

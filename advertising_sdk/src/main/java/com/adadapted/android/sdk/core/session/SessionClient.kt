@@ -119,7 +119,7 @@ class SessionClient private constructor(private val adapter: SessionAdapter, pri
         sessionLock.lock()
         try {
             if (currentSession.hasExpired()) {
-                Log.i(LOGTAG, "Session has expired. Expired at: " + currentSession.expiresAt)
+                Log.i(LOGTAG, "Session has expired. Expired at: " + currentSession.expiresAt())
                 notifySessionExpired()
                 performReinitialize()
             } else {
@@ -286,7 +286,7 @@ class SessionClient private constructor(private val adapter: SessionAdapter, pri
     }
 
     override fun onSessionInitializeFailed() {
-        updateCurrentSession(Session(deviceInfo))
+        updateCurrentSession(Session().apply { setDeviceInfo(deviceInfo) })
         notifySessionInitFailed()
         setStatus(Status.OK)
     }
@@ -298,7 +298,7 @@ class SessionClient private constructor(private val adapter: SessionAdapter, pri
     }
 
     override fun onNewAdsLoadFailed() {
-        updateCurrentZones(Session(deviceInfo))
+        updateCurrentZones(Session().apply { setDeviceInfo(deviceInfo) })
         notifyAdsAvailable()
         setStatus(Status.OK)
     }

@@ -4,7 +4,7 @@ The Android SDK integrates AdAdapted services with partner Android apps.
 
 Development is done using Android Studio. Updating the public facing API should be done with care since those changes will require more than a drop-in update from partners.
 
-Documentation for integrating the SDK with and App can be found at [https://docs.adadapted.com/#/docs/android-getting-started](https://docs.adadapted.com/#/docs/android-getting-started)
+Documentation for integrating the SDK with an App can be found at [https://docs.adadapted.com/#/docs/android-getting-started](https://docs.adadapted.com/#/docs/android-getting-started)
 
 A valid API key is required to be able to run the SDK which can be dropped into the testing application in TestApplication.java.
 
@@ -27,7 +27,7 @@ Add it in your root build.gradle at the **end** of repositories:
 Step 2. Add the dependency (based on latest release version)
 
 	dependencies {
-	        implementation 'com.gitlab.adadapted:android_sdk:2.2.1'
+	        implementation 'com.gitlab.adadapted:android_sdk:2.2.11'
 	}
 
 ## Running the tests
@@ -36,8 +36,7 @@ Unit tests can be run within the IDE and will report coverage on the gradle logs
 
 ## Deployment
 
-To create a new release, a new tag must be created first and named as only the version number (i.e. 1.0.0). Once the new tag is made, a release can be made off of it by simply
-adding release notes and it will immediately be available through the Jitpack repository.
+To create a new release, it must be named as only the version number (i.e. 1.0.0). Once the new release is published, it will be available through the Jitpack repository shortly afterward.
 
 ## Built With
 
