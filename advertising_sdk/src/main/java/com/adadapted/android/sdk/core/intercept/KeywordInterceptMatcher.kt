@@ -30,14 +30,14 @@ class KeywordInterceptMatcher private constructor() : SessionListener(), Interce
                 return suggestions
             }
             val matcher = Matcher()
-            for (term in intercept.getTerms()) {
-                if (term.term.startsWith(input, ignoreCase = true)) {
-                    fileTerm(term, constraint.toString(), suggestions)
+            for (interceptTerm in intercept.getTerms()) {
+                if (interceptTerm.term.startsWith(input, ignoreCase = true)) {
+                    fileTerm(interceptTerm, constraint.toString(), suggestions)
                     break
-                } else if (term.term.contains(input, ignoreCase = true)) {
+                } else if (interceptTerm.term.contains(input, ignoreCase = true)) {
                     matcher.found = true
                     matcher.input = input
-                    matcher.term = term
+                    matcher.term = interceptTerm
                 }
             }
             if (suggestions.isEmpty()) {
