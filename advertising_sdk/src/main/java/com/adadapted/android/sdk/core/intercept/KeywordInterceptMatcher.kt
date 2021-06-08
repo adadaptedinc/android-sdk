@@ -15,12 +15,6 @@ class KeywordInterceptMatcher private constructor() : SessionListener(), Interce
     private var intercept: Intercept = Intercept()
     private var mLoaded = false
 
-    private class Matcher() {
-        var found = false
-        var input = ""
-        var term: Term? = null
-    }
-
     private fun matchKeyword(constraint: CharSequence): Set<Suggestion> {
         val suggestions: MutableSet<Suggestion> = HashSet()
         interceptLock.lock()
@@ -29,23 +23,14 @@ class KeywordInterceptMatcher private constructor() : SessionListener(), Interce
             if (!shouldCheckConstraint(input)) {
                 return suggestions
             }
-            val matcher = Matcher()
-            for (term in intercept.getTerms()) {
-                if (term.term.startsWith(input, ignoreCase = true)) {
-                    fileTerm(term, constraint.toString(), suggestions)
+            for (interceptTerm in intercept.getTerms()) {
+                if (interceptTerm.term.startsWith(input, ignoreCase = true)) {
+                    fileTerm(interceptTerm, constraint.toString(), suggestions)
                     break
-                } else if (term.term.contains(input, ignoreCase = true)) {
-                    matcher.found = true
-                    matcher.input = input
-                    matcher.term = term
                 }
             }
             if (suggestions.isEmpty()) {
-                if (matcher.found) {
-                    fileTerm(matcher.term, matcher.input, suggestions)
-                } else {
-                    SuggestionTracker.suggestionNotMatched(intercept.searchId, constraint.toString())
-                }
+                SuggestionTracker.suggestionNotMatched(intercept.searchId, constraint.toString())
             }
         } finally {
             interceptLock.unlock()

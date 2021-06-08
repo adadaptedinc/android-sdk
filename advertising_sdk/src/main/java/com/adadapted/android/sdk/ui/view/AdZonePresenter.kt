@@ -42,7 +42,7 @@ internal class AdZonePresenter(private val context: Context, private val pixelWe
     private var adCompleted = false
     private var timerRunning = false
     private val timerLock: Lock = ReentrantLock()
-    private val timer: Timer
+    private var timer: Timer
     private val adEventClient: AdEventClient = AdEventClient.getInstance()
     private val appEventClient: AppEventClient = AppEventClient.getInstance()
     private val sessionClient: SessionClient = SessionClient.getInstance()
@@ -210,6 +210,15 @@ internal class AdZonePresenter(private val context: Context, private val pixelWe
             }
             else -> Log.w(LOGTAG, "Cannot handle Action type: $actionType")
         }
+
+        restartTimer()
+        setNextAd()
+    }
+
+    private fun restartTimer() {
+        timer.cancel()
+        timerRunning = false
+        timer = Timer()
     }
 
     private fun handleContentAction(ad: Ad) {

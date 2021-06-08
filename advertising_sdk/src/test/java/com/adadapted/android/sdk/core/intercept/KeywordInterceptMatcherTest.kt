@@ -51,13 +51,6 @@ class KeywordInterceptMatcherTest {
     }
 
     @Test
-    fun interceptMatchesContains() {
-        KeywordInterceptMatcher.match("ter")
-        InterceptClient.getInstance().onPublishEvents()
-        assertEquals(InterceptEvent.MATCHED, testInterceptAdapter.testEvents.first().event)
-    }
-
-    @Test
     fun interceptDoesNotMatch() {
         KeywordInterceptMatcher.match("oxo")
         InterceptClient.getInstance().onPublishEvents()
