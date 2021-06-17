@@ -61,7 +61,7 @@ class PayloadContentParser {
                 .setCategory(parseField(itemJson, JsonFields.ProductCategory))
                 .setProductUpc(parseField(itemJson, JsonFields.ProductBarCode))
                 .setRetailerSku(parseField(itemJson, JsonFields.ProductSku))
-                .setDiscount(parseField(itemJson, JsonFields.ProductDiscount))
+                .setRetailerID(parseField(itemJson, JsonFields.ProductDiscount)) //discount to ID temp swap
                 .setProductImage(parseField(itemJson, JsonFields.ProductImage))
         return builder.build()
     }

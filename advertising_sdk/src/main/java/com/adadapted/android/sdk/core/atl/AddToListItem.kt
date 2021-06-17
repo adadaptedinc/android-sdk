@@ -14,8 +14,9 @@ class AddToListItem(
         val productUpc: String,
         @SerializedName("product_sku")
         val retailerSku: String,
+        //Temporarily hijacking this 'discount' parameter until a more elegant backend solutions exists in V2
         @SerializedName("product_discount")
-        val discount: String,
+        val retailerID: String,
         @SerializedName("product_image")
         val productImage: String) {
 
@@ -24,6 +25,9 @@ class AddToListItem(
         return productUpc
     }
 
+    @Deprecated("Discount is no longer used in payload item data.")
+    val discount: String =  ""
+
     class Builder {
         private var trackingId = ""
         private var title = ""
@@ -31,6 +35,7 @@ class AddToListItem(
         private var category = ""
         private var productUpc = ""
         private var retailerSku = ""
+        private var retailerID = ""
         private var discount = ""
         private var productImage = ""
         fun setTrackingId(trackingId: String): Builder {
@@ -63,6 +68,11 @@ class AddToListItem(
             return this
         }
 
+        fun setRetailerID(retailerID: String): Builder {
+            this.retailerID = retailerID
+            return this
+        }
+
         fun setDiscount(discount: String): Builder {
             this.discount = discount
             return this
@@ -81,7 +91,7 @@ class AddToListItem(
                     category,
                     productUpc,
                     retailerSku,
-                    discount,
+                    retailerID,
                     productImage)
         }
 
