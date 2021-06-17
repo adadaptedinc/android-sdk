@@ -64,7 +64,8 @@ class AdTest {
         assertEquals(addToListContent.getItems().first().category, "TestCategory")
         assertEquals(addToListContent.getItems().first().productUpc, "TestUPC")
         assertEquals(addToListContent.getItems().first().retailerSku, "TestSKU")
-        assertEquals(addToListContent.getItems().first().discount, "TestDiscount")
+        assertEquals(addToListContent.getItems().first().discount, "") //temp discount swap
+        assertEquals(addToListContent.getItems().first().retailerID, "TestDiscount")
         assertEquals(addToListContent.getItems().first().productImage, "TestImage")
     }
 
