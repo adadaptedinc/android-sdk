@@ -12,11 +12,12 @@ object SuggestionTracker {
 
     @Synchronized
     fun suggestionMatched(
-            searchId: String,
-            termId: String,
-            term: String,
-            replacement: String,
-            userInput: String) {
+        searchId: String,
+        termId: String,
+        term: String,
+        replacement: String,
+        userInput: String
+    ) {
         matcherLock.lock()
         try {
             val lcTerm = convertToLowerCase(term)
@@ -38,7 +39,8 @@ object SuggestionTracker {
             if (replacements.containsKey(lcReplacement)) {
                 val term = replacements[lcReplacement]
                 val userInput = items[term]
-                InterceptClient.getInstance().trackPresented(searchId, termId, term ?: "", userInput ?: "")
+                InterceptClient.getInstance()
+                    .trackPresented(searchId, termId, term ?: "", userInput ?: "")
             }
         } finally {
             matcherLock.unlock()
@@ -53,7 +55,8 @@ object SuggestionTracker {
             if (replacements.containsKey(lcReplacement)) {
                 val term = replacements[lcReplacement]
                 val userInput = items[term]
-                InterceptClient.getInstance().trackSelected(searchId, termId, term ?: "", userInput ?: "")
+                InterceptClient.getInstance()
+                    .trackSelected(searchId, termId, term ?: "", userInput ?: "")
             }
         } finally {
             matcherLock.unlock()

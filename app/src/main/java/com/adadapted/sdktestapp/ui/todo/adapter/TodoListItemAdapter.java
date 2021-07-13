@@ -12,9 +12,6 @@ import com.adadapted.sdktestapp.core.todo.TodoItem;
 
 import java.util.List;
 
-/**
- * Created by chrisweeden on 6/26/15.
- */
 public class TodoListItemAdapter extends ArrayAdapter<TodoItem> {
     private List<TodoItem> items;
 

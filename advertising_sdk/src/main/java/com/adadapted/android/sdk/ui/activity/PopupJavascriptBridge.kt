@@ -20,22 +20,24 @@ class PopupJavascriptBridge internal constructor(private val ad: Ad) {
     }
 
     @JavascriptInterface
-    fun addItemToList(payloadId: String,
-                      trackingId: String,
-                      title: String,
-                      brand: String,
-                      category: String,
-                      barCode: String,
-                      retailerSku: String,
-                      discount: String,
-                      productImage: String) {
-
+    fun addItemToList(
+        payloadId: String,
+        trackingId: String,
+        title: String,
+        brand: String,
+        category: String,
+        barCode: String,
+        retailerSku: String,
+        discount: String,
+        productImage: String
+    ) {
         val params = HashMap<String, String>()
         params["tracking_id"] = trackingId
         getInstance().trackSdkEvent(EventStrings.POPUP_ATL_CLICKED, params)
 
         val items: MutableList<AddToListItem> = ArrayList()
-        items.add(AddToListItem(
+        items.add(
+            AddToListItem(
                 trackingId,
                 title,
                 brand,
@@ -44,7 +46,8 @@ class PopupJavascriptBridge internal constructor(private val ad: Ad) {
                 retailerSku,
                 discount,
                 productImage
-        ))
+            )
+        )
         val content = createPopupContent(payloadId, items)
         AdditContentPublisher.getInstance().publishPopupContent(content)
     }

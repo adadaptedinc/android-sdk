@@ -14,9 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Created by chrisweeden on 4/1/15.
- */
+
 public class TodoListManager implements TodoLoader.Listener {
     private static String TAG = TodoListManager.class.getName();
 

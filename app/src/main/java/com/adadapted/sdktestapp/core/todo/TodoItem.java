@@ -2,9 +2,6 @@ package com.adadapted.sdktestapp.core.todo;
 
 import java.util.UUID;
 
-/**
- * Created by chrisweeden on 4/1/15.
- */
 public class TodoItem {
     private UUID id;
     private String name;

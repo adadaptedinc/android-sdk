@@ -31,7 +31,10 @@ class AaWebViewPopupActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val webViewLayout = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT)
+        val webViewLayout = RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.MATCH_PARENT
+        )
         popupWebView = WebView(this)
         popupWebView.layoutParams = webViewLayout
 
@@ -47,7 +50,10 @@ class AaWebViewPopupActivity : Activity() {
         if (url.startsWith("http")) {
             loadPopup(ad.actionPath)
         } else {
-            AppEventClient.getInstance().trackError(EventStrings.POPUP_URL_MALFORMED, "Incorrect Action Path URL supplied for Ad: " + ad.id)
+            AppEventClient.getInstance().trackError(
+                EventStrings.POPUP_URL_MALFORMED,
+                "Incorrect Action Path URL supplied for Ad: " + ad.id
+            )
         }
     }
 
@@ -72,17 +78,28 @@ class AaWebViewPopupActivity : Activity() {
         popupWebView.settings.javaScriptEnabled = true
         popupWebView.addJavascriptInterface(PopupJavascriptBridge(ad), "AdAdapted")
         popupWebView.webViewClient = object : WebViewClient() {
-            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+            override fun shouldOverrideUrlLoading(
+                view: WebView,
+                request: WebResourceRequest
+            ): Boolean {
                 return false
             }
 
-            override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+            override fun onReceivedError(
+                view: WebView,
+                request: WebResourceRequest,
+                error: WebResourceError
+            ) {
                 super.onReceivedError(view, request, error)
                 Log.w(LOGTAG, "onReceivedError: $request $error")
                 val params: MutableMap<String, String> = HashMap()
                 params["url"] = url
                 params["error"] = error.toString()
-                AppEventClient.getInstance().trackError(EventStrings.POPUP_URL_LOAD_FAILED, "Problem loading popup url", params)
+                AppEventClient.getInstance().trackError(
+                    EventStrings.POPUP_URL_LOAD_FAILED,
+                    "Problem loading popup url",
+                    params
+                )
             }
         }
         popupWebView.loadUrl(url)

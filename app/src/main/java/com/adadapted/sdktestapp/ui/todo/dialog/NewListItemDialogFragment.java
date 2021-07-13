@@ -18,9 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Created by chrisweeden on 6/25/15.
- */
 public class NewListItemDialogFragment extends DialogFragment {
     private static final String TAG = NewListItemDialogFragment.class.getName();
 

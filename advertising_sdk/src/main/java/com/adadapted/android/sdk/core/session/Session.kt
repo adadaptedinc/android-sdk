@@ -8,30 +8,31 @@ import java.util.Date
 import kotlin.collections.HashMap
 
 class Session(
-        @SerializedName("session_id")
-        val id: String = "",
+    @SerializedName("session_id")
+    val id: String = "",
 
-        @SerializedName("will_serve_ads")
-        private val willServeAds: Boolean = false,
+    @SerializedName("will_serve_ads")
+    private val willServeAds: Boolean = false,
 
-        @SerializedName("active_campaigns")
-        val hasAds: Boolean = false,
+    @SerializedName("active_campaigns")
+    val hasAds: Boolean = false,
 
-        @SerializedName("polling_interval_ms")
-        val refreshTime: Long = Config.DEFAULT_AD_POLLING,
+    @SerializedName("polling_interval_ms")
+    val refreshTime: Long = Config.DEFAULT_AD_POLLING,
 
-        @SerializedName("session_expires_at")
-        val expiration: Long = 0,
+    @SerializedName("session_expires_at")
+    val expiration: Long = 0,
 
-        private var zones: Map<String, Zone> = HashMap()) {
+    private var zones: Map<String, Zone> = HashMap()
+) {
 
     constructor(session: Session, zones: Map<String, Zone>?) : this(
-            session.id,
-            session.willServeAds,
-            session.hasActiveCampaigns(),
-            session.refreshTime,
-            session.expiration,
-            zones ?: HashMap<String, Zone>()
+        session.id,
+        session.willServeAds,
+        session.hasActiveCampaigns(),
+        session.refreshTime,
+        session.expiration,
+        zones ?: HashMap<String, Zone>()
     )
 
     private var deviceInfo: DeviceInfo = DeviceInfo()
