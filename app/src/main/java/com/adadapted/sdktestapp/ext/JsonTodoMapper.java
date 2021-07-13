@@ -7,9 +7,6 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by chrisweeden on 4/7/15.
- */
 public class JsonTodoMapper {
     List<TodoList> toTodoList(JSONArray jsonArray) {
         List<TodoList> lists = new ArrayList<>();

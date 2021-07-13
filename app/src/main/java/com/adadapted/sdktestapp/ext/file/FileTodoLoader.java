@@ -16,9 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Created by chrisweeden on 4/6/15.
- */
 public class FileTodoLoader implements TodoLoader {
     private static final String TAG = FileTodoLoader.class.getName();
 
