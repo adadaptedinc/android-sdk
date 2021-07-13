@@ -17,7 +17,11 @@ class PixelWebView @SuppressLint("SetJavaScriptEnabled") constructor(context: Co
     init {
         setLayerType(View.LAYER_TYPE_SOFTWARE, null)
         webViewClient = object : WebViewClient() {
-            override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+            override fun onReceivedError(
+                view: WebView,
+                request: WebResourceRequest,
+                error: WebResourceError
+            ) {
                 super.onReceivedError(view, request, error)
                 Log.e(LOGTAG, "Problem loading Tracking HTML: $error")
             }

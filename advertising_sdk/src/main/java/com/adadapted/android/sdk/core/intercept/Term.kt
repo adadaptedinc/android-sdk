@@ -3,13 +3,13 @@ package com.adadapted.android.sdk.core.intercept
 import com.google.gson.annotations.SerializedName
 
 class Term(
-        @SerializedName("term_id")
-        val termId: String,
-        val term: String,
-        val replacement: String,
-        val icon: String,
-        val tagLine: String,
-        private val priority: Int
+    @SerializedName("term_id")
+    val termId: String,
+    val term: String,
+    val replacement: String,
+    val icon: String,
+    val tagLine: String,
+    private val priority: Int
 ) {
 
     operator fun compareTo(a2: Term): Int {

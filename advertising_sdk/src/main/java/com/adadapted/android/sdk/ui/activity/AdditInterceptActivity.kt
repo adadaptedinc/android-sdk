@@ -26,7 +26,11 @@ class AdditInterceptActivity : AppCompatActivity() {
             Log.w(LOGTAG, "Problem dealing with Addit content. Recovering. " + ex.message)
             val errorParams: MutableMap<String, String> = HashMap()
             ex.message?.let { errorParams.put(EventStrings.EXCEPTION_MESSAGE, it) }
-            AppEventClient.getInstance().trackError(EventStrings.ADDIT_DEEPLINK_HANDLING_ERROR, "Problem handling deeplink", errorParams)
+            AppEventClient.getInstance().trackError(
+                EventStrings.ADDIT_DEEPLINK_HANDLING_ERROR,
+                "Problem handling deeplink",
+                errorParams
+            )
             startActivity(packageManager.getLaunchIntentForPackage(packageName))
         }
         PayloadClient.getInstance().deeplinkCompleted()

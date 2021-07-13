@@ -42,11 +42,11 @@ class KeywordInterceptMatcher private constructor() : SessionListener(), Interce
         if (term != null) {
             suggestions.add(Suggestion(intercept.searchId, term))
             SuggestionTracker.suggestionMatched(
-                    intercept.searchId,
-                    term.termId,
-                    term.term,
-                    term.replacement,
-                    input
+                intercept.searchId,
+                term.termId,
+                term.term,
+                term.replacement,
+                input
             )
         }
     }
