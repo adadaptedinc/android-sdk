@@ -34,11 +34,6 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
         setup(context)
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context.applicationContext, attrs, defStyleAttr) {
-        setup(context)
-    }
-
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(context.applicationContext, attrs, defStyleAttr, defStyleRes) {
         setup(context)
