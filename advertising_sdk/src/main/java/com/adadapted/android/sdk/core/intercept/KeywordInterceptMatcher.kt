@@ -89,13 +89,15 @@ class KeywordInterceptMatcher private constructor() : SessionListener(), Interce
             return if (this::instance.isInitialized) {
                 instance.matchKeyword(constraint)
             } else {
-                try {
-                    SessionClient.getInstance()
-                } catch (error: UninitializedPropertyAccessException) {
-                    return emptySet()
+                when {
+                    SessionClient.hasInstance() -> {
+                        instance = KeywordInterceptMatcher()
+                        emptySet()
+                    }
+                    else -> {
+                        return emptySet()
+                    }
                 }
-                instance = KeywordInterceptMatcher()
-                emptySet()
             }
         }
     }
