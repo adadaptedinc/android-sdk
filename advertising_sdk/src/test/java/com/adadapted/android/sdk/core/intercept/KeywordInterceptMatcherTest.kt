@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.core.intercept
 
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.event.TestAppEventSink
@@ -56,7 +55,6 @@ class KeywordInterceptMatcherTest {
         InterceptClient.getInstance().onPublishEvents()
         assertEquals(InterceptEvent.NOT_MATCHED, testInterceptAdapter.testEvents.first().event)
     }
-
 
     @Test
     fun sessionIsNotAvailable() {
