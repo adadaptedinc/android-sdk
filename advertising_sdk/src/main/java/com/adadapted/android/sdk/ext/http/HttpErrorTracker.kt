@@ -5,7 +5,12 @@ import com.adadapted.android.sdk.core.event.AppEventClient
 import com.android.volley.VolleyError
 
 object HttpErrorTracker {
-    fun trackHttpError(volleyError: VolleyError?, url: String, eventString: String, logTag: String) {
+    fun trackHttpError(
+        volleyError: VolleyError?,
+        url: String,
+        eventString: String,
+        logTag: String
+    ) {
         if (volleyError?.networkResponse != null) {
             val statusCode = volleyError.networkResponse.statusCode
             if (statusCode >= 400) {
@@ -15,9 +20,13 @@ object HttpErrorTracker {
                 params["status_code"] = statusCode.toString()
                 params["data"] = data
                 try {
-                    AppEventClient.getInstance().trackError(eventString, volleyError.message ?: "", params)
+                    AppEventClient.getInstance()
+                        .trackError(eventString, volleyError.message ?: "", params)
                 } catch (illegalArg: IllegalArgumentException) {
-                    Log.e(logTag, "AppEventClient was not initialized, is your API key valid? -DETAIL: " + illegalArg.message)
+                    Log.e(
+                        logTag,
+                        "AppEventClient was not initialized, is your API key valid? -DETAIL: " + illegalArg.message
+                    )
                 }
             }
         }

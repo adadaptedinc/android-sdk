@@ -7,9 +7,6 @@ import android.widget.SpinnerAdapter;
 
 import com.adadapted.sdktestapp.R;
 
-/**
- * Created by chrisweeden on 4/8/15.
- */
 public abstract class SpinnerActionBarActivity extends SingleFragmentActivity
         implements ActionBar.OnNavigationListener {
     protected String [] menuItems;

@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by chrisweeden on 4/1/15.
- */
 public class TodoList {
     private UUID id;
     private String name;

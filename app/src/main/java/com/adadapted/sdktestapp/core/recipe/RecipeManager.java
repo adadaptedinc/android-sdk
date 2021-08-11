@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Created by chrisweeden on 4/6/15.
- */
 public class RecipeManager {
     private static RecipeManager ourInstance;
 

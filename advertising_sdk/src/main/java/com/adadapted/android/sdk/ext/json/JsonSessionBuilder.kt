@@ -24,9 +24,9 @@ class JsonSessionBuilder(private val deviceInfo: DeviceInfo) {
             params["exception"] = ex.message ?: ""
             params["bad_json"] = response.toString()
             getInstance().trackError(
-                    EventStrings.SESSION_PAYLOAD_PARSE_FAILED,
-                    "Failed to parse Session payload for processing.",
-                    params.toMap()
+                EventStrings.SESSION_PAYLOAD_PARSE_FAILED,
+                "Failed to parse Session payload for processing.",
+                params.toMap()
             )
         }
         return Session()

@@ -105,7 +105,13 @@ object AdAdapted {
         SessionClient.getInstance().start(startListener)
         AppEventClient.getInstance().trackSdkEvent(EventStrings.APP_OPENED)
         KeywordInterceptMatcher.match("INIT") //init the matcher
-        Log.i(LOG_TAG, String.format("AdAdapted Android Advertising SDK v%s initialized.", BuildConfig.VERSION_NAME))
+        Log.i(
+            LOG_TAG,
+            String.format(
+                "AdAdapted Android Advertising SDK v%s initialized.",
+                BuildConfig.VERSION_NAME
+            )
+        )
     }
 
     fun disableAdTracking(context: Context) {
