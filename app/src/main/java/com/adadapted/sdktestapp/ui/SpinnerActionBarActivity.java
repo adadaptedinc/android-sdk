@@ -1,9 +1,10 @@
 package com.adadapted.sdktestapp.ui;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.widget.ArrayAdapter;
 import android.widget.SpinnerAdapter;
+
+import androidx.appcompat.app.ActionBar;
 
 import com.adadapted.sdktestapp.R;
 

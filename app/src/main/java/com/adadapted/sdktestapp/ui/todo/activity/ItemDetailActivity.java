@@ -1,7 +1,7 @@
 package com.adadapted.sdktestapp.ui.todo.activity;
 
 import android.net.Uri;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
 

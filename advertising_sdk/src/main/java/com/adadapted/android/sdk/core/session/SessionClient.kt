@@ -350,6 +350,10 @@ class SessionClient private constructor(private val adapter: SessionAdapter, pri
         fun createInstance(adapter: SessionAdapter, transporter: TransporterCoroutineScope) {
             instance = SessionClient(adapter, transporter)
         }
+
+        fun hasInstance(): Boolean {
+            return this::instance.isInitialized
+        }
     }
 
     init {
