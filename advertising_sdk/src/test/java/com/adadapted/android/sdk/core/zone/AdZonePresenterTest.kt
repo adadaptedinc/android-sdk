@@ -16,7 +16,6 @@ import com.adadapted.android.sdk.core.event.TestAppEventSink
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.session.SessionTest
-import com.adadapted.android.sdk.ext.models.Payload
 import com.adadapted.android.sdk.tools.TestAdEventSink
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestTransporter
@@ -36,7 +35,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
-import java.util.Date
 import kotlin.collections.HashMap
 
 @RunWith(RobolectricTestRunner::class)
@@ -110,7 +108,7 @@ class AdZonePresenterTest {
         val testAdEventListener = TestAdEventClientListener()
         AdEventClient.getInstance().addListener(testAdEventListener)
 
-        testAdZonePresenter.onAdDisplayed(Ad("TestAdId"))
+        testAdZonePresenter.onAdDisplayed(Ad("TestAdId"), true)
         testAdZonePresenter.onDetach()
 
         assertEquals("", testListener.testZone.id)
@@ -125,9 +123,23 @@ class AdZonePresenterTest {
 
         val testAdEventListener = TestAdEventClientListener()
         AdEventClient.getInstance().addListener(testAdEventListener)
-        testAdZonePresenter.onAdDisplayed(Ad("TestAdId"))
+        testAdZonePresenter.onAdDisplayed(Ad("TestAdId"), true)
 
         assertEquals(AdEvent.Types.IMPRESSION, testAdEventListener.testAdEvent?.eventType)
+    }
+
+    @Test
+    fun testOnAdDisplayedButZoneNotVisible() {
+        testAdZonePresenter.init("testZoneId")
+        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(Ad("TestAdId")))))
+        testSession.setZones(zones)
+        testAdZonePresenter.onSessionAvailable(testSession)
+
+        val testAdEventListener = TestAdEventClientListener()
+        AdEventClient.getInstance().addListener(testAdEventListener)
+        testAdZonePresenter.onAdDisplayed(Ad("TestAdId"), false)
+
+        assertEquals(AdEvent.Types.INVISIBLE_IMPRESSION, testAdEventListener.testAdEvent?.eventType)
     }
 
    @Test
@@ -140,7 +152,7 @@ class AdZonePresenterTest {
 
        val testAdEventListener = TestAdEventClientListener()
        AdEventClient.getInstance().addListener(testAdEventListener)
-       testAdZonePresenter.onAdDisplayed(testAd)
+       testAdZonePresenter.onAdDisplayed(testAd, true)
        testAdZonePresenter.onAdClicked(testAd)
 
        AppEventClient.getInstance().onPublishEvents()
@@ -158,7 +170,7 @@ class AdZonePresenterTest {
 
         val testAdEventListener = TestAdEventClientListener()
         AdEventClient.getInstance().addListener(testAdEventListener)
-        testAdZonePresenter.onAdDisplayed(testAd)
+        testAdZonePresenter.onAdDisplayed(testAd, true)
         testAdZonePresenter.onAdClicked(testAd)
 
         assertEquals(AdEvent.Types.INTERACTION, testAdEventListener.testAdEvent?.eventType)
@@ -174,7 +186,7 @@ class AdZonePresenterTest {
 
         val testAdEventListener = TestAdEventClientListener()
         AdEventClient.getInstance().addListener(testAdEventListener)
-        testAdZonePresenter.onAdDisplayed(testAd)
+        testAdZonePresenter.onAdDisplayed(testAd, true)
         testAdZonePresenter.onAdClicked(testAd)
 
         assertEquals(AdEvent.Types.INTERACTION, testAdEventListener.testAdEvent?.eventType)
@@ -190,7 +202,7 @@ class AdZonePresenterTest {
 
         val testAdEventListener = TestAdEventClientListener()
         AdEventClient.getInstance().addListener(testAdEventListener)
-        testAdZonePresenter.onAdDisplayed(testAd)
+        testAdZonePresenter.onAdDisplayed(testAd, true)
         testAdZonePresenter.onAdClicked(testAd)
 
         AppEventClient.getInstance().onPublishEvents()

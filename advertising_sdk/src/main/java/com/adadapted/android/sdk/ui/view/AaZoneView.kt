@@ -25,6 +25,7 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
     private var presenter: AdZonePresenter? = null
     private var isVisible = true
     private var listener: Listener? = null
+    private var isAdVisible = true
 
     constructor(context: Context) : super(context.applicationContext) {
         setup(context)
@@ -56,6 +57,10 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
 
     fun shutdown() {
         Handler(Looper.getMainLooper()).post { this@AaZoneView.onStop() }
+    }
+
+    fun setAdZoneVisibility(isViewable: Boolean) {
+        isAdVisible = isViewable
     }
 
     /**
@@ -146,7 +151,7 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
      */
     override fun onAdLoaded(ad: Ad) {
         if (presenter != null) {
-            presenter?.onAdDisplayed(ad)
+            presenter?.onAdDisplayed(ad, isAdVisible)
             notifyAdLoaded()
         }
     }
