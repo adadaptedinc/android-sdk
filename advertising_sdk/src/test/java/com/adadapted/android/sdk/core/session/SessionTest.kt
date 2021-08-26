@@ -1,26 +1,27 @@
 package com.adadapted.android.sdk.core.session
 
+import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.zone.Zone
+import com.adadapted.android.sdk.ext.models.Payload
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertFalse
 import org.junit.Assert
 import org.junit.Test
 import java.time.Instant
-import java.time.LocalDateTime
 import java.util.Date
 
 class SessionTest {
     @Test
     fun emptySessionCreated() {
-        val deviceInfo = DeviceInfo.empty()
+        DeviceInfo.empty()
         val session = Session()
         Assert.assertEquals("", session.id)
     }
 
     @Test
     fun constructSession() {
-        val deviceInfo = DeviceInfo.empty()
+        DeviceInfo.empty()
         val session = Session()
         val constructedSession = Session(session, mapOf())
 
@@ -30,6 +31,19 @@ class SessionTest {
     @Test
     fun sessionHasCampaigns() {
         assert(buildTestSession().hasActiveCampaigns())
+    }
+
+    @Test
+    fun sessionDoesNotHaveZoneAds() {
+        assert(!buildTestSession().hasZoneAds())
+    }
+
+    @Test
+    fun sessionHasZoneAds() {
+        val session = buildTestSession()
+        val zones = mapOf<String, Zone>().plus(Pair("testZone", Zone("zoneId", listOf(Ad("testAdId", "impId", "url", "action", "actionPath", Payload(listOf()))))))
+        session.setZones(zones)
+        assert(session.hasZoneAds())
     }
 
     @Test

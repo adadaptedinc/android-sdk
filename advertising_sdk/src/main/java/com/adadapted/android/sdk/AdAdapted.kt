@@ -92,6 +92,9 @@ object AdAdapted {
         val startListener: SessionListener = object : SessionListener() {
             override fun onSessionAvailable(session: Session) {
                 sessionListener?.onHasAdsToServe(session.hasActiveCampaigns())
+                if (session.hasActiveCampaigns() && !session.hasZoneAds()) {
+                    Log.e(LOG_TAG,"Session has ads to show but none were loaded properly. Is an obfuscation tool obstructing the AdAdapted SDK?")
+                }
             }
 
             override fun onAdsAvailable(session: Session) {

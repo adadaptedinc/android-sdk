@@ -72,6 +72,13 @@ class Session(
         return !willServeAds || refreshTime == 0L
     }
 
+    fun hasZoneAds(): Boolean {
+        for (zone in zones) {
+            return zone.value.ads.any()
+        }
+        return false
+    }
+
     companion object {
         fun convertExpirationToDate(expireTime: Long): Date {
             return Date(expireTime * 1000)
