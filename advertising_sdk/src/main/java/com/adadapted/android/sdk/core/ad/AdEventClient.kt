@@ -119,6 +119,12 @@ class AdEventClient private constructor(private val adEventSink: AdEventSink, pr
         }
     }
 
+    fun trackInvisibleImpression(ad: Ad) {
+        transporter.dispatchToBackground {
+            fileEvent(ad, AdEvent.Types.INVISIBLE_IMPRESSION)
+        }
+    }
+
     fun trackInteraction(ad: Ad) {
         transporter.dispatchToBackground {
             fileEvent(ad, AdEvent.Types.INTERACTION)
