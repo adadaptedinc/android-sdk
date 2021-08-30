@@ -129,12 +129,16 @@ internal class AdZonePresenter(private val context: Context, private val pixelWe
         }
     }
 
-    fun onAdDisplayed(ad: Ad) {
+    fun onAdDisplayed(ad: Ad, isAdVisible: Boolean) {
         zoneLock.lock()
         try {
             adStarted = true
-            adEventClient.trackImpression(ad)
-            pixelWebView.loadData(ad.trackingHtml, "text/html", null)
+            if (isAdVisible) {
+                adEventClient.trackImpression(ad)
+                pixelWebView.loadData(ad.trackingHtml, "text/html", null)
+            } else {
+                adEventClient.trackInvisibleImpression(ad) //track the impression but log it as invisible (not a valid impression)
+            }
             startZoneTimer()
         } finally {
             zoneLock.unlock()
