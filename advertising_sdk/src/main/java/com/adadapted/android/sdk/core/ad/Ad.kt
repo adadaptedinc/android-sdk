@@ -29,6 +29,8 @@ class Ad : Serializable {
     @SerializedName("tracking_html")
     val trackingHtml: String
 
+    private var isImpressionTracked: Boolean = false
+
     constructor(id: String = "",
                 impressionId: String = "",
                 url: String = "",
@@ -52,6 +54,18 @@ class Ad : Serializable {
 
     fun getContent(): AdContent {
         return AdContent.createAddToListContent(this)
+    }
+
+    fun setImpressionTracked() {
+        isImpressionTracked = true
+    }
+
+    fun resetImpressionTracking() {
+        isImpressionTracked = false
+    }
+
+    fun impressionWasTracked(): Boolean {
+        return isImpressionTracked
     }
 
     val zoneId: String

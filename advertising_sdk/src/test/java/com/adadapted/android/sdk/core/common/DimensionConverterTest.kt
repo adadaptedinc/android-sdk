@@ -21,6 +21,12 @@ class DimensionConverterTest {
     }
 
     @Test
+    fun convertDimensionByInstance() {
+        val converted = DimensionConverter.getInstance().convertDpToPx(5)
+        assertEquals(0, converted)
+    }
+
+    @Test
     fun dimensionIsCorrect() {
         val dimension = Dimension(2, 3)
         assertEquals(2, dimension.height)

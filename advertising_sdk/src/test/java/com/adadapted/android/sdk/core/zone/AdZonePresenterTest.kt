@@ -139,6 +139,30 @@ class AdZonePresenterTest {
         AdEventClient.getInstance().addListener(testAdEventListener)
         testAdZonePresenter.onAdDisplayed(Ad("TestAdId"), false)
 
+        assert(testAdEventListener.testAdEvent == null)
+    }
+
+    @Test
+    fun testOnAdCompletedButZoneNotVisible() {
+        testAdZonePresenter.init("testZoneId")
+        val testAd = Ad(id = "TestAdId")
+        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(testAd))))
+        testSession.setZones(zones)
+        testAdZonePresenter.onSessionAvailable(testSession)
+
+        val testAdEventListener = TestAdEventClientListener()
+        AdEventClient.getInstance().addListener(testAdEventListener)
+        testAdZonePresenter.onAdDisplayed(testAd, false)
+        testAdZonePresenter.onAttach(object : AdZonePresenter.Listener{
+            override fun onZoneAvailable(zone: Zone) {}
+            override fun onAdsRefreshed(zone: Zone) {}
+            override fun onAdAvailable(ad: Ad) {}
+            override fun onNoAdAvailable() {}
+        })
+        testAdZonePresenter.onAdClicked(testAd)
+        testAdZonePresenter.onAdDisplayed(testAd, false)
+        testAdZonePresenter.onAdClicked(testAd)
+
         assertEquals(AdEvent.Types.INVISIBLE_IMPRESSION, testAdEventListener.testAdEvent?.eventType)
     }
 
