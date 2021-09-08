@@ -122,6 +122,10 @@ internal class AdZonePresenter(private val context: Context, private val pixelWe
         if (!currentAd.isEmpty && adStarted && !adCompleted) {
             zoneLock.lock()
             try {
+                if (!currentAd.impressionWasTracked()) {
+                    adEventClient.trackInvisibleImpression(currentAd)
+                }
+                currentAd.resetImpressionTracking() //this is critical to make sure rotating ads can get more than one impression (total)
                 adCompleted = true
             } finally {
                 zoneLock.unlock()
@@ -133,16 +137,15 @@ internal class AdZonePresenter(private val context: Context, private val pixelWe
         zoneLock.lock()
         try {
             adStarted = true
-            if (isAdVisible) {
-                adEventClient.trackImpression(ad)
-                pixelWebView.loadData(ad.trackingHtml, "text/html", null)
-            } else {
-                adEventClient.trackInvisibleImpression(ad) //track the impression but log it as invisible (not a valid impression)
-            }
+            trackAdImpression(ad, isAdVisible)
             startZoneTimer()
         } finally {
             zoneLock.unlock()
         }
+    }
+
+    fun onAdVisibilityChanged(isAdVisible: Boolean) {
+        trackAdImpression(currentAd, isAdVisible)
     }
 
     fun onAdDisplayFailed() {
@@ -165,6 +168,13 @@ internal class AdZonePresenter(private val context: Context, private val pixelWe
         } finally {
             zoneLock.unlock()
         }
+    }
+
+    private fun trackAdImpression(ad: Ad, isAdVisible: Boolean) {
+        if (!isAdVisible || ad.impressionWasTracked() || ad.isEmpty) return
+        ad.setImpressionTracked()
+        adEventClient.trackImpression(ad)
+        pixelWebView.loadData(ad.trackingHtml, "text/html", null)
     }
 
     private fun startZoneTimer() {

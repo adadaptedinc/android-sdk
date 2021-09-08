@@ -61,6 +61,7 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
 
     fun setAdZoneVisibility(isViewable: Boolean) {
         isAdVisible = isViewable
+        presenter?.onAdVisibilityChanged(isAdVisible)
     }
 
     /**
