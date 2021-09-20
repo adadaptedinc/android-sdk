@@ -3,7 +3,6 @@ package com.adadapted.android.sdk.core.http
 import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.ad.AdEvent
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.event.TestAppEventSink
@@ -29,7 +28,7 @@ class HttpAdEventSinkTest {
     private var testHttpRequestManager = TestHttpRequestManager()
     private lateinit var httpAdEventSink: HttpAdEventSink
     private var mockSession = Session("testId", true, true, 30, 1907245044, mutableMapOf())
-    private var adEvents = setOf(AdEvent("adId", "adZoneId", "impressionId", AdEvent.Types.IMPRESSION))
+    private var adEvents = setOf(AdEvent("adId", "adZoneId", "impressionId", AdEvent.Types.IMPRESSION, Date().time))
 
     @Before
     fun setup() {

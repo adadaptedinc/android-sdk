@@ -36,6 +36,22 @@ class AdditContentTest {
     }
 
     @Test
+    fun createGenericAdditContent() {
+        val content = AdditContent(
+            "payloadId",
+            "message",
+            "image",
+            0,
+            "source",
+            "additSource", listOf(), AppEventClient.getInstance(), PayloadClient.getInstance())
+
+        assertEquals("payloadId", content.payloadId)
+        assertEquals("message", content.message)
+        assertEquals("image", content.image)
+        assertEquals("additSource", content.additSource)
+    }
+
+    @Test
     fun createDeeplinkContent() {
         val content = AdditContent.createDeeplinkContent(
                 "payloadId",
@@ -146,6 +162,9 @@ class AdditContentTest {
         content.duplicate()
         AppEventClient.getInstance().onPublishEvents()
         assert(testAppEventSink.testEvents.any { event -> event.name == EventStrings.ADDIT_DUPLICATE_PAYLOAD })
+
+        content.duplicate()
+        assert(testAppEventSink.testEvents.any { event -> event.name == EventStrings.ADDIT_DUPLICATE_PAYLOAD })
     }
 
     @Test
@@ -161,6 +180,9 @@ class AdditContentTest {
         )
         content.failed("test failed message")
         AppEventClient.getInstance().onPublishEvents()
+        assert(testAppEventSink.testErrors.any { event -> event.code == EventStrings.ADDIT_CONTENT_FAILED })
+
+        content.failed("test failed message")
         assert(testAppEventSink.testErrors.any { event -> event.code == EventStrings.ADDIT_CONTENT_FAILED })
     }
 

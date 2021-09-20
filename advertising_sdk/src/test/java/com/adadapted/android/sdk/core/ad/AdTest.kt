@@ -8,8 +8,9 @@ import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.ext.models.Payload
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.nhaarman.mockitokotlin2.mock
-import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertNotNull
+import junit.framework.TestCase.assertEquals
+
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,6 +25,20 @@ class AdTest {
         SessionClient.createInstance(mock(), mock())
         AdEventClient.createInstance(mock(), mock())
         AppEventClient.createInstance(mock(), mock())
+    }
+
+    @Test
+    fun verifyAdEventStructure() {
+        val adEventTypes = AdEvent.Types
+        val adEventImp = adEventTypes.IMPRESSION
+        val adEventInv = adEventTypes.INVISIBLE_IMPRESSION
+        val adEventInt = adEventTypes.INTERACTION
+        val adEventPop = adEventTypes.POPUP_BEGIN
+
+        assertEquals(AdEvent.Types.IMPRESSION, adEventImp)
+        assertEquals(AdEvent.Types.INVISIBLE_IMPRESSION, adEventInv)
+        assertEquals(AdEvent.Types.INTERACTION, adEventInt)
+        assertEquals(AdEvent.Types.POPUP_BEGIN, adEventPop)
     }
 
     @Test

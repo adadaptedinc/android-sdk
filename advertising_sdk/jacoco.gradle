@@ -44,7 +44,10 @@ project.afterEvaluate {
                     '**/Config.*',
                     '**/AdAdapted.*',
                     '**/JsonFields.*',
-                    '**/ContentTypes.*'
+                    '**/ContentTypes.*',
+                    '**/AddToListContent.*',
+                    '**/Dimension.*',
+                    '**/DimensionConverter.*',
             ]
             def javaClasses = fileTree(dir: variant.javaCompiler.destinationDir, excludes: excludes)
             def kotlinClasses = fileTree(dir: "${buildDir}/tmp/kotlin-classes/${variantName}", excludes: excludes)

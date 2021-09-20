@@ -8,22 +8,13 @@ class DimensionConverterTest {
     fun convertDpToPx() {
         val dc = DimensionConverter(2f)
         val converted = dc.convertDpToPx(5)
-
         assertEquals(10, converted)
     }
 
     @Test
     fun convertDpToPxLessThanZero() {
-        val dc = DimensionConverter(2f)
-        val converted = dc.convertDpToPx(-1)
-
+        val converted = DimensionConverter.getInstance().convertDpToPx(-1)
         assertEquals(-1, converted)
-    }
-
-    @Test
-    fun convertDimensionByInstance() {
-        val converted = DimensionConverter.getInstance().convertDpToPx(5)
-        assertEquals(0, converted)
     }
 
     @Test
