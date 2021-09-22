@@ -210,4 +210,26 @@ class AdditContentTest {
         AppEventClient.getInstance().onPublishEvents()
         assert(testAppEventSink.testErrors.any { event -> event.code == EventStrings.ADDIT_CONTENT_ITEM_FAILED })
     }
+
+    @Test
+    fun addItSourcesAreCorrect() {
+        val addItContentSources = AdditContent.AdditSources
+        val sourceOne = addItContentSources.DEEPLINK
+        val sourceTwo = addItContentSources.IN_APP
+        val sourceThree = addItContentSources.PAYLOAD
+
+        assertEquals(sourceOne, "deeplink")
+        assertEquals(sourceTwo, "in_app")
+        assertEquals(sourceThree, "payload")
+    }
+
+    @Test
+    fun contentTypesAreCorrect() {
+        val contentTypeWrapper = ContentTypes
+        val atlItem = contentTypeWrapper.ADD_TO_LIST_ITEM
+        val atlItems = contentTypeWrapper.ADD_TO_LIST_ITEMS
+
+        assertEquals(atlItem, 2)
+        assertEquals(atlItems, 1)
+    }
 }
