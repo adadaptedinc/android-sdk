@@ -4,7 +4,6 @@ import android.os.Looper.getMainLooper
 import com.adadapted.android.sdk.core.atl.AddToListContent
 import com.adadapted.android.sdk.core.atl.AddToListItem
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.event.TestAppEventSink
@@ -27,7 +26,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows
-import java.util.Date
 
 @RunWith(RobolectricTestRunner::class)
 class AdContentPublisherTest {

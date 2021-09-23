@@ -42,6 +42,12 @@ class AdTest {
     }
 
     @Test
+    fun verifyAdEventCreation() {
+        val testAdEvent = AdEvent("adId", "zoneId", "impressionId", AdEvent.Types.IMPRESSION)
+        assertEquals("impressionId", testAdEvent.impressionId)
+    }
+
+    @Test
     fun defaultAdIsCreated() {
         val mockAd = Ad()
 

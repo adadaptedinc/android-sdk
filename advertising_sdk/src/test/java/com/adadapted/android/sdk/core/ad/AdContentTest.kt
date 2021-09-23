@@ -24,7 +24,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import java.util.Date
 import kotlin.collections.HashMap
 
 @RunWith(RobolectricTestRunner::class)
@@ -68,6 +67,7 @@ class AdContentTest {
         assertEquals(AdEvent.Types.INTERACTION, testAdEventSink.testEvents.first().eventType)
         assertEquals("testZoneId", testAdEventSink.testEvents.first().zoneId)
         assertEquals("adContentId", testAdEventSink.testEvents.first().adId)
+        testAdContent.acknowledge()
     }
 
     @Test
@@ -91,6 +91,7 @@ class AdContentTest {
         AppEventClient.getInstance().onPublishEvents()
         assertEquals(EventStrings.ATL_ADDED_TO_LIST_FAILED, testAppEventSink.testErrors.first().code)
         assertEquals("adContentFail", testAppEventSink.testErrors.first().message)
+        testAdContent.failed("adContentFail")
     }
 
     @Test
@@ -110,5 +111,18 @@ class AdContentTest {
         testAdContent.failed("adContentFail")
         AppEventClient.getInstance().onPublishEvents()
         assertTrue(testAppEventSink.testErrors.any { event -> event.code == EventStrings.AD_PAYLOAD_IS_EMPTY})
+    }
+
+    @Test
+    fun getSourceIsCorrect() {
+        val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId"))
+        val source = testAdContent.getSource()
+        assertEquals("in_app", source)
+    }
+
+    @Test
+    fun hasNoItemsIsCorrect() {
+        val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId"))
+        assertEquals(testAdContent.hasNoItems(), true)
     }
 }

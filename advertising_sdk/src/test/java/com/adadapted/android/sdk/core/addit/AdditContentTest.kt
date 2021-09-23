@@ -232,4 +232,19 @@ class AdditContentTest {
         assertEquals(atlItem, 2)
         assertEquals(atlItems, 1)
     }
+
+    @Test
+    fun atlItemBarcodeTest() {
+        val item = AddToListItem(
+            "trackingId",
+            "title",
+            "brand",
+            "category",
+            "productUpc",
+            "retailerSku",
+            "discount",
+            "productImage"
+        )
+        assertEquals(item.getBarCode(), item.productUpc)
+    }
 }
