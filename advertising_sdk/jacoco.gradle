@@ -1,7 +1,7 @@
 apply plugin:  'jacoco'
 
 jacoco {
-    toolVersion = "0.8.5"
+    toolVersion = "0.8.7"
     reportsDir = file("$buildDir/coverage")
 }
 
@@ -31,20 +31,23 @@ project.afterEvaluate {
                     '**/BuildConfig.*',
                     '**/Manifest*.*',
                     '**/*Test*.*',
+                    '**/*$[0-9].*',
                     'android/**/*.*',
                     'jdk.internal.*',
-                    '**/Transporter.*',
                     '**/EventStrings.*',
                     '**/DeviceInfoExtractor.*',
                     '**/AdditInterceptActivity.*',
                     '**/AdWebView.*',
-                    '**/AdWebViewPopupActivity.*',
+                    '**/AaWebViewPopupActivity.*',
                     '**/PixelWebView.*',
-                    '**/HttpRequestManager.*',
                     '**/Config.*',
                     '**/AdAdapted.*',
-                    '**/JsonFields.*',
-                    '**/ContentTypes.*'
+                    '**/AddToListContent.*',
+                    '**/Dimension*.*',
+                    '**/DeeplinkContentParser.*',
+                    '**/PayloadContentParser.*',
+                    '**/Http*.*',
+                    '**/Json*.*',
             ]
             def javaClasses = fileTree(dir: variant.javaCompiler.destinationDir, excludes: excludes)
             def kotlinClasses = fileTree(dir: "${buildDir}/tmp/kotlin-classes/${variantName}", excludes: excludes)

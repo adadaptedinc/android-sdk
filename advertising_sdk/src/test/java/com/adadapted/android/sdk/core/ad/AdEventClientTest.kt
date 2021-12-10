@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.core.ad
 
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.tools.TestAdEventSink
@@ -17,7 +16,6 @@ import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
-import java.util.Date
 
 class AdEventClientTest {
 
@@ -35,6 +33,9 @@ class AdEventClientTest {
         whenever(mockAdEventSink.sendBatch(any(),any())).then { }
 
         testAdEventClient.createInstance(mockAdEventSink, testTransporterScope)
+
+        testAdEventClientFailSafes()
+
         testAdEventClient.getInstance().onSessionAvailable(mockSession)
         testAdEventClient.getInstance().onAdsAvailable(mockSession)
     }
@@ -98,6 +99,11 @@ class AdEventClientTest {
         testAdEventClient.getInstance().addListener(mockListener)
         testAdEventClient.getInstance().trackImpression(testAd)
         verify(mockListener).onAdEventTracked(any())
+    }
+
+    private fun testAdEventClientFailSafes() {
+        testAdEventClient.getInstance().onPublishEvents()
+        testAdEventClient.getInstance().trackImpression(Ad())
     }
 }
 

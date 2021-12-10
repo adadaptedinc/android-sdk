@@ -38,7 +38,7 @@ class AppEventClientTest {
 
     @Test
     fun trackAppEvent() {
-        testAppEventClient.getInstance().trackAppEvent("testTrackAppEvent", hashMapOf())
+        testAppEventClient.getInstance().trackAppEvent("testTrackAppEvent")
         testAppEventClient.getInstance().onPublishEvents()
         assertEquals("app", testAppEventSink.testEvents.first().type)
         assertEquals("testTrackAppEvent", testAppEventSink.testEvents.first().name)

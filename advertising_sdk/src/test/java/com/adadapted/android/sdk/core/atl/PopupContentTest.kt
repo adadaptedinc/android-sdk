@@ -89,4 +89,10 @@ class PopupContentTest {
         assertEquals(EventStrings.POPUP_CONTENT_ITEM_FAILED, testAppEventSink.testErrors.first().code)
         assertEquals("popupItemFail", testAppEventSink.testErrors.first().message)
     }
+
+    @Test
+    fun popupContentGetSourceIsCorrect() {
+        val testPopupContent = PopupContent("testPayloadId", testAddTolistItems)
+        assertEquals(testPopupContent.getSource(), "in_app")
+    }
 }

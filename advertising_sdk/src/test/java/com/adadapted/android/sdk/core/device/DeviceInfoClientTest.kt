@@ -19,11 +19,19 @@ class DeviceInfoClientTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), TestDeviceInfoExtractor(), testTransporterScope)
+        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), DeviceInfoExtractor(), testTransporterScope)
+
+        DeviceInfoClient.getInstance().getDeviceInfo(object: DeviceInfoClient.Callback {
+            override fun onDeviceInfoCollected(deviceInfo: DeviceInfo) {
+                //dummy
+            }
+        })
+
     }
 
     @Test
     fun testGetDeviceInfo() {
+        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), TestDeviceInfoExtractor(), testTransporterScope)
         var deviceInfoResult = DeviceInfo()
         assertNull(deviceInfoResult.device)
 
@@ -34,5 +42,13 @@ class DeviceInfoClientTest {
         })
 
         assertEquals("TestDevice", deviceInfoResult.device)
+    }
+
+    @Test
+    fun deviceInfoProdIsChangedCorrectly() {
+        val deviceInfoResult = DeviceInfo()
+        assertEquals(deviceInfoResult.isProd, false)
+        deviceInfoResult.isProd = true
+        assertEquals(deviceInfoResult.isProd, true)
     }
 }
