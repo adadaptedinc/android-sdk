@@ -38,6 +38,19 @@ public class FileTodoLoader implements TodoLoader {
         TodoList defaultList = new TodoList("Default List");
         defaultList.addNewItem("Item 1");
         defaultList.addNewItem("Item 2");
+        defaultList.addNewItem("Item 3");
+        defaultList.addNewItem("Item 4");
+        defaultList.addNewItem("Item 5");
+        defaultList.addNewItem("Item 6");
+        defaultList.addNewItem("Item 7");
+        defaultList.addNewItem("Item 8");
+        defaultList.addNewItem("Item 9");
+        defaultList.addNewItem("Item 10");
+        defaultList.addNewItem("Item 11");
+        defaultList.addNewItem("Item 12");
+        defaultList.addNewItem("Item 13");
+        defaultList.addNewItem("Item 14");
+        defaultList.addNewItem("Item 15");
         lists.add(defaultList);
 
         TodoList groceryList = new TodoList("Grocery List");

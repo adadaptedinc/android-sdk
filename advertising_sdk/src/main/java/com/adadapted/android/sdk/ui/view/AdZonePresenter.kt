@@ -225,8 +225,14 @@ internal class AdZonePresenter(private val context: Context, private val pixelWe
             else -> Log.w(LOGTAG, "Cannot handle Action type: $actionType")
         }
 
-        restartTimer()
-        setNextAd()
+        cycleToNextAdIfPossible()
+    }
+
+    private fun cycleToNextAdIfPossible() {
+        if (currentZone.ads.count() > 1) {
+            restartTimer()
+            setNextAd()
+        }
     }
 
     private fun restartTimer() {
