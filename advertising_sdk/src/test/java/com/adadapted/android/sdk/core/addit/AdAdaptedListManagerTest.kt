@@ -29,7 +29,7 @@ class AdAdaptedListManagerTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), TestDeviceInfoExtractor(), testTransporterScope)
+        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
         AppEventClient.createInstance(testAppEventSink, testTransporterScope)
     }

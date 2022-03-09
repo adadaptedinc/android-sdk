@@ -32,6 +32,7 @@ import com.adadapted.android.sdk.ui.messaging.SdkEventPublisher
 object AdAdapted {
     enum class Env { PROD, DEV }
 
+    private var customIdentifier: String = ""
     private var hasStarted = false
     private var apiKey: String = ""
     private var isProd = false
@@ -48,6 +49,11 @@ object AdAdapted {
 
     fun inEnv(environment: Env): AdAdapted {
         isProd = environment == Env.PROD
+        return this
+    }
+
+    fun setCustomIdentifier(identifier: String): AdAdapted {
+        customIdentifier = identifier
         return this
     }
 
@@ -137,7 +143,7 @@ object AdAdapted {
         Config.init(isProd)
         HttpRequestManager.createQueue(context.applicationContext)
 
-        DeviceInfoClient.createInstance(context.applicationContext, apiKey, isProd, params, DeviceInfoExtractor(), Transporter())
+        DeviceInfoClient.createInstance(context.applicationContext, apiKey, isProd, params, customIdentifier, DeviceInfoExtractor(), Transporter())
         SessionClient.createInstance(HttpSessionAdapter(Config.getInitSessionUrl(), Config.getRefreshAdsUrl()), Transporter())
         AppEventClient.createInstance(HttpAppEventSink(Config.getAppEventsUrl(), Config.getAppErrorsUrl()), Transporter())
         AdEventClient.createInstance(HttpAdEventSink(Config.getAdsEventUrl()), Transporter())

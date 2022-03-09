@@ -34,7 +34,7 @@ class HttpAppEventSinkTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), TestDeviceInfoExtractor(), testTransporterScope)
+        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
         AppEventClient.createInstance(testAppEventSink, testTransporterScope)
         testHttpRequestManager.createQueue(mock())

@@ -19,7 +19,7 @@ class DeviceInfoClientTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), DeviceInfoExtractor(), testTransporterScope)
+        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "", DeviceInfoExtractor(), testTransporterScope)
 
         DeviceInfoClient.getInstance().getDeviceInfo(object: DeviceInfoClient.Callback {
             override fun onDeviceInfoCollected(deviceInfo: DeviceInfo) {
@@ -31,7 +31,7 @@ class DeviceInfoClientTest {
 
     @Test
     fun testGetDeviceInfo() {
-        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), TestDeviceInfoExtractor(), testTransporterScope)
+        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         var deviceInfoResult = DeviceInfo()
         assertNull(deviceInfoResult.device)
 
@@ -42,6 +42,22 @@ class DeviceInfoClientTest {
         })
 
         assertEquals("TestDevice", deviceInfoResult.device)
+    }
+
+    @Test
+    fun testGetDeviceInfoWithCustomIdentifier() {
+        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "customUDID", TestDeviceInfoExtractor(), testTransporterScope)
+        var deviceInfoResult = DeviceInfo()
+        assertNull(deviceInfoResult.device)
+
+        DeviceInfoClient.getInstance().getDeviceInfo(object: DeviceInfoClient.Callback {
+            override fun onDeviceInfoCollected(deviceInfo: DeviceInfo) {
+                deviceInfoResult = deviceInfo
+            }
+        })
+
+        assertEquals("TestDevice", deviceInfoResult.device)
+        assertEquals("customUDID", deviceInfoResult.udid)
     }
 
     @Test

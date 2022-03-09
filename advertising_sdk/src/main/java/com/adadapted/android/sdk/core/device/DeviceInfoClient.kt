@@ -1,15 +1,17 @@
 package com.adadapted.android.sdk.core.device
 
+import android.annotation.SuppressLint
 import android.content.Context
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
 class DeviceInfoClient private constructor(
-        private val context: Context,
+        private var context: Context?,
         private val appId: String,
         private val isProd: Boolean,
         private val params: Map<String, String>,
+        private val customIdentifier: String,
         private val deviceInfoExtractor: InfoExtractor,
         private val transporter: TransporterCoroutineScope) {
 
@@ -26,6 +28,7 @@ class DeviceInfoClient private constructor(
         try {
             if (this::deviceInfo.isInitialized) {
                 callback.onDeviceInfoCollected(deviceInfo)
+                context = null
             } else {
                 callbacks.add(callback)
             }
@@ -37,7 +40,7 @@ class DeviceInfoClient private constructor(
    private fun collectDeviceInfo() {
        lock.lock()
        try {
-           this.deviceInfo = deviceInfoExtractor.extractDeviceInfo(context, appId, isProd, params)
+           this.deviceInfo = context?.let { deviceInfoExtractor.extractDeviceInfo(it, appId, isProd, params, customIdentifier) }!!
        } finally {
            lock.unlock()
        }
@@ -65,15 +68,17 @@ class DeviceInfoClient private constructor(
     }
 
     companion object {
+        @SuppressLint("StaticFieldLeak")
         private lateinit var instance: DeviceInfoClient
 
         fun createInstance(context: Context,
                            appId: String,
                            isProd: Boolean,
                            params: Map<String, String>,
+                           customIdentifier: String,
                            deviceInfoExtractor: InfoExtractor = DeviceInfoExtractor(),
                            transporter: TransporterCoroutineScope) {
-            instance = DeviceInfoClient(context, appId, isProd, params, deviceInfoExtractor, transporter)
+            instance = DeviceInfoClient(context, appId, isProd, params, customIdentifier, deviceInfoExtractor, transporter)
         }
 
         fun getInstance(): DeviceInfoClient {

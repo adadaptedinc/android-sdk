@@ -28,7 +28,7 @@ class KeywordInterceptMatcherTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), TestDeviceInfoExtractor(), testTransporterScope)
+        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), testTransporterScope)
         AppEventClient.createInstance(testAppEventSink, testTransporterScope)
         val testIntercept = Intercept("test_searchId", 5, 3, listOf(
