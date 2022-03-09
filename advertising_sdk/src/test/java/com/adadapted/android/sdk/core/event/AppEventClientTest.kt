@@ -25,7 +25,7 @@ class AppEventClientTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), TestDeviceInfoExtractor(), testTransporterScope)
+        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
         testAppEventClient.createInstance(testAppEventSink, testTransporterScope)
     }
@@ -54,7 +54,7 @@ class AppEventClientTest {
 
     @Test
     fun onGaidDisabled() {
-        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), TestDeviceInfoExtractor(gaiaDisabled = true), testTransporterScope)
+        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "", TestDeviceInfoExtractor(gaiaDisabled = true), testTransporterScope)
         testAppEventClient.createInstance(testAppEventSink, testTransporterScope)
         testAppEventClient.getInstance().onPublishEvents()
         assertEquals(EventStrings.GAID_UNAVAILABLE, testAppEventSink.testErrors.first().code)

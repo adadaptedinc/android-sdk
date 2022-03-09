@@ -16,7 +16,7 @@ import java.util.TimeZone
 import java.util.Locale
 
 class DeviceInfoExtractor: InfoExtractor {
-    override fun extractDeviceInfo(context: Context, appId: String, isProd: Boolean, params: Map<String, String>) : DeviceInfo {
+    override fun extractDeviceInfo(context: Context, appId: String, isProd: Boolean, params: Map<String, String>, customIdentifier: String) : DeviceInfo {
         val deviceInfo = DeviceInfo()
         deviceInfo.appId = appId
         deviceInfo.isProd = isProd
@@ -28,19 +28,23 @@ class DeviceInfoExtractor: InfoExtractor {
         deviceInfo.timezone = TimeZone.getDefault().id
         deviceInfo.locale = Locale.getDefault().toString()
 
-        try {
-            Class.forName(AdvertisingIdClientName)
-            val info = getAdvertisingIdClientInfo(context)
-            if (info != null) {
-                deviceInfo.udid = info.id
-                deviceInfo.setAllowRetargeting(!info.isLimitAdTrackingEnabled)
-            } else {
+        if (customIdentifier.isNotEmpty()) {
+            deviceInfo.udid = customIdentifier
+        } else {
+            try {
+                Class.forName(AdvertisingIdClientName)
+                val info = getAdvertisingIdClientInfo(context)
+                if (info != null) {
+                    deviceInfo.udid = info.id
+                    deviceInfo.setAllowRetargeting(!info.isLimitAdTrackingEnabled)
+                } else {
+                    deviceInfo.udid = captureAndroidId(context)
+                    deviceInfo.setAllowRetargeting(false)
+                }
+            } catch (e: ClassNotFoundException) {
                 deviceInfo.udid = captureAndroidId(context)
                 deviceInfo.setAllowRetargeting(false)
             }
-        } catch (e: ClassNotFoundException) {
-            deviceInfo.udid = captureAndroidId(context)
-            deviceInfo.setAllowRetargeting(false)
         }
 
         try {

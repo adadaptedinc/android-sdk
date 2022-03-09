@@ -42,7 +42,7 @@ class PayloadContentParserTest {
         val testTransporter = TestCoroutineDispatcher()
         val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), TestDeviceInfoExtractor(), testTransporterScope)
+        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
         AppEventClient.createInstance(mock(), mock())
         PayloadClient.createInstance(mock(), AppEventClient.getInstance(), mock())

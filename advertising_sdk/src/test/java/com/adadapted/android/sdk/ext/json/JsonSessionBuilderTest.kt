@@ -27,7 +27,7 @@ class JsonSessionBuilderTest {
 
     @Before
     fun setup() {
-        DeviceInfoClient.createInstance(mock(), "", false, mock(), mock(), mock())
+        DeviceInfoClient.createInstance(mock(), "", false, mock(), "", mock(), mock())
         SessionClient.createInstance(mock(), mock())
         AppEventClient.createInstance(testAppEventSink, testTransporterScope)
         testJsonSessionBuilder = JsonSessionBuilder(mockDeviceInfo)

@@ -42,56 +42,56 @@ public class TestAppApplication extends Application {
         //AdAdapted.INSTANCE.disableAdTracking(this); //Disable ad tracking completely
 
         AdAdapted.INSTANCE
-            .withAppId("") // #YOUR API KEY GOES HERE#
-            .inEnv(AdAdapted.Env.DEV)
-            .setSdkSessionListener(new AaSdkSessionListener() {
-                @Override
-                public void onHasAdsToServe(boolean hasAds) {
-                    Log.i(TAG, "Has Ads To Serve: " + hasAds);
-                }
-            })
-            .setSdkEventListener(new AaSdkEventListener() {
-                @Override
-                public void onNextAdEvent(String zoneId, String eventType) {
-                    Log.i(TAG, "Ad " + eventType + " for Zone " + zoneId);
-                }
-            })
-            .setSdkAdditContentListener(new AaSdkAdditContentListener() {
-                @Override
-                public void onContentAvailable(final AddToListContent content) {
-                    try {
-                        final List<AddToListItem> listItems = content.getItems();
+                .withAppId("") // #YOUR API KEY GOES HERE#
+                .inEnv(AdAdapted.Env.DEV)
+                //.setCustomIdentifier("customTestId")
+                .setSdkSessionListener(new AaSdkSessionListener() {
+                    @Override
+                    public void onHasAdsToServe(boolean hasAds) {
+                        Log.i(TAG, "Has Ads To Serve: " + hasAds);
+                    }
+                })
+                .setSdkEventListener(new AaSdkEventListener() {
+                    @Override
+                    public void onNextAdEvent(String zoneId, String eventType) {
+                        Log.i(TAG, "Ad " + eventType + " for Zone " + zoneId);
+                    }
+                })
+                .setSdkAdditContentListener(new AaSdkAdditContentListener() {
+                    @Override
+                    public void onContentAvailable(final AddToListContent content) {
+                        try {
+                            final List<AddToListItem> listItems = content.getItems();
 
-                        final TodoList list = TodoListManager.getInstance(TestAppApplication.this).getDefaultList();
+                            final TodoList list = TodoListManager.getInstance(TestAppApplication.this).getDefaultList();
 
-                        for (final AddToListItem item : listItems) {
-                            TodoListManager
-                                .getInstance(TestAppApplication.this)
-                                .addItemToList(list.getId(), item.getTitle());
+                            for (final AddToListItem item : listItems) {
+                                TodoListManager
+                                        .getInstance(TestAppApplication.this)
+                                        .addItemToList(list.getId(), item.getTitle());
 
-                            content.itemAcknowledge(item);
-                        }
+                                content.itemAcknowledge(item);
+                            }
 
-                        content.acknowledge();
+                            content.acknowledge();
 
-                        if (content.getSource().equals(AddToListContent.Sources.OUT_OF_APP)) {
-                            final Intent intent = new Intent(getApplicationContext(), TodoListsActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            if (content.getSource().equals(AddToListContent.Sources.OUT_OF_APP)) {
+                                final Intent intent = new Intent(getApplicationContext(), TodoListsActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                            startActivity(intent);
-                        } else {
-                            Toast.makeText(
-                                TestAppApplication.this,
-                                String.format(Locale.ENGLISH, "%d item(s) added to Default List", listItems.size()),
-                                Toast.LENGTH_LONG).show();
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(
+                                        TestAppApplication.this,
+                                        String.format(Locale.ENGLISH, "%d item(s) added to Default List", listItems.size()),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        } catch (Exception ex) {
+                            Log.e(TAG, "Error handling Addit payload", ex);
+                            content.failed("Client Error handling Addit payload");
                         }
                     }
-                    catch(Exception ex) {
-                        Log.e(TAG, "Error handling Addit payload", ex);
-                        content.failed("Client Error handling Addit payload");
-                    }
-                }
-            })
-            .start(this);
+                })
+                .start(this);
     }
 }

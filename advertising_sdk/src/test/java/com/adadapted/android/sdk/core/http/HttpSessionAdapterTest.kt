@@ -36,7 +36,7 @@ class HttpSessionAdapterTest {
     fun setup() {
         mockSession.setDeviceInfo(DeviceInfo().apply { appId = "testAppId" }.apply { udid = "testUdId" })
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), TestDeviceInfoExtractor(), testTransporterScope)
+        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
         AppEventClient.createInstance(testAppEventSink, testTransporterScope)
         testHttpRequestManager.createQueue(mock())

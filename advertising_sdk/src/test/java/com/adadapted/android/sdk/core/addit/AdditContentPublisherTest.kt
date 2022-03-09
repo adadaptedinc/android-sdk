@@ -49,7 +49,7 @@ class AdditContentPublisherTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(testContext,"", false, HashMap(), TestDeviceInfoExtractor(), testTransporterScope)
+        DeviceInfoClient.createInstance(testContext,"", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
         AdEventClient.createInstance(mockAdEventSink, testTransporterScope)
         AdEventClient.getInstance().onSessionAvailable(mockSession)

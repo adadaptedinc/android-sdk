@@ -47,7 +47,7 @@ class AaWebViewPopupActivityTest {
         whenever(mockAdEventSink.sendBatch(any(), any())).then { }
 
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), TestDeviceInfoExtractor(), testTransporterScope)
+        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
         AppEventClient.createInstance(mock(), testTransporterScope)
         AdEventClient.createInstance(mockAdEventSink, testTransporterScope)
