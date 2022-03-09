@@ -21,7 +21,7 @@ class AdTest {
 
     @Before
     fun setup() {
-        DeviceInfoClient.createInstance(mock(), "", false, mock(), TestDeviceInfoExtractor(), mock())
+        DeviceInfoClient.createInstance(mock(), "", false, mock(), "", TestDeviceInfoExtractor(), mock())
         SessionClient.createInstance(mock(), mock())
         AdEventClient.createInstance(mock(), mock())
         AppEventClient.createInstance(mock(), mock())

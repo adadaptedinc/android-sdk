@@ -27,7 +27,7 @@ class SessionClientTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), TestDeviceInfoExtractor(), testTransporterScope)
+        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         whenever(mockSessionAdapter.sendInit(any(), any())).then {}
         whenever(mockSessionAdapter.sendRefreshAds(any(), any())).then {}
 
