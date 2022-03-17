@@ -56,7 +56,7 @@ class DeviceInfoExtractor: InfoExtractor {
         }
 
         val manager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        val carrier = if (manager.networkOperatorName.isNotEmpty()) manager.networkOperatorName else NetworkOperatorDefault
+        val carrier = manager.networkOperatorName.ifEmpty { NetworkOperatorDefault }
         deviceInfo.carrier = carrier
 
         val metrics = context.resources.displayMetrics
@@ -72,7 +72,7 @@ class DeviceInfoExtractor: InfoExtractor {
 
     private fun captureAndroidId(context: Context): String {
         @SuppressLint("HardwareIds") val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-        return androidId ?: ""
+        return androidId ?: getOrGenerateCustomId(context)
     }
 
     private fun getAdvertisingIdClientInfo(context: Context): AdvertisingIdClient.Info? {
@@ -92,6 +92,21 @@ class DeviceInfoExtractor: InfoExtractor {
         return null
     }
 
+    private fun getOrGenerateCustomId(context: Context): String {
+        val sharedPrefs = context.getSharedPreferences(Config.AASDK_PREFS_KEY, Context.MODE_PRIVATE)
+        val generatedId = sharedPrefs.getString(Config.AASDK_PREFS_GENERATED_ID_KEY, "")
+
+        if (generatedId.isNullOrEmpty()) {
+            val newGeneratedId = List(32) { IdCharacters.random() }.joinToString("")
+            with (sharedPrefs.edit()) {
+                putString(Config.AASDK_PREFS_GENERATED_ID_KEY, newGeneratedId)
+                apply()
+            }
+            return newGeneratedId
+        }
+        return generatedId
+    }
+
     private fun isTrackingDisabled(context: Context): Boolean {
         val sharedPrefs = context.getSharedPreferences(Config.AASDK_PREFS_KEY, Context.MODE_PRIVATE)
         return sharedPrefs.getBoolean(Config.AASDK_PREFS_TRACKING_DISABLED_KEY, false)
@@ -103,6 +118,7 @@ class DeviceInfoExtractor: InfoExtractor {
 
     companion object {
         private val LOGTAG = DeviceInfoExtractor::class.java.name
+        private val IdCharacters: List<Char> = ('a'..'z') + ('0'..'9')
         private const val GooglePlayAdError = "Problem retrieving Google Play Advertiser Info"
         private const val AdvertisingIdClientName = "com.google.android.gms.ads.identifier.AdvertisingIdClient"
         private const val NetworkOperatorDefault = "None"

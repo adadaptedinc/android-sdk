@@ -9,6 +9,7 @@ object Config {
 
     const val AASDK_PREFS_KEY = "AASDK_PREFS"
     const val AASDK_PREFS_TRACKING_DISABLED_KEY = "TRACKING_DISABLED"
+    const val AASDK_PREFS_GENERATED_ID_KEY = "GENERATED_ID"
 
     private const val AD_SERVER_VERSION = "/v/0.9.5/"
     private const val TRACKING_SERVER_VERSION = "/v/1/"
