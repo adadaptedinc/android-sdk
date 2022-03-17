@@ -67,11 +67,4 @@ class DeviceInfoClientTest {
         deviceInfoResult.isProd = true
         assertEquals(deviceInfoResult.isProd, true)
     }
-
-    @Test
-    fun deviceInfoGeneratedIdIsValid() {
-        val deviceInfoExtractor = DeviceInfoExtractor()
-        val generatedId = deviceInfoExtractor.generateCustomId()
-        assert(generatedId.length == 32)
-    }
 }

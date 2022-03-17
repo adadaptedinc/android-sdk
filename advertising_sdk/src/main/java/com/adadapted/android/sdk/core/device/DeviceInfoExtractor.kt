@@ -72,7 +72,7 @@ class DeviceInfoExtractor: InfoExtractor {
 
     private fun captureAndroidId(context: Context): String {
         @SuppressLint("HardwareIds") val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-        return androidId ?: generateCustomId()
+        return androidId ?: getOrGenerateCustomId(context)
     }
 
     private fun getAdvertisingIdClientInfo(context: Context): AdvertisingIdClient.Info? {
@@ -92,8 +92,19 @@ class DeviceInfoExtractor: InfoExtractor {
         return null
     }
 
-    fun generateCustomId(): String {
-        return List(32) { IdCharacters.random() }.joinToString("")
+    private fun getOrGenerateCustomId(context: Context): String {
+        val sharedPrefs = context.getSharedPreferences(Config.AASDK_PREFS_KEY, Context.MODE_PRIVATE)
+        val generatedId = sharedPrefs.getString(Config.AASDK_PREFS_GENERATED_ID_KEY, "")
+
+        if (generatedId.isNullOrEmpty()) {
+            val newGeneratedId = List(32) { IdCharacters.random() }.joinToString("")
+            with (sharedPrefs.edit()) {
+                putString(Config.AASDK_PREFS_GENERATED_ID_KEY, newGeneratedId)
+                apply()
+            }
+            return newGeneratedId
+        }
+        return generatedId
     }
 
     private fun isTrackingDisabled(context: Context): Boolean {
