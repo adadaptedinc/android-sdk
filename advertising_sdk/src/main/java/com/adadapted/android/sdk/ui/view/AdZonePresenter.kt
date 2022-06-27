@@ -15,6 +15,7 @@ import com.adadapted.android.sdk.core.session.SessionListener
 import com.adadapted.android.sdk.core.zone.Zone
 import com.adadapted.android.sdk.ui.activity.AaWebViewPopupActivity
 import com.adadapted.android.sdk.ui.messaging.AdContentPublisher
+import com.adadapted.android.sdk.ui.messaging.AdZoneException
 import java.util.Timer
 import java.util.TimerTask
 import java.util.concurrent.locks.Lock
@@ -301,6 +302,9 @@ internal class AdZonePresenter(private val context: Context, private val pixelWe
     }
 
     override fun onSessionAvailable(session: Session) {
+        if (zoneId.isNullOrBlank()) {
+            throw AdZoneException(EventStrings.ADZONE_NULL_ERROR_MESSAGE)
+        }
         updateCurrentZone(session.getZone(zoneId!!))
         if (updateSessionId(session.id)) {
             notifyZoneAvailable()
@@ -308,6 +312,9 @@ internal class AdZonePresenter(private val context: Context, private val pixelWe
     }
 
     override fun onAdsAvailable(session: Session) {
+        if (zoneId.isNullOrBlank()) {
+            throw AdZoneException(EventStrings.ADZONE_NULL_ERROR_MESSAGE)
+        }
         updateCurrentZone(session.getZone(zoneId!!))
         notifyAdsRefreshed()
     }
