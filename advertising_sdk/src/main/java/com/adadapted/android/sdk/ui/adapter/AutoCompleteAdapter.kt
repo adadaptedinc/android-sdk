@@ -11,11 +11,7 @@ class AutoCompleteAdapter(context: Context, resource: Int, items: List<String>) 
     private val currentSuggestions: MutableSet<Suggestion> = HashSet()
 
     fun suggestionSelected(name: String) {
-        for (suggestion in currentSuggestions) {
-            if (suggestion.name == name) {
-                suggestion.selected()
-            }
-        }
+        currentSuggestions.firstOrNull { s -> s.name == name }?.selected()
     }
 
     override fun getFilter(): Filter {
@@ -52,14 +48,13 @@ class AutoCompleteAdapter(context: Context, resource: Int, items: List<String>) 
             if (results != null) {
                 if (results.count > 0) {
                     val filteredList: List<*> = results.values as ArrayList<*>
-                    for (o in filteredList) {
-                        if (o is String) {
-                            add(o)
+                    filteredList.forEach {
+                        if (it is String) {
+                            add(it)
                         }
-                    }
+                    }.also { notifyDataSetChanged() }
                 }
             }
-            notifyDataSetChanged()
         }
     }
 }
