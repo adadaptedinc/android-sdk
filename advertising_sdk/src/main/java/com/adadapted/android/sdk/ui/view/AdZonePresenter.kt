@@ -53,7 +53,6 @@ internal class AdZonePresenter(private val context: Context, private val pixelWe
             this.zoneId = zoneId
             val params: MutableMap<String, String> = HashMap()
             params["zone_id"] = zoneId
-            appEventClient.trackSdkEvent(EventStrings.ZONE_LOADED, params)
         }
     }
 

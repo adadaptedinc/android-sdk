@@ -66,7 +66,6 @@ class KeywordInterceptMatcher private constructor() : SessionListener(), Interce
         }
 
     override fun onKeywordInterceptInitialized(intercept: Intercept) {
-        AppEventClient.getInstance().trackSdkEvent(EventStrings.KI_INITIALIZED)
         interceptLock.lock()
         try {
             this.intercept = intercept

@@ -75,13 +75,6 @@ class AdZonePresenterTest {
     }
 
     @Test
-    fun testInitialize() {
-        testAdZonePresenter.init("testZoneId")
-        AppEventClient.getInstance().onPublishEvents()
-        assertEquals(EventStrings.ZONE_LOADED, testAppEventSink.testEvents.first().name)
-    }
-
-    @Test
     fun testOnAttach() {
         testAdZonePresenter.init("testZoneId")
         val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(Ad("TestAdId")))))
