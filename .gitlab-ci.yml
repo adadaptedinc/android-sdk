@@ -33,6 +33,8 @@ lintDebug:
   stage: build
   script:
     - ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
+  tags:
+    - gcp
 
 assembleDebug:
   stage: build
@@ -41,9 +43,13 @@ assembleDebug:
   artifacts:
     paths:
       - app/build/outputs/
+  tags:
+    - gcp
 
 debugTests:
   stage: test
   script:
     - ./gradlew testDebugUnitTestCoverage
   coverage: '/Line Coverage: \d+\.\d+/'
+  tags:
+    - gcp

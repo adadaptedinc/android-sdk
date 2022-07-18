@@ -31,6 +31,7 @@ class AdditInterceptActivity : AppCompatActivity() {
                 "Problem handling deeplink",
                 errorParams
             )
+        } finally {
             startActivity(packageManager.getLaunchIntentForPackage(packageName))
         }
         PayloadClient.getInstance().deeplinkCompleted()

@@ -23,10 +23,10 @@ class KeywordInterceptMatcher private constructor() : SessionListener(), Interce
             if (!shouldCheckConstraint(input)) {
                 return suggestions
             }
+
             for (interceptTerm in intercept.getTerms()) {
-                if (interceptTerm.term.startsWith(input, ignoreCase = true)) {
+                if (interceptTerm.searchTerm.startsWith(input, ignoreCase = true)) {
                     fileTerm(interceptTerm, constraint.toString(), suggestions)
-                    break
                 }
             }
             if (suggestions.isEmpty()) {
@@ -44,7 +44,7 @@ class KeywordInterceptMatcher private constructor() : SessionListener(), Interce
             SuggestionTracker.suggestionMatched(
                 intercept.searchId,
                 term.termId,
-                term.term,
+                term.searchTerm,
                 term.replacement,
                 input
             )
@@ -66,7 +66,6 @@ class KeywordInterceptMatcher private constructor() : SessionListener(), Interce
         }
 
     override fun onKeywordInterceptInitialized(intercept: Intercept) {
-        AppEventClient.getInstance().trackSdkEvent(EventStrings.KI_INITIALIZED)
         interceptLock.lock()
         try {
             this.intercept = intercept

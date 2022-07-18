@@ -112,7 +112,6 @@ object AdAdapted {
             }
         }
         SessionClient.getInstance().start(startListener)
-        AppEventClient.getInstance().trackSdkEvent(EventStrings.APP_OPENED)
         KeywordInterceptMatcher.match("INIT") //init the matcher
         Log.i(
             LOG_TAG,

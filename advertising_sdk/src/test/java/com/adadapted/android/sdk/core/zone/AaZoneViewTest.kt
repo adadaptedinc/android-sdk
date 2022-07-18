@@ -65,19 +65,6 @@ class AaZoneViewTest {
     }
 
     @Test
-    fun testInit() {
-        testAaZoneView.init("TestZoneId")
-        AppEventClient.getInstance().onPublishEvents()
-        assertEquals(EventStrings.ZONE_LOADED, testAppEventSink.testEvents.first().name)
-    }
-    @Test
-    fun testInitWithResourceId() {
-        testAaZoneView.init("TestZoneId", 0)
-        AppEventClient.getInstance().onPublishEvents()
-        assertEquals(EventStrings.ZONE_LOADED, testAppEventSink.testEvents.first().name)
-    }
-
-    @Test
     fun testStart() {
         val testListener = TestAaZoneViewListener()
         val testAd = (Ad("NewAdId"))
