@@ -51,8 +51,6 @@ internal class AdZonePresenter(private val context: Context, private val pixelWe
     fun init(zoneId: String) {
         if (this.zoneId == null) {
             this.zoneId = zoneId
-            val params: MutableMap<String, String> = HashMap()
-            params["zone_id"] = zoneId
         }
     }
 
