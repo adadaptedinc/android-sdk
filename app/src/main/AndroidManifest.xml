@@ -22,6 +22,7 @@
 
         <activity
             android:name=".ui.todo.activity.TodoListsActivity"
+            android:exported="true"
             android:label="@string/title_activity_todo_lists" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -60,7 +61,8 @@
             android:name="com.adadapted.android.sdk.ui.activity.AdditInterceptActivity"
             android:launchMode="singleTask"
             android:taskAffinity=""
-            android:excludeFromRecents="true">
+            android:excludeFromRecents="true"
+            android:exported="true">
             <intent-filter android:label="@string/filter_title_viewadditintercept">
                 <action android:name="android.intent.action.VIEW" />
 

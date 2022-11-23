@@ -72,11 +72,10 @@ class Session(
         return !willServeAds || refreshTime == 0L
     }
 
-    fun hasZoneAds(): Boolean {
-        for (zone in zones) {
-            return zone.value.ads.any()
-        }
-        return false
+    fun getZonesWithAds(): List<String> {
+        val activeZones = mutableListOf<String>()
+        zones.forEach { zone -> if (zone.value.ads.any()) activeZones.add(zone.value.id) }
+        return activeZones
     }
 
     companion object {

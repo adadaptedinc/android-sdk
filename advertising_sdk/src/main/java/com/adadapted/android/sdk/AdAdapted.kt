@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import com.adadapted.android.sdk.config.Config
-import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.ad.AdEventClient
 import com.adadapted.android.sdk.core.addit.AdditContent
 import com.adadapted.android.sdk.core.addit.PayloadClient
@@ -97,18 +96,18 @@ object AdAdapted {
 
         val startListener: SessionListener = object : SessionListener() {
             override fun onSessionAvailable(session: Session) {
-                sessionListener?.onHasAdsToServe(session.hasActiveCampaigns())
-                if (session.hasActiveCampaigns() && !session.hasZoneAds()) {
+                sessionListener?.onHasAdsToServe(session.hasActiveCampaigns(), session.getZonesWithAds())
+                if (session.hasActiveCampaigns() && session.getZonesWithAds().isEmpty()) {
                     Log.e(LOG_TAG,"Session has ads to show but none were loaded properly. Is an obfuscation tool obstructing the AdAdapted SDK?")
                 }
             }
 
             override fun onAdsAvailable(session: Session) {
-                sessionListener?.onHasAdsToServe(session.hasActiveCampaigns())
+                sessionListener?.onHasAdsToServe(session.hasActiveCampaigns(), session.getZonesWithAds())
             }
 
             override fun onSessionInitFailed() {
-                sessionListener?.onHasAdsToServe(false)
+                sessionListener?.onHasAdsToServe(false, listOf())
             }
         }
         SessionClient.getInstance().start(startListener)

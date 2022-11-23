@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.atl.AddToListContent;
 import com.adadapted.android.sdk.core.atl.AddToListItem;
@@ -15,8 +17,6 @@ import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener;
 import com.adadapted.sdktestapp.core.todo.TodoList;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;
 import com.adadapted.sdktestapp.ui.todo.activity.TodoListsActivity;
-
-import com.squareup.leakcanary.LeakCanary;
 
 import java.util.List;
 import java.util.Locale;
@@ -32,13 +32,6 @@ public class TestAppApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            // This process is dedicated to LeakCanary for heap analysis.
-            // You should not retrieve your app in this process.
-            return;
-        }
-        LeakCanary.install(this);
-
         //AdAdapted.INSTANCE.disableAdTracking(this); //Disable ad tracking completely
 
         AdAdapted.INSTANCE
@@ -47,8 +40,9 @@ public class TestAppApplication extends Application {
                 //.setCustomIdentifier("customTestId")
                 .setSdkSessionListener(new AaSdkSessionListener() {
                     @Override
-                    public void onHasAdsToServe(boolean hasAds) {
+                    public void onHasAdsToServe(boolean hasAds, @NonNull List<String> availableZoneIds) {
                         Log.i(TAG, "Has Ads To Serve: " + hasAds);
+                        Log.i(TAG, "The following zones have ads to serve: " + availableZoneIds);
                     }
                 })
                 .setSdkEventListener(new AaSdkEventListener() {

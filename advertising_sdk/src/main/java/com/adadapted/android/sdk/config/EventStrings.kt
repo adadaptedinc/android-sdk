@@ -57,5 +57,5 @@ object EventStrings {
     const val POPUP_URL_MALFORMED ="POPUP_URL_MALFORMED"
     const val POPUP_URL_LOAD_FAILED = "POPUP_URL_LOAD_FAILED"
 
-    const val ADZONE_NULL_ERROR_MESSAGE = "An AdZone ID was expected but returned null. Is something calling onStop() prematurely on the AdZone? The onStart() and onStop() methods should only be called in the hosting view's overriding methods."
+    const val ADZONE_NULL_ERROR_MESSAGE = "An AdZone ID was expected but returned null. Was init called on the AdZone before adding it to the view? Is something calling onStop() prematurely on the AdZone? The onStart() and onStop() methods should only be called in the hosting view's overriding methods."
 }
