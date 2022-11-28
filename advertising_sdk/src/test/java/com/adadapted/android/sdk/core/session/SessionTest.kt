@@ -35,7 +35,7 @@ class SessionTest {
 
     @Test
     fun sessionDoesNotHaveZoneAds() {
-        assert(!buildTestSession().hasZoneAds())
+        assert(buildTestSession().getZonesWithAds().isEmpty())
     }
 
     @Test
@@ -43,7 +43,7 @@ class SessionTest {
         val session = buildTestSession()
         val zones = mapOf<String, Zone>().plus(Pair("testZone", Zone("zoneId", listOf(Ad("testAdId", "impId", "url", "action", "actionPath", Payload(listOf()))))))
         session.setZones(zones)
-        assert(session.hasZoneAds())
+        assert(session.getZonesWithAds().isNotEmpty())
     }
 
     @Test
