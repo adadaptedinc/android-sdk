@@ -35,7 +35,7 @@ public class TestAppApplication extends Application {
         //AdAdapted.INSTANCE.disableAdTracking(this); //Disable ad tracking completely
 
         AdAdapted.INSTANCE
-                .withAppId("") // #YOUR API KEY GOES HERE#
+                .withAppId("NTGXMTA3ZWJJYWZL") // #YOUR API KEY GOES HERE#
                 .inEnv(AdAdapted.Env.DEV)
                 //.setCustomIdentifier("customTestId")
                 .setSdkSessionListener(new AaSdkSessionListener() {
