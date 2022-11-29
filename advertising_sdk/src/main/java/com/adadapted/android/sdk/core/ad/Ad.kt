@@ -26,19 +26,17 @@ class Ad : Serializable {
     @SerializedName("refresh_time")
     val refreshTime: Long
 
-    @SerializedName("tracking_html")
-    val trackingHtml: String
-
     private var isImpressionTracked: Boolean = false
 
-    constructor(id: String = "",
-                impressionId: String = "",
-                url: String = "",
-                actionType: String = "",
-                actionPath: String = "",
-                payload: Payload = Payload(listOf()),
-                refreshTime: Long = Config.DEFAULT_AD_REFRESH,
-                trackingHtml: String = "") {
+    constructor(
+        id: String = "",
+        impressionId: String = "",
+        url: String = "",
+        actionType: String = "",
+        actionPath: String = "",
+        payload: Payload = Payload(listOf()),
+        refreshTime: Long = Config.DEFAULT_AD_REFRESH
+    ) {
         this.id = id
         this.impressionId = impressionId
         this.url = url
@@ -46,7 +44,6 @@ class Ad : Serializable {
         this.actionPath = actionPath
         this.payload = payload
         this.refreshTime = refreshTime
-        this.trackingHtml = trackingHtml
     }
 
     val isEmpty: Boolean

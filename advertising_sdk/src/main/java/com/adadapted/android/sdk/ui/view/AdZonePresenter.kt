@@ -21,7 +21,7 @@ import java.util.TimerTask
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
-internal class AdZonePresenter(private val context: Context, private val pixelWebView: PixelWebView = PixelWebView(context.applicationContext), private val aaWebViewPopupActivity: AaWebViewPopupActivity = AaWebViewPopupActivity())
+internal class AdZonePresenter(private val context: Context, private val aaWebViewPopupActivity: AaWebViewPopupActivity = AaWebViewPopupActivity())
     : SessionListener() {
     internal interface Listener {
         fun onZoneAvailable(zone: Zone)
@@ -172,7 +172,6 @@ internal class AdZonePresenter(private val context: Context, private val pixelWe
         if (!isAdVisible || ad.impressionWasTracked() || ad.isEmpty) return
         ad.setImpressionTracked()
         adEventClient.trackImpression(ad)
-        pixelWebView.loadData(ad.trackingHtml, "text/html", null)
     }
 
     private fun startZoneTimer() {

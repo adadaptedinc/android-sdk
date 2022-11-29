@@ -21,7 +21,6 @@ import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.adadapted.android.sdk.ui.activity.AaWebViewPopupActivity
 import com.adadapted.android.sdk.ui.view.AdZonePresenter
-import com.adadapted.android.sdk.ui.view.PixelWebView
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -71,7 +70,7 @@ class AdZonePresenterTest {
                 .resume()
                 .get()
 
-        testAdZonePresenter = AdZonePresenter(testContext, PixelWebView(testContext), testAaWebViewPopupActivity)
+        testAdZonePresenter = AdZonePresenter(testContext, testAaWebViewPopupActivity)
     }
 
     @Test
@@ -200,7 +199,7 @@ class AdZonePresenterTest {
 
     @Test
     fun testOnAdClickedLink() {
-        testAdZonePresenter = AdZonePresenter(mockContext, PixelWebView(testContext), testAaWebViewPopupActivity)
+        testAdZonePresenter = AdZonePresenter(mockContext, testAaWebViewPopupActivity)
         testAdZonePresenter.init("testZoneId")
         val testAd = Ad("TestAdId", "impressionId", "url", AdActionType.LINK)
         val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(testAd))))
