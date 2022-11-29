@@ -7,7 +7,6 @@ import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdEvent
 import com.adadapted.android.sdk.core.ad.AdEventClient
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.session.Session
@@ -30,7 +29,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
-import java.util.Date
 
 @RunWith(RobolectricTestRunner::class)
 class AaWebViewPopupActivityTest {
@@ -40,7 +38,7 @@ class AaWebViewPopupActivityTest {
     private var testTransporter = TestCoroutineDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
     var mockSession = Session("testId", true, true, 30, 1907245044, mutableMapOf())
-    private var testAd = Ad("TestAdId", "imp", "url", "type", "http://example.com", Payload(listOf()), 5, "html")
+    private var testAd = Ad("TestAdId", "imp", "url", "type", "http://example.com", Payload(listOf()), 5)
 
     @Before
     fun setup() {

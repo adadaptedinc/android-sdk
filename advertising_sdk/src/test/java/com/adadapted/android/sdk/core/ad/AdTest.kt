@@ -59,7 +59,6 @@ class AdTest {
         assert(mockAd.actionPath.isEmpty())
         assertNotNull(mockAd.payload)
         assert(mockAd.refreshTime == Config.DEFAULT_AD_REFRESH)
-        assert(mockAd.trackingHtml.isEmpty())
         assert(mockAd.isEmpty)
     }
 
@@ -98,7 +97,6 @@ class AdTest {
                 "TestActionType",
                 "TestActionPath",
                 payload,
-                1,
-                "TestTrackingHtml")
+                1)
     }
 }
