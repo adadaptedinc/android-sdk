@@ -27,7 +27,7 @@ Add it in your root build.gradle at the **end** of repositories:
 Step 2. Add the dependency (based on latest release version)
 
 	dependencies {
-	        implementation 'com.gitlab.adadapted:android_sdk:3.0.1'
+	        implementation 'com.github.adadaptedinc:android-sdk:3.0.1'
 	}
 
 ## Running the tests
