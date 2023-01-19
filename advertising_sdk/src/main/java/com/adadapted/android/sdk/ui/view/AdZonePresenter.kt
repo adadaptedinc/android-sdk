@@ -65,8 +65,8 @@ internal class AdZonePresenter(private val context: Context, private val aaWebVi
                 attached = true
                 listener = l
                 sessionClient.addPresenter(this)
+                setNextAd()
             }
-            setNextAd()
         } finally {
             zoneLock.unlock()
         }
@@ -87,7 +87,7 @@ internal class AdZonePresenter(private val context: Context, private val aaWebVi
     }
 
     private fun setNextAd() {
-        if (!zoneLoaded || timerRunning) {
+        if (!zoneLoaded || timerRunning || sessionClient.hasStaleAds()) {
             return
         }
         completeCurrentAd()
