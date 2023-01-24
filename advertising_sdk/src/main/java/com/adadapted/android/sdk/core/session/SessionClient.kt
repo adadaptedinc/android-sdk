@@ -281,26 +281,30 @@ class SessionClient private constructor(private val adapter: SessionAdapter, pri
 
     override fun onSessionInitialized(session: Session) {
         updateCurrentSession(session)
-        notifySessionAvailable()
         setStatus(Status.OK)
+        notifySessionAvailable()
     }
 
     override fun onSessionInitializeFailed() {
         updateCurrentSession(Session().apply { setDeviceInfo(deviceInfo) })
-        notifySessionInitFailed()
         setStatus(Status.OK)
+        notifySessionInitFailed()
     }
 
     override fun onNewAdsLoaded(session: Session) {
         updateCurrentZones(session)
-        notifyAdsAvailable()
         setStatus(Status.OK)
+        notifyAdsAvailable()
     }
 
     override fun onNewAdsLoadFailed() {
         updateCurrentZones(Session().apply { setDeviceInfo(deviceInfo) })
-        notifyAdsAvailable()
         setStatus(Status.OK)
+        notifyAdsAvailable()
+    }
+
+    fun hasStaleAds(): Boolean {
+        return status != Status.OK
     }
 
     @Synchronized
