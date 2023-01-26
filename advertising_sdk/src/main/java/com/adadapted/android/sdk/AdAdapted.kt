@@ -35,6 +35,8 @@ object AdAdapted {
     private var hasStarted = false
     private var apiKey: String = ""
     private var isProd = false
+    private var isKeywordInterceptEnabled = false
+    private var isPayloadEnabled = false
     private val params: Map<String, String> = HashMap()
     private var sessionListener: AaSdkSessionListener? = null
     private var eventListener: AaSdkEventListener? = null
@@ -53,6 +55,16 @@ object AdAdapted {
 
     fun setCustomIdentifier(identifier: String): AdAdapted {
         customIdentifier = identifier
+        return this
+    }
+
+    fun enableKeywordIntercept(value: Boolean): AdAdapted {
+        isKeywordInterceptEnabled = value
+        return this
+    }
+
+    fun enablePayloads(value: Boolean): AdAdapted {
+        isPayloadEnabled = value
         return this
     }
 
@@ -86,13 +98,16 @@ object AdAdapted {
         setupClients(context)
         eventListener?.let { SdkEventPublisher.getInstance().setListener(it) }
         contentListener?.let { AdditContentPublisher.getInstance().addListener(it) }
-        PayloadClient.getInstance().pickupPayloads(object : PayloadClient.Callback {
-            override fun onPayloadAvailable(content: List<AdditContent>) {
-                if (content.isNotEmpty()) {
-                    AdditContentPublisher.getInstance().publishAdditContent(content[0])
+
+        if (isPayloadEnabled) {
+            PayloadClient.getInstance().pickupPayloads(object : PayloadClient.Callback {
+                override fun onPayloadAvailable(content: List<AdditContent>) {
+                    if (content.isNotEmpty()) {
+                        AdditContentPublisher.getInstance().publishAdditContent(content[0])
+                    }
                 }
-            }
-        })
+            })
+        }
 
         val startListener: SessionListener = object : SessionListener() {
             override fun onSessionAvailable(session: Session) {
@@ -111,7 +126,9 @@ object AdAdapted {
             }
         }
         SessionClient.getInstance().start(startListener)
-        KeywordInterceptMatcher.match("INIT") //init the matcher
+        if (isKeywordInterceptEnabled) {
+            KeywordInterceptMatcher.match("INIT") //init the matcher
+        }
         Log.i(
             LOG_TAG,
             String.format(
@@ -139,7 +156,7 @@ object AdAdapted {
 
     private fun setupClients(context: Context) {
         Config.init(isProd)
-        HttpRequestManager.createQueue(context.applicationContext)
+        HttpRequestManager.createQueue(context.applicationContext, apiKey)
 
         DeviceInfoClient.createInstance(context.applicationContext, apiKey, isProd, params, customIdentifier, DeviceInfoExtractor(), Transporter())
         SessionClient.createInstance(HttpSessionAdapter(Config.getInitSessionUrl(), Config.getRefreshAdsUrl()), Transporter())

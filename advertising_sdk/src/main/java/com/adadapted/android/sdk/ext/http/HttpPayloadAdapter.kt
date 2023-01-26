@@ -5,6 +5,7 @@ import com.adadapted.android.sdk.core.addit.PayloadAdapter
 import com.adadapted.android.sdk.core.addit.PayloadContentParser
 import com.adadapted.android.sdk.core.addit.PayloadEvent
 import com.adadapted.android.sdk.core.device.DeviceInfo
+import com.adadapted.android.sdk.ext.json.AdAdaptedJsonObjectRequest
 import com.adadapted.android.sdk.ext.json.JsonPayloadBuilder
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
@@ -16,7 +17,8 @@ class HttpPayloadAdapter(private val pickupUrl: String, private val trackUrl: St
 
     override fun pickup(deviceInfo: DeviceInfo, callback: PayloadAdapter.Callback) {
         val json = builder.buildRequest(deviceInfo)
-        val request = JsonObjectRequest(
+        val request = AdAdaptedJsonObjectRequest(
+            httpQueueManager.getAppId(),
             Request.Method.POST,
             pickupUrl,
             json,
@@ -37,7 +39,8 @@ class HttpPayloadAdapter(private val pickupUrl: String, private val trackUrl: St
 
     override fun publishEvent(event: PayloadEvent) {
         val json = builder.buildEvent(event)
-        val request = JsonObjectRequest(
+        val request = AdAdaptedJsonObjectRequest(
+            httpQueueManager.getAppId(),
             Request.Method.POST,
             trackUrl,
             json,
