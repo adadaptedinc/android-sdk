@@ -4,6 +4,7 @@ import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.intercept.InterceptAdapter
 import com.adadapted.android.sdk.core.intercept.InterceptEvent
 import com.adadapted.android.sdk.core.session.Session
+import com.adadapted.android.sdk.ext.json.AdAdaptedJsonObjectRequest
 import com.adadapted.android.sdk.ext.json.JsonInterceptBuilder
 import com.adadapted.android.sdk.ext.json.JsonInterceptEventBuilder
 import com.android.volley.Request
@@ -19,7 +20,8 @@ class HttpInterceptAdapter(private val initUrl: String, private val eventUrl: St
             return
         }
         val url = initUrl + String.format("?aid=%s", session.getDeviceInfo().appId) + String.format("&uid=%s", session.getDeviceInfo().udid) + String.format("&sid=%s", session.id) + String.format("&sdk=%s", session.getDeviceInfo().sdkVersion)
-        val jsonRequest = JsonObjectRequest(
+        val jsonRequest = AdAdaptedJsonObjectRequest(
+            httpQueueManager.getAppId(),
             Request.Method.GET,
             url,
             null,
@@ -39,7 +41,8 @@ class HttpInterceptAdapter(private val initUrl: String, private val eventUrl: St
 
     override fun sendEvents(session: Session, events: MutableSet<InterceptEvent>) {
         val json = eventBuilder.marshalEvents(session, events)
-        val jsonRequest = JsonObjectRequest(
+        val jsonRequest = AdAdaptedJsonObjectRequest(
+            httpQueueManager.getAppId(),
             Request.Method.POST,
             eventUrl,
             json,

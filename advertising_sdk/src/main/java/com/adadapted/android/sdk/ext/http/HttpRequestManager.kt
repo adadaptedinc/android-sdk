@@ -9,9 +9,15 @@ import com.android.volley.toolbox.Volley
 object HttpRequestManager : HttpQueueManager {
     private val LOGTAG = HttpRequestManager::class.java.name
     private lateinit var requestQueue: RequestQueue
+    private lateinit var appId: String
 
-    override fun createQueue(context: Context) {
+    override fun createQueue(context: Context, apiKey: String) {
         requestQueue = Volley.newRequestQueue(context.applicationContext)
+        appId = apiKey
+    }
+
+    override fun getAppId(): String {
+        return appId
     }
 
     @Synchronized

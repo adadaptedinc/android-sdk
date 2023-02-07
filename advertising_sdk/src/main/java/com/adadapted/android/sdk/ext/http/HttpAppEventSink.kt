@@ -6,6 +6,7 @@ import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.event.AppError
 import com.adadapted.android.sdk.core.event.AppEvent
 import com.adadapted.android.sdk.core.event.AppEventSink
+import com.adadapted.android.sdk.ext.json.AdAdaptedJsonObjectRequest
 import com.adadapted.android.sdk.ext.json.JsonAppEventBuilder
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
@@ -16,6 +17,7 @@ class HttpAppEventSink(private val eventUrl: String, private val errorUrl: Strin
     private val eventBuilder: JsonAppEventBuilder = JsonAppEventBuilder()
     private var eventWrapper: JSONObject? = null
     private var errorWrapper: JSONObject? = null
+    private var appID: String = ""
 
     override fun generateWrappers(deviceInfo: DeviceInfo) {
         eventWrapper = eventBuilder.buildWrapper(deviceInfo)
@@ -28,7 +30,8 @@ class HttpAppEventSink(private val eventUrl: String, private val errorUrl: Strin
             return
         }
         val json = eventBuilder.buildEventItem(eventWrapper, events)
-        val jsonRequest = JsonObjectRequest(
+        val jsonRequest = AdAdaptedJsonObjectRequest(
+            httpQueueManager.getAppId(),
             Request.Method.POST,
             eventUrl,
             json,
@@ -50,7 +53,8 @@ class HttpAppEventSink(private val eventUrl: String, private val errorUrl: Strin
             return
         }
         val json = eventBuilder.buildErrorItem(errorWrapper, errors)
-        val jsonRequest = JsonObjectRequest(
+        val jsonRequest = AdAdaptedJsonObjectRequest(
+            httpQueueManager.getAppId(),
             Request.Method.POST,
             errorUrl,
             json,

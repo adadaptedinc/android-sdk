@@ -6,10 +6,12 @@ import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionAdapter
 import com.adadapted.android.sdk.core.session.SessionAdapter.AdGetListener
 import com.adadapted.android.sdk.core.session.SessionAdapter.SessionInitListener
+import com.adadapted.android.sdk.ext.json.AdAdaptedJsonObjectRequest
 import com.adadapted.android.sdk.ext.json.JsonSessionBuilder
 import com.adadapted.android.sdk.ext.json.JsonSessionRequestBuilder
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
+
 
 class HttpSessionAdapter(private val initUrl: String, private val refreshUrl: String, private var sessionBuilder: JsonSessionBuilder? = null, private val httpQueueManager: HttpQueueManager = HttpRequestManager) : SessionAdapter {
     private val LOGTAG = HttpSessionAdapter::class.java.name
@@ -18,7 +20,8 @@ class HttpSessionAdapter(private val initUrl: String, private val refreshUrl: St
         val requestBuilder = JsonSessionRequestBuilder()
         sessionBuilder = JsonSessionBuilder(deviceInfo)
         val json = requestBuilder.buildSessionInitRequest(deviceInfo)
-        val jsonRequest = JsonObjectRequest(
+        val jsonRequest = AdAdaptedJsonObjectRequest(
+            httpQueueManager.getAppId(),
             Request.Method.POST,
             initUrl,
             json,
@@ -42,7 +45,8 @@ class HttpSessionAdapter(private val initUrl: String, private val refreshUrl: St
             return
         }
         val url = refreshUrl + String.format("?aid=%s", session.getDeviceInfo().appId) + String.format("&uid=%s", session.getDeviceInfo().udid) + String.format("&sid=%s", session.id) + String.format("&sdk=%s", session.getDeviceInfo().sdkVersion)
-        val request = JsonObjectRequest(
+        val request = AdAdaptedJsonObjectRequest(
+            httpQueueManager.getAppId(),
             Request.Method.GET,
             url,
             null,

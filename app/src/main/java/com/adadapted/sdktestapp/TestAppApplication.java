@@ -37,6 +37,8 @@ public class TestAppApplication extends Application {
         AdAdapted.INSTANCE
                 .withAppId("") // #YOUR API KEY GOES HERE#
                 .inEnv(AdAdapted.Env.DEV)
+                .enableKeywordIntercept(true)
+                .enablePayloads(true)
                 //.setCustomIdentifier("customTestId")
                 .setSdkSessionListener(new AaSdkSessionListener() {
                     @Override
