@@ -17,7 +17,7 @@ class TestHttpRequestManager: HttpQueueManager {
         queuedRequest = null
     }
 
-    override fun createQueue(context: Context) {
+    override fun createQueue(context: Context, apiKey: String) {
         queueWasCreated = true
     }
 
@@ -26,5 +26,9 @@ class TestHttpRequestManager: HttpQueueManager {
         if (shouldReturnError) {
             request.errorListener.onErrorResponse(VolleyError(NetworkResponse(404, ByteArray(0), true, 5, mutableListOf())))
         }
+    }
+
+    override fun getAppId(): String {
+        return "TESTAPIKEY"
     }
 }

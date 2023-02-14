@@ -36,7 +36,7 @@ class HttpAdEventSinkTest {
         DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
         AppEventClient.createInstance(testAppEventSink, testTransporterScope)
-        testHttpRequestManager.createQueue(mock())
+        testHttpRequestManager.createQueue(mock(), "TESTAPIKEY")
         httpAdEventSink = HttpAdEventSink("testBatchUrl", testHttpRequestManager)
     }
 
