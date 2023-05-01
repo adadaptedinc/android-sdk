@@ -194,7 +194,7 @@ class AdditContentTest {
                 "image",
                 ContentTypes.ADD_TO_LIST_ITEMS,
                 AddToListContent.Sources.IN_APP,
-                AdditContent.AdditSources.IN_APP,
+                AdditContent.AdditSources.PAYLOAD,
                 LinkedList()
         )
         content.itemFailed(AddToListItem(
@@ -209,6 +209,7 @@ class AdditContentTest {
         ), "test failed message")
         AppEventClient.getInstance().onPublishEvents()
         assert(testAppEventSink.testErrors.any { event -> event.code == EventStrings.ADDIT_CONTENT_ITEM_FAILED })
+        assert(testAppEventSink.testErrors.any { event -> event.code == EventStrings.ADDIT_CONTENT_FAILED })
     }
 
     @Test

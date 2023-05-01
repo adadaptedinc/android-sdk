@@ -90,6 +90,10 @@ class AdditContent(
     override fun itemFailed(item: AddToListItem, message: String) {
         lock.lock()
         try {
+            if (!handled) {
+                handled = true
+                payloadClient.markContentFailed(this, message)
+            }
             payloadClient.markContentItemFailed(this, item, message)
         } finally {
             lock.unlock()
