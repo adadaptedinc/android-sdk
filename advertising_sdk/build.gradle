@@ -61,7 +61,6 @@ dependencies {
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 kotlin {
