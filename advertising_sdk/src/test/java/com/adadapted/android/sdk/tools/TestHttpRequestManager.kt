@@ -24,7 +24,7 @@ class TestHttpRequestManager: HttpQueueManager {
     override fun queueRequest(request: Request<*>) {
         queuedRequest = request
         if (shouldReturnError) {
-            request.errorListener.onErrorResponse(VolleyError(NetworkResponse(404, ByteArray(0), true, 5, mutableListOf())))
+            request.errorListener?.onErrorResponse(VolleyError(NetworkResponse(404, ByteArray(0), true, 5, mutableListOf())))
         }
     }
 
