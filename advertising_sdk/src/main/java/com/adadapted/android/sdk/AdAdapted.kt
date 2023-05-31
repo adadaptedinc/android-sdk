@@ -27,6 +27,7 @@ import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener
 import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener
 import com.adadapted.android.sdk.ui.messaging.AdditContentPublisher
 import com.adadapted.android.sdk.ui.messaging.SdkEventPublisher
+import com.gitlab.adadapted.BuildConfig
 
 object AdAdapted {
     enum class Env { PROD, DEV }

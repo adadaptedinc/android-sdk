@@ -1,6 +1,6 @@
 package com.adadapted.android.sdk.core.device
 
-import com.adadapted.android.sdk.BuildConfig
+import com.gitlab.adadapted.BuildConfig
 
 class DeviceInfo {
     var appId: String? = null

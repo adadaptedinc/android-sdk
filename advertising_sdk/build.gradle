@@ -15,11 +15,12 @@ group='com.gitlab.adadapted'
 
 android {
     compileSdkVersion 33
+    namespace = 'com.gitlab.adadapted'
 
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 33
-        versionName "3.4.1"
+        versionName "3.4.2"
         buildConfigField("String","VERSION_NAME", "\"${defaultConfig.versionName}\"")
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'aasdk-proguard-rules.pro'
