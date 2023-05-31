@@ -8,6 +8,7 @@ plugins {
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'maven-publish'
 apply from: 'jacoco.gradle'
 
 group='com.gitlab.adadapted'
