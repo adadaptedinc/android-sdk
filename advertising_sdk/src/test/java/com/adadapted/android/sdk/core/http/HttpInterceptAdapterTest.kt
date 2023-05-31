@@ -1,6 +1,5 @@
 package com.adadapted.android.sdk.core.http
 
-import com.adadapted.android.sdk.BuildConfig
 import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
@@ -16,6 +15,7 @@ import com.adadapted.android.sdk.ext.http.HttpInterceptAdapter
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestHttpRequestManager
 import com.adadapted.android.sdk.tools.TestTransporter
+import com.gitlab.adadapted.BuildConfig
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.TestCoroutineDispatcher
@@ -24,7 +24,6 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import java.util.Date
 
 class HttpInterceptAdapterTest {
     private var testTransporter = TestCoroutineDispatcher()
