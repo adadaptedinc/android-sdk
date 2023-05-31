@@ -3,12 +3,12 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
     id("org.barfuin.gradle.jacocolog") version "1.2.1"
+    id 'maven-publish'
 }
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'maven-publish'
 apply from: 'jacoco.gradle'
 
 group='com.gitlab.adadapted'
@@ -20,7 +20,7 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 33
-        versionName "3.4.4"
+        versionName "3.4.5"
         buildConfigField("String","VERSION_NAME", "\"${defaultConfig.versionName}\"")
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'aasdk-proguard-rules.pro'
@@ -66,6 +66,20 @@ repositories {
 
 kotlin {
     explicitApi()
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                from components.release
+                groupId = 'com.gitlab.adadapted'
+                artifactId = 'android-sdk'
+                version = '3.4.5'
+            }
+        }
+    }
 }
 
 tasks.withType(Test) {
