@@ -307,6 +307,10 @@ class SessionClient private constructor(private val adapter: SessionAdapter, pri
         return status != Status.OK
     }
 
+    fun getCachedDeviceInfo(): DeviceInfo {
+        return deviceInfo
+    }
+
     @Synchronized
     fun start(listener: SessionListener) {
         addListener(listener)
