@@ -49,7 +49,7 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
         presenter = AdZonePresenter(this.context)
         webView = AdWebView(context.applicationContext, this)
         reportButton = ImageButton(this.context)
-        reportButton.setImageResource(R.drawable.flag_16)
+        reportButton.setImageResource(R.drawable.report_ad)
         reportButton.setColorFilter(Color.rgb(0, 175, 204))
         reportButton.setBackgroundColor(Color.TRANSPARENT)
 
@@ -65,17 +65,13 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
 
         reportButton.setOnClickListener {
             val cachedDeviceInfo = SessionClient.getInstance().getCachedDeviceInfo()
-            var currentAdId = webView.currentAd.id
-            var appId = cachedDeviceInfo.appId
-            var udid = cachedDeviceInfo.udid
-            //open web page and pass in these params
-
+            cachedDeviceInfo.udid?.let { udid ->
+                presenter?.onReportAdClicked(webView.currentAd.id, udid)
+            }
         }
 
         Handler(Looper.getMainLooper()).post {
             addView(webView)
-            //addView(reportButton)
-            //reportButton.layoutParams = LayoutParams(10, 10)
         }
     }
 

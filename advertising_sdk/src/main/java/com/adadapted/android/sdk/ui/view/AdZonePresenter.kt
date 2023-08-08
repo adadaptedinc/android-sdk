@@ -225,6 +225,13 @@ internal class AdZonePresenter(private val context: Context, private val aaWebVi
         cycleToNextAdIfPossible()
     }
 
+    fun onReportAdClicked(adId: String, udid: String ) {
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        intent.data = Uri.parse(formatReportingUrl(adId, udid))
+        context.startActivity(intent)
+    }
+
     private fun cycleToNextAdIfPossible() {
         if (currentZone.ads.count() > 1) {
             restartTimer()
@@ -295,6 +302,15 @@ internal class AdZonePresenter(private val context: Context, private val aaWebVi
         if (currentAd.isEmpty) {
             setNextAd()
         }
+    }
+
+    private fun formatReportingUrl(adId: String, udid: String): String {
+        //TODO format the reporting url
+        //uid
+        //aid
+        //src = "mobile"
+
+        return "http://www.google.com"
     }
 
     override fun onSessionAvailable(session: Session) {
