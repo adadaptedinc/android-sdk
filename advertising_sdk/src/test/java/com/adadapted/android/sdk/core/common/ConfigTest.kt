@@ -1,6 +1,6 @@
 package com.adadapted.android.sdk.core.common
 
-import com.adadapted.android.sdk.config.Config
+import com.adadapted.android.sdk.constants.Config
 import junit.framework.Assert.assertEquals
 import org.junit.Test
 

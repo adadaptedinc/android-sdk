@@ -1,7 +1,5 @@
 package com.adadapted.android.sdk.ext.json
 
-import com.adadapted.android.sdk.core.addit.PayloadEvent
-import com.adadapted.android.sdk.core.device.DeviceInfo
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals

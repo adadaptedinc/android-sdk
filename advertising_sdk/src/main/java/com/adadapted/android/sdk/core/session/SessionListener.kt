@@ -1,9 +1,9 @@
 package com.adadapted.android.sdk.core.session
 
-abstract class SessionListener {
-    open fun onPublishEvents() {}
-    open fun onSessionAvailable(session: Session) {}
-    open fun onAdsAvailable(session: Session) {}
-    open fun onSessionExpired() {}
-    open fun onSessionInitFailed() {}
+interface SessionListener {
+    fun onPublishEvents() {}
+    fun onSessionAvailable(session: Session) {}
+    fun onAdsAvailable(session: Session) {}
+    fun onSessionExpired() {}
+    fun onSessionInitFailed() {}
 }

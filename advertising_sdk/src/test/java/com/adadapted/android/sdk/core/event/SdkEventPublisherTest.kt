@@ -1,14 +1,6 @@
 package com.adadapted.android.sdk.core.event
 
 import android.os.Looper
-import androidx.test.platform.app.InstrumentationRegistry
-import com.adadapted.android.sdk.core.ad.AdEvent
-import com.adadapted.android.sdk.core.ad.AdEventClient
-import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.device.DeviceInfo
-import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.core.session.Session
-import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener
@@ -23,7 +15,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows
-import java.util.Date
 import kotlin.collections.HashMap
 
 @RunWith(RobolectricTestRunner::class)

@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.core.session
 
 import com.adadapted.android.sdk.core.ad.Ad
-import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.zone.Zone
 import com.adadapted.android.sdk.ext.models.Payload
 import junit.framework.Assert.assertEquals

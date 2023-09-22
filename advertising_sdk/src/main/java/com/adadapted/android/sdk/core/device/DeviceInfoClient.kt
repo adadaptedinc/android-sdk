@@ -1,94 +1,71 @@
 package com.adadapted.android.sdk.core.device
 
-import android.annotation.SuppressLint
-import android.content.Context
+import com.adadapted.android.sdk.core.concurrency.Transporter
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import java.util.concurrent.locks.Lock
-import java.util.concurrent.locks.ReentrantLock
+import com.adadapted.android.sdk.core.interfaces.DeviceCallback
 
-class DeviceInfoClient private constructor(
-        private var context: Context?,
-        private val appId: String,
-        private val isProd: Boolean,
-        private val params: Map<String, String>,
-        private val customIdentifier: String,
-        private val deviceInfoExtractor: InfoExtractor,
-        private val transporter: TransporterCoroutineScope) {
+object DeviceInfoClient {
 
-    interface Callback {
-        fun onDeviceInfoCollected(deviceInfo: DeviceInfo)
-    }
+    private var appId: String = ""
+    private var isProd: Boolean = false
+    private var params: Map<String, String> = emptyMap()
+    private var customIdentifier: String =""
+    private var deviceInfoExtractor: DeviceInfoExtractor? = null
+    private var transporter: TransporterCoroutineScope = Transporter()
+    private var deviceInfo: DeviceInfo? = null
+    private var deviceCallbacks: MutableSet<DeviceCallback> = HashSet()
 
-    private lateinit var deviceInfo: DeviceInfo
-    private val lock: Lock = ReentrantLock()
-    private val callbacks: MutableSet<Callback>
-
-    private fun performGetInfo(callback: Callback) {
-        lock.lock()
-        try {
-            if (this::deviceInfo.isInitialized) {
-                callback.onDeviceInfoCollected(deviceInfo)
-                context = null
-            } else {
-                callbacks.add(callback)
-            }
-        } finally {
-            lock.unlock()
+    private fun performGetInfo(deviceCallback: DeviceCallback) {
+        if (deviceInfo != null) {
+            deviceInfo?.let { deviceCallback.onDeviceInfoCollected(it) }
+        } else {
+            deviceCallbacks.add(deviceCallback)
         }
     }
 
-   private fun collectDeviceInfo() {
-       lock.lock()
-       try {
-           this.deviceInfo = context?.let { deviceInfoExtractor.extractDeviceInfo(it, appId, isProd, params, customIdentifier) }!!
-       } finally {
-           lock.unlock()
-       }
-       notifyCallbacks()
-   }
+    private fun collectDeviceInfo() {
+        deviceInfo = deviceInfoExtractor?.extractDeviceInfo(appId, isProd, customIdentifier, params)
+        notifyCallbacks()
+    }
 
     private fun notifyCallbacks() {
-        lock.lock()
-        try {
-            val currentCallbacks: Set<Callback> = HashSet(callbacks)
-            for (caller in currentCallbacks) {
-                caller.onDeviceInfoCollected(deviceInfo)
-                callbacks.remove(caller)
-            }
-        } finally {
-            lock.unlock()
+        val currentDeviceCallbacks: Set<DeviceCallback> = HashSet(deviceCallbacks)
+        for (caller in currentDeviceCallbacks) {
+            deviceInfo?.let { caller.onDeviceInfoCollected(it) }
+            deviceCallbacks.remove(caller)
         }
     }
 
-
-    fun getDeviceInfo(callback: Callback) {
-        transporter.dispatchToBackground {
-            performGetInfo(callback)
+    fun getDeviceInfo(deviceCallback: DeviceCallback) {
+        transporter.dispatchToThread {
+            performGetInfo(deviceCallback)
         }
     }
 
-    companion object {
-        @SuppressLint("StaticFieldLeak")
-        private lateinit var instance: DeviceInfoClient
-
-        fun createInstance(context: Context,
-                           appId: String,
-                           isProd: Boolean,
-                           params: Map<String, String>,
-                           customIdentifier: String,
-                           deviceInfoExtractor: InfoExtractor = DeviceInfoExtractor(),
-                           transporter: TransporterCoroutineScope) {
-            instance = DeviceInfoClient(context, appId, isProd, params, customIdentifier, deviceInfoExtractor, transporter)
-        }
-
-        fun getInstance(): DeviceInfoClient {
-            return instance
+    fun getCachedDeviceInfo(): DeviceInfo? {
+        return if (deviceInfo != null) {
+            deviceInfo
+        } else {
+            null
         }
     }
 
-    init {
-        callbacks = HashSet()
-        transporter.dispatchToBackground {
+    fun createInstance(
+        appId: String,
+        isProd: Boolean,
+        params: Map<String, String>,
+        customIdentifier: String,
+        deviceInfoExtractor: DeviceInfoExtractor,
+        transporter: TransporterCoroutineScope
+    ) {
+            DeviceInfoClient.appId = appId
+            DeviceInfoClient.isProd = isProd
+            DeviceInfoClient.params = params
+            DeviceInfoClient.customIdentifier = customIdentifier
+            DeviceInfoClient.deviceInfoExtractor = deviceInfoExtractor
+            DeviceInfoClient.transporter = transporter
+
+        transporter.dispatchToThread {
             collectDeviceInfo()
         }
     }

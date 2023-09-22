@@ -1,11 +1,12 @@
 package com.adadapted.android.sdk.core.ad
 
-import com.adadapted.android.sdk.config.EventStrings
+import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.atl.AddToListContent
 import com.adadapted.android.sdk.core.atl.AddToListItem
+import com.adadapted.android.sdk.core.event.EventClient
 import kotlin.collections.HashMap
 
-class AdContent private constructor(
+public class AdContent private constructor(
     private val ad: Ad,
     private val items: List<AddToListItem>,
     private val eventClient: EventClient = EventClient

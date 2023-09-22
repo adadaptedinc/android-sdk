@@ -1,12 +1,9 @@
 package com.adadapted.android.sdk.ext.json
 
-import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.intercept.InterceptEvent
-import com.adadapted.android.sdk.core.session.Session
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.util.Date
 
 class JsonInterceptEventBuilderTest {
     private var mockSession = Session("testId", true, true, 30, 1907245044, mutableMapOf())

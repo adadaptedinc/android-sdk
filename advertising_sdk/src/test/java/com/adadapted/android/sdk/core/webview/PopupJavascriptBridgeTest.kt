@@ -1,13 +1,8 @@
 package com.adadapted.android.sdk.core.webview
 
-import com.adadapted.android.sdk.config.EventStrings
+import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
-import com.adadapted.android.sdk.core.ad.AdEventClient
-import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.event.TestAppEventSink
-import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.adadapted.android.sdk.ui.activity.PopupJavascriptBridge
 import com.nhaarman.mockitokotlin2.mock

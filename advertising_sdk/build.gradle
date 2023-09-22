@@ -4,11 +4,11 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 plugins {
     id("org.barfuin.gradle.jacocolog") version "1.2.1"
     id 'maven-publish'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.10'
 }
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply from: 'jacoco.gradle'
 
 group='com.gitlab.adadapted'
@@ -18,7 +18,7 @@ android {
     namespace = 'com.gitlab.adadapted'
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 23
         targetSdkVersion 33
         versionName "3.5.1"
         buildConfigField("String","VERSION_NAME", "\"${defaultConfig.versionName}\"")
@@ -47,9 +47,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.android.volley:volley:1.2.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.21"
-    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10"
 
     implementation("io.ktor:ktor-client-core:2.2.4")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.4")
@@ -57,7 +55,7 @@ dependencies {
 
     // DateTime
     implementation 'org.jetbrains.kotlinx:kotlinx-datetime:0.4.0'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.21'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10'
 
     // Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1'
@@ -65,13 +63,14 @@ dependencies {
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'io.ktor:ktor-client-android:2.2.4'
     implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
+    implementation("io.github.aakira:napier:2.6.1")
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'io.ktor:ktor-client-mock2.2.4'
     testImplementation 'org.json:json:20200518'
     testImplementation 'org.robolectric:robolectric:4.10.3'
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1'
     testImplementation project(path: ':advertising_sdk')
 }
 
@@ -80,7 +79,7 @@ repositories {
 }
 
 kotlin {
-    explicitApi()
+    explicitApiWarning()
 }
 
 afterEvaluate {

@@ -3,7 +3,6 @@ package com.adadapted.android.sdk.core.adapter
 import android.R
 import android.widget.AutoCompleteTextView
 import androidx.test.platform.app.InstrumentationRegistry
-import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.ui.adapter.AutoCompleteAdapter
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.Assert.assertEquals

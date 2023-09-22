@@ -1,15 +1,7 @@
 package com.adadapted.android.sdk.core.http
 
-import com.adadapted.android.sdk.config.EventStrings
-import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.device.DeviceInfo
-import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.core.event.AppEventClient
+import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.event.TestAppEventSink
-import com.adadapted.android.sdk.core.session.Session
-import com.adadapted.android.sdk.core.session.SessionAdapter
-import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.core.zone.ZoneContext
 import com.adadapted.android.sdk.ext.http.HttpSessionAdapter
 import com.adadapted.android.sdk.ext.json.JsonSessionBuilder
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
@@ -68,30 +60,20 @@ class HttpSessionAdapterTest {
         val testInitListener = TestSessionInitListener()
         val testListener = TestAdGetListener()
         testHttpSessionAdapter.sendInit(HttpAppEventSinkTest.generateMockDeviceInfo(), testInitListener)
-        testHttpSessionAdapter.sendRefreshAds(mockSession, testListener, ZoneContext())
+        testHttpSessionAdapter.sendRefreshAds(mockSession, testListener)
         assert(testHttpRequestManager.queueWasCreated)
-        assertEquals("refreshUrl?aid=testAppId&uid=testUdId&sid=testSessionId&sdk=" + BuildConfig.VERSION_NAME + "&zoneID=&contextID=", testHttpRequestManager.queuedRequest?.url)
-    }
-
-    @Test
-    fun refreshedAdsSentWithZoneContext() {
-        val testInitListener = TestSessionInitListener()
-        val testListener = TestAdGetListener()
-        testHttpSessionAdapter.sendInit(HttpAppEventSinkTest.generateMockDeviceInfo(), testInitListener)
-        testHttpSessionAdapter.sendRefreshAds(mockSession, testListener, ZoneContext("12345","recipeId"))
-        assert(testHttpRequestManager.queueWasCreated)
-        assertEquals("refreshUrl?aid=testAppId&uid=testUdId&sid=testSessionId&sdk=" + BuildConfig.VERSION_NAME + "&zoneID=12345&contextID=recipeId", testHttpRequestManager.queuedRequest?.url)
+        assertEquals("refreshUrl?aid=testAppId&uid=testUdId&sid=testSessionId&sdk=" + BuildConfig.VERSION_NAME, testHttpRequestManager.queuedRequest?.url)
     }
 
     @Test
     fun refreshedAdsSentWithErrors() {
         testHttpRequestManager.shouldReturnError = true
         val testListener = TestAdGetListener()
-        testHttpSessionAdapter.sendRefreshAds(mockSession, testListener, ZoneContext())
+        testHttpSessionAdapter.sendRefreshAds(mockSession, testListener)
         AppEventClient.getInstance().onPublishEvents()
         assertEquals(EventStrings.AD_GET_REQUEST_FAILED, testAppEventSink.testErrors.first().code)
         assert(testHttpRequestManager.queueWasCreated)
-        assertEquals("refreshUrl?aid=testAppId&uid=testUdId&sid=testSessionId&sdk=" + BuildConfig.VERSION_NAME + "&zoneID=&contextID=", testHttpRequestManager.queuedRequest?.url)
+        assertEquals("refreshUrl?aid=testAppId&uid=testUdId&sid=testSessionId&sdk=" + BuildConfig.VERSION_NAME, testHttpRequestManager.queuedRequest?.url)
     }
 }
 

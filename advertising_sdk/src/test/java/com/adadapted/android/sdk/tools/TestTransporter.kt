@@ -1,6 +1,5 @@
 package com.adadapted.android.sdk.tools
 
-import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch

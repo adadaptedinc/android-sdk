@@ -1,13 +1,7 @@
 package com.adadapted.android.sdk.core.http
 
-import com.adadapted.android.sdk.config.EventStrings
-import com.adadapted.android.sdk.core.ad.AdEvent
-import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.core.event.AppEventClient
+import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.event.TestAppEventSink
-import com.adadapted.android.sdk.core.session.Session
-import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.ext.http.HttpAdEventSink
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestHttpRequestManager
