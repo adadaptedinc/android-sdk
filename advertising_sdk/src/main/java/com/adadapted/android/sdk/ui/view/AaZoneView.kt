@@ -2,17 +2,21 @@ package com.adadapted.android.sdk.ui.view
 
 import android.annotation.TargetApi
 import android.content.Context
+import android.graphics.Color
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
 import android.view.View
+import android.widget.ImageButton
 import android.widget.RelativeLayout
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.common.Dimension
+import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.zone.Zone
 import com.adadapted.android.sdk.ui.messaging.AdContentListener
 import com.adadapted.android.sdk.ui.messaging.AdContentPublisher
+import com.gitlab.adadapted.R
 
 class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener {
     interface Listener {
@@ -22,6 +26,7 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
     }
 
     private lateinit var webView: AdWebView
+    private lateinit var reportButton: ImageButton
     private var presenter: AdZonePresenter? = null
     private var isVisible = true
     private var listener: Listener? = null
@@ -43,7 +48,31 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
     private fun setup(context: Context) {
         presenter = AdZonePresenter(this.context)
         webView = AdWebView(context.applicationContext, this)
-        Handler(Looper.getMainLooper()).post { addView(webView) }
+        reportButton = ImageButton(this.context)
+        reportButton.setImageResource(R.drawable.report_ad)
+        reportButton.setColorFilter(Color.rgb(0, 175, 204))
+        reportButton.setBackgroundColor(Color.TRANSPARENT)
+
+
+        val params = LayoutParams(
+            LayoutParams.WRAP_CONTENT,
+            LayoutParams.WRAP_CONTENT
+        )
+
+        reportButton.layoutParams = params
+        params.addRule(ALIGN_PARENT_END)
+        params.addRule(ALIGN_PARENT_TOP)
+
+        reportButton.setOnClickListener {
+            val cachedDeviceInfo = SessionClient.getInstance().getCachedDeviceInfo()
+            cachedDeviceInfo.udid?.let { udid ->
+                presenter?.onReportAdClicked(webView.currentAd.id, udid)
+            }
+        }
+
+        Handler(Looper.getMainLooper()).post {
+            addView(webView)
+        }
     }
 
     fun init(zoneId: String) {
@@ -129,7 +158,12 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
             val dimension = zone.dimensions[Dimension.Orientation.PORT]
             adjustedLayoutParams = LayoutParams(dimension?.width ?: LayoutParams.MATCH_PARENT, dimension?.height ?: LayoutParams.MATCH_PARENT)
         }
-        Handler(Looper.getMainLooper()).post { webView.layoutParams = adjustedLayoutParams }
+        Handler(Looper.getMainLooper()).post {
+            webView.layoutParams = adjustedLayoutParams
+            if(!webView.currentAd.isEmpty) {
+                addView(reportButton)
+            }
+        }
         notifyZoneHasAds(zone.hasAds())
     }
 

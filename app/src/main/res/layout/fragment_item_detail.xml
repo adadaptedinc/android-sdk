@@ -13,7 +13,7 @@
     <com.adadapted.android.sdk.ui.view.AaZoneView
         android:id="@+id/fragment_item_detail_aa_zone"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="120dp"
         android:layout_gravity="center_horizontal|bottom"
         android:backgroundTint="@color/background_material_dark">
     </com.adadapted.android.sdk.ui.view.AaZoneView>

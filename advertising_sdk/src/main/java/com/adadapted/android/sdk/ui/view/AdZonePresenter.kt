@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import com.adadapted.android.sdk.config.Config
 import com.adadapted.android.sdk.config.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdActionType
@@ -223,6 +224,13 @@ internal class AdZonePresenter(private val context: Context, private val aaWebVi
         }
 
         cycleToNextAdIfPossible()
+    }
+
+    fun onReportAdClicked(adId: String, udid: String ) {
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        intent.data = Config.getAdReportingUrl(adId, udid)
+        context.startActivity(intent)
     }
 
     private fun cycleToNextAdIfPossible() {
