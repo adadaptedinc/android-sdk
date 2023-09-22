@@ -160,7 +160,9 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
         }
         Handler(Looper.getMainLooper()).post {
             webView.layoutParams = adjustedLayoutParams
-            addView(reportButton)
+            if(!webView.currentAd.isEmpty) {
+                addView(reportButton)
+            }
         }
         notifyZoneHasAds(zone.hasAds())
     }
