@@ -23,7 +23,7 @@ internal class AdWebView @SuppressLint("SetJavaScriptEnabled") constructor(conte
         fun onBlankLoaded()
     }
 
-    lateinit var currentAd: Ad
+    var currentAd: Ad = Ad()
     private var loaded = false
     private val adLock: Lock = ReentrantLock()
 
