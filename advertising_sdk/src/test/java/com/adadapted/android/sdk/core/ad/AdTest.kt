@@ -1,10 +1,6 @@
 package com.adadapted.android.sdk.core.ad
 
-import com.adadapted.android.sdk.config.Config
-import com.adadapted.android.sdk.core.atl.AddToListItem
-import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.core.event.AppEventClient
-import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.constants.Config
 import com.adadapted.android.sdk.ext.models.Payload
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.nhaarman.mockitokotlin2.mock

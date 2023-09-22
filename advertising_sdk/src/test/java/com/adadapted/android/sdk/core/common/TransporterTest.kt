@@ -1,6 +1,5 @@
 package com.adadapted.android.sdk.core.common
 
-import com.adadapted.android.sdk.core.concurrency.Transporter
 import org.junit.Test
 
 class TransporterTest {

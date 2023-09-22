@@ -1,9 +1,5 @@
 package com.adadapted.android.sdk.core.intercept
 
-import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.device.DeviceInfo
-import com.adadapted.android.sdk.core.session.Session
-import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock

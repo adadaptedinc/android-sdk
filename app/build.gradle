@@ -1,13 +1,12 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'newrelic'
 
 android {
     compileSdkVersion 33
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 23
         targetSdkVersion 33
         versionCode 1
         versionName "1.0"

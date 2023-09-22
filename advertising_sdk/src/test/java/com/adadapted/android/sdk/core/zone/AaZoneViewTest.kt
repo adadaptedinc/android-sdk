@@ -3,20 +3,12 @@ package com.adadapted.android.sdk.core.zone
 import android.os.Looper
 import android.view.View
 import androidx.test.platform.app.InstrumentationRegistry
-import com.adadapted.android.sdk.config.EventStrings
+import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdContent
-import com.adadapted.android.sdk.core.ad.AdEventClient
 import com.adadapted.android.sdk.core.ad.TestAdContentListener
-import com.adadapted.android.sdk.core.atl.AddToListItem
 import com.adadapted.android.sdk.core.common.DimensionConverter
-import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.device.DeviceInfo
-import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.core.event.AppEventClient
 import com.adadapted.android.sdk.core.event.TestAppEventSink
-import com.adadapted.android.sdk.core.session.Session
-import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.ext.models.Payload
 import com.adadapted.android.sdk.tools.TestAdEventSink
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
@@ -35,7 +27,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows
-import java.util.Date
 import kotlin.collections.HashMap
 
 @RunWith(RobolectricTestRunner::class)

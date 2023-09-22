@@ -1,8 +1,5 @@
 package com.adadapted.android.sdk.core.ad
 
-import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.session.Session
-import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.tools.TestAdEventSink
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.any

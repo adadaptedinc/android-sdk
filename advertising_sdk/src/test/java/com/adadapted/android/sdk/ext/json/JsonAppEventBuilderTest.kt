@@ -1,8 +1,5 @@
 package com.adadapted.android.sdk.ext.json
 
-import com.adadapted.android.sdk.core.device.DeviceInfo
-import com.adadapted.android.sdk.core.event.AppError
-import com.adadapted.android.sdk.core.event.AppEvent
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Test

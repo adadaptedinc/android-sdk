@@ -1,8 +1,5 @@
 package com.adadapted.android.sdk.core.session
 
-import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.device.DeviceInfo
-import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.any

@@ -1,12 +1,7 @@
 package com.adadapted.android.sdk.ext.json
 
-import com.adadapted.android.sdk.config.EventStrings
-import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.device.DeviceInfo
-import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.core.event.AppEventClient
+import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.event.TestAppEventSink
-import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.test.TestCoroutineDispatcher

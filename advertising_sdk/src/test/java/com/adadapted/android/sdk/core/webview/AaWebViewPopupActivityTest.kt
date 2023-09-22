@@ -4,13 +4,6 @@ import android.content.Intent
 import android.view.KeyEvent
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.core.ad.Ad
-import com.adadapted.android.sdk.core.ad.AdEvent
-import com.adadapted.android.sdk.core.ad.AdEventClient
-import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.core.event.AppEventClient
-import com.adadapted.android.sdk.core.session.Session
-import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.zone.TestAdEventClientListener
 import com.adadapted.android.sdk.ext.models.Payload
 import com.adadapted.android.sdk.tools.TestAdEventSink

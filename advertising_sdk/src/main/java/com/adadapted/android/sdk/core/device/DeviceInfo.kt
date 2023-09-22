@@ -1,36 +1,34 @@
 package com.adadapted.android.sdk.core.device
 
-import com.gitlab.adadapted.BuildConfig
+import kotlinx.serialization.SerialName
 
-class DeviceInfo {
-    var appId: String? = null
-    var isProd = false
-    var scale = 0f
-    var bundleId: String? = null
-    var bundleVersion: String? = null
-    var udid: String? = null
-    var device: String? = null
-    var deviceUdid: String? = null
-    val os = OS
-    var osv: String? = null
-    var locale: String? = null
-    var timezone: String? = null
-    var carrier: String? = null
-    var dw = 0
-    var dh = 0
-    var density = 0
-    var isAllowRetargetingEnabled = false
-        private set
-    val sdkVersion: String = BuildConfig.VERSION_NAME
-    var params: Map<String, String>? = null
-
-    fun setAllowRetargeting(allowRetargeting: Boolean) {
-        isAllowRetargetingEnabled = allowRetargeting
-    }
+@kotlinx.serialization.Serializable
+data class DeviceInfo(
+    @SerialName("app_id")val appId: String = UNKNOWN_VALUE,
+    val isProd: Boolean = false,
+    val customIdentifier: String = "",
+    val scale: Float = 0f,
+    @SerialName("bundle_id") val bundleId: String = "",
+    @SerialName("bundle_version") val bundleVersion: String = "",
+    val udid: String = "",
+    @SerialName("device_name") val deviceName: String = "",
+    @SerialName("device_udid") val deviceUdid: String = "",
+    @SerialName("device_os") val os: String = UNKNOWN_VALUE,
+    @SerialName("device_osv") val osv: String = "",
+    @SerialName("device_locale") val locale: String = "",
+    @SerialName("device_timezone") val timezone: String = "",
+    @SerialName("device_carrier") val carrier: String = "",
+    @SerialName("device_width") val dw: Int = 0,
+    @SerialName("device_height") val dh: Int = 0,
+    @SerialName("device_density") val density: String = "",
+    @SerialName("allow_retargeting") val isAllowRetargetingEnabled: Boolean = false,
+    @SerialName("sdk_version") val sdkVersion: String = "",
+    @SerialName("created_at") val createdAt: Long = 0,
+    val params: Map<String, String> = mapOf()
+) {
 
     companion object {
         const val UNKNOWN_VALUE = "Unknown"
-        const val OS = "Android"
         fun empty(): DeviceInfo {
             return DeviceInfo()
         }

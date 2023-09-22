@@ -1,61 +1,54 @@
 package com.adadapted.android.sdk
 
 import android.content.Context
-import android.util.Log
-import android.widget.Toast
-import com.adadapted.android.sdk.config.Config
-import com.adadapted.android.sdk.core.ad.AdEventClient
-import com.adadapted.android.sdk.core.addit.AdditContent
-import com.adadapted.android.sdk.core.addit.PayloadClient
+import com.adadapted.android.sdk.constants.Config
+import com.adadapted.android.sdk.core.atl.AddItContentPublisher
 import com.adadapted.android.sdk.core.concurrency.Transporter
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.device.DeviceInfoExtractor
-import com.adadapted.android.sdk.core.event.AppEventClient
-import com.adadapted.android.sdk.core.intercept.InterceptClient
-import com.adadapted.android.sdk.core.intercept.KeywordInterceptMatcher
+import com.adadapted.android.sdk.core.event.EventBroadcaster
+import com.adadapted.android.sdk.core.event.EventClient
+import com.adadapted.android.sdk.core.interfaces.AddItContentListener
+import com.adadapted.android.sdk.core.interfaces.EventBroadcastListener
+import com.adadapted.android.sdk.core.interfaces.SessionBroadcastListener
+import com.adadapted.android.sdk.core.keyword.InterceptClient
+import com.adadapted.android.sdk.core.keyword.InterceptMatcher
+import com.adadapted.android.sdk.core.log.AALogger
+import com.adadapted.android.sdk.core.network.HttpConnector
+import com.adadapted.android.sdk.core.network.HttpEventAdapter
+import com.adadapted.android.sdk.core.network.HttpInterceptAdapter
+import com.adadapted.android.sdk.core.network.HttpPayloadAdapter
+import com.adadapted.android.sdk.core.network.HttpSessionAdapter
+import com.adadapted.android.sdk.core.payload.PayloadClient
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.session.SessionListener
-import com.adadapted.android.sdk.ext.http.HttpAdEventSink
-import com.adadapted.android.sdk.ext.http.HttpAppEventSink
-import com.adadapted.android.sdk.ext.http.HttpInterceptAdapter
-import com.adadapted.android.sdk.ext.http.HttpPayloadAdapter
-import com.adadapted.android.sdk.ext.http.HttpRequestManager
-import com.adadapted.android.sdk.ext.http.HttpSessionAdapter
-import com.adadapted.android.sdk.ui.messaging.AaSdkAdditContentListener
-import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener
-import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener
-import com.adadapted.android.sdk.ui.messaging.AdditContentPublisher
-import com.adadapted.android.sdk.ui.messaging.SdkEventPublisher
-import com.gitlab.adadapted.BuildConfig
 
 object AdAdapted {
     enum class Env { PROD, DEV }
-
-    private var customIdentifier: String = ""
     private var hasStarted = false
     private var apiKey: String = ""
     private var isProd = false
+    private var customIdentifier: String = ""
     private var isKeywordInterceptEnabled = false
     private var isPayloadEnabled = false
-    private val params: Map<String, String> = HashMap()
-    private var sessionListener: AaSdkSessionListener? = null
-    private var eventListener: AaSdkEventListener? = null
-    private var contentListener: AaSdkAdditContentListener? = null
-    private val LOG_TAG = AdAdapted::class.java.name
+    val params: Map<String, String> = HashMap()
+    lateinit var sessionListener: SessionBroadcastListener
+    private lateinit var eventListener: EventBroadcastListener
+    private lateinit var contentListener: AddItContentListener
 
     fun withAppId(key: String): AdAdapted {
         this.apiKey = key
         return this
     }
 
-    fun inEnv(environment: Env): AdAdapted {
-        isProd = environment == Env.PROD
+    fun inEnv(env: Env): AdAdapted {
+        isProd = env == Env.PROD
         return this
     }
 
-    fun setCustomIdentifier(identifier: String): AdAdapted {
-        customIdentifier = identifier
+    fun setSdkSessionListener(listener: SessionBroadcastListener): AdAdapted {
+        sessionListener = listener
         return this
     }
 
@@ -69,87 +62,88 @@ object AdAdapted {
         return this
     }
 
-    fun setSdkSessionListener(listener: AaSdkSessionListener): AdAdapted {
-        sessionListener = listener
-        return this
-    }
-
-    fun setSdkEventListener(listener: AaSdkEventListener): AdAdapted {
+    fun setSdkEventListener(listener: EventBroadcastListener): AdAdapted {
         eventListener = listener
         return this
     }
 
-    fun setSdkAdditContentListener(listener: AaSdkAdditContentListener): AdAdapted {
+    fun setSdkAddItContentListener(listener: AddItContentListener): AdAdapted {
         contentListener = listener
+        return this
+    }
+
+    fun enableDebugLogging(): AdAdapted {
+        AALogger.enableDebugLogging()
+        return this
+    }
+
+    fun setCustomIdentifier(identifier: String): AdAdapted {
+        customIdentifier = identifier
+        return this
+    }
+
+    fun disableAdTracking(context: Context): AdAdapted {
+        setAdTracking(context, true)
+        return this
+    }
+
+    fun enableAdTracking(context: Context): AdAdapted {
+        setAdTracking(context, false)
         return this
     }
 
     fun start(context: Context) {
         if (apiKey.isEmpty()) {
-            Log.e(LOG_TAG, "The Api Key cannot be NULL")
-            Toast.makeText(context, "AdAdapted API Key Is Missing", Toast.LENGTH_SHORT).show()
+            AALogger.logError("The AdAdapted Api Key is missing or NULL")
         }
         if (hasStarted) {
             if (!isProd) {
-                Log.w(LOG_TAG, "AdAdapted Android Advertising SDK has already been started")
+                AALogger.logError("AdAdapted Android Advertising SDK has already been started.")
             }
-            return
         }
         hasStarted = true
         setupClients(context)
-        eventListener?.let { SdkEventPublisher.getInstance().setListener(it) }
-        contentListener?.let { AdditContentPublisher.getInstance().addListener(it) }
+        eventListener.let { EventBroadcaster.setListener(it) }
+        contentListener.let { AddItContentPublisher.addListener(it) }
 
         if (isPayloadEnabled) {
-            PayloadClient.getInstance().pickupPayloads(object : PayloadClient.Callback {
-                override fun onPayloadAvailable(content: List<AdditContent>) {
-                    if (content.isNotEmpty()) {
-                        AdditContentPublisher.getInstance().publishAdditContent(content[0])
+            PayloadClient.pickupPayloads {
+                if (it.isNotEmpty()) {
+                    for (content in it) {
+                        AddItContentPublisher.publishAddItContent(content)
                     }
                 }
-            })
+            }
         }
 
-        val startListener: SessionListener = object : SessionListener() {
+        val startListener: SessionListener = object : SessionListener {
             override fun onSessionAvailable(session: Session) {
-                sessionListener?.onHasAdsToServe(session.hasActiveCampaigns(), session.getZonesWithAds())
+                sessionListener.onHasAdsToServe(session.hasActiveCampaigns(), session.getZonesWithAds())
                 if (session.hasActiveCampaigns() && session.getZonesWithAds().isEmpty()) {
-                    Log.e(LOG_TAG,"Session has ads to show but none were loaded properly. Is an obfuscation tool obstructing the AdAdapted SDK?")
+                    AALogger.logError("The session has ads to show but none were loaded properly. Is an obfuscation tool obstructing the AdAdapted Library?")
                 }
             }
 
             override fun onAdsAvailable(session: Session) {
-                sessionListener?.onHasAdsToServe(session.hasActiveCampaigns(), session.getZonesWithAds())
+                sessionListener.onHasAdsToServe(session.hasActiveCampaigns(), session.getZonesWithAds())
             }
 
             override fun onSessionInitFailed() {
-                sessionListener?.onHasAdsToServe(false, listOf())
+                sessionListener.onHasAdsToServe(false, listOf())
             }
         }
-        SessionClient.getInstance().start(startListener)
+        SessionClient.start(startListener)
+
         if (isKeywordInterceptEnabled) {
-            KeywordInterceptMatcher.match("INIT") //init the matcher
+            InterceptMatcher.match("INIT") //init the matcher
         }
-        Log.i(
-            LOG_TAG,
-            String.format(
-                "AdAdapted Android Advertising SDK v%s initialized.",
-                BuildConfig.VERSION_NAME
-            )
-        )
-    }
-
-    fun disableAdTracking(context: Context) {
-        setAdTracking(context, true)
-    }
-
-    fun enableAdTracking(context: Context) {
-        setAdTracking(context, false)
+        AALogger.logInfo("AdAdapted Android SDK ${Config.LIBRARY_VERSION} initialized.")
     }
 
     private fun setAdTracking(context: Context, value: Boolean) {
-        val sharedPref = context.getSharedPreferences(Config.AASDK_PREFS_KEY, Context.MODE_PRIVATE) ?: return
-        with (sharedPref.edit()) {
+        val sharedPref =
+            context.getSharedPreferences(Config.AASDK_PREFS_KEY, Context.MODE_PRIVATE) ?: return
+        with(sharedPref.edit()) {
             putBoolean(Config.AASDK_PREFS_TRACKING_DISABLED_KEY, value)
             apply()
         }
@@ -157,13 +151,45 @@ object AdAdapted {
 
     private fun setupClients(context: Context) {
         Config.init(isProd)
-        HttpRequestManager.createQueue(context.applicationContext, apiKey)
 
-        DeviceInfoClient.createInstance(context.applicationContext, apiKey, isProd, params, customIdentifier, DeviceInfoExtractor(), Transporter())
-        SessionClient.createInstance(HttpSessionAdapter(Config.getInitSessionUrl(), Config.getRefreshAdsUrl()), Transporter())
-        AppEventClient.createInstance(HttpAppEventSink(Config.getAppEventsUrl(), Config.getAppErrorsUrl()), Transporter())
-        AdEventClient.createInstance(HttpAdEventSink(Config.getAdsEventUrl()), Transporter())
-        InterceptClient.createInstance(HttpInterceptAdapter(Config.getRetrieveInterceptsUrl(), Config.getInterceptEventsUrl()), Transporter())
-        PayloadClient.createInstance(HttpPayloadAdapter(Config.getPickupPayloadsUrl(), Config.getTrackingPayloadUrl()), AppEventClient.getInstance(), Transporter())
+        val deviceInfoExtractor = DeviceInfoExtractor(context)
+        DeviceInfoClient.createInstance(
+            apiKey,
+            isProd,
+            params,
+            customIdentifier,
+            deviceInfoExtractor,
+            Transporter()
+        )
+        SessionClient.createInstance(
+            HttpSessionAdapter(
+                Config.getInitSessionUrl(),
+                Config.getRefreshAdsUrl(),
+                HttpConnector
+            ), Transporter()
+        )
+        EventClient.createInstance(
+            HttpEventAdapter(
+                Config.getAdEventsUrl(),
+                Config.getSdkEventsUrl(),
+                Config.getSdkErrorsUrl(),
+                HttpConnector
+            ), Transporter()
+        )
+        InterceptClient.createInstance(
+            HttpInterceptAdapter(
+                Config.getRetrieveInterceptsUrl(),
+                Config.getInterceptEventsUrl(),
+                HttpConnector
+            ), Transporter()
+        )
+        PayloadClient.createInstance(
+            HttpPayloadAdapter(
+                Config.getPickupPayloadsUrl(),
+                Config.getTrackingPayloadUrl(),
+                HttpConnector
+            ), EventClient, Transporter()
+        )
     }
 }
+
