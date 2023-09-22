@@ -4,14 +4,13 @@ object EventStrings {
     const val EXPIRED_EVENT = "session_expired"
     const val EXCEPTION_MESSAGE = "exception_message"
     const val GAID_UNAVAILABLE = "GAID_UNAVAILABLE"
-    const val APP_EVENT_REQUEST_FAILED = "APP_EVENT_REQUEST_FAILED"
+    const val SDK_EVENT_REQUEST_FAILED = "APP_EVENT_REQUEST_FAILED"
+    const val SDK_EVENT_TYPE = "sdk"
 
-    const val ADDIT_PAYLOAD_FIELD_PARSE_FAILED = "ADDIT_PAYLOAD_FIELD_PARSE_FAILED"
     const val ADDIT_APP_OPENED = "addit_app_opened"
     const val ADDIT_DEEPLINK_HANDLING_ERROR = "ADDIT_DEEPLINK_HANDLING_ERROR"
     const val ADDIT_PAYLOAD_IS_EMPTY = "ADDIT_PAYLOAD_IS_EMPTY"
     const val ADDIT_NO_DEEPLINK_RECEIVED = "ADDIT_NO_DEEPLINK_RECEIVED"
-    const val ADDIT_UNKNOWN_PAYLOAD_TYPE = "ADDIT_UNKNOWN_PAYLOAD_TYPE"
     const val ADDIT_PAYLOAD_PARSE_FAILED = "ADDIT_PAYLOAD_PARSE_FAILED"
     const val ADDIT_ADDED_TO_LIST = "addit_added_to_list"
     const val ADDIT_ITEM_ADDED_TO_LIST = "addit_item_added_to_list"
@@ -19,23 +18,20 @@ object EventStrings {
     const val ADDIT_CONTENT_FAILED = "ADDIT_CONTENT_FAILED"
     const val ADDIT_CONTENT_ITEM_FAILED = "ADDIT_CONTENT_ITEM_FAILED"
     const val NO_ADDIT_CONTENT_LISTENER = "NO_ADDIT_CONTENT_LISTENER"
+    const val LISTENER_REGISTRATION_ERROR = "App did not register an AddIt Content listener"
 
     const val AD_PAYLOAD_IS_EMPTY = "AD_PAYLOAD_IS_EMPTY"
-    const val AD_PAYLOAD_PARSE_FAILED = "AD_PAYLOAD_PARSE_FAILED"
     const val AD_GET_REQUEST_FAILED = "AD_GET_REQUEST_FAILED"
     const val AD_EVENT_TRACK_REQUEST_FAILED = "AD_EVENT_TRACK_REQUEST_FAILED"
 
     const val PAYLOAD_PICKUP_ATTEMPT = "payload_pickup_attempt"
     const val PAYLOAD_PICKUP_REQUEST_FAILED = "PAYLOAD_PICKUP_REQUEST_FAILED"
     const val PAYLOAD_EVENT_REQUEST_FAILED = "PAYLOAD_EVENT_REQUEST_FAILED"
+    const val NO_DEEPLINK_URL = "Did not receive a deeplink url."
 
-    const val SESSION_AD_PAYLOAD_PARSE_FAILED = "SESSION_AD_PAYLOAD_PARSE_FAILED"
-    const val SESSION_PAYLOAD_PARSE_FAILED = "SESSION_PAYLOAD_PARSE_FAILED"
-    const val SESSION_ZONE_PAYLOAD_PARSE_FAILED = "SESSION_ZONE_PAYLOAD_PARSE_FAILED"
     const val SESSION_REQUEST_FAILED = "SESSION_REQUEST_FAILED"
 
-    const val KI_PAYLOAD_PARSE_FAILED = "KI_PAYLOAD_PARSE_FAILED"
-    const val KI_SESSION_REQUEST_FAILED = "KI_SESSION_REQUEST_FAILED"
+    const val KI_INIT_REQUEST_FAILED = "KI_INIT_REQUEST_FAILED"
     const val KI_EVENT_REQUEST_FAILED = "KI_EVENT_REQUEST_FAILED"
 
     const val USER_ADDED_TO_LIST = "user_added_to_list"
@@ -56,6 +52,4 @@ object EventStrings {
     const val POPUP_ATL_CLICKED = "popup_atl_clicked"
     const val POPUP_URL_MALFORMED ="POPUP_URL_MALFORMED"
     const val POPUP_URL_LOAD_FAILED = "POPUP_URL_LOAD_FAILED"
-
-    const val ADZONE_NULL_ERROR_MESSAGE = "An AdZone ID was expected but returned null. Was init called on the AdZone before adding it to the view? Is something calling onStop() prematurely on the AdZone? The onStart() and onStop() methods should only be called in the hosting view's overriding methods."
 }
