@@ -6,8 +6,4 @@ object AdActionType {
     const val POPUP = "p"
     const val LINK = "l"
     const val EXTERNAL_LINK = "e"
-
-    fun handlesContent(type: String): Boolean {
-        return CONTENT == type || CONTENT_POPUP == type
-    }
 }
