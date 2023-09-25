@@ -13,7 +13,7 @@ import org.junit.Test
 import java.util.Date
 import kotlin.collections.HashMap
 
-class KeywordInterceptMatcherTest {
+class KeywordKeywordInterceptMatcherTest {
     private var testTransporter = TestCoroutineDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
     private var testAppEventSink = TestAppEventSink()

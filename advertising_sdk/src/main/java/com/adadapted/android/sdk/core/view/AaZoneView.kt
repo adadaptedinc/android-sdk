@@ -15,7 +15,7 @@ import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.gitlab.adadapted.R
 
-class AndroidZoneView : RelativeLayout, AdZonePresenterListener, AndroidWebView.Listener {
+class AaZoneView : RelativeLayout, AdZonePresenterListener, AndroidWebView.Listener {
     interface Listener {
         fun onZoneHasAds(hasAds: Boolean)
         fun onAdLoaded()

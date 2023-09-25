@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.adadapted.android.sdk.ui.view.AaZoneView;
+import com.adadapted.android.sdk.core.view.AaZoneView;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.recipe.Recipe;
 import com.adadapted.sdktestapp.core.recipe.RecipeManager;
@@ -65,7 +65,7 @@ public class RecipeDetailActivityFragment extends Fragment implements AaZoneView
 
         RecipeManager.getInstance(getActivity()).addListener(this);
 
-        aaZoneView.onStart();
+        aaZoneView.onStart(this, null);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class RecipeDetailActivityFragment extends Fragment implements AaZoneView
 
         RecipeManager.getInstance(getActivity()).removeListener(this);
 
-        aaZoneView.onStop();
+        aaZoneView.onStop(null);
     }
 
     @Override
