@@ -13,7 +13,7 @@ import com.adadapted.android.sdk.core.ad.AdContentListener
 import com.adadapted.android.sdk.core.ad.AdContentPublisher
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.session.SessionClient
-import com.gitlab.adadapted.R
+import com.adadapted.R
 
 class AaZoneView : RelativeLayout, AdZonePresenterListener, AndroidWebView.Listener {
     interface Listener {

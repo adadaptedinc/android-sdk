@@ -11,16 +11,17 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply from: 'jacoco.gradle'
 
-group='com.gitlab.adadapted'
+group='com.adadapted'
 
 android {
-    compileSdkVersion 33
-    namespace = 'com.gitlab.adadapted'
+    compileSdk 34
+    namespace = 'com.adadapted'
 
     defaultConfig {
         minSdkVersion 23
-        targetSdkVersion 33
-        versionName "3.5.1"
+        //noinspection EditedTargetSdkVersion
+        targetSdkVersion 34
+        versionName "3.4.5"
         buildConfigField("String","VERSION_NAME", "\"${defaultConfig.versionName}\"")
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'aasdk-proguard-rules.pro'
@@ -90,7 +91,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.gitlab.adadapted'
                 artifactId = 'android-sdk'
-                version = '3.5.1'
+                version = '3.4.5'
             }
         }
     }
