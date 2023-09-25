@@ -2,15 +2,15 @@ package com.adadapted.android.sdk.core.event
 
 import com.adadapted.android.sdk.core.concurrency.Transporter
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.interfaces.EventBroadcastListener
+import com.adadapted.android.sdk.core.interfaces.AaSdkEventListener
 import com.adadapted.android.sdk.core.interfaces.EventClientListener
 
 object EventBroadcaster : EventClientListener {
 
     private val transporter: TransporterCoroutineScope = Transporter()
-    private var listener: EventBroadcastListener? = null
+    private var listener: AaSdkEventListener? = null
 
-    fun setListener(listener: EventBroadcastListener) {
+    fun setListener(listener: AaSdkEventListener) {
         EventBroadcaster.listener = listener
     }
 
@@ -18,7 +18,7 @@ object EventBroadcaster : EventClientListener {
         if (listener == null || event == null) {
             return
         }
-        transporter.dispatchToThread { listener?.onAdEventTracked(event.zoneId, event.eventType) }
+        transporter.dispatchToThread { listener?.onNextAdEvent(event.zoneId, event.eventType) }
     }
 
     init {

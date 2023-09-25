@@ -13,7 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.adadapted.android.sdk.ui.view.AaZoneView;
+import com.adadapted.android.sdk.core.view.AaZoneView;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.recipe.Recipe;
 import com.adadapted.sdktestapp.core.recipe.RecipeManager;
@@ -100,7 +100,7 @@ public class RecipesFragment extends ListFragment implements AaZoneView.Listener
 
         RecipeManager.getInstance(getActivity()).addListener(this);
 
-        aaZoneView.onStart();
+        aaZoneView.onStart(this, null);
     }
 
     @Override
@@ -109,7 +109,7 @@ public class RecipesFragment extends ListFragment implements AaZoneView.Listener
 
         RecipeManager.getInstance(getActivity()).removeListener(this);
 
-        aaZoneView.onStop();
+        aaZoneView.onStop(null);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

@@ -5,16 +5,16 @@ import com.adadapted.android.sdk.constants.EventStrings.LISTENER_REGISTRATION_ER
 import com.adadapted.android.sdk.core.ad.AdContent
 import com.adadapted.android.sdk.core.concurrency.Transporter
 import com.adadapted.android.sdk.core.event.EventClient
-import com.adadapted.android.sdk.core.interfaces.AddItContentListener
+import com.adadapted.android.sdk.core.interfaces.AaSdkAdditContentListener
 import com.adadapted.android.sdk.core.log.AALogger
 
 object AddItContentPublisher {
 
     private var transporter: Transporter = Transporter()
     private val publishedContent: MutableMap<String, AddItContent> = HashMap()
-    private var listener: AddItContentListener? = null
+    private var listener: AaSdkAdditContentListener? = null
 
-    fun addListener(listener: AddItContentListener) {
+    fun addListener(listener: AaSdkAdditContentListener) {
         AddItContentPublisher.listener = listener
     }
 

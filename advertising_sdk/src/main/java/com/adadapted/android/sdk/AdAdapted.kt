@@ -8,11 +8,11 @@ import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.device.DeviceInfoExtractor
 import com.adadapted.android.sdk.core.event.EventBroadcaster
 import com.adadapted.android.sdk.core.event.EventClient
-import com.adadapted.android.sdk.core.interfaces.AddItContentListener
-import com.adadapted.android.sdk.core.interfaces.EventBroadcastListener
-import com.adadapted.android.sdk.core.interfaces.SessionBroadcastListener
+import com.adadapted.android.sdk.core.interfaces.AaSdkAdditContentListener
+import com.adadapted.android.sdk.core.interfaces.AaSdkEventListener
+import com.adadapted.android.sdk.core.interfaces.AaSdkSessionListener
 import com.adadapted.android.sdk.core.keyword.InterceptClient
-import com.adadapted.android.sdk.core.keyword.InterceptMatcher
+import com.adadapted.android.sdk.core.keyword.KeywordInterceptMatcher
 import com.adadapted.android.sdk.core.log.AALogger
 import com.adadapted.android.sdk.core.network.HttpConnector
 import com.adadapted.android.sdk.core.network.HttpEventAdapter
@@ -33,9 +33,9 @@ object AdAdapted {
     private var isKeywordInterceptEnabled = false
     private var isPayloadEnabled = false
     val params: Map<String, String> = HashMap()
-    lateinit var sessionListener: SessionBroadcastListener
-    private lateinit var eventListener: EventBroadcastListener
-    private lateinit var contentListener: AddItContentListener
+    lateinit var sessionListener: AaSdkSessionListener
+    private lateinit var eventListener: AaSdkEventListener
+    private lateinit var contentListener: AaSdkAdditContentListener
 
     fun withAppId(key: String): AdAdapted {
         this.apiKey = key
@@ -47,7 +47,7 @@ object AdAdapted {
         return this
     }
 
-    fun setSdkSessionListener(listener: SessionBroadcastListener): AdAdapted {
+    fun setSdkSessionListener(listener: AaSdkSessionListener): AdAdapted {
         sessionListener = listener
         return this
     }
@@ -62,12 +62,12 @@ object AdAdapted {
         return this
     }
 
-    fun setSdkEventListener(listener: EventBroadcastListener): AdAdapted {
+    fun setSdkEventListener(listener: AaSdkEventListener): AdAdapted {
         eventListener = listener
         return this
     }
 
-    fun setSdkAddItContentListener(listener: AddItContentListener): AdAdapted {
+    fun setSdkAdditContentListener(listener: AaSdkAdditContentListener): AdAdapted {
         contentListener = listener
         return this
     }
@@ -135,7 +135,7 @@ object AdAdapted {
         SessionClient.start(startListener)
 
         if (isKeywordInterceptEnabled) {
-            InterceptMatcher.match("INIT") //init the matcher
+            KeywordInterceptMatcher.match("INIT") //init the matcher
         }
         AALogger.logInfo("AdAdapted Android SDK ${Config.LIBRARY_VERSION} initialized.")
     }

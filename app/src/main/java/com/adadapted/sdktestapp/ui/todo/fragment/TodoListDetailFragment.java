@@ -17,10 +17,10 @@ import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.adadapted.android.sdk.core.ad.AdContentListener;
 import com.adadapted.android.sdk.core.atl.AddToListContent;
 import com.adadapted.android.sdk.core.atl.AddToListItem;
-import com.adadapted.android.sdk.ui.messaging.AdContentListener;
-import com.adadapted.android.sdk.ui.view.AaZoneView;
+import com.adadapted.android.sdk.core.view.AaZoneView;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.todo.TodoList;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;

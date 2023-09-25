@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.adadapted.android.sdk.ui.view.AaZoneView;
+import com.adadapted.android.sdk.core.view.AaZoneView;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.todo.TodoItem;
 import com.adadapted.sdktestapp.core.todo.TodoList;
@@ -106,14 +106,14 @@ public class ItemDetailFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        aaZoneView.onStart();
+        aaZoneView.onStart(null, null);
     }
 
     @Override
     public void onStop() {
         super.onStop();
 
-        aaZoneView.onStop();
+        aaZoneView.onStop(null);
     }
 
     @Override

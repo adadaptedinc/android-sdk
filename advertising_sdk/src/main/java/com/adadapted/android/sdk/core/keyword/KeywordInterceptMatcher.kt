@@ -5,7 +5,7 @@ import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.session.SessionListener
 
-object InterceptMatcher : SessionListener, InterceptListener {
+public object KeywordInterceptMatcher : SessionListener, InterceptListener {
     private var intercept: Intercept = Intercept()
     private var mLoaded = false
     private var hasInstance: Boolean = false
@@ -49,7 +49,7 @@ object InterceptMatcher : SessionListener, InterceptListener {
         }
 
     override fun onKeywordInterceptInitialized(intercept: Intercept) {
-        InterceptMatcher.intercept = intercept
+        KeywordInterceptMatcher.intercept = intercept
         mLoaded = true
     }
 
@@ -63,7 +63,7 @@ object InterceptMatcher : SessionListener, InterceptListener {
         hasInstance = true
     }
 
-    fun match(constraint: CharSequence): Set<Suggestion> {
+    public fun match(constraint: CharSequence): Set<Suggestion> {
         return if (hasInstance) {
             matchKeyword(constraint)
         } else {
