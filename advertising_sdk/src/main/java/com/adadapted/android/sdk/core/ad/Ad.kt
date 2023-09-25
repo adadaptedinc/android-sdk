@@ -5,7 +5,7 @@ import com.adadapted.android.sdk.core.payload.Payload
 import kotlinx.serialization.SerialName
 
 @kotlinx.serialization.Serializable
-public data class Ad(
+data class Ad(
     @SerialName("ad_id") val id: String = "",
     @SerialName("impression_id") val impressionId: String = "",
     @SerialName("creative_url") val url: String = "",
@@ -19,19 +19,19 @@ public data class Ad(
     val isEmpty: Boolean
         get() = id.isEmpty()
 
-    public fun getContent(): AdContent {
+    fun getContent(): AdContent {
         return AdContent.createAddToListContent(this)
     }
 
-    public fun resetImpressionTracking() {
+    fun resetImpressionTracking() {
         isImpressionTracked = false
     }
 
-    public fun setImpressionTracked() {
+    fun setImpressionTracked() {
         isImpressionTracked = true
     }
 
-    public fun impressionWasTracked(): Boolean {
+    fun impressionWasTracked(): Boolean {
         return isImpressionTracked
     }
 

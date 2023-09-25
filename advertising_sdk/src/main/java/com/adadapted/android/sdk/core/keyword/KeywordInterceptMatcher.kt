@@ -5,7 +5,7 @@ import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.session.SessionListener
 
-public object KeywordInterceptMatcher : SessionListener, InterceptListener {
+object KeywordInterceptMatcher : SessionListener, InterceptListener {
     private var intercept: Intercept = Intercept()
     private var mLoaded = false
     private var hasInstance: Boolean = false

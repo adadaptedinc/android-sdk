@@ -1,5 +1,5 @@
 package com.adadapted.android.sdk.core.interfaces
 
-public interface AaSdkEventListener {
-    public fun onNextAdEvent(zoneId: String, eventType: String)
+interface AaSdkEventListener {
+    fun onNextAdEvent(zoneId: String, eventType: String)
 }

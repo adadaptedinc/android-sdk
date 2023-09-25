@@ -1,8 +1,7 @@
 package com.adadapted.android.sdk.core.log
 
+import android.util.Log
 import com.adadapted.android.sdk.constants.Config
-import io.github.aakira.napier.DebugAntilog
-import io.github.aakira.napier.Napier
 
 object AALogger {
     private var isDebugLoggingEnabled = false
@@ -10,16 +9,16 @@ object AALogger {
 
     fun logDebug(message: String) {
         if (isDebugLoggingEnabled && !disableLogging) {
-            Napier.d(message = message, tag = Config.LOG_TAG)
+            Log.d(Config.LOG_TAG, message)
         }
     }
 
     fun logInfo(message: String) {
-        if (!disableLogging)Napier.i(message = message, tag = Config.LOG_TAG)
+        if (!disableLogging)Log.i(Config.LOG_TAG, message)
     }
 
     fun logError(message: String) {
-        if (!disableLogging)Napier.e(message = message, tag = Config.LOG_TAG)
+        if (!disableLogging)Log.e(Config.LOG_TAG, message)
     }
 
     fun enableDebugLogging() {
@@ -28,9 +27,5 @@ object AALogger {
 
     fun disableAllLogging() {
         disableLogging = true
-    }
-
-    init {
-        Napier.base(DebugAntilog())
     }
 }
