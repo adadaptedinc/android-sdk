@@ -6,7 +6,7 @@ import com.adadapted.android.sdk.core.atl.AddToListItem
 import com.adadapted.android.sdk.core.event.EventClient
 import kotlin.collections.HashMap
 
-public class AdContent private constructor(
+class AdContent private constructor(
     private val ad: Ad,
     private val items: List<AddToListItem>,
     private val eventClient: EventClient = EventClient
