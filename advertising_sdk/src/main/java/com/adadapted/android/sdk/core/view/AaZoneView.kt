@@ -53,6 +53,8 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
         reportButton.layoutParams = params
         params.addRule(ALIGN_PARENT_END)
         params.addRule(ALIGN_PARENT_TOP)
+        params.marginEnd = 4
+        params.topMargin = 4
 
         reportButton.setOnClickListener {
             val cachedDeviceInfo = DeviceInfoClient.getCachedDeviceInfo()

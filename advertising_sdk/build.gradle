@@ -81,9 +81,9 @@ afterEvaluate {
             // Creates a Maven publication called "release".
             release(MavenPublication) {
                 from components.release
-                groupId = 'com.gitlab.adadapted'
+                groupId = 'com.adadapted'
                 artifactId = 'android-sdk'
-                version = '3.4.5'
+                version = '4.0.0'
             }
         }
     }
