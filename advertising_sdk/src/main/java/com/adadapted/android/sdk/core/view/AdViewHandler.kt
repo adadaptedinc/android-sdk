@@ -15,7 +15,7 @@ class AdViewHandler(private val context: Context) {
     }
 
     fun handlePopup(ad: Ad) {
-        val intent = AndroidWebViewPopupActivity().createActivity(context, ad)
+        val intent = AaWebViewPopupActivity().createActivity(context, ad)
         context.startActivity(intent)
     }
 

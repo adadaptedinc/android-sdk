@@ -1,40 +1,58 @@
 package com.adadapted.android.sdk.core.intercept
 
-import com.adadapted.android.sdk.core.event.TestAppEventSink
+import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
+import com.adadapted.android.sdk.core.device.DeviceInfoClient
+import com.adadapted.android.sdk.core.event.EventClient
+import com.adadapted.android.sdk.core.keyword.Intercept
+import com.adadapted.android.sdk.core.keyword.InterceptClient
+import com.adadapted.android.sdk.core.keyword.InterceptEvent
+import com.adadapted.android.sdk.core.keyword.KeywordInterceptMatcher
+import com.adadapted.android.sdk.core.keyword.Term
+import com.adadapted.android.sdk.core.session.Session
+import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
+import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import java.util.Date
 import kotlin.collections.HashMap
+import kotlin.test.AfterTest
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class KeywordKeywordInterceptMatcherTest {
-    private var testTransporter = TestCoroutineDispatcher()
+    private var testTransporter = UnconfinedTestDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
-    private var testAppEventSink = TestAppEventSink()
     private var testInterceptAdapter = TestInterceptAdapter()
-    private var mockSession = Session("testId", willServeAds = true, hasAds = true, refreshTime = 30, expiration = Date().time, zones = mutableMapOf())
 
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
+        DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), testTransporterScope)
-        AppEventClient.createInstance(testAppEventSink, testTransporterScope)
+        EventClient.createInstance(TestEventAdapter, testTransporterScope)
+        EventClient.onSessionAvailable(MockData.session)
         val testIntercept = Intercept("test_searchId", 5, 3, listOf(
                 Term("testTermId", "testTerm", "replacementTerm", "testIcon", "testTagLine", 1),
                 Term("testTermTwoId", "testTermTwo", "replacementTermTwo", "testIcon", "testTagLine", 2)))
         testInterceptAdapter.testIntercept = testIntercept
         InterceptClient.createInstance(testInterceptAdapter, testTransporterScope)
-        InterceptClient.getInstance().onSessionAvailable(mockSession)
+        InterceptClient.getInstance().onSessionAvailable(MockData.session)
         KeywordInterceptMatcher.match("INIT")
-        SessionClient.getInstance().onSessionInitialized(Session("newSessionId", willServeAds = true, hasAds = true, refreshTime = 30, expiration = Date().time, zones = mutableMapOf()))
+        SessionClient.onSessionInitialized(Session("newSessionId", willServeAds = true, hasAds = true, refreshTime = 30, expiration = Date().time, zones = mutableMapOf()))
         clearEvents()
+    }
+
+    @AfterTest
+    fun cleanup() {
+        TestEventAdapter.cleanupEvents()
     }
 
     @Test
@@ -53,19 +71,19 @@ class KeywordKeywordInterceptMatcherTest {
 
     @Test
     fun sessionIsNotAvailable() {
-        SessionClient.getInstance().onSessionInitialized(Session("", willServeAds = true, hasAds = true, refreshTime = 30, expiration = Date().time, zones = mutableMapOf()))
+        SessionClient.onSessionInitialized(Session("", willServeAds = true, hasAds = true, refreshTime = 30, expiration = Date().time, zones = mutableMapOf()))
         KeywordInterceptMatcher.match("tes")
         InterceptClient.getInstance().onPublishEvents()
-        AppEventClient.getInstance().onPublishEvents()
+        EventClient.onPublishEvents()
         assertEquals(InterceptEvent.MATCHED, testInterceptAdapter.testEvents.first().event)
     }
 
     @Test
     fun adIsAvailable() {
-        SessionClient.getInstance().onNewAdsLoaded(Session("newSessionId", willServeAds = true, hasAds = true, refreshTime = 30, expiration = Date().time, zones = mutableMapOf()))
+        SessionClient.onNewAdsLoaded(Session("newSessionId", willServeAds = true, hasAds = true, refreshTime = 30, expiration = Date().time, zones = mutableMapOf()))
         KeywordInterceptMatcher.match("tes")
         InterceptClient.getInstance().onPublishEvents()
-        AppEventClient.getInstance().onPublishEvents()
+        EventClient.onPublishEvents()
         assertEquals(InterceptEvent.MATCHED, testInterceptAdapter.testEvents.first().event)
     }
 

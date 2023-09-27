@@ -1,7 +1,7 @@
 package com.adadapted.android.sdk.core.payload
 
 import com.adadapted.android.sdk.constants.EventStrings
-import com.adadapted.android.sdk.core.atl.AddItContent
+import com.adadapted.android.sdk.core.atl.AdditContent
 import com.adadapted.android.sdk.core.atl.AddToListItem
 import com.adadapted.android.sdk.core.concurrency.Transporter
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
@@ -21,7 +21,7 @@ object PayloadClient {
     private const val ITEM_NAME = "item_name"
     private var deeplinkInProgress = false
 
-    private fun performPickupPayload(callback: (content: List<AddItContent>) -> Unit) {
+    private fun performPickupPayload(callback: (content: List<AdditContent>) -> Unit) {
         DeviceInfoClient.getDeviceInfo(object : DeviceCallback {
             override fun onDeviceInfoCollected(deviceInfo: DeviceInfo) {
                 eventClient?.trackSdkEvent(EventStrings.PAYLOAD_PICKUP_ATTEMPT)
@@ -34,7 +34,7 @@ object PayloadClient {
         })
     }
 
-    private fun trackPayload(content: AddItContent, result: String) {
+    private fun trackPayload(content: AdditContent, result: String) {
         val event = PayloadEvent(content.payloadId, result)
         transporter.dispatchToThread {
             DeviceInfoClient.getCachedDeviceInfo()
@@ -42,7 +42,7 @@ object PayloadClient {
         }
     }
 
-    fun pickupPayloads(callback: (content: List<AddItContent>) -> Unit) {
+    fun pickupPayloads(callback: (content: List<AdditContent>) -> Unit) {
         if (deeplinkInProgress) {
             return
         }
@@ -61,11 +61,11 @@ object PayloadClient {
         deeplinkInProgress = false
     }
 
-    fun markContentAcknowledged(content: AddItContent) {
+    fun markContentAcknowledged(content: AdditContent) {
         transporter.dispatchToThread {
             val eventParams: MutableMap<String, String> = HashMap()
             eventParams[PAYLOAD_ID] = content.payloadId
-            eventParams[SOURCE] = content.addItSource
+            eventParams[SOURCE] = content.additSource
             eventClient?.trackSdkEvent(EventStrings.ADDIT_ADDED_TO_LIST, eventParams)
             if (content.isPayloadSource) {
                 trackPayload(content, "delivered")
@@ -73,18 +73,18 @@ object PayloadClient {
         }
     }
 
-    fun markContentItemAcknowledged(content: AddItContent, item: AddToListItem) {
+    fun markContentItemAcknowledged(content: AdditContent, item: AddToListItem) {
         transporter.dispatchToThread {
             val eventParams: MutableMap<String, String> = HashMap()
             eventParams[PAYLOAD_ID] = content.payloadId
             eventParams[TRACKING_ID] = item.trackingId
             eventParams[ITEM_NAME] = item.title
-            eventParams[SOURCE] = content.addItSource
+            eventParams[SOURCE] = content.additSource
             eventClient?.trackSdkEvent(EventStrings.ADDIT_ITEM_ADDED_TO_LIST, eventParams)
         }
     }
 
-    fun markContentDuplicate(content: AddItContent) {
+    fun markContentDuplicate(content: AdditContent) {
         transporter.dispatchToThread {
             val eventParams: MutableMap<String, String> = HashMap()
             eventParams[PAYLOAD_ID] = content.payloadId
@@ -95,7 +95,7 @@ object PayloadClient {
         }
     }
 
-    fun markContentFailed(content: AddItContent, message: String) {
+    fun markContentFailed(content: AdditContent, message: String) {
         transporter.dispatchToThread {
             val eventParams: MutableMap<String, String> = HashMap()
             eventParams[PAYLOAD_ID] = content.payloadId
@@ -106,7 +106,7 @@ object PayloadClient {
         }
     }
 
-    fun markContentItemFailed(content: AddItContent, item: AddToListItem, message: String) {
+    fun markContentItemFailed(content: AdditContent, item: AddToListItem, message: String) {
         transporter.dispatchToThread {
             val eventParams: MutableMap<String, String> = HashMap()
             eventParams[PAYLOAD_ID] = content.payloadId

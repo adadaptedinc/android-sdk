@@ -6,20 +6,25 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdContent
+import com.adadapted.android.sdk.core.ad.AdContentPublisher
 import com.adadapted.android.sdk.core.ad.TestAdContentListener
-import com.adadapted.android.sdk.core.common.DimensionConverter
-import com.adadapted.android.sdk.core.event.TestAppEventSink
-import com.adadapted.android.sdk.ext.models.Payload
-import com.adadapted.android.sdk.tools.TestAdEventSink
+import com.adadapted.android.sdk.core.atl.AddToListItem
+import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
+import com.adadapted.android.sdk.core.device.DeviceInfoClient
+import com.adadapted.android.sdk.core.event.EventClient
+import com.adadapted.android.sdk.core.payload.Payload
+import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.core.view.AaZoneView
+import com.adadapted.android.sdk.core.view.DimensionConverter
+import com.adadapted.android.sdk.core.view.Zone
+import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
+import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
-import com.adadapted.android.sdk.ui.messaging.AdContentPublisher
-import com.adadapted.android.sdk.ui.view.AaZoneView
-import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -27,31 +32,24 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows
-import kotlin.collections.HashMap
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 class AaZoneViewTest {
-    private var mockAdEventSink = mock<TestAdEventSink>()
     private var testContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var testAaZoneView: AaZoneView
-    private var testTransporter = TestCoroutineDispatcher()
+    private var testTransporter = UnconfinedTestDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
-    private var testAppEventSink = TestAppEventSink()
-    private var mockSession = Session("testId", true, true, 30, 1907245044, mutableMapOf())
 
 
     @Before
     fun setup() {
-        whenever(mockAdEventSink.sendBatch(any(), any())).then { }
-
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(testContext,"", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
+        DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
-        AdEventClient.createInstance(mockAdEventSink, testTransporterScope)
-        AdEventClient.getInstance().onSessionAvailable(mockSession)
-        AppEventClient.createInstance(testAppEventSink, testTransporterScope)
+        EventClient.createInstance(TestEventAdapter, testTransporterScope)
+        EventClient.onSessionAvailable(MockData.session)
         DimensionConverter.createInstance(0f)
-        AdContentPublisher.createInstance()
         testAaZoneView = AaZoneView(testContext)
     }
 
@@ -62,7 +60,7 @@ class AaZoneViewTest {
         testAaZoneView.init("TestZoneId")
         testAaZoneView.onStart(testListener)
         testAaZoneView.onAdAvailable(testAd)
-        testAaZoneView.onAdLoaded(testAd)
+        testAaZoneView.onAdLoadedInWebView(testAd)
         Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals(testListener.adLoaded, true)
@@ -73,10 +71,12 @@ class AaZoneViewTest {
         val testAdContentListener = TestAdContentListener()
         val testAd = (Ad("NewAdId"))
         testAaZoneView.init("TestZoneId")
-        testAaZoneView.onStart(testAdContentListener)
+        testAaZoneView.onStart(contentListener = testAdContentListener)
         testAaZoneView.onAdAvailable(testAd)
-        testAaZoneView.onAdLoaded(testAd)
-        AdContentPublisher.getInstance().publishContent("TestZoneId", AdContent.createAddToListContent(Ad(payload = Payload(listOf(AddToListItem("trackId", "title", "brand", "cat", "upc", "sku", "disc", "image"))))))
+        testAaZoneView.onAdLoadedInWebView(testAd)
+        AdContentPublisher.publishContent("TestZoneId", AdContent.createAddToListContent(Ad(payload = Payload(detailedListItems = listOf(
+            AddToListItem("trackId", "title", "brand", "cat", "upc", "sku", "disc", "image")
+        )))))
         Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals("TestZoneId", testAdContentListener.resultZoneId)
@@ -90,7 +90,7 @@ class AaZoneViewTest {
         testAaZoneView.init("TestZoneId")
         testAaZoneView.onStart(testListener, testAdContentListener)
         testAaZoneView.onAdAvailable(testAd)
-        testAaZoneView.onAdLoaded(testAd)
+        testAaZoneView.onAdLoadedInWebView(testAd)
         Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals(testListener.adLoaded, true)
@@ -171,7 +171,7 @@ class AaZoneViewTest {
         val testListener = TestAaZoneViewListener()
         testAaZoneView.init("TestZoneId")
         testAaZoneView.onStart(testListener)
-        testAaZoneView.onAdLoaded(Ad("NewAdId"))
+        testAaZoneView.onAdLoadedInWebView(Ad("NewAdId"))
         Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals(testListener.adLoaded, true)
@@ -182,7 +182,7 @@ class AaZoneViewTest {
         val testListener = TestAaZoneViewListener()
         testAaZoneView.init("TestZoneId")
         testAaZoneView.onStart(testListener)
-        testAaZoneView.onAdLoadFailed()
+        testAaZoneView.onAdLoadInWebViewFailed()
         Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals(testListener.adFailed, true)
@@ -193,7 +193,7 @@ class AaZoneViewTest {
         val testListener = TestAaZoneViewListener()
         testAaZoneView.init("TestZoneId")
         testAaZoneView.onStart(testListener)
-        testAaZoneView.onBlankLoaded()
+        testAaZoneView.onBlankAdInWebViewLoaded()
         Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals(testListener.adLoaded, false)
@@ -206,7 +206,7 @@ class AaZoneViewTest {
         testAaZoneView.onStart(testListener)
         testAaZoneView.visibility = View.GONE
         testAaZoneView.visibility = View.VISIBLE
-        testAaZoneView.onAdLoaded(Ad("NewAdId"))
+        testAaZoneView.onAdLoadedInWebView(Ad("NewAdId"))
         Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals(testListener.adLoaded, true)
@@ -218,13 +218,13 @@ class AaZoneViewTest {
         val testAd = Ad("NewAdId", actionType = "c")
         testAaZoneView.init("TestZoneId")
         testAaZoneView.onStart(testListener)
-        testAaZoneView.onAdLoaded(testAd)
-        testAaZoneView.onAdClicked(testAd)
-        AppEventClient.getInstance().onPublishEvents()
+        testAaZoneView.onAdLoadedInWebView(testAd)
+        testAaZoneView.onAdInWebViewClicked(testAd)
+        EventClient.onPublishEvents()
         Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals(testListener.adLoaded, true)
-        assert(testAppEventSink.testEvents.any { event -> event.name == EventStrings.ATL_AD_CLICKED })
+        assert(TestEventAdapter.testSdkEvents.any { event -> event.name == EventStrings.ATL_AD_CLICKED })
     }
 }
 

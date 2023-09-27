@@ -17,10 +17,10 @@ import java.io.IOException
 import java.util.TimeZone
 import java.util.Locale
 
-class DeviceInfoExtractor(context: Context) {
+open class DeviceInfoExtractor(context: Context) {
     private var contextRef: Context? = context
 
-    fun extractDeviceInfo(appId: String, isProd: Boolean, customIdentifier: String, params: Map<String, String>): DeviceInfo {
+    open fun extractDeviceInfo(appId: String, isProd: Boolean, customIdentifier: String, params: Map<String, String>): DeviceInfo {
         var mUdid: String
         var mAllowRetargeting = false
         var mScale = 0f

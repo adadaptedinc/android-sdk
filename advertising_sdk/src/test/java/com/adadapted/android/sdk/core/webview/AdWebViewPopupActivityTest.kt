@@ -4,18 +4,25 @@ import android.content.Intent
 import android.view.KeyEvent
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.core.ad.Ad
+import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
+import com.adadapted.android.sdk.core.device.DeviceInfoClient
+import com.adadapted.android.sdk.core.event.AdEventTypes
+import com.adadapted.android.sdk.core.event.EventClient
+import com.adadapted.android.sdk.core.payload.Payload
+import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.core.view.AaWebViewPopupActivity
 import com.adadapted.android.sdk.core.zone.TestAdEventClientListener
-import com.adadapted.android.sdk.ext.models.Payload
-import com.adadapted.android.sdk.tools.TestAdEventSink
+import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
+import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
-import com.adadapted.android.sdk.ui.activity.AaWebViewPopupActivity
-import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -23,29 +30,26 @@ import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
-class AaWebViewPopupActivityTest {
+class AdWebViewPopupActivityTest {
     private lateinit var testAaWebViewPopupActivity: AaWebViewPopupActivity
-    private var mockAdEventSink = mock<TestAdEventSink>()
     private var testContext = InstrumentationRegistry.getInstrumentation().targetContext
-    private var testTransporter = TestCoroutineDispatcher()
+    private var testTransporter = UnconfinedTestDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
-    var mockSession = Session("testId", true, true, 30, 1907245044, mutableMapOf())
-    private var testAd = Ad("TestAdId", "imp", "url", "type", "http://example.com", Payload(listOf()), 5)
+    private var testAd = Ad("TestAdId", "imp", "url", "type", "http://example.com", Payload(detailedListItems = listOf()), 5)
 
     @Before
     fun setup() {
-        whenever(mockAdEventSink.sendBatch(any(), any())).then { }
-
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
+        DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
-        AppEventClient.createInstance(mock(), testTransporterScope)
-        AdEventClient.createInstance(mockAdEventSink, testTransporterScope)
-        AdEventClient.getInstance().onSessionAvailable(mockSession)
+        EventClient.createInstance(TestEventAdapter, testTransporterScope)
+        EventClient.onSessionAvailable(MockData.session)
 
         val testIntent = Intent(testContext, AaWebViewPopupActivity::class.java)
-        testIntent.putExtra(AaWebViewPopupActivity::class.java.name + ".EXTRA_POPUP_AD", testAd)
+        testIntent.putExtra(AaWebViewPopupActivity::class.java.name + ".EXTRA_POPUP_AD", Json.encodeToString(
+            serializer(), testAd))
         testIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         testAaWebViewPopupActivity = Robolectric.buildActivity(AaWebViewPopupActivity::class.java, testIntent)
                 .create()
@@ -63,9 +67,9 @@ class AaWebViewPopupActivityTest {
     @Test
     fun testOnStart() {
         val testAdEventListener = TestAdEventClientListener()
-        AdEventClient.getInstance().addListener(testAdEventListener)
+        EventClient.addListener(testAdEventListener)
         testAaWebViewPopupActivity.onStart()
-        assertEquals(AdEvent.Types.POPUP_BEGIN, testAdEventListener.testAdEvent?.eventType)
+        assertEquals(AdEventTypes.POPUP_BEGIN, testAdEventListener.testAdEvent?.eventType)
     }
 
     @Test

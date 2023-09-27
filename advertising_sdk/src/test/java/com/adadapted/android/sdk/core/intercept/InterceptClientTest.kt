@@ -1,5 +1,14 @@
 package com.adadapted.android.sdk.core.intercept
 
+import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
+import com.adadapted.android.sdk.core.interfaces.InterceptListener
+import com.adadapted.android.sdk.core.keyword.Intercept
+import com.adadapted.android.sdk.core.keyword.InterceptAdapter
+import com.adadapted.android.sdk.core.keyword.InterceptClient
+import com.adadapted.android.sdk.core.keyword.InterceptEvent
+import com.adadapted.android.sdk.core.session.Session
+import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -7,27 +16,26 @@ import com.nhaarman.mockitokotlin2.verify
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertNotNull
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
-import java.util.Date
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class InterceptClientTest {
-
-    private var testTransporter = TestCoroutineDispatcher()
+    private var testTransporter = UnconfinedTestDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
     private var testInterceptClient = InterceptClient
     private var testInterceptAdapter = TestInterceptAdapter()
     private val testEvent = InterceptEvent("testId", "testTermId", "testTerm", "testInput")
-    private var mockSession = Session("testId", willServeAds = true, hasAds = true, refreshTime = 30, expiration = Date().time, zones = mutableMapOf())
 
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
         SessionClient.createInstance(mock(), mock())
         testInterceptClient.createInstance(testInterceptAdapter, testTransporterScope)
-        testInterceptClient.getInstance().onSessionAvailable(mockSession)
+        testInterceptClient.getInstance().onSessionAvailable(MockData.session)
     }
 
     @Test
@@ -37,8 +45,8 @@ class InterceptClientTest {
 
     @Test
     fun initialize() {
-        val mockListener = mock<InterceptClient.Listener>()
-        testInterceptClient.getInstance().initialize(mockSession, mockListener)
+        val mockListener = mock<InterceptListener>()
+        testInterceptClient.getInstance().initialize(MockData.session, mockListener)
         verify(mockListener).onKeywordInterceptInitialized(any())
     }
 
@@ -78,12 +86,11 @@ class InterceptClientTest {
 class TestInterceptAdapter: InterceptAdapter {
     var testEvents = mutableSetOf<InterceptEvent>()
     var testIntercept = Intercept()
-
-    override fun retrieve(session: Session, callback: InterceptAdapter.Callback) {
-        callback.onSuccess(testIntercept)
+    override suspend fun retrieve(session: Session, listener: InterceptAdapter.Listener) {
+        listener.onSuccess(testIntercept)
     }
 
-    override fun sendEvents(session: Session, events: MutableSet<InterceptEvent>) {
+    override suspend fun sendEvents(session: Session, events: MutableSet<InterceptEvent>) {
         testEvents = events
     }
 }

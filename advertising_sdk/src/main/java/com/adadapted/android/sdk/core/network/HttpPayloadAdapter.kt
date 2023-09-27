@@ -1,7 +1,7 @@
 package com.adadapted.android.sdk.core.network
 
 import com.adadapted.android.sdk.constants.EventStrings
-import com.adadapted.android.sdk.core.atl.AddItContent
+import com.adadapted.android.sdk.core.atl.AdditContent
 import com.adadapted.android.sdk.core.atl.AddItContentParser
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.log.AALogger
@@ -20,7 +20,7 @@ class HttpPayloadAdapter(
     private val trackUrl: String,
     private val httpConnector: HttpConnector
 ) : PayloadAdapter {
-    override suspend fun pickup(deviceInfo: DeviceInfo, callback: (content: List<AddItContent>) -> Unit) {
+    override suspend fun pickup(deviceInfo: DeviceInfo, callback: (content: List<AdditContent>) -> Unit) {
         try {
             val response: HttpResponse = httpConnector.client.post(pickupUrl) {
                 contentType(ContentType.Application.Json)
