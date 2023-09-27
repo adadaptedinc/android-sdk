@@ -1,20 +1,16 @@
 package com.adadapted.android.sdk.tools
 
-import android.content.Context
+import com.adadapted.android.sdk.core.device.DeviceInfo
+import com.adadapted.android.sdk.core.device.DeviceInfoExtractor
+import com.nhaarman.mockitokotlin2.mock
 
-class TestDeviceInfoExtractor(var gaiaDisabled: Boolean = false): InfoExtractor {
-    override fun extractDeviceInfo(context: Context, appId: String, isProd: Boolean, params: Map<String, String>, customIdentifier: String): DeviceInfo {
-        val mockDeviceInfo = DeviceInfo()
-        mockDeviceInfo.appId = "TestAppId"
-        mockDeviceInfo.device = "TestDevice"
-        mockDeviceInfo.udid = customIdentifier
-
-        if (gaiaDisabled) {
-            mockDeviceInfo.setAllowRetargeting(false)
-        } else {
-            mockDeviceInfo.setAllowRetargeting(true)
-        }
-
-        return mockDeviceInfo
+class TestDeviceInfoExtractor: DeviceInfoExtractor(mock()) {
+    override fun extractDeviceInfo(
+        appId: String,
+        isProd: Boolean,
+        customIdentifier: String,
+        params: Map<String, String>
+    ): DeviceInfo {
+        return DeviceInfo(deviceName = "TestDevice", udid = "customUDID")
     }
 }

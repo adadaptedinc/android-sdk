@@ -1,36 +1,36 @@
 package com.adadapted.android.sdk.core.adapter
 
-import com.adadapted.android.sdk.core.intercept.InterceptClient
-import com.adadapted.android.sdk.core.intercept.InterceptEvent
+import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.intercept.TestInterceptAdapter
+import com.adadapted.android.sdk.core.keyword.InterceptClient
+import com.adadapted.android.sdk.core.keyword.InterceptEvent
+import com.adadapted.android.sdk.core.keyword.SuggestionTracker
+import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestTransporter
-import com.adadapted.android.sdk.ui.adapter.SuggestionTracker
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import java.util.Date
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SuggestionTrackerTest {
 
-    private var testTransporter = TestCoroutineDispatcher()
+    private var testTransporter = UnconfinedTestDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
     private var testInterceptClient = InterceptClient
     private var testInterceptAdapter = TestInterceptAdapter()
-    private val testEvent = InterceptEvent("testId", "testTermId", "testTerm", "testInput")
-    private var mockSession = Session("testId", true, true, 30, Date().time, mutableMapOf())
 
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
         SessionClient.createInstance(mock(), mock())
         testInterceptClient.createInstance(testInterceptAdapter, testTransporterScope)
-        testInterceptClient.getInstance().onSessionAvailable(mockSession)
-
-
+        testInterceptClient.getInstance().onSessionAvailable(MockData.session)
     }
 
     @Test

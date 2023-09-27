@@ -11,14 +11,14 @@ import com.adadapted.android.sdk.core.log.AALogger
 object AddItContentPublisher {
 
     private var transporter: Transporter = Transporter()
-    private val publishedContent: MutableMap<String, AddItContent> = HashMap()
+    private val publishedContent: MutableMap<String, AdditContent> = HashMap()
     private var listener: AaSdkAdditContentListener? = null
 
     fun addListener(listener: AaSdkAdditContentListener) {
         AddItContentPublisher.listener = listener
     }
 
-    fun publishAddItContent(content: AddItContent) {
+    fun publishAddItContent(content: AdditContent) {
         if (content.hasNoItems()) {
             return
         }

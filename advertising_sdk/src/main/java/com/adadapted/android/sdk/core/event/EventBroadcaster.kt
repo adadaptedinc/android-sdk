@@ -7,11 +7,12 @@ import com.adadapted.android.sdk.core.interfaces.EventClientListener
 
 object EventBroadcaster : EventClientListener {
 
-    private val transporter: TransporterCoroutineScope = Transporter()
+    private var transporter: TransporterCoroutineScope = Transporter()
     private var listener: AaSdkEventListener? = null
 
-    fun setListener(listener: AaSdkEventListener) {
+    fun setListener(listener: AaSdkEventListener, transporter: TransporterCoroutineScope = Transporter()) {
         EventBroadcaster.listener = listener
+        EventBroadcaster.transporter = transporter
     }
 
     override fun onAdEventTracked(event: AdEvent?) {

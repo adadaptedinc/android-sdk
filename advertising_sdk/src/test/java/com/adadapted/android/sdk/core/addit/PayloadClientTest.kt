@@ -1,36 +1,55 @@
 package com.adadapted.android.sdk.core.addit
 
 import com.adadapted.android.sdk.constants.EventStrings
-import com.adadapted.android.sdk.core.event.TestAppEventSink
+import com.adadapted.android.sdk.core.atl.AddToListItem
+import com.adadapted.android.sdk.core.atl.AdditContent
+import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
+import com.adadapted.android.sdk.core.device.DeviceInfo
+import com.adadapted.android.sdk.core.device.DeviceInfoClient
+import com.adadapted.android.sdk.core.event.EventClient
+import com.adadapted.android.sdk.core.payload.PayloadAdapter
+import com.adadapted.android.sdk.core.payload.PayloadClient
+import com.adadapted.android.sdk.core.payload.PayloadEvent
+import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
+import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.mock
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertNotNull
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
+import kotlin.test.AfterTest
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import kotlin.test.assertTrue
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 class PayloadClientTest {
-
-    private var testTransporter = TestCoroutineDispatcher()
+    private var testTransporter = UnconfinedTestDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
     private var testPayloadClient = PayloadClient
-    private var testAppEventSink = TestAppEventSink()
     private var testPayloadAdapter = TestPayloadAdapter()
 
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
+        DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
-        AppEventClient.createInstance(testAppEventSink, testTransporterScope)
-        testPayloadClient.createInstance(testPayloadAdapter, AppEventClient.getInstance(), testTransporterScope)
+        EventClient.createInstance(TestEventAdapter, testTransporterScope)
+        EventClient.onSessionAvailable(MockData.session)
+        testPayloadClient.createInstance(testPayloadAdapter, EventClient, testTransporterScope)
+    }
+
+    @AfterTest
+    fun cleanup() {
+        TestEventAdapter.cleanupEvents()
     }
 
     @Test
@@ -41,14 +60,11 @@ class PayloadClientTest {
     @Test
     fun pickupPayloads() {
         var testContent = listOf<AdditContent>()
-        val callback = object: PayloadClient.Callback {
-            override fun onPayloadAvailable(content: List<AdditContent>) {
-                testContent = content
-            }
-        }
 
         assert(testContent.isEmpty())
-        testPayloadClient.getInstance().pickupPayloads(callback)
+        testPayloadClient.pickupPayloads {
+            testContent = it
+        }
 
         assert(testContent.isNotEmpty())
         assertEquals("testPayloadId", testContent.first().payloadId)
@@ -57,20 +73,19 @@ class PayloadClientTest {
     @Test
     fun deeplinkInProgressAndCompletes() {
         var testContent = listOf<AdditContent>()
-        val callback = object: PayloadClient.Callback {
-            override fun onPayloadAvailable(content: List<AdditContent>) {
-                testContent = content
-            }
+
+        assert(testContent.isEmpty())
+        testPayloadClient.deeplinkInProgress()
+        testPayloadClient.pickupPayloads{
+            testContent = it
         }
 
         assert(testContent.isEmpty())
-        testPayloadClient.getInstance().deeplinkInProgress()
-        testPayloadClient.getInstance().pickupPayloads(callback)
 
-        assert(testContent.isEmpty())
-
-        testPayloadClient.getInstance().deeplinkCompleted()
-        testPayloadClient.getInstance().pickupPayloads(callback)
+        testPayloadClient.deeplinkCompleted()
+        testPayloadClient.pickupPayloads{
+            testContent = it
+        }
 
         assert(testContent.isNotEmpty())
         assertEquals("testPayloadId", testContent.first().payloadId)
@@ -79,89 +94,102 @@ class PayloadClientTest {
     @Test
     fun markContentAcknowledged() {
         val content = getTestAdditPayloadContent()
-        testPayloadClient.getInstance().markContentAcknowledged(content)
-        AppEventClient.getInstance().onPublishEvents()
-        assertEquals(EventStrings.ADDIT_ADDED_TO_LIST, testAppEventSink.testEvents.first().name)
-        assertEquals("testPayloadId", testAppEventSink.testEvents.first().params.getValue("payload_id"))
-        assertEquals(AdditContent.AdditSources.PAYLOAD, testAppEventSink.testEvents.first().params.getValue("source"))
+        testPayloadClient.markContentAcknowledged(content)
+        EventClient.onPublishEvents()
+        assertEquals(EventStrings.ADDIT_ADDED_TO_LIST, TestEventAdapter.testSdkEvents.first().name)
+        assertEquals("testPayloadId", TestEventAdapter.testSdkEvents.first().params.getValue("payload_id"))
+        assertEquals(AdditContent.AdditSources.PAYLOAD, TestEventAdapter.testSdkEvents.first().params.getValue("source"))
         assertEquals("delivered", testPayloadAdapter.publishedEvent.status)
     }
 
     @Test
     fun markNonPayloadContentAcknowledged() {
         val content = getTestAdditPayloadContent(isPayloadSource = false)
-        testAppEventSink.testEvents = mutableSetOf()
-        testPayloadClient.getInstance().markContentAcknowledged(content)
-        AppEventClient.getInstance().onPublishEvents()
-        assertEquals(EventStrings.ADDIT_ADDED_TO_LIST, testAppEventSink.testEvents.first().name)
-        assertEquals("testPayloadId", testAppEventSink.testEvents.first().params.getValue("payload_id"))
-        assertEquals("", testAppEventSink.testEvents.first().params.getValue("source"))
+        TestEventAdapter.testSdkEvents = mutableListOf()
+        testPayloadClient.markContentAcknowledged(content)
+        EventClient.onPublishEvents()
+        assertEquals(EventStrings.ADDIT_ADDED_TO_LIST, TestEventAdapter.testSdkEvents.first().name)
+        assertEquals("testPayloadId", TestEventAdapter.testSdkEvents.first().params.getValue("payload_id"))
+        assertEquals("", TestEventAdapter.testSdkEvents.first().params.getValue("source"))
         assertEquals("", testPayloadAdapter.publishedEvent.status)
     }
 
     @Test
     fun markContentItemAcknowledged() {
         val content = getTestAdditPayloadContent()
-        testPayloadClient.getInstance().markContentItemAcknowledged(content, getTestAddToListItem())
-        AppEventClient.getInstance().onPublishEvents()
-        assertEquals(EventStrings.ADDIT_ITEM_ADDED_TO_LIST, testAppEventSink.testEvents.first().name)
-        assertEquals("testPayloadId", testAppEventSink.testEvents.first().params.getValue("payload_id"))
-        assertEquals("testTitle", testAppEventSink.testEvents.first().params.getValue("item_name"))
-        assertEquals(AdditContent.AdditSources.PAYLOAD, testAppEventSink.testEvents.first().params.getValue("source"))
+        testPayloadClient.markContentItemAcknowledged(content, getTestAddToListItem())
+        EventClient.onPublishEvents()
+        assertEquals(EventStrings.ADDIT_ITEM_ADDED_TO_LIST, TestEventAdapter.testSdkEvents.first().name)
+        assertEquals("testPayloadId", TestEventAdapter.testSdkEvents.first().params.getValue("payload_id"))
+        assertEquals("testTitle", TestEventAdapter.testSdkEvents.first().params.getValue("item_name"))
+        assertEquals(AdditContent.AdditSources.PAYLOAD, TestEventAdapter.testSdkEvents.first().params.getValue("source"))
     }
 
     @Test
     fun markContentDuplicate() {
         val content = getTestAdditPayloadContent()
-        testAppEventSink.testEvents = mutableSetOf()
-        testPayloadClient.getInstance().markContentDuplicate(content)
-        AppEventClient.getInstance().onPublishEvents()
-        assertEquals(EventStrings.ADDIT_DUPLICATE_PAYLOAD, testAppEventSink.testEvents.first().name)
-        assertEquals("testPayloadId", testAppEventSink.testEvents.first().params.getValue("payload_id"))
+        TestEventAdapter.testSdkEvents = mutableListOf()
+        testPayloadClient.markContentDuplicate(content)
+        EventClient.onPublishEvents()
+        assertTrue {
+            TestEventAdapter.testSdkEvents.any { e -> e.name ==  EventStrings.ADDIT_DUPLICATE_PAYLOAD }
+            TestEventAdapter.testSdkEvents.first { e -> e.name == EventStrings.ADDIT_DUPLICATE_PAYLOAD }
+                .params.getValue("payload_id") == "testPayloadId"
+        }
         assertEquals("duplicate", testPayloadAdapter.publishedEvent.status)
     }
 
     @Test
     fun markNonPayloadContentDuplicate() {
         val content = getTestAdditPayloadContent(isPayloadSource = false)
-        testAppEventSink.testEvents = mutableSetOf()
-        testPayloadClient.getInstance().markContentDuplicate(content)
-        AppEventClient.getInstance().onPublishEvents()
-        assertEquals(EventStrings.ADDIT_DUPLICATE_PAYLOAD, testAppEventSink.testEvents.first().name)
-        assertEquals("testPayloadId", testAppEventSink.testEvents.first().params.getValue("payload_id"))
+        TestEventAdapter.testSdkEvents = mutableListOf()
+        testPayloadClient.markContentDuplicate(content)
+        EventClient.onPublishEvents()
+
+        assertTrue {
+            TestEventAdapter.testSdkEvents.any { e -> e.name == EventStrings.ADDIT_DUPLICATE_PAYLOAD }
+            TestEventAdapter.testSdkEvents.first { e -> e.name == EventStrings.ADDIT_DUPLICATE_PAYLOAD }
+                .params.getValue("payload_id") == "testPayloadId"
+        }
         assertEquals("", testPayloadAdapter.publishedEvent.status)
     }
 
     @Test
     fun markContentFailed() {
         val content = getTestAdditPayloadContent()
-        testAppEventSink.testErrors = mutableSetOf()
-        testPayloadClient.getInstance().markContentFailed(content, "testFail")
-        AppEventClient.getInstance().onPublishEvents()
-        assertEquals(EventStrings.ADDIT_CONTENT_FAILED, testAppEventSink.testErrors.first().code)
-        assertEquals("testFail", testAppEventSink.testErrors.first().message)
+        TestEventAdapter.testSdkErrors = mutableListOf()
+        testPayloadClient.markContentFailed(content, "testFail")
+        EventClient.onPublishEvents()
+        assertTrue {
+            TestEventAdapter.testSdkErrors.any { e -> e.code ==  EventStrings.ADDIT_CONTENT_FAILED }
+            TestEventAdapter.testSdkErrors.any { e -> e.message == "testFail"}
+        }
         assertEquals("rejected", testPayloadAdapter.publishedEvent.status)
     }
 
     @Test
     fun markNonPayloadContentFailed() {
         val content = getTestAdditPayloadContent(isPayloadSource = false)
-        testAppEventSink.testErrors = mutableSetOf()
-        testPayloadClient.getInstance().markContentFailed(content, "testFail")
-        AppEventClient.getInstance().onPublishEvents()
-        assertEquals(EventStrings.ADDIT_CONTENT_FAILED, testAppEventSink.testErrors.first().code)
-        assertEquals("testFail", testAppEventSink.testErrors.first().message)
+        TestEventAdapter.testSdkErrors = mutableListOf()
+        testPayloadClient.markContentFailed(content, "testFail")
+        EventClient.onPublishEvents()
+        assertTrue {
+            TestEventAdapter.testSdkErrors.any { e -> e.code == EventStrings.ADDIT_CONTENT_FAILED }
+            TestEventAdapter.testSdkErrors.any { e -> e.message == "testFail"}
+        }
         assertEquals("", testPayloadAdapter.publishedEvent.status)
     }
 
     @Test
     fun markContentItemFailed() {
         val content = getTestAdditPayloadContent()
-        testAppEventSink.testErrors = mutableSetOf()
-        testPayloadClient.getInstance().markContentItemFailed(content, getTestAddToListItem(), "testItemFail")
-        AppEventClient.getInstance().onPublishEvents()
-        assertEquals(EventStrings.ADDIT_CONTENT_ITEM_FAILED, testAppEventSink.testErrors.first().code)
-        assertEquals("testItemFail", testAppEventSink.testErrors.first().message)
+        TestEventAdapter.testSdkErrors = mutableListOf()
+        testPayloadClient.markContentItemFailed(content, getTestAddToListItem(), "testItemFail")
+        EventClient.onPublishEvents()
+        assertTrue {
+            TestEventAdapter.testSdkErrors.any { e -> e.code == EventStrings.ADDIT_CONTENT_ITEM_FAILED }
+            TestEventAdapter.testSdkErrors.any { e -> e.message == "testItemFail" }
+        }
     }
 
     companion object {
@@ -185,12 +213,11 @@ class PayloadClientTest {
 
 class TestPayloadAdapter: PayloadAdapter {
     var publishedEvent = PayloadEvent("", "")
-
-    override fun pickup(deviceInfo: DeviceInfo, callback: PayloadAdapter.Callback) {
-        callback.onSuccess(listOf(PayloadClientTest.getTestAdditPayloadContent()))
+    override suspend fun pickup(deviceInfo: DeviceInfo, callback: (content: List<AdditContent>) -> Unit) {
+        callback(listOf(PayloadClientTest.getTestAdditPayloadContent()))
     }
 
-    override fun publishEvent(event: PayloadEvent) {
+    override suspend fun publishEvent(deviceInfo: DeviceInfo, event: PayloadEvent) {
         publishedEvent = event
     }
 }

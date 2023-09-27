@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.core.intercept
 
+import com.adadapted.android.sdk.core.keyword.Term
 import org.junit.Assert
 import org.junit.Test
 

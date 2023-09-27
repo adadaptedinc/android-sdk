@@ -4,19 +4,19 @@ import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.event.EventClient
 import com.adadapted.android.sdk.core.payload.PayloadClient
 
-data class AddItContent(
+data class AdditContent(
     val payloadId: String,
     val message: String,
     val image: String,
     val type: Int,
     private val source: String,
-    val addItSource: String,
+    val additSource: String,
     private val items: List<AddToListItem>,
     private val payloadClient: PayloadClient = PayloadClient,
     private val eventClient: EventClient = EventClient
 ) : AddToListContent {
 
-    internal object AddItSources {
+    internal object AdditSources {
         const val DEEPLINK = "deeplink"
         const val PAYLOAD = "payload"
     }
@@ -73,7 +73,7 @@ data class AddItContent(
     }
 
     val isPayloadSource: Boolean
-        get() = addItSource == AddItSources.PAYLOAD
+        get() = additSource == AdditSources.PAYLOAD
 
     override fun getItems(): List<AddToListItem> {
         return items

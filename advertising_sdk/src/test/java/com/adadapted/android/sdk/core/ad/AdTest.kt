@@ -1,7 +1,13 @@
 package com.adadapted.android.sdk.core.ad
 
 import com.adadapted.android.sdk.constants.Config
-import com.adadapted.android.sdk.ext.models.Payload
+import com.adadapted.android.sdk.core.atl.AddToListItem
+import com.adadapted.android.sdk.core.device.DeviceInfoClient
+import com.adadapted.android.sdk.core.event.AdEvent
+import com.adadapted.android.sdk.core.event.AdEventTypes
+import com.adadapted.android.sdk.core.event.EventClient
+import com.adadapted.android.sdk.core.payload.Payload
+import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.nhaarman.mockitokotlin2.mock
 import junit.framework.Assert.assertNotNull
@@ -17,29 +23,28 @@ class AdTest {
 
     @Before
     fun setup() {
-        DeviceInfoClient.createInstance(mock(), "", false, mock(), "", TestDeviceInfoExtractor(), mock())
+        DeviceInfoClient.createInstance("", false, mock(), "", TestDeviceInfoExtractor(), mock())
         SessionClient.createInstance(mock(), mock())
-        AdEventClient.createInstance(mock(), mock())
-        AppEventClient.createInstance(mock(), mock())
+        EventClient.createInstance(mock(), mock())
     }
 
     @Test
     fun verifyAdEventStructure() {
-        val adEventTypes = AdEvent.Types
+        val adEventTypes = AdEventTypes
         val adEventImp = adEventTypes.IMPRESSION
         val adEventInv = adEventTypes.INVISIBLE_IMPRESSION
         val adEventInt = adEventTypes.INTERACTION
         val adEventPop = adEventTypes.POPUP_BEGIN
 
-        assertEquals(AdEvent.Types.IMPRESSION, adEventImp)
-        assertEquals(AdEvent.Types.INVISIBLE_IMPRESSION, adEventInv)
-        assertEquals(AdEvent.Types.INTERACTION, adEventInt)
-        assertEquals(AdEvent.Types.POPUP_BEGIN, adEventPop)
+        assertEquals(AdEventTypes.IMPRESSION, adEventImp)
+        assertEquals(AdEventTypes.INVISIBLE_IMPRESSION, adEventInv)
+        assertEquals(AdEventTypes.INTERACTION, adEventInt)
+        assertEquals(AdEventTypes.POPUP_BEGIN, adEventPop)
     }
 
     @Test
     fun verifyAdEventCreation() {
-        val testAdEvent = AdEvent("adId", "zoneId", "impressionId", AdEvent.Types.IMPRESSION)
+        val testAdEvent = AdEvent("adId", "zoneId", "impressionId", AdEventTypes.IMPRESSION)
         assertEquals("impressionId", testAdEvent.impressionId)
     }
 
@@ -61,7 +66,7 @@ class AdTest {
     @Test
     fun addToListContentIsCreated() {
         val testAd = getTestAd(
-                Payload(arrayListOf(
+                Payload(detailedListItems = arrayListOf(
                         AddToListItem(
                                 "TestTrackingId",
                                 "TestTitle",
@@ -70,7 +75,9 @@ class AdTest {
                                 "TestUPC",
                                 "TestSKU",
                                 "TestDiscount",
-                                "TestImage"))))
+                                "TestImage")
+                ))
+        )
 
         val addToListContent = testAd.getContent()
 
@@ -80,12 +87,11 @@ class AdTest {
         assertEquals(addToListContent.getItems().first().category, "TestCategory")
         assertEquals(addToListContent.getItems().first().productUpc, "TestUPC")
         assertEquals(addToListContent.getItems().first().retailerSku, "TestSKU")
-        assertEquals(addToListContent.getItems().first().discount, "") //temp discount swap
         assertEquals(addToListContent.getItems().first().retailerID, "TestDiscount")
         assertEquals(addToListContent.getItems().first().productImage, "TestImage")
     }
 
-    private fun getTestAd(payload: Payload = Payload(arrayListOf())): Ad {
+    private fun getTestAd(payload: Payload = Payload(detailedListItems = arrayListOf())): Ad {
         return Ad(
                 "TestId",
                 "TestImpressionId",

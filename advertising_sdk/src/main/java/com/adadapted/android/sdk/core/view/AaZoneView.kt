@@ -15,14 +15,14 @@ import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.R
 
-class AaZoneView : RelativeLayout, AdZonePresenterListener, AndroidWebView.Listener {
+class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     interface Listener {
         fun onZoneHasAds(hasAds: Boolean)
         fun onAdLoaded()
         fun onAdLoadFailed()
     }
 
-    private lateinit var webView: AndroidWebView
+    private lateinit var webView: AdWebView
     private lateinit var reportButton: ImageButton
     private var presenter: AdZonePresenter = AdZonePresenter(AdViewHandler(context), SessionClient)
     private var zoneViewListener: Listener? = null
@@ -38,7 +38,7 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AndroidWebView.Liste
     }
 
     private fun setup(context: Context) {
-        webView = AndroidWebView(context.applicationContext, this)
+        webView = AdWebView(context.applicationContext, this)
         reportButton = ImageButton(this.context)
         reportButton.setImageResource(R.drawable.report_ad)
         reportButton.setColorFilter(Color.rgb(0, 175, 204))

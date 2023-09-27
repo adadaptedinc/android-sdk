@@ -3,7 +3,7 @@ package com.adadapted.android.sdk.core.deeplink
 import android.net.Uri
 import android.util.Base64
 import com.adadapted.android.sdk.constants.EventStrings
-import com.adadapted.android.sdk.core.atl.AddItContent
+import com.adadapted.android.sdk.core.atl.AdditContent
 import com.adadapted.android.sdk.core.atl.AddItContentParser
 import com.adadapted.android.sdk.core.event.EventClient
 import com.adadapted.android.sdk.core.payload.Payload
@@ -13,7 +13,7 @@ import org.json.JSONException
 
 class DeeplinkContentParser {
     @Throws(Exception::class)
-    fun parse(uri: Uri?): AddItContent {
+    fun parse(uri: Uri?): AdditContent {
         if (uri == null) {
             EventClient.trackSdkError(EventStrings.ADDIT_NO_DEEPLINK_RECEIVED, NO_DEEPLINK_URL)
             throw Exception(NO_DEEPLINK_URL)
