@@ -13,7 +13,7 @@ import com.adadapted.android.sdk.core.ad.AdContentListener
 import com.adadapted.android.sdk.core.ad.AdContentPublisher
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.R
+import com.adadapted.R.drawable.report_ad
 
 class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     interface Listener {
@@ -40,7 +40,7 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     private fun setup(context: Context) {
         webView = AdWebView(context.applicationContext, this)
         reportButton = ImageButton(this.context)
-        reportButton.setImageResource(R.drawable.report_ad)
+        reportButton.setImageResource(report_ad)
         reportButton.setColorFilter(Color.rgb(0, 175, 204))
         reportButton.setBackgroundColor(Color.TRANSPARENT)
 
