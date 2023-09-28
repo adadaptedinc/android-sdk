@@ -69,8 +69,23 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
         presenter.init(zoneId)
     }
 
-    fun shutdown() {
-        this.onStop()
+    fun onStart() {
+        presenter.onAttach(this)
+    }
+
+    fun onStart(listener: Listener) {
+        this.zoneViewListener = listener
+        onStart()
+    }
+
+    fun onStart(listener: Listener, contentListener: AdContentListener) {
+        AdContentPublisher.addListener(contentListener)
+        onStart(listener)
+    }
+
+    fun onStart(contentListener: AdContentListener) {
+        AdContentPublisher.addListener(contentListener)
+        onStart()
     }
 
     fun setAdZoneVisibility(isViewable: Boolean) {
@@ -78,38 +93,18 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
         presenter.onAdVisibilityChanged(isAdVisible)
     }
 
-    fun onStart(listener: Listener? = null, contentListener: AdContentListener? = null) {
-        presenter.onAttach(this)
-        this.zoneViewListener = listener
-        if (contentListener != null) {
-            AdContentPublisher.addListener(contentListener)
-        }
-    }
-
-    fun onStop(contentListener: AdContentListener? = null) {
-        this.zoneViewListener = null
+    fun onStop() {
+        zoneViewListener = null
         presenter.onDetach()
-        if (contentListener != null) {
-            AdContentPublisher.removeListener(contentListener)
-        }
     }
 
-    private fun notifyClientZoneHasAds(hasAds: Boolean) {
-        Handler(Looper.getMainLooper()).post {
-            zoneViewListener?.onZoneHasAds(hasAds)
-        }
+    fun onStop(listener: AdContentListener) {
+        AdContentPublisher.removeListener(listener)
+        onStop()
     }
 
-    private fun notifyClientAdLoaded() {
-        Handler(Looper.getMainLooper()).post {
-            zoneViewListener?.onAdLoaded()
-        }
-    }
-
-    private fun notifyClientAdLoadFailed() {
-        Handler(Looper.getMainLooper()).post {
-            zoneViewListener?.onAdLoadFailed()
-        }
+    fun shutdown() {
+        this.onStop()
     }
 
     override fun onZoneAvailable(zone: Zone) {
@@ -166,6 +161,24 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
             View.GONE -> setInvisible()
             View.INVISIBLE -> setInvisible()
             View.VISIBLE -> setVisible()
+        }
+    }
+
+    private fun notifyClientZoneHasAds(hasAds: Boolean) {
+        Handler(Looper.getMainLooper()).post {
+            zoneViewListener?.onZoneHasAds(hasAds)
+        }
+    }
+
+    private fun notifyClientAdLoaded() {
+        Handler(Looper.getMainLooper()).post {
+            zoneViewListener?.onAdLoaded()
+        }
+    }
+
+    private fun notifyClientAdLoadFailed() {
+        Handler(Looper.getMainLooper()).post {
+            zoneViewListener?.onAdLoadFailed()
         }
     }
 

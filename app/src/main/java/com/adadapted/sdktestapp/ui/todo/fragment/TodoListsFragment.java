@@ -78,7 +78,7 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
         super.onResume();
 
         TodoListManager.getInstance(getActivity()).addListener(this);
-        aaZoneView.onStart(this, null);
+        aaZoneView.onStart(this);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class TodoListsFragment extends ListFragment implements TodoListManager.L
         super.onPause();
 
         TodoListManager.getInstance(getActivity()).removeListener(this);
-        aaZoneView.onStop(null);
+        aaZoneView.onStop();
     }
 
     @Override
