@@ -107,7 +107,6 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
 
         aaZoneView = new AaZoneView(getActivity());
         aaZoneView.init("102110");
-        aaZoneView.enableAdaptiveSizing(true);
 
         getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -131,23 +130,14 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
     }
 
     public boolean onOptionsItemSelected (MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_new_list_item:
-                dialog.show(getActivity().getSupportFragmentManager(), "NewListItemDialogFragment");
-                return true;
 
-            case R.id.action_settings:
-                return true;
-
-            case R.id.zone_context_on:
-                aaZoneView.setAdZoneContextId("alex_recipe_id_1");
-                return true;
-
-            case R.id.zone_context_off:
-                aaZoneView.clearAdZoneContext();
-                return true;
+        if(item.getItemId() == R.id.action_new_list_item) {
+            dialog.show(getActivity().getSupportFragmentManager(), "NewListItemDialogFragment");
+            return true;
         }
-
+        if(item.getItemId() == R.id.action_settings) {
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 

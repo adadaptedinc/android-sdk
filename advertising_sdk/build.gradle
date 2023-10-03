@@ -3,7 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 
 plugins {
-    id("org.barfuin.gradle.jacocolog") version "1.2.1"
+    id("org.barfuin.gradle.jacocolog") version "3.1.0"
     id 'maven-publish'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.10'
 }
@@ -13,15 +13,16 @@ apply plugin: 'kotlin-android'
 apply from: 'jacoco.gradle'
 
 group='com.adadapted'
+android.buildFeatures.buildConfig true
 
 android {
-    compileSdk 33
-    namespace = 'com.adadapted'
+    compileSdk 34
+    namespace 'com.adadapted'
 
     defaultConfig {
         minSdkVersion 23
         //noinspection EditedTargetSdkVersion
-        targetSdkVersion 33
+        targetSdkVersion 34
         versionName "3.4.5"
         buildConfigField("String","VERSION_NAME", "\"${defaultConfig.versionName}\"")
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -42,6 +43,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'aasdk-proguard-rules.pro'
         }
     }
+
+    buildFeatures {
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.3"
+    }
 }
 
 dependencies {
@@ -56,6 +65,9 @@ dependencies {
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'io.ktor:ktor-client-android:2.2.4'
     implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
+    implementation 'androidx.compose.ui:ui:1.5.2'
+    implementation 'androidx.compose.foundation:foundation:1.5.2'
+    implementation 'androidx.compose.material:material:1.5.2'
 
     testImplementation 'junit:junit:4.13.2'
     //testImplementation 'io.ktor:ktor-client-mock2.2.4'
@@ -73,6 +85,7 @@ repositories {
 
 kotlin {
     setExplicitApi(ExplicitApiMode.Disabled)
+    jvmToolchain(17)
 }
 
 afterEvaluate {
