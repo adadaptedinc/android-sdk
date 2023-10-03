@@ -130,15 +130,14 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
     }
 
     public boolean onOptionsItemSelected (MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_new_list_item:
-                dialog.show(getActivity().getSupportFragmentManager(), "NewListItemDialogFragment");
-                return true;
 
-            case R.id.action_settings:
-                return true;
+        if(item.getItemId() == R.id.action_new_list_item) {
+            dialog.show(getActivity().getSupportFragmentManager(), "NewListItemDialogFragment");
+            return true;
         }
-
+        if(item.getItemId() == R.id.action_settings) {
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 

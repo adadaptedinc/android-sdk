@@ -2,7 +2,7 @@ apply plugin:  'jacoco'
 
 jacoco {
     toolVersion = "0.8.7"
-    reportsDir = file("$buildDir/coverage")
+    reportsDirectory = file("$buildDir/coverage")
 }
 
 tasks.withType(Test) {
@@ -21,8 +21,8 @@ project.afterEvaluate {
             description = "Generate Jacoco coverage reports for the ${variantName.capitalize()} build."
 
             reports {
-                html.enabled = true
-                xml.enabled = true
+                html{enabled}
+                xml{enabled}
             }
 
             def excludes = [
