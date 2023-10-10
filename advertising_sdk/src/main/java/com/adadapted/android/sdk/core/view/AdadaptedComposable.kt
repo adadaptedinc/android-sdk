@@ -120,6 +120,14 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         presenter.onAdVisibilityChanged(isAdVisible)
     }
 
+    fun setAdZoneContextId(contextId: String) {
+        presenter.setZoneContext(contextId)
+    }
+
+    fun clearAdZoneContext() {
+        presenter.clearZoneContext()
+    }
+
     private fun dispose() {
         storedContentListener?.let { AdContentPublisher.removeListener(it) }
         storedContentListener = null
