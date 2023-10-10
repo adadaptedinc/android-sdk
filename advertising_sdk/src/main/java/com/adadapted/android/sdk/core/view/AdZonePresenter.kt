@@ -63,6 +63,14 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
         }
     }
 
+    fun setZoneContext(contextId: String) {
+        sessionClient?.setZoneContext(ZoneContext(this.zoneId, contextId))
+    }
+
+    fun clearZoneContext() {
+        sessionClient?.clearZoneContext()
+    }
+
     private fun setNextAd() {
         if (!zoneLoaded || sessionClient?.hasStaleAds() == true) {
             return
@@ -228,10 +236,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
         zoneLoaded = true
         currentZone = zone
         restartTimer()
-
-        if (currentAd.isEmpty) {
-            setNextAd()
-        }
+        setNextAd()
     }
 
     override fun onSessionAvailable(session: Session) {

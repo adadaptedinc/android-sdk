@@ -8,6 +8,7 @@ import com.adadapted.android.sdk.core.interfaces.SessionInitListener
 import com.adadapted.android.sdk.core.log.AALogger
 import com.adadapted.android.sdk.core.network.HttpConnector.API_HEADER
 import com.adadapted.android.sdk.core.session.Session
+import com.adadapted.android.sdk.core.view.ZoneContext
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.HttpResponse
@@ -43,14 +44,24 @@ class HttpSessionAdapter(
         }
     }
 
-    override suspend fun sendRefreshAds(session: Session, listener: AdGetListener) {
+    override suspend fun sendRefreshAds(
+        session: Session,
+        listener: AdGetListener,
+        zoneContext: ZoneContext
+    ) {
         try {
-            val url = refreshUrl + ("?aid=" + session.deviceInfo.appId + "&uid=" + session.deviceInfo.udid + "&sid=" + session.id + "&sdk=" + session.deviceInfo.sdkVersion)
+            val url = refreshUrl + ("?aid=" + session.deviceInfo.appId +
+                    "&uid=" + session.deviceInfo.udid +
+                    "&sid=" + session.id +
+                    "&sdk=" + session.deviceInfo.sdkVersion +
+                    "&zoneID=" + zoneContext.zoneId +
+                    "&contextID=" + zoneContext.contextId)
             val response: HttpResponse = httpConnector.client.get(url) {
                 contentType(ContentType.Application.Json)
                 header(API_HEADER, session.deviceInfo.appId)
             }
-            listener.onNewAdsLoaded(response.body<Session>().apply{ this.deviceInfo = session.deviceInfo })
+            listener.onNewAdsLoaded(
+                response.body<Session>().apply { this.deviceInfo = session.deviceInfo })
         } catch (e: Exception) {
             e.message?.let { AALogger.logError(it) }
             HttpErrorTracker.trackHttpError(

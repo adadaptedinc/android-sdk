@@ -20,12 +20,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.AfterTest
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import java.util.LinkedList
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
 class AdditContentTest {
     private var testTransporter = UnconfinedTestDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)

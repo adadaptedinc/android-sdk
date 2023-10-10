@@ -15,10 +15,7 @@ import junit.framework.TestCase.assertEquals
 
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
 class AdTest {
 
     @Before

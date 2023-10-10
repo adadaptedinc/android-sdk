@@ -16,5 +16,4 @@
     <item android:id="@+id/zone_context_off"
         android:title="Zone Context Off"
         app:showAsAction="never" />
-
 </menu>
