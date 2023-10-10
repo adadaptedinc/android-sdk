@@ -1,6 +1,5 @@
 package com.adadapted.android.sdk.core.ad
 
-import android.os.Looper.getMainLooper
 import com.adadapted.android.sdk.core.atl.AddToListContent
 import com.adadapted.android.sdk.core.atl.AddToListItem
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
@@ -21,12 +20,8 @@ import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.Shadows
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
 class AdContentPublisherTest {
 
     private var testTransporter = UnconfinedTestDispatcher()
@@ -55,7 +50,6 @@ class AdContentPublisherTest {
                                 AddToListItem("track", "title", "brand", "cat", "upc", "sku", "discount", "image")
                         ))
                 )))
-        Shadows.shadowOf(getMainLooper()).idle()
         assertEquals("testZoneId", testListener.resultZoneId)
         assertEquals("adZoneId", (testListener.resultContent as AdContent).zoneId)
     }

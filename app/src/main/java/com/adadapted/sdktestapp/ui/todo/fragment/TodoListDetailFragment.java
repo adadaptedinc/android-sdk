@@ -138,6 +138,14 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
         if(item.getItemId() == R.id.action_settings) {
             return true;
         }
+        if(item.getItemId() == R.id.zone_context_on) {
+            aaZoneView.setAdZoneContextId("alex_recipe_id_1");
+            return true;
+        }
+        if(item.getItemId() == R.id.zone_context_off) {
+            aaZoneView.clearAdZoneContext();
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 

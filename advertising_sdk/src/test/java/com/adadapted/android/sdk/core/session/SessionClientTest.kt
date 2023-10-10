@@ -5,6 +5,7 @@ import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.interfaces.AdGetListener
 import com.adadapted.android.sdk.core.interfaces.SessionAdapter
 import com.adadapted.android.sdk.core.interfaces.SessionInitListener
+import com.adadapted.android.sdk.core.view.ZoneContext
 import com.adadapted.android.sdk.tools.TestTransporter
 import junit.framework.Assert.assertNotNull
 import kotlinx.coroutines.Dispatchers
@@ -145,7 +146,7 @@ class TestSessionAdapter: SessionAdapter {
         initSent = true
     }
 
-    override suspend fun sendRefreshAds(session: Session, listener: AdGetListener) {
+    override suspend fun sendRefreshAds(session: Session, listener: AdGetListener, zoneContext: ZoneContext) {
         adsRefreshed = true
     }
 

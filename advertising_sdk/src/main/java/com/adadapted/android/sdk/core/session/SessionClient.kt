@@ -10,6 +10,7 @@ import com.adadapted.android.sdk.core.interfaces.DeviceCallback
 import com.adadapted.android.sdk.core.interfaces.SessionAdapter
 import com.adadapted.android.sdk.core.interfaces.SessionAdapterListener
 import com.adadapted.android.sdk.core.log.AALogger
+import com.adadapted.android.sdk.core.view.ZoneContext
 import kotlin.jvm.Synchronized
 
 object SessionClient : SessionAdapterListener {
@@ -31,6 +32,7 @@ object SessionClient : SessionAdapterListener {
     private var pollingTimerRunning: Boolean
     private var eventTimerRunning: Boolean
     private var hasInstance: Boolean = false
+    private var zoneContext: ZoneContext = ZoneContext()
 
     private fun performAddListener(listener: SessionListener) {
         sessionListeners.add(listener)
@@ -99,7 +101,8 @@ object SessionClient : SessionAdapterListener {
                 transporter.dispatchToThread {
                     adapter?.sendRefreshAds(
                         currentSession,
-                        this@SessionClient
+                        this@SessionClient,
+                        zoneContext
                     )
                 }
             } else {
@@ -237,6 +240,16 @@ object SessionClient : SessionAdapterListener {
 
     fun hasInstance(): Boolean {
         return hasInstance
+    }
+
+    fun setZoneContext(zoneContext: ZoneContext){
+        this.zoneContext = zoneContext
+        performRefreshAds()
+    }
+
+    fun clearZoneContext(){
+        zoneContext = ZoneContext()
+        performRefreshAds()
     }
 
     fun createInstance(adapter: SessionAdapter, transporter: TransporterCoroutineScope) {
