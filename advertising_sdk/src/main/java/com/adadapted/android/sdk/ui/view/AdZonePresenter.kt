@@ -14,6 +14,7 @@ import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.session.SessionListener
 import com.adadapted.android.sdk.core.zone.Zone
+import com.adadapted.android.sdk.core.zone.ZoneContext
 import com.adadapted.android.sdk.ui.activity.AaWebViewPopupActivity
 import com.adadapted.android.sdk.ui.messaging.AdContentPublisher
 import com.adadapted.android.sdk.ui.messaging.AdZoneException
@@ -53,6 +54,14 @@ internal class AdZonePresenter(private val context: Context, private val aaWebVi
         if (this.zoneId == null) {
             this.zoneId = zoneId
         }
+    }
+
+    fun setZoneContext(contextId: String) {
+        sessionClient.setZoneContext(ZoneContext(this.zoneId ?: "", contextId))
+    }
+
+    fun clearZoneContext() {
+        sessionClient.clearZoneContext()
     }
 
     fun onAttach(l: Listener?) {
@@ -300,9 +309,8 @@ internal class AdZonePresenter(private val context: Context, private val aaWebVi
         } finally {
             zoneLock.unlock()
         }
-        if (currentAd.isEmpty) {
-            setNextAd()
-        }
+        restartTimer()
+        setNextAd()
     }
 
     override fun onSessionAvailable(session: Session) {

@@ -6,11 +6,11 @@ import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionAdapter
 import com.adadapted.android.sdk.core.session.SessionAdapter.AdGetListener
 import com.adadapted.android.sdk.core.session.SessionAdapter.SessionInitListener
+import com.adadapted.android.sdk.core.zone.ZoneContext
 import com.adadapted.android.sdk.ext.json.AdAdaptedJsonObjectRequest
 import com.adadapted.android.sdk.ext.json.JsonSessionBuilder
 import com.adadapted.android.sdk.ext.json.JsonSessionRequestBuilder
 import com.android.volley.Request
-import com.android.volley.toolbox.JsonObjectRequest
 
 
 class HttpSessionAdapter(private val initUrl: String, private val refreshUrl: String, private var sessionBuilder: JsonSessionBuilder? = null, private val httpQueueManager: HttpQueueManager = HttpRequestManager) : SessionAdapter {
@@ -40,11 +40,23 @@ class HttpSessionAdapter(private val initUrl: String, private val refreshUrl: St
         httpQueueManager.queueRequest(jsonRequest)
     }
 
-    override fun sendRefreshAds(session: Session, listener: AdGetListener) {
+    override fun sendRefreshAds(session: Session, listener: AdGetListener, zoneContext: ZoneContext) {
         if (sessionBuilder == null) {
             return
         }
-        val url = refreshUrl + String.format("?aid=%s", session.getDeviceInfo().appId) + String.format("&uid=%s", session.getDeviceInfo().udid) + String.format("&sid=%s", session.id) + String.format("&sdk=%s", session.getDeviceInfo().sdkVersion)
+        val url = refreshUrl + String.format(
+            "?aid=%s",
+            session.getDeviceInfo().appId
+        ) + String.format("&uid=%s", session.getDeviceInfo().udid) + String.format(
+            "&sid=%s",
+            session.id
+        ) + String.format(
+            "&sdk=%s",
+            session.getDeviceInfo().sdkVersion
+        ) + String.format("&zoneID=%s", zoneContext.zoneId) + String.format(
+            "&contextID=%s",
+            zoneContext.contextId
+        )
         val request = AdAdaptedJsonObjectRequest(
             httpQueueManager.getAppId(),
             Request.Method.GET,

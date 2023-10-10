@@ -14,6 +14,7 @@ import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.common.Dimension
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.zone.Zone
+import com.adadapted.android.sdk.core.zone.ZoneContext
 import com.adadapted.android.sdk.ui.messaging.AdContentListener
 import com.adadapted.android.sdk.ui.messaging.AdContentPublisher
 import com.gitlab.adadapted.R
@@ -91,6 +92,14 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
     fun setAdZoneVisibility(isViewable: Boolean) {
         isAdVisible = isViewable
         presenter?.onAdVisibilityChanged(isAdVisible)
+    }
+
+    fun setAdZoneContextId(contextId: String) {
+        presenter?.setZoneContext(contextId)
+    }
+
+    fun clearAdZoneContext() {
+        presenter?.clearZoneContext()
     }
 
     /**
