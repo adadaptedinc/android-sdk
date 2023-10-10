@@ -1,6 +1,7 @@
 package com.adadapted.android.sdk.core.session
 
 import com.adadapted.android.sdk.core.device.DeviceInfo
+import com.adadapted.android.sdk.core.zone.ZoneContext
 
 interface SessionAdapter {
     interface SessionInitListener {
@@ -16,5 +17,5 @@ interface SessionAdapter {
     interface Listener : SessionInitListener, AdGetListener
 
     fun sendInit(deviceInfo: DeviceInfo, listener: SessionInitListener)
-    fun sendRefreshAds(session: Session, listener: AdGetListener)
+    fun sendRefreshAds(session: Session, listener: AdGetListener, zoneContext: ZoneContext)
 }

@@ -29,7 +29,7 @@ class SessionClientTest {
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         whenever(mockSessionAdapter.sendInit(any(), any())).then {}
-        whenever(mockSessionAdapter.sendRefreshAds(any(), any())).then {}
+        whenever(mockSessionAdapter.sendRefreshAds(any(), any(), any())).then {}
 
         testSessionClient.createInstance(mockSessionAdapter, testTransporterScope)
         testSessionClient.getInstance().onSessionInitialized(SessionTest().buildTestSession())

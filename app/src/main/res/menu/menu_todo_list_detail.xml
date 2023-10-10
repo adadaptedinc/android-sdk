@@ -10,5 +10,11 @@
         android:title="@string/action_settings"
         android:orderInCategory="100"
         app:showAsAction="never" />
+    <item android:id="@+id/zone_context_on"
+        android:title="Zone Context On"
+        app:showAsAction="never" />
+    <item android:id="@+id/zone_context_off"
+        android:title="Zone Context Off"
+        app:showAsAction="never" />
 
 </menu>

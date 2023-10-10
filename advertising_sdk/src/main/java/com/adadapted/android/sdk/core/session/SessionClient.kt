@@ -6,6 +6,7 @@ import com.adadapted.android.sdk.config.Config
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
+import com.adadapted.android.sdk.core.zone.ZoneContext
 import java.util.Timer
 import java.util.TimerTask
 import java.util.concurrent.locks.Lock
@@ -33,6 +34,7 @@ class SessionClient private constructor(private val adapter: SessionAdapter, pri
     private val statusLock: Lock = ReentrantLock()
     private var pollingTimerRunning: Boolean
     private var eventTimerRunning: Boolean
+    private var zoneContext: ZoneContext = ZoneContext()
 
     private fun getStatus(): Status {
         statusLock.lock()
@@ -154,7 +156,7 @@ class SessionClient private constructor(private val adapter: SessionAdapter, pri
                 sessionLock.lock()
                 try {
                     setStatus(Status.IS_REFRESH_ADS)
-                    adapter.sendRefreshAds(currentSession, this)
+                    adapter.sendRefreshAds(currentSession, this, zoneContext)
                 } finally {
                     sessionLock.unlock()
                 }
@@ -309,6 +311,16 @@ class SessionClient private constructor(private val adapter: SessionAdapter, pri
 
     fun getCachedDeviceInfo(): DeviceInfo {
         return deviceInfo
+    }
+
+    fun setZoneContext(zoneContext: ZoneContext) {
+        this.zoneContext = zoneContext
+        performRefreshAds()
+    }
+
+    fun clearZoneContext() {
+        this.zoneContext = ZoneContext()
+        performRefreshAds()
     }
 
     @Synchronized
