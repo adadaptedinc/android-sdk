@@ -37,6 +37,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     private var storedContentListener: AdContentListener? = null
     private var zoneViewListener: Listener? = null
     private var isAdVisible = true
+    private var webViewLoaded = false
     private var webView = AdWebView(context, object : AdWebView.Listener {
         override fun onAdInWebViewClicked(ad: Ad) {
             presenter.onAdClicked(ad)
@@ -136,7 +137,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     }
 
     override fun onAdAvailable(ad: Ad) {
-        Handler(Looper.getMainLooper()).post { webView.loadAd(ad) }
+        loadWebViewAd(ad)
     }
 
     override fun onAdsRefreshed(zone: Zone) {
@@ -147,8 +148,21 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         Handler(Looper.getMainLooper()).post { webView.loadBlank() }
     }
 
+    override fun onAdVisibilityChanged(ad: Ad) {
+        if(!webViewLoaded) {
+            loadWebViewAd(ad)
+        }
+    }
+
     override fun onZoneAvailable(zone: Zone) {
         notifyClientZoneHasAds(zone.hasAds())
+    }
+
+    private fun loadWebViewAd(ad: Ad) {
+        if (isAdVisible) {
+            webViewLoaded = true
+            Handler(Looper.getMainLooper()).post { webView.loadAd(ad) }
+        }
     }
 
     private fun notifyClientZoneHasAds(hasAds: Boolean) {

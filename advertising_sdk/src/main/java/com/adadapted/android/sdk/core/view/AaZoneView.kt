@@ -28,6 +28,8 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     private var zoneViewListener: Listener? = null
     private var isVisible = true
     private var isAdVisible = true
+    private var webViewLoaded = false
+
 
     constructor(context: Context) : super(context.applicationContext) {
         setup(context)
@@ -136,13 +138,17 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     }
 
     override fun onAdAvailable(ad: Ad) {
-        if (isVisible) {
-            Handler(Looper.getMainLooper()).post { webView.loadAd(ad) }
-        }
+        loadWebViewAd(ad)
     }
 
     override fun onNoAdAvailable() {
         Handler(Looper.getMainLooper()).post { webView.loadBlank() }
+    }
+
+    override fun onAdVisibilityChanged(ad: Ad) {
+        if(!webViewLoaded) {
+            loadWebViewAd(ad)
+        }
     }
 
     override fun onAdLoadedInWebView(ad: Ad) {
@@ -169,6 +175,13 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
             View.GONE -> setInvisible()
             View.INVISIBLE -> setInvisible()
             View.VISIBLE -> setVisible()
+        }
+    }
+
+    private fun loadWebViewAd(ad: Ad) {
+        if (isVisible && isAdVisible) {
+            webViewLoaded = true
+            Handler(Looper.getMainLooper()).post { webView.loadAd(ad) }
         }
     }
 
