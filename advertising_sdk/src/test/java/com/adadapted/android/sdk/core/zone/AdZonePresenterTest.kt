@@ -149,6 +149,8 @@ class AdZonePresenterTest {
             override fun onZoneAvailable(zone: Zone) {}
             override fun onAdsRefreshed(zone: Zone) {}
             override fun onAdAvailable(ad: Ad) {}
+            override fun onAdVisibilityChanged(ad: Ad) {}
+
             override fun onNoAdAvailable() {}
         })
         testAdZonePresenter.onAdClicked(testAd)
@@ -173,6 +175,8 @@ class AdZonePresenterTest {
             override fun onZoneAvailable(zone: Zone) {}
             override fun onAdsRefreshed(zone: Zone) {}
             override fun onAdAvailable(ad: Ad) {}
+            override fun onAdVisibilityChanged(ad: Ad) {}
+
             override fun onNoAdAvailable() {}
         })
         testAdZonePresenter.onAdClicked(testAd)
@@ -312,6 +316,10 @@ class TestAdZonePresenterListener: AdZonePresenter.Listener {
     }
 
     override fun onAdAvailable(ad: Ad) {
+        testAd = ad
+    }
+
+    override fun onAdVisibilityChanged(ad: Ad) {
         testAd = ad
     }
 
