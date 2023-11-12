@@ -14,7 +14,6 @@ import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.common.Dimension
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.zone.Zone
-import com.adadapted.android.sdk.core.zone.ZoneContext
 import com.adadapted.android.sdk.ui.messaging.AdContentListener
 import com.adadapted.android.sdk.ui.messaging.AdContentPublisher
 import com.gitlab.adadapted.R
@@ -32,6 +31,7 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
     private var isVisible = true
     private var listener: Listener? = null
     private var isAdVisible = true
+    private var webViewLoaded = false
 
     constructor(context: Context) : super(context.applicationContext) {
         setup(context)
@@ -140,6 +140,13 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
     /*
      * Notifies AaZoneView.Listener
      */
+    private fun loadWebViewAd(ad: Ad) {
+        if (isVisible && isAdVisible) {
+            webViewLoaded = true
+            Handler(Looper.getMainLooper()).post { webView.loadAd(ad) }
+        }
+    }
+
     private fun notifyZoneHasAds(hasAds: Boolean) {
         Handler(Looper.getMainLooper()).post {
             listener?.onZoneHasAds(hasAds)
@@ -181,8 +188,12 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
     }
 
     override fun onAdAvailable(ad: Ad) {
-        if (isVisible) {
-            Handler(Looper.getMainLooper()).post { webView.loadAd(ad) }
+        loadWebViewAd(ad)
+    }
+
+    override fun onAdVisibilityChanged(ad: Ad) {
+        if(!webViewLoaded) {
+            loadWebViewAd(ad)
         }
     }
 

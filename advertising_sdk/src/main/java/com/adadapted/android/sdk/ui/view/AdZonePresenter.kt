@@ -29,6 +29,7 @@ internal class AdZonePresenter(private val context: Context, private val aaWebVi
         fun onZoneAvailable(zone: Zone)
         fun onAdsRefreshed(zone: Zone)
         fun onAdAvailable(ad: Ad)
+        fun onAdVisibilityChanged(ad: Ad)
         fun onNoAdAvailable()
     }
 
@@ -153,6 +154,7 @@ internal class AdZonePresenter(private val context: Context, private val aaWebVi
     }
 
     fun onAdVisibilityChanged(isAdVisible: Boolean) {
+        listener?.onAdVisibilityChanged(currentAd)
         trackAdImpression(currentAd, isAdVisible)
     }
 
