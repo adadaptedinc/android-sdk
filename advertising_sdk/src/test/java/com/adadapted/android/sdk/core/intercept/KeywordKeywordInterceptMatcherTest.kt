@@ -41,6 +41,8 @@ class KeywordKeywordInterceptMatcherTest {
         EventClient.onSessionAvailable(MockData.session)
         val testIntercept = Intercept("test_searchId", 5, 3, listOf(
                 Term("testTermId", "testTerm", "replacementTerm", "testIcon", "testTagLine", 1),
+                Term("twoTermId", "twoTestTerm", "replacementTerm", "testIcon", "testTagLine", 1),
+                Term("threeTermId", "threeTestTerm", "replacementTerm", "testIcon", "testTagLine", 1),
                 Term("testTermTwoId", "testTermTwo", "replacementTermTwo", "testIcon", "testTagLine", 2)))
         testInterceptAdapter.testIntercept = testIntercept
         InterceptClient.createInstance(testInterceptAdapter, testTransporterScope)
@@ -59,32 +61,32 @@ class KeywordKeywordInterceptMatcherTest {
     fun interceptMatches() {
         KeywordInterceptMatcher.match("tes")
         InterceptClient.getInstance().onPublishEvents()
-        assertEquals(InterceptEvent.MATCHED, testInterceptAdapter.testEvents.first().event)
+        assertEquals(InterceptEvent.MATCHED, testInterceptAdapter.testEvents.first{i -> i.userInput == "tes" }.event)
     }
 
     @Test
     fun interceptDoesNotMatch() {
         KeywordInterceptMatcher.match("oxo")
         InterceptClient.getInstance().onPublishEvents()
-        assertEquals(InterceptEvent.NOT_MATCHED, testInterceptAdapter.testEvents.first().event)
+        assertEquals(InterceptEvent.NOT_MATCHED, testInterceptAdapter.testEvents.first{i -> i.userInput == "oxo" }.event)
     }
 
     @Test
     fun sessionIsNotAvailable() {
         SessionClient.onSessionInitialized(Session("", willServeAds = true, hasAds = true, refreshTime = 30, expiration = Date().time, zones = mutableMapOf()))
-        KeywordInterceptMatcher.match("tes")
+        KeywordInterceptMatcher.match("two")
         InterceptClient.getInstance().onPublishEvents()
         EventClient.onPublishEvents()
-        assertEquals(InterceptEvent.MATCHED, testInterceptAdapter.testEvents.first().event)
+        assertEquals(InterceptEvent.MATCHED, testInterceptAdapter.testEvents.first{i -> i.userInput == "two" }.event)
     }
 
     @Test
     fun adIsAvailable() {
         SessionClient.onNewAdsLoaded(Session("newSessionId", willServeAds = true, hasAds = true, refreshTime = 30, expiration = Date().time, zones = mutableMapOf()))
-        KeywordInterceptMatcher.match("tes")
+        KeywordInterceptMatcher.match("thr")
         InterceptClient.getInstance().onPublishEvents()
         EventClient.onPublishEvents()
-        assertEquals(InterceptEvent.MATCHED, testInterceptAdapter.testEvents.first().event)
+        assertEquals(InterceptEvent.MATCHED, testInterceptAdapter.testEvents.first{i -> i.userInput == "thr" }.event)
     }
 
     private fun clearEvents() {

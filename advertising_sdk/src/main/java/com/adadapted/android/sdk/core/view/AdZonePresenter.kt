@@ -17,6 +17,7 @@ interface AdZonePresenterListener {
     fun onAdsRefreshed(zone: Zone)
     fun onAdAvailable(ad: Ad)
     fun onNoAdAvailable()
+    fun onAdVisibilityChanged(ad: Ad)
 }
 
 class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sessionClient: SessionClient?) :
@@ -115,6 +116,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
     }
 
     fun onAdVisibilityChanged(isAdVisible: Boolean) {
+        adZonePresenterListener?.onAdVisibilityChanged(currentAd)
         trackAdImpression(currentAd, isAdVisible)
     }
 
