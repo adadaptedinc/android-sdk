@@ -48,7 +48,7 @@
         </activity>
 
         <activity
-            android:name="com.adadapted.android.sdk.ui.activity.AaWebViewPopupActivity"
+            android:name="com.adadapted.android.sdk.core.view.AaWebViewPopupActivity"
             android:label="Popup Activity"
             android:parentActivityName=".ui.todo.activity.TodoListDetailActivity">
             <!-- Parent activity meta-data to support 4.0 and lower -->
