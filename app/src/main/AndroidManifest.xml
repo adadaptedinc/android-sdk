@@ -58,7 +58,7 @@
         </activity>
 
         <activity
-            android:name="com.adadapted.android.sdk.ui.activity.AdditInterceptActivity"
+            android:name="com.adadapted.android.sdk.core.deeplink.DeeplinkInterceptActivity"
             android:launchMode="singleTask"
             android:taskAffinity=""
             android:excludeFromRecents="true"
