@@ -29,6 +29,7 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     private var isVisible = true
     private var isAdVisible = true
     private var webViewLoaded = false
+    private var isAdaptiveSizingEnabled = false
 
 
     constructor(context: Context) : super(context.applicationContext) {
@@ -117,14 +118,25 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
         this.onStop()
     }
 
+    fun enableAdaptiveSizing(value: Boolean) {
+        isAdaptiveSizingEnabled = value
+    }
+
     override fun onZoneAvailable(zone: Zone) {
         var adjustedLayoutParams = LayoutParams(width, height)
         if (width == 0 || height == 0) {
-            val dimension = zone.dimensions[Dimension.Orientation.PORT]
-            adjustedLayoutParams = LayoutParams(
-                dimension?.width ?: LayoutParams.MATCH_PARENT,
-                dimension?.height ?: LayoutParams.MATCH_PARENT
-            )
+            adjustedLayoutParams = if (isAdaptiveSizingEnabled) {
+                LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT
+                )
+            } else {
+                val dimension = zone.dimensions[Dimension.Orientation.PORT]
+                LayoutParams(
+                    dimension?.width ?: LayoutParams.MATCH_PARENT,
+                    dimension?.height ?: LayoutParams.MATCH_PARENT
+                )
+            }
         }
         Handler(Looper.getMainLooper()).post {
             webView.layoutParams = adjustedLayoutParams
