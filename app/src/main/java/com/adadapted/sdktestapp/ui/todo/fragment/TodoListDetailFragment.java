@@ -107,6 +107,7 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
 
         aaZoneView = new AaZoneView(getActivity());
         aaZoneView.init("102110");
+        aaZoneView.enableAdaptiveSizing(true);
 
         getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
