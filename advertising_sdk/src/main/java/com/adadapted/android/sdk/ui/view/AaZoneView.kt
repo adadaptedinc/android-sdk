@@ -32,6 +32,7 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
     private var listener: Listener? = null
     private var isAdVisible = true
     private var webViewLoaded = false
+    private var isAdaptiveSizingEnabled = false
 
     constructor(context: Context) : super(context.applicationContext) {
         setup(context)
@@ -137,6 +138,10 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
         onStop()
     }
 
+    fun enableAdaptiveSizing(value: Boolean) {
+        isAdaptiveSizingEnabled = value
+    }
+
     /*
      * Notifies AaZoneView.Listener
      */
@@ -171,12 +176,22 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
     override fun onZoneAvailable(zone: Zone) {
         var adjustedLayoutParams = LayoutParams(width, height)
         if (width == 0 || height == 0) {
-            val dimension = zone.dimensions[Dimension.Orientation.PORT]
-            adjustedLayoutParams = LayoutParams(dimension?.width ?: LayoutParams.MATCH_PARENT, dimension?.height ?: LayoutParams.MATCH_PARENT)
+            adjustedLayoutParams = if (isAdaptiveSizingEnabled) {
+                LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT
+                )
+            } else {
+                val dimension = zone.dimensions[Dimension.Orientation.PORT]
+                LayoutParams(
+                    dimension?.width ?: LayoutParams.MATCH_PARENT,
+                    dimension?.height ?: LayoutParams.MATCH_PARENT
+                )
+            }
         }
         Handler(Looper.getMainLooper()).post {
             webView.layoutParams = adjustedLayoutParams
-            if(!webView.currentAd.isEmpty) {
+            if(zone.hasAds()) {
                 addView(reportButton)
             }
         }
