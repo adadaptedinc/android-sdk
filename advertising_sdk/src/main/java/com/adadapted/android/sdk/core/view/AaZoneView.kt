@@ -122,6 +122,14 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
         isAdaptiveSizingEnabled = value
     }
 
+    fun resizeAdZoneView(width: Int, height: Int) {
+        Handler(Looper.getMainLooper()).post {
+            val resizedLayoutParams = LayoutParams(width, height)
+            this.layoutParams = resizedLayoutParams
+            webView.layoutParams = resizedLayoutParams
+        }
+    }
+
     override fun onZoneAvailable(zone: Zone) {
         var adjustedLayoutParams = LayoutParams(width, height)
         if (width == 0 || height == 0) {
