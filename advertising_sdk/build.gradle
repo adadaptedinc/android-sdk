@@ -20,7 +20,7 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 33
-        versionName "3.4.5"
+        versionName "3.5.0"
         buildConfigField("String","VERSION_NAME", "\"${defaultConfig.versionName}\"")
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'aasdk-proguard-rules.pro'
@@ -76,7 +76,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.gitlab.adadapted'
                 artifactId = 'android-sdk'
-                version = '3.4.5'
+                version = '3.5.0'
             }
         }
     }
