@@ -154,8 +154,10 @@ class AaZoneView : RelativeLayout, AdZonePresenter.Listener, AdWebView.Listener 
      * Notifies AaZoneView.Listener
      */
     private fun loadWebViewAd(ad: Ad) {
-        if (isVisible && isAdVisible) {
+        if (isVisible && isAdVisible && !webViewLoaded) {
             webViewLoaded = true
+            Handler(Looper.getMainLooper()).post { webView.loadAd(ad) }
+        } else if (isVisible && webViewLoaded) {
             Handler(Looper.getMainLooper()).post { webView.loadAd(ad) }
         }
     }
