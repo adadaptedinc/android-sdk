@@ -27,7 +27,6 @@ class InterceptClient private constructor(
                 }
             })
         }
-        SessionClient.addListener(this)
     }
 
     @Synchronized
