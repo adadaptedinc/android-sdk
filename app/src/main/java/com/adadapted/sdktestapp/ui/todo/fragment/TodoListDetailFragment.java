@@ -43,6 +43,8 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
 
     private AaZoneView aaZoneView;
 
+    private AaZoneView aaZoneViewTwo;
+
     private OnFragmentInteractionListener mListener;
 
     /**
@@ -109,6 +111,9 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
         aaZoneView.init("102110");
         aaZoneView.enableAdaptiveSizing(true);
 
+        aaZoneViewTwo = new AaZoneView(getActivity());
+        aaZoneViewTwo.init("123456");
+
         getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView absListView, int i) {
@@ -140,7 +145,12 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
             return true;
         }
         if(item.getItemId() == R.id.zone_context_on) {
-            aaZoneView.setAdZoneContextId("alex_recipe_id_1");
+            aaZoneView.setAdZoneContextId("1201");
+            aaZoneViewTwo.setAdZoneContextId("1201");
+            return true;
+        }
+        if(item.getItemId() == R.id.zone_remove_context) {
+            aaZoneView.removeAdZoneContext(); //remove just one zone context
             return true;
         }
         if(item.getItemId() == R.id.zone_context_off) {

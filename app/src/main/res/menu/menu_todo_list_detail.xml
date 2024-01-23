@@ -16,4 +16,7 @@
     <item android:id="@+id/zone_context_off"
         android:title="Zone Context Off"
         app:showAsAction="never" />
+    <item android:id="@+id/zone_remove_context"
+        android:title="Remove One Zone Context"
+        app:showAsAction="never" />
 </menu>

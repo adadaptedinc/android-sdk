@@ -6,5 +6,5 @@ import com.adadapted.android.sdk.core.view.ZoneContext
 
 interface SessionAdapter {
     suspend fun sendInit(deviceInfo: DeviceInfo, listener: SessionInitListener)
-    suspend fun sendRefreshAds(session: Session, listener: AdGetListener, zoneContext: ZoneContext)
+    suspend fun sendRefreshAds(session: Session, listener: AdGetListener, zoneContexts: MutableSet<ZoneContext>)
 }
