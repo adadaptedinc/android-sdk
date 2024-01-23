@@ -47,15 +47,17 @@ class HttpSessionAdapter(
     override suspend fun sendRefreshAds(
         session: Session,
         listener: AdGetListener,
-        zoneContext: ZoneContext
+        zoneContexts: MutableSet<ZoneContext>
     ) {
         try {
+            val zoneIdsInContext = zoneContexts.joinToString(",") { it.zoneId }
+            val zoneContextId = zoneContexts.firstOrNull()?.contextId ?: ""
             val url = refreshUrl + ("?aid=" + session.deviceInfo.appId +
                     "&uid=" + session.deviceInfo.udid +
                     "&sid=" + session.id +
                     "&sdk=" + session.deviceInfo.sdkVersion +
-                    "&zoneID=" + zoneContext.zoneId +
-                    "&contextID=" + zoneContext.contextId)
+                    "&zoneID=" + zoneIdsInContext +
+                    "&contextID=" + zoneContextId)
             val response: HttpResponse = httpConnector.client.get(url) {
                 contentType(ContentType.Application.Json)
                 header(API_HEADER, session.deviceInfo.appId)

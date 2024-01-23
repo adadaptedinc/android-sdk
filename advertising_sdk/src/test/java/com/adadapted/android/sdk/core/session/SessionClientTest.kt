@@ -146,7 +146,7 @@ class TestSessionAdapter: SessionAdapter {
         initSent = true
     }
 
-    override suspend fun sendRefreshAds(session: Session, listener: AdGetListener, zoneContext: ZoneContext) {
+    override suspend fun sendRefreshAds(session: Session, listener: AdGetListener, zoneContexts: MutableSet<ZoneContext>) {
         adsRefreshed = true
     }
 

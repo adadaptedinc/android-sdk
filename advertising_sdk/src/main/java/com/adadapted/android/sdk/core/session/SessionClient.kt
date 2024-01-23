@@ -32,7 +32,7 @@ object SessionClient : SessionAdapterListener {
     private var pollingTimerRunning: Boolean
     private var eventTimerRunning: Boolean
     private var hasInstance: Boolean = false
-    private var zoneContext: ZoneContext = ZoneContext()
+    private var zoneContexts: MutableSet<ZoneContext> = mutableSetOf()
 
     private fun performAddListener(listener: SessionListener) {
         sessionListeners.add(listener)
@@ -97,12 +97,12 @@ object SessionClient : SessionAdapterListener {
         if (status == Status.OK || status == Status.SHOULD_REFRESH) {
             if (presenterSize() > 0) {
                 AALogger.logInfo("Checking for more Ads.")
-                status = Status.IS_REFRESH_ADS
+                status = if(zoneContexts.any()) { Status.OK } else { Status.IS_REFRESH_ADS }
                 transporter.dispatchToThread {
                     adapter?.sendRefreshAds(
                         currentSession,
                         this@SessionClient,
-                        zoneContext
+                        zoneContexts
                     )
                 }
             } else {
@@ -243,12 +243,19 @@ object SessionClient : SessionAdapterListener {
     }
 
     fun setZoneContext(zoneContext: ZoneContext){
-        this.zoneContext = zoneContext
+        if (zoneContexts.none { it.zoneId == zoneContext.zoneId }) {
+            zoneContexts.add(zoneContext)
+            performRefreshAds()
+        }
+    }
+
+    fun removeZoneContext(zoneId: String) {
+        zoneContexts.removeAll { z -> z.zoneId == zoneId }
         performRefreshAds()
     }
 
     fun clearZoneContext(){
-        zoneContext = ZoneContext()
+        zoneContexts = mutableSetOf()
         performRefreshAds()
     }
 

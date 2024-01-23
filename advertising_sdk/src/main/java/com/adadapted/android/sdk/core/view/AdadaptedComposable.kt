@@ -125,6 +125,10 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         presenter.setZoneContext(contextId)
     }
 
+    fun removeAdZoneContext() {
+        presenter.removeZoneContext()
+    }
+
     fun clearAdZoneContext() {
         presenter.clearZoneContext()
     }

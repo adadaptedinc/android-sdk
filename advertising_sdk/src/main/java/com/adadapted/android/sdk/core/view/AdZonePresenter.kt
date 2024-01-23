@@ -68,6 +68,10 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
         sessionClient?.setZoneContext(ZoneContext(this.zoneId, contextId))
     }
 
+    fun removeZoneContext() {
+        sessionClient?.removeZoneContext(this.zoneId)
+    }
+
     fun clearZoneContext() {
         sessionClient?.clearZoneContext()
     }

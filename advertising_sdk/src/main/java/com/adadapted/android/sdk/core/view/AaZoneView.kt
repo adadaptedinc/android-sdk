@@ -100,6 +100,10 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
         presenter.setZoneContext(contextId)
     }
 
+    fun removeAdZoneContext() {
+        presenter.removeZoneContext()
+    }
+
     fun clearAdZoneContext() {
         presenter.clearZoneContext()
     }
