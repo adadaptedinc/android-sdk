@@ -109,10 +109,10 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
 
         aaZoneView = new AaZoneView(getActivity());
         aaZoneView.init("102110");
-        aaZoneView.enableAdaptiveSizing(true);
+        //aaZoneView.enableAdaptiveSizing(true);
 
         aaZoneViewTwo = new AaZoneView(getActivity());
-        aaZoneViewTwo.init("123456");
+        aaZoneViewTwo.init("110002");
 
         getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -145,8 +145,8 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
             return true;
         }
         if(item.getItemId() == R.id.zone_context_on) {
-            aaZoneView.setAdZoneContextId("1201");
-            aaZoneViewTwo.setAdZoneContextId("1201");
+            aaZoneView.setAdZoneContextId("organic");
+            aaZoneViewTwo.setAdZoneContextId("organic");
             return true;
         }
         if(item.getItemId() == R.id.zone_remove_context) {
