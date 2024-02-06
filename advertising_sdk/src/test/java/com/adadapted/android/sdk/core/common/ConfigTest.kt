@@ -1,6 +1,6 @@
 package com.adadapted.android.sdk.core.common
 
-import com.adadapted.android.sdk.config.Config
+import com.adadapted.android.sdk.constants.Config
 import junit.framework.Assert.assertEquals
 import org.junit.Test
 
@@ -12,11 +12,11 @@ class ConfigTest {
     fun serverUrlsUseSandboxByDefault() {
         assertEquals(ServerUrl.SAND_AD_SERVER.plus(adServerVersion).plus("android/sessions/initialize"), Config.getInitSessionUrl())
         assertEquals(ServerUrl.SAND_AD_SERVER.plus(adServerVersion).plus("android/ads/retrieve"), Config.getRefreshAdsUrl())
-        assertEquals(ServerUrl.SAND_AD_SERVER.plus(adServerVersion).plus("android/ads/events"), Config.getAdsEventUrl())
+        assertEquals(ServerUrl.SAND_AD_SERVER.plus(adServerVersion).plus("android/ads/events"), Config.getAdEventsUrl())
         assertEquals(ServerUrl.SAND_AD_SERVER.plus(adServerVersion).plus("android/intercepts/retrieve"), Config.getRetrieveInterceptsUrl())
         assertEquals(ServerUrl.SAND_AD_SERVER.plus(adServerVersion).plus("android/intercepts/events"), Config.getInterceptEventsUrl())
-        assertEquals(ServerUrl.SAND_EVENT_SERVER.plus(trackServerVersion).plus("android/events"), Config.getAppEventsUrl())
-        assertEquals(ServerUrl.SAND_EVENT_SERVER.plus(trackServerVersion).plus("android/errors"), Config.getAppErrorsUrl())
+        assertEquals(ServerUrl.SAND_EVENT_SERVER.plus(trackServerVersion).plus("android/events"), Config.getSdkEventsUrl())
+        assertEquals(ServerUrl.SAND_EVENT_SERVER.plus(trackServerVersion).plus("android/errors"), Config.getSdkErrorsUrl())
         assertEquals(ServerUrl.SAND_PAYLOAD_SERVER.plus(trackServerVersion).plus("pickup"), Config.getPickupPayloadsUrl())
         assertEquals(ServerUrl.SAND_PAYLOAD_SERVER.plus(trackServerVersion).plus("tracking"), Config.getTrackingPayloadUrl())
     }
@@ -26,11 +26,11 @@ class ConfigTest {
         Config.init(true)
         assertEquals(ServerUrl.PROD_AD_SERVER.plus(adServerVersion).plus("android/sessions/initialize"), Config.getInitSessionUrl())
         assertEquals(ServerUrl.PROD_AD_SERVER.plus(adServerVersion).plus("android/ads/retrieve"), Config.getRefreshAdsUrl())
-        assertEquals(ServerUrl.PROD_AD_SERVER.plus(adServerVersion).plus("android/ads/events"), Config.getAdsEventUrl())
+        assertEquals(ServerUrl.PROD_AD_SERVER.plus(adServerVersion).plus("android/ads/events"), Config.getAdEventsUrl())
         assertEquals(ServerUrl.PROD_AD_SERVER.plus(adServerVersion).plus("android/intercepts/retrieve"), Config.getRetrieveInterceptsUrl())
         assertEquals(ServerUrl.PROD_AD_SERVER.plus(adServerVersion).plus("android/intercepts/events"), Config.getInterceptEventsUrl())
-        assertEquals(ServerUrl.PROD_EVENT_SERVER.plus(trackServerVersion).plus("android/events"), Config.getAppEventsUrl())
-        assertEquals(ServerUrl.PROD_EVENT_SERVER.plus(trackServerVersion).plus("android/errors"), Config.getAppErrorsUrl())
+        assertEquals(ServerUrl.PROD_EVENT_SERVER.plus(trackServerVersion).plus("android/events"), Config.getSdkEventsUrl())
+        assertEquals(ServerUrl.PROD_EVENT_SERVER.plus(trackServerVersion).plus("android/errors"), Config.getSdkErrorsUrl())
         assertEquals(ServerUrl.PROD_PAYLOAD_SERVER.plus(trackServerVersion).plus("pickup"), Config.getPickupPayloadsUrl())
         assertEquals(ServerUrl.PROD_PAYLOAD_SERVER.plus(trackServerVersion).plus("tracking"), Config.getTrackingPayloadUrl())
     }

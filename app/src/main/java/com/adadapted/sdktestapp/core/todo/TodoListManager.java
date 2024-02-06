@@ -107,7 +107,7 @@ public class TodoListManager implements TodoLoader.Listener {
         TodoList list = getList(listId);
         list.addNewItem(itemName);
 
-        AdAdaptedListManager.INSTANCE.itemAddedToList(itemName);
+        AdAdaptedListManager.INSTANCE.itemAddedToList(itemName, list.getName());
 
         saveData();
     }

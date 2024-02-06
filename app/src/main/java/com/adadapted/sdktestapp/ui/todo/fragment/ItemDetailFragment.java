@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.adadapted.android.sdk.ui.view.AaZoneView;
+import com.adadapted.android.sdk.core.view.AaZoneView;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.todo.TodoItem;
 import com.adadapted.sdktestapp.core.todo.TodoList;
@@ -89,8 +89,8 @@ public class ItemDetailFragment extends Fragment {
         nameTextView = (TextView)view.findViewById(R.id.fragment_item_detail_name_textView);
         nameTextView.setText(item.getName());
 
-        aaZoneView = (AaZoneView)view.findViewById(R.id.fragment_item_detail_aa_zone);
-        aaZoneView.init("10");
+//        aaZoneView = (AaZoneView)view.findViewById(R.id.fragment_item_detail_aa_zone);
+//        aaZoneView.init("10");
 
         return view;
     }
@@ -106,14 +106,14 @@ public class ItemDetailFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        aaZoneView.onStart();
+        aaZoneView.onStart(null, null);
     }
 
     @Override
     public void onStop() {
         super.onStop();
 
-        aaZoneView.onStop();
+        aaZoneView.onStop(null);
     }
 
     @Override

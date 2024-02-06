@@ -3,7 +3,7 @@ package com.adadapted.android.sdk.core.webview
 import android.view.MotionEvent
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.core.ad.Ad
-import com.adadapted.android.sdk.ui.view.AdWebView
+import com.adadapted.android.sdk.core.view.AdWebView
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,19 +41,19 @@ class TestAdWebViewListener: AdWebView.Listener {
     var adFailed = false
     var blankAdLoaded = false
 
-    override fun onAdLoaded(ad: Ad) {
+    override fun onAdLoadedInWebView(ad: Ad) {
         loadedAd = true
     }
 
-    override fun onAdLoadFailed() {
+    override fun onAdLoadInWebViewFailed() {
         adFailed = true
     }
 
-    override fun onAdClicked(ad: Ad) {
+    override fun onAdInWebViewClicked(ad: Ad) {
         clickedAd = true
     }
 
-    override fun onBlankLoaded() {
+    override fun onBlankAdInWebViewLoaded() {
         blankAdLoaded = true
     }
 }

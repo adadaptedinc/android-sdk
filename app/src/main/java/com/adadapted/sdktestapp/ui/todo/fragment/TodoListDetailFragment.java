@@ -17,10 +17,10 @@ import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.adadapted.android.sdk.core.ad.AdContentListener;
 import com.adadapted.android.sdk.core.atl.AddToListContent;
 import com.adadapted.android.sdk.core.atl.AddToListItem;
-import com.adadapted.android.sdk.ui.messaging.AdContentListener;
-import com.adadapted.android.sdk.ui.view.AaZoneView;
+import com.adadapted.android.sdk.core.view.AaZoneView;
 import com.adadapted.sdktestapp.R;
 import com.adadapted.sdktestapp.core.todo.TodoList;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;
@@ -42,6 +42,8 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
     private DialogFragment dialog;
 
     private AaZoneView aaZoneView;
+
+    private AaZoneView aaZoneViewTwo;
 
     private OnFragmentInteractionListener mListener;
 
@@ -107,7 +109,10 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
 
         aaZoneView = new AaZoneView(getActivity());
         aaZoneView.init("102110");
-        aaZoneView.enableAdaptiveSizing(true);
+        //aaZoneView.enableAdaptiveSizing(true);
+
+        aaZoneViewTwo = new AaZoneView(getActivity());
+        aaZoneViewTwo.init("110002");
 
         getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -131,23 +136,27 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
     }
 
     public boolean onOptionsItemSelected (MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_new_list_item:
-                dialog.show(getActivity().getSupportFragmentManager(), "NewListItemDialogFragment");
-                return true;
 
-            case R.id.action_settings:
-                return true;
-
-            case R.id.zone_context_on:
-                aaZoneView.setAdZoneContextId("alex_recipe_id_1");
-                return true;
-
-            case R.id.zone_context_off:
-                aaZoneView.clearAdZoneContext();
-                return true;
+        if(item.getItemId() == R.id.action_new_list_item) {
+            dialog.show(getActivity().getSupportFragmentManager(), "NewListItemDialogFragment");
+            return true;
         }
-
+        if(item.getItemId() == R.id.action_settings) {
+            return true;
+        }
+        if(item.getItemId() == R.id.zone_context_on) {
+            aaZoneView.setAdZoneContextId("organic");
+            aaZoneViewTwo.setAdZoneContextId("organic");
+            return true;
+        }
+        if(item.getItemId() == R.id.zone_remove_context) {
+            aaZoneView.removeAdZoneContext(); //remove just one zone context
+            return true;
+        }
+        if(item.getItemId() == R.id.zone_context_off) {
+            aaZoneView.clearAdZoneContext();
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 

@@ -11,7 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 
-import com.adadapted.android.sdk.ui.adapter.AutoCompleteAdapter;
+import com.adadapted.android.sdk.core.view.AutoCompleteAdapter;
 import com.adadapted.sdktestapp.R;
 
 import java.util.ArrayList;

@@ -1,113 +1,100 @@
 package com.adadapted.android.sdk.core.ad
 
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.session.Session
+import com.adadapted.android.sdk.core.event.AdEvent
+import com.adadapted.android.sdk.core.event.AdEventTypes
+import com.adadapted.android.sdk.core.event.EventClient
+import com.adadapted.android.sdk.core.interfaces.EventClientListener
 import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.tools.TestAdEventSink
+import com.adadapted.android.sdk.tools.MockData
+import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
-import com.nhaarman.mockitokotlin2.whenever
 import junit.framework.Assert.assertNotNull
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AdEventClientTest {
-
-    var mockAdEventSink = mock<TestAdEventSink>()
-    var testTransporter = TestCoroutineDispatcher()
+    var testTransporter = UnconfinedTestDispatcher()
     val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
-    var testAdEventClient = AdEventClient
-    var mockSession = Session("testId", true, true, 30, 1907245044, mutableMapOf())
     var testAd = Ad("adId", "zoneId", "impId")
 
     @Before
     fun setup() {
-        SessionClient.createInstance(mock(), mock())
         Dispatchers.setMain(testTransporter)
-        whenever(mockAdEventSink.sendBatch(any(),any())).then { }
-
-        testAdEventClient.createInstance(mockAdEventSink, testTransporterScope)
-
+        SessionClient.createInstance(mock(), mock())
+        EventClient.createInstance(TestEventAdapter, testTransporterScope)
         testAdEventClientFailSafes()
-
-        testAdEventClient.getInstance().onSessionAvailable(mockSession)
-        testAdEventClient.getInstance().onAdsAvailable(mockSession)
+        EventClient.onSessionAvailable(MockData.session)
+        EventClient.onAdsAvailable(MockData.session)
     }
 
     @Test
     fun createInstance() {
-        assertNotNull(testAdEventClient)
+        assertNotNull(TestEventAdapter)
     }
     
     @Test
     fun addListenerAndTrackEventImpression() {
-        val mockListener = mock<AdEventClient.Listener>()
-        testAdEventClient.getInstance().addListener(mockListener)
-        testAdEventClient.getInstance().trackImpression(testAd)
+        val mockListener = mock<EventClientListener>()
+        EventClient.addListener(mockListener)
+        EventClient.trackImpression(testAd)
         verify(mockListener).onAdEventTracked(any())
     }
 
     @Test
     fun removeListener() {
-        val mockListener = mock<AdEventClient.Listener>()
-        testAdEventClient.getInstance().addListener(mockListener)
-        testAdEventClient.getInstance().trackImpression(testAd)
+        val mockListener = mock<EventClientListener>()
+        EventClient.addListener(mockListener)
+        EventClient.trackImpression(testAd)
         verify(mockListener).onAdEventTracked(any())
 
-        testAdEventClient.getInstance().removeListener(mockListener)
-        testAdEventClient.getInstance().trackImpression(testAd)
+        EventClient.removeListener(mockListener)
+        EventClient.trackImpression(testAd)
         verifyZeroInteractions(mockListener)
     }
 
     @Test
     fun trackInteraction() {
         val mockListener = TestAdEventClientListener()
-        testAdEventClient.getInstance().addListener(mockListener)
-        testAdEventClient.getInstance().trackInteraction(testAd)
-        assert(mockListener.getTrackedEvent()?.eventType == AdEvent.Types.INTERACTION)
+        EventClient.addListener(mockListener)
+        EventClient.trackInteraction(testAd)
+        assert(mockListener.getTrackedEvent()?.eventType == AdEventTypes.INTERACTION)
     }
 
     @Test
     fun trackPopupBegin() {
         val mockListener = TestAdEventClientListener()
-        testAdEventClient.getInstance().addListener(mockListener)
-        testAdEventClient.getInstance().trackPopupBegin(testAd)
-        assert(mockListener.getTrackedEvent()?.eventType == AdEvent.Types.POPUP_BEGIN)
-    }
-
-    @Test
-    fun publishEvents() {
-        val mockListener = TestAdEventClientListener()
-        testAdEventClient.getInstance().addListener(mockListener)
-        testAdEventClient.getInstance().trackInteraction(testAd)
-
-        testAdEventClient.getInstance().onPublishEvents()
-        verify(mockAdEventSink).sendBatch(any(), any())
+        EventClient.addListener(mockListener)
+        EventClient.trackPopupBegin(testAd)
+        assert(mockListener.getTrackedEvent()?.eventType == AdEventTypes.POPUP_BEGIN)
     }
 
     @Test
     fun onSessionInitFailed() {
-        testAdEventClient.getInstance().onSessionInitFailed()
+        EventClient.onSessionInitFailed()
 
-        val mockListener = mock<AdEventClient.Listener>()
-        testAdEventClient.getInstance().addListener(mockListener)
-        testAdEventClient.getInstance().trackImpression(testAd)
+        val mockListener = mock<EventClientListener>()
+        EventClient.addListener(mockListener)
+        EventClient.trackImpression(testAd)
         verify(mockListener).onAdEventTracked(any())
     }
 
     private fun testAdEventClientFailSafes() {
-        testAdEventClient.getInstance().onPublishEvents()
-        testAdEventClient.getInstance().trackImpression(Ad())
+        EventClient.onPublishEvents()
+        EventClient.trackImpression(Ad())
     }
 }
 
-class TestAdEventClientListener: AdEventClient.Listener {
+class TestAdEventClientListener: EventClientListener {
     private var trackedEvent: AdEvent? = null
 
     fun getTrackedEvent(): AdEvent? {

@@ -1,12 +1,9 @@
 package com.adadapted.android.sdk.core.adapter
 
-import com.adadapted.android.sdk.core.intercept.Term
-import com.adadapted.android.sdk.ui.model.Suggestion
+import com.adadapted.android.sdk.core.keyword.Suggestion
+import com.adadapted.android.sdk.core.keyword.Term
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
 class SuggestionTest {
 
     @Test

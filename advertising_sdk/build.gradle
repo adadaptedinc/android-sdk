@@ -1,26 +1,29 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 
 plugins {
-    id("org.barfuin.gradle.jacocolog") version "1.2.1"
+    id("org.barfuin.gradle.jacocolog") version "3.1.0"
     id 'maven-publish'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.10'
 }
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply from: 'jacoco.gradle'
 
-group='com.gitlab.adadapted'
+group='com.adadapted'
+android.buildFeatures.buildConfig true
 
 android {
-    compileSdkVersion 33
-    namespace = 'com.gitlab.adadapted'
+    compileSdk 34
+    namespace 'com.adadapted'
 
     defaultConfig {
-        minSdkVersion 19
-        targetSdkVersion 33
-        versionName "3.5.1"
+        minSdkVersion 23
+        //noinspection EditedTargetSdkVersion
+        targetSdkVersion 34
+        versionName "3.4.5"
         buildConfigField("String","VERSION_NAME", "\"${defaultConfig.versionName}\"")
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'aasdk-proguard-rules.pro'
@@ -40,23 +43,39 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'aasdk-proguard-rules.pro'
         }
     }
+
+    buildFeatures {
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.3"
+    }
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.android.volley:volley:1.2.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7'
-    implementation 'com.google.code.gson:gson:2.8.9'
 
-    testImplementation 'junit:junit:4.12'
+    implementation("io.ktor:ktor-client-core:2.2.4")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.4")
+    implementation("io.ktor:ktor-client-content-negotiation:2.2.4")
+    implementation 'org.jetbrains.kotlinx:kotlinx-datetime:0.4.0'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'io.ktor:ktor-client-android:2.2.4'
+    implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
+    implementation 'androidx.compose.ui:ui:1.5.2'
+    implementation 'androidx.compose.foundation:foundation:1.5.2'
+    implementation 'androidx.compose.material:material:1.5.2'
+
+    testImplementation 'junit:junit:4.13.2'
+    //testImplementation 'io.ktor:ktor-client-mock2.2.4'
     testImplementation 'org.json:json:20200518'
-    testImplementation 'org.robolectric:robolectric:4.10.3'
+    testImplementation 'org.robolectric:robolectric:4.11.1'
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.4'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
     testImplementation project(path: ':advertising_sdk')
 }
 
@@ -65,7 +84,8 @@ repositories {
 }
 
 kotlin {
-    explicitApi()
+    setExplicitApi(ExplicitApiMode.Disabled)
+    jvmToolchain(17)
 }
 
 afterEvaluate {
@@ -74,9 +94,9 @@ afterEvaluate {
             // Creates a Maven publication called "release".
             release(MavenPublication) {
                 from components.release
-                groupId = 'com.gitlab.adadapted'
+                groupId = 'com.adadapted'
                 artifactId = 'android-sdk'
-                version = '3.5.1'
+                version = '4.0.0'
             }
         }
     }

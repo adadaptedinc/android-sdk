@@ -1,334 +1,217 @@
 package com.adadapted.android.sdk.core.session
 
-import android.os.Handler
-import android.util.Log
-import com.adadapted.android.sdk.config.Config
+import com.adadapted.android.sdk.constants.Config
+import com.adadapted.android.sdk.core.concurrency.Timer
+import com.adadapted.android.sdk.core.concurrency.Transporter
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.core.zone.ZoneContext
-import java.util.Timer
-import java.util.TimerTask
-import java.util.concurrent.locks.Lock
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.collections.HashSet
+import com.adadapted.android.sdk.core.interfaces.DeviceCallback
+import com.adadapted.android.sdk.core.interfaces.SessionAdapter
+import com.adadapted.android.sdk.core.interfaces.SessionAdapterListener
+import com.adadapted.android.sdk.core.log.AALogger
+import com.adadapted.android.sdk.core.view.ZoneContext
+import kotlin.jvm.Synchronized
 
-class SessionClient private constructor(private val adapter: SessionAdapter, private val transporter: TransporterCoroutineScope) : SessionAdapter.Listener {
+object SessionClient : SessionAdapterListener {
 
-    internal enum class Status {
+    enum class Status {
         OK,  // Normal Status. No alterations to regular behavior
         SHOULD_REFRESH,  // SDK should refresh Ads or Reinitialize Session at the next available chance
         IS_REFRESH_ADS,  // SDK is currently refreshing Ads
         IS_REINITIALIZING_SESSION // SDK is currently reinitializing the Session
     }
 
-    private val listeners: MutableSet<SessionListener>
-    private val listenerLock: Lock = ReentrantLock()
-    private val presenters: MutableSet<String>
-    private val presenterLock: Lock = ReentrantLock()
-    private lateinit var deviceInfo: DeviceInfo
-    private val deviceInfoLock: Lock = ReentrantLock()
     private lateinit var currentSession: Session
-    private val sessionLock: Lock = ReentrantLock()
-    private var status: Status
-    private val statusLock: Lock = ReentrantLock()
+    private var adapter: SessionAdapter? = null
+    private var transporter: TransporterCoroutineScope = Transporter()
+    private val sessionListeners: MutableSet<SessionListener>
+    private val presenters: MutableSet<String>
+    var status: Status
+        private set
     private var pollingTimerRunning: Boolean
     private var eventTimerRunning: Boolean
-    private var zoneContext: ZoneContext = ZoneContext()
-
-    private fun getStatus(): Status {
-        statusLock.lock()
-        return try {
-            status
-        } finally {
-            statusLock.unlock()
-        }
-    }
-
-    private fun setStatus(status: Status) {
-        statusLock.lock()
-        try {
-            this.status = status
-        } finally {
-            statusLock.unlock()
-        }
-    }
+    private var hasInstance: Boolean = false
+    private var zoneContexts: MutableSet<ZoneContext> = mutableSetOf()
 
     private fun performAddListener(listener: SessionListener) {
-        listenerLock.lock()
-        try {
-            listeners.add(listener)
-        } finally {
-            listenerLock.unlock()
-        }
+        sessionListeners.add(listener)
         if (this::currentSession.isInitialized) {
             listener.onSessionAvailable(currentSession)
         }
     }
 
     private fun performRemoveListener(listener: SessionListener) {
-        listenerLock.lock()
-        try {
-            listeners.remove(listener)
-        } finally {
-            listenerLock.unlock()
-        }
+        sessionListeners.remove(listener)
     }
 
     private fun performAddPresenter(listener: SessionListener) {
         performAddListener(listener)
-        presenterLock.lock()
-        try {
-            presenters.add(listener.toString())
-        } finally {
-            presenterLock.unlock()
-        }
-        if (getStatus() == Status.SHOULD_REFRESH) {
+        presenters.add(listener.toString())
+
+        if (status == Status.SHOULD_REFRESH) {
             performRefresh()
         }
     }
 
     private fun performRemovePresenter(listener: SessionListener) {
         performRemoveListener(listener)
-        presenterLock.lock()
-        try {
-            presenters.remove(listener.toString())
-        } finally {
-            presenterLock.unlock()
-        }
+        presenters.remove(listener.toString())
     }
 
-    private fun presenterSize(): Int {
-        presenterLock.lock()
-        return try {
-            presenters.size
-        } finally {
-            presenterLock.unlock()
-        }
-    }
+    private fun presenterSize() = presenters.size
 
     private fun performInitialize(deviceInfo: DeviceInfo) {
-        deviceInfoLock.lock()
-        try {
-            this.deviceInfo = deviceInfo
-        } finally {
-            deviceInfoLock.unlock()
-        }
-        adapter.sendInit(deviceInfo, this)
+        transporter.dispatchToThread { adapter?.sendInit(deviceInfo, this@SessionClient) }
     }
 
-    private fun performRefresh() {
-        sessionLock.lock()
-        try {
-            if (currentSession.hasExpired()) {
-                Log.i(LOGTAG, "Session has expired. Expired at: " + currentSession.expiresAt())
-                notifySessionExpired()
-                performReinitialize()
-            } else {
-                performRefreshAds()
+    private fun performRefresh(
+        deviceInfo: DeviceInfo? = DeviceInfoClient.getCachedDeviceInfo()
+    ) {
+        if (currentSession.hasExpired()) {
+            AALogger.logInfo("Session has expired. Expired at: " + currentSession.expiration)
+            notifySessionExpired()
+            if (deviceInfo != null) {
+                performReinitialize(deviceInfo)
             }
-        } finally {
-            sessionLock.unlock()
+        } else {
+            performRefreshAds()
         }
     }
 
-    private fun performReinitialize() {
-        if (getStatus() == Status.OK || getStatus() == Status.SHOULD_REFRESH) {
+    private fun performReinitialize(deviceInfo: DeviceInfo) {
+        if (status == Status.OK || status == Status.SHOULD_REFRESH) {
             if (presenterSize() > 0) {
-                Log.i(LOGTAG, "Reinitializing Session.")
-                deviceInfoLock.lock()
-                try {
-                    setStatus(Status.IS_REINITIALIZING_SESSION)
-                    adapter.sendInit(deviceInfo, this)
-                } finally {
-                    deviceInfoLock.unlock()
+                AALogger.logInfo("Reinitializing Session.")
+                status = Status.IS_REINITIALIZING_SESSION
+                transporter.dispatchToThread {
+                    adapter?.sendInit(deviceInfo, this@SessionClient)
                 }
             } else {
-                setStatus(Status.SHOULD_REFRESH)
+                status = Status.SHOULD_REFRESH
             }
         }
     }
 
     private fun performRefreshAds() {
-        if (getStatus() == Status.OK || getStatus() == Status.SHOULD_REFRESH) {
+        if (status == Status.OK || status == Status.SHOULD_REFRESH) {
             if (presenterSize() > 0) {
-                Log.i(LOGTAG, "Checking for more Ads.")
-                sessionLock.lock()
-                try {
-                    setStatus(Status.IS_REFRESH_ADS)
-                    adapter.sendRefreshAds(currentSession, this, zoneContext)
-                } finally {
-                    sessionLock.unlock()
+                AALogger.logInfo("Checking for more Ads.")
+                status = if(zoneContexts.any()) { Status.OK } else { Status.IS_REFRESH_ADS }
+                transporter.dispatchToThread {
+                    adapter?.sendRefreshAds(
+                        currentSession,
+                        this@SessionClient,
+                        zoneContexts
+                    )
                 }
             } else {
-                setStatus(Status.SHOULD_REFRESH)
+                status = Status.SHOULD_REFRESH
             }
         }
     }
 
     private fun updateCurrentSession(session: Session) {
-        sessionLock.lock()
-        try {
-            currentSession = session
-            startPublishTimer()
-        } finally {
-            sessionLock.unlock()
-        }
+        currentSession = session
+        startPublishTimer()
         startPollingTimer()
     }
 
     private fun updateCurrentZones(session: Session) {
-        sessionLock.lock()
-        currentSession = try {
-            session
-        } finally {
-            sessionLock.unlock()
-        }
+        currentSession.updateZones(session.getAllZones())
         startPollingTimer()
     }
 
     private fun startPollingTimer() {
         if (pollingTimerRunning || currentSession.willNotServeAds()) {
-            Log.i(LOGTAG, "Session will not serve Ads. Ignoring Ad polling timer.")
+            AALogger.logInfo("Session will not serve Ads. Ignoring Ad polling timer.")
             return
         }
         pollingTimerRunning = true
-        sessionLock.lock()
-        try {
-            Log.i(LOGTAG, "Starting Ad polling timer.")
-            Timer().schedule(object : TimerTask() {
-                override fun run() {
-                    pollingTimerRunning = false
-                    performRefresh()
-                }
-            }, currentSession.refreshTime)
-        } finally {
-            sessionLock.unlock()
-        }
+        AALogger.logInfo("Starting Ad polling timer.")
+
+        val refreshTimer = Timer(
+            { performRefresh() },
+            repeatMillis = currentSession.refreshTime,
+            delayMillis = currentSession.refreshTime
+        )
+        refreshTimer.startTimer()
     }
 
     private fun startPublishTimer() {
-        if(eventTimerRunning) {
+        if (eventTimerRunning) {
             return
         }
-
-        Log.i(LOGTAG, "Starting up the Event Publisher.")
         eventTimerRunning = true
 
-        val handler = Handler()
-        val publisher: Runnable = object : Runnable{
-            override fun run() {
-                notifyPublishEvents()
-                handler.postDelayed(this, Config.DEFAULT_EVENT_POLLING)
-            }
-        }
-
-        publisher.run()
+        val eventTimer = Timer(
+            { notifyPublishEvents() },
+            repeatMillis = Config.DEFAULT_EVENT_POLLING,
+            delayMillis = Config.DEFAULT_EVENT_POLLING
+        )
+        eventTimer.startTimer()
     }
 
     private fun notifyPublishEvents() {
-        listenerLock.lock()
-        try {
-            for (l in listeners) {
-                l.onPublishEvents()
-            }
-        } finally {
-            listenerLock.unlock()
+        for (l in sessionListeners) {
+            l.onPublishEvents()
         }
     }
 
     private fun notifySessionAvailable() {
-        listenerLock.lock()
-        try {
-            for (l in listeners) {
-                l.onSessionAvailable(currentSession)
-            }
-        } finally {
-            listenerLock.unlock()
+        for (l in sessionListeners) {
+            currentSession.let { l.onSessionAvailable(it) }
         }
     }
 
     private fun notifyAdsAvailable() {
-        listenerLock.lock()
-        try {
-            for (l in listeners) {
-                l.onAdsAvailable(currentSession)
-            }
-        } finally {
-            listenerLock.unlock()
+        for (l in sessionListeners) {
+            currentSession.let { l.onAdsAvailable(it) }
         }
     }
 
     private fun notifySessionInitFailed() {
-        listenerLock.lock()
-        try {
-            for (l in listeners) {
-                l.onSessionInitFailed()
-            }
-        } finally {
-            listenerLock.unlock()
+        for (l in sessionListeners) {
+            l.onSessionInitFailed()
         }
     }
 
     private fun notifySessionExpired() {
-        listenerLock.lock()
-        try {
-            for (l in listeners) {
-                l.onSessionExpired()
-            }
-        } finally {
-            listenerLock.unlock()
+        for (l in sessionListeners) {
+            l.onSessionExpired()
         }
     }
 
     override fun onSessionInitialized(session: Session) {
         updateCurrentSession(session)
-        setStatus(Status.OK)
+        status = Status.OK
         notifySessionAvailable()
     }
 
     override fun onSessionInitializeFailed() {
-        updateCurrentSession(Session().apply { setDeviceInfo(deviceInfo) })
-        setStatus(Status.OK)
+        updateCurrentSession(Session())
+        status = Status.OK
         notifySessionInitFailed()
     }
 
     override fun onNewAdsLoaded(session: Session) {
         updateCurrentZones(session)
-        setStatus(Status.OK)
+        status = Status.OK
         notifyAdsAvailable()
     }
 
     override fun onNewAdsLoadFailed() {
-        updateCurrentZones(Session().apply { setDeviceInfo(deviceInfo) })
-        setStatus(Status.OK)
+        updateCurrentZones(Session())
+        status = Status.OK
         notifyAdsAvailable()
-    }
-
-    fun hasStaleAds(): Boolean {
-        return status != Status.OK
-    }
-
-    fun getCachedDeviceInfo(): DeviceInfo {
-        return deviceInfo
-    }
-
-    fun setZoneContext(zoneContext: ZoneContext) {
-        this.zoneContext = zoneContext
-        performRefreshAds()
-    }
-
-    fun clearZoneContext() {
-        this.zoneContext = ZoneContext()
-        performRefreshAds()
     }
 
     @Synchronized
     fun start(listener: SessionListener) {
         addListener(listener)
-        DeviceInfoClient.getInstance().getDeviceInfo(object: DeviceInfoClient.Callback {
+        DeviceInfoClient.getDeviceInfo(object : DeviceCallback {
             override fun onDeviceInfoCollected(deviceInfo: DeviceInfo) {
-                transporter.dispatchToBackground {
+                transporter.dispatchToThread {
                     performInitialize(deviceInfo)
                 }
             }
@@ -336,48 +219,54 @@ class SessionClient private constructor(private val adapter: SessionAdapter, pri
     }
 
     fun addListener(listener: SessionListener) {
-        transporter.dispatchToBackground {
-            performAddListener(listener)
-        }
+        performAddListener(listener)
     }
 
     fun removeListener(listener: SessionListener) {
-        transporter.dispatchToBackground {
-            performRemoveListener(listener)
-        }
+        performRemoveListener(listener)
     }
 
     fun addPresenter(listener: SessionListener) {
-        transporter.dispatchToBackground {
-            performAddPresenter(listener)
-        }
+        performAddPresenter(listener)
     }
 
     fun removePresenter(listener: SessionListener) {
-        transporter.dispatchToBackground {
-            performRemovePresenter(listener)
+        performRemovePresenter(listener)
+    }
+
+    fun hasStaleAds(): Boolean {
+        return status != Status.OK
+    }
+
+    fun hasInstance(): Boolean {
+        return hasInstance
+    }
+
+    fun setZoneContext(zoneContext: ZoneContext){
+        if (zoneContexts.none { it.zoneId == zoneContext.zoneId }) {
+            zoneContexts.add(zoneContext)
+            performRefreshAds()
         }
     }
 
-    companion object {
-        private val LOGTAG = SessionClient::class.java.name
-        private lateinit var instance: SessionClient
+    fun removeZoneContext(zoneId: String) {
+        zoneContexts.removeAll { z -> z.zoneId == zoneId }
+        performRefreshAds()
+    }
 
-        fun getInstance(): SessionClient {
-            return instance
-        }
+    fun clearZoneContext(){
+        zoneContexts = mutableSetOf()
+        performRefreshAds()
+    }
 
-        fun createInstance(adapter: SessionAdapter, transporter: TransporterCoroutineScope) {
-            instance = SessionClient(adapter, transporter)
-        }
-
-        fun hasInstance(): Boolean {
-            return this::instance.isInitialized
-        }
+    fun createInstance(adapter: SessionAdapter, transporter: TransporterCoroutineScope) {
+        SessionClient.adapter = adapter
+        SessionClient.transporter = transporter
+        hasInstance = true
     }
 
     init {
-        listeners = HashSet()
+        sessionListeners = HashSet()
         presenters = HashSet()
         pollingTimerRunning = false
         eventTimerRunning = false

@@ -2,43 +2,51 @@ package com.adadapted.android.sdk.core.session
 
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfo
-import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
+import com.adadapted.android.sdk.core.interfaces.AdGetListener
+import com.adadapted.android.sdk.core.interfaces.SessionAdapter
+import com.adadapted.android.sdk.core.interfaces.SessionInitListener
+import com.adadapted.android.sdk.core.view.ZoneContext
 import com.adadapted.android.sdk.tools.TestTransporter
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import junit.framework.Assert.assertNotNull
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SessionClientTest {
-    private var testTransporter = TestCoroutineDispatcher()
-    private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
+    var testTransporter = UnconfinedTestDispatcher()
+    val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
     private var testSessionClient = SessionClient
-    private var mockSessionAdapter = mock<SessionAdapter>()
+    private var mockSessionAdapter = TestSessionAdapter()
+    private lateinit var testListener: SessionListener
+    private var onSessionAvailHit = false
 
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
-        whenever(mockSessionAdapter.sendInit(any(), any())).then {}
-        whenever(mockSessionAdapter.sendRefreshAds(any(), any(), any())).then {}
-
         testSessionClient.createInstance(mockSessionAdapter, testTransporterScope)
-        testSessionClient.getInstance().onSessionInitialized(SessionTest().buildTestSession())
+        testSessionClient.onSessionInitialized(SessionTest().buildTestSession())
+        testListener = object : SessionListener {
+            override fun onSessionAvailable(session: Session) {
+                onSessionAvailHit = true
+            }
+
+            override fun onAdsAvailable(session: Session) {
+            }
+
+            override fun onSessionInitFailed() {
+            }
+        }
     }
 
     @After
     fun tearDown() {
         Dispatchers.resetMain()
-        testTransporter.cleanupTestCoroutines()
     }
 
     @Test
@@ -49,73 +57,64 @@ class SessionClientTest {
     @Test
     fun start() {
         val testListener = TestSessionClientListener()
-        testSessionClient.getInstance().start(testListener)
+        testSessionClient.start(testListener)
         assert(testListener.getTrackedSession()?.id == "SessionAvailable")
-        verify(mockSessionAdapter).sendInit(any(), any())
     }
 
     @Test
     fun addListener() {
-        val mockListener = mock<SessionListener>()
-        testSessionClient.getInstance().addListener(mockListener)
-        verify(mockListener).onSessionAvailable(any())
+        testSessionClient.addListener(testListener)
+        assert(onSessionAvailHit)
     }
 
     @Test
     fun removeListener() {
         val testListener = TestSessionClientListener()
-        testSessionClient.getInstance().addListener(testListener)
+        testSessionClient.addListener(testListener)
         assertNotNull(testListener.getTrackedSession())
 
-        testSessionClient.getInstance().removeListener(testListener)
-        testSessionClient.getInstance().onNewAdsLoaded(Session())
+        testSessionClient.removeListener(testListener)
+        testSessionClient.onNewAdsLoaded(Session())
         assert(testListener.getTrackedSession()?.id != "AdsAvailable")
     }
 
     @Test
-    fun addPresenter() {
-        val mockListener = mock<SessionListener>()
-        testSessionClient.getInstance().addPresenter(mockListener)
-        verify(mockListener).onSessionAvailable(any())
-    }
-
-    @Test
-    fun removePresenter() {
+    fun addRemovePresenter() {
         val testListener = TestSessionClientListener()
-        testSessionClient.getInstance().addPresenter(testListener)
+        testSessionClient.addPresenter(testListener)
         assertNotNull(testListener.getTrackedSession())
 
-        testSessionClient.getInstance().removePresenter(testListener)
-        testSessionClient.getInstance().onNewAdsLoaded(Session())
+        testSessionClient.removePresenter(testListener)
+        testSessionClient.onNewAdsLoaded(Session())
         assert(testListener.getTrackedSession()?.id != "AdsAvailable")
     }
 
     @Test
     fun onSessionInitializeFailed() {
         val testListener = TestSessionClientListener()
-        testSessionClient.getInstance().start(testListener)
-        testSessionClient.getInstance().onSessionInitializeFailed()
+        testSessionClient.start(testListener)
+        testSessionClient.onSessionInitializeFailed()
         assert(testListener.getTrackedSession()?.id == "SessionFailed")
     }
 
     @Test
     fun onNewAdsLoaded() {
         val testListener = TestSessionClientListener()
-        testSessionClient.getInstance().addListener(testListener)
-        testSessionClient.getInstance().onNewAdsLoaded(Session())
+        testSessionClient.addListener(testListener)
+        testSessionClient.onNewAdsLoaded(Session())
         assert(testListener.getTrackedSession()?.id == "AdsAvailable")
     }
 
     @Test
     fun onNewAdsLoadFailed() {
         val testListener = TestSessionClientListener()
-        testSessionClient.getInstance().start(testListener)
-        testSessionClient.getInstance().onNewAdsLoadFailed()
+        testSessionClient.start(testListener)
+        testSessionClient.onNewAdsLoadFailed()
         assert(testListener.getTrackedSession()?.id == "AdsAvailable")
     }
 }
 
-class TestSessionClientListener: SessionListener() {
+class TestSessionClientListener: SessionListener {
     private var trackedSession: Session? = null
 
     fun getTrackedSession(): Session? {
@@ -136,5 +135,23 @@ class TestSessionClientListener: SessionListener() {
 
     override fun onSessionInitFailed() {
         trackedSession = Session("SessionFailed")
+    }
+}
+
+class TestSessionAdapter: SessionAdapter {
+    var initSent = false
+    var adsRefreshed = false
+
+    override suspend fun sendInit(deviceInfo: DeviceInfo, listener: SessionInitListener) {
+        initSent = true
+    }
+
+    override suspend fun sendRefreshAds(session: Session, listener: AdGetListener, zoneContexts: MutableSet<ZoneContext>) {
+        adsRefreshed = true
+    }
+
+    fun reset() {
+        initSent = false
+        adsRefreshed = false
     }
 }

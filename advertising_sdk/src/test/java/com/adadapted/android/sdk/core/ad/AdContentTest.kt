@@ -1,116 +1,107 @@
 package com.adadapted.android.sdk.core.ad
 
-import com.adadapted.android.sdk.config.EventStrings
+import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.atl.AddToListItem
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.core.event.AppEventClient
-import com.adadapted.android.sdk.core.event.TestAppEventSink
-import com.adadapted.android.sdk.core.session.Session
+import com.adadapted.android.sdk.core.event.AdEventTypes
+import com.adadapted.android.sdk.core.event.EventClient
+import com.adadapted.android.sdk.core.payload.Payload
 import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.ext.models.Payload
-import com.adadapted.android.sdk.tools.TestAdEventSink
+import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
+import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.mock
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.setMain
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import kotlin.collections.HashMap
 
-@RunWith(RobolectricTestRunner::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class AdContentTest {
-    private var testAdEventSink = TestAdEventSink()
-    private var testAppEventSink = TestAppEventSink()
-    private var testTransporter = TestCoroutineDispatcher()
+    private var testTransporter = UnconfinedTestDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
-    private var mockSession = Session("testId", true, true, 30, 1907245044, mutableMapOf())
     private var testAddTolistItems = listOf(AddToListItem("testTrackingId", "title", "brand", "cat", "upc", "sku", "discount", "image"))
 
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
+        DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
-        AdEventClient.createInstance(testAdEventSink, testTransporterScope)
-        AdEventClient.getInstance().onSessionAvailable(mockSession)
-        AppEventClient.createInstance(testAppEventSink, testTransporterScope)
+        EventClient.createInstance(TestEventAdapter, testTransporterScope)
+        EventClient.onSessionAvailable(MockData.session)
     }
 
     @After
     fun tearDown() {
         Dispatchers.resetMain()
-        testTransporter.cleanupTestCoroutines()
+        TestEventAdapter.cleanupEvents()
     }
 
     @Test
     fun createAdContent() {
         val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId"))
-        assertEquals(0, testAdContent.type)
         assertEquals("testZoneId", testAdContent.zoneId)
     }
 
     @Test
     fun acknowledge() {
         val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId"))
-        testAdEventSink.testEvents = mutableSetOf()
+        TestEventAdapter.testAdEvents = mutableListOf()
         testAdContent.acknowledge()
-        AdEventClient.getInstance().onPublishEvents()
-        assertEquals(AdEvent.Types.INTERACTION, testAdEventSink.testEvents.first().eventType)
-        assertEquals("testZoneId", testAdEventSink.testEvents.first().zoneId)
-        assertEquals("adContentId", testAdEventSink.testEvents.first().adId)
-        testAdContent.acknowledge()
+        EventClient.onPublishEvents()
+        assertEquals(AdEventTypes.INTERACTION, TestEventAdapter.testAdEvents.first().eventType)
+        assertEquals("testZoneId", TestEventAdapter.testAdEvents.first().zoneId)
+        assertEquals("adContentId", TestEventAdapter.testAdEvents.first().adId)
     }
 
     @Test
     fun itemAcknowledge() {
-        val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId", payload = Payload(testAddTolistItems)))
-        testAdEventSink.testEvents = mutableSetOf()
+        val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId", payload = Payload(detailedListItems = testAddTolistItems)))
+        TestEventAdapter.testAdEvents = mutableListOf()
         testAdContent.itemAcknowledge(testAdContent.getItems().first())
-        AdEventClient.getInstance().onPublishEvents()
-        AppEventClient.getInstance().onPublishEvents()
-        assert(testAdEventSink.testEvents.any { event -> event.eventType == AdEvent.Types.INTERACTION })
-        assert(testAppEventSink.testEvents.any { event -> event.name == EventStrings.ATL_ITEM_ADDED_TO_LIST })
-        assertEquals("adContentId", testAdEventSink.testEvents.first().adId)
-        assertEquals("testZoneId", testAdEventSink.testEvents.first().zoneId)
+        EventClient.onPublishEvents()
+        assert(TestEventAdapter.testAdEvents.any { event -> event.eventType == AdEventTypes.INTERACTION })
+        assert(TestEventAdapter.testSdkEvents.any { event -> event.name == EventStrings.ATL_ITEM_ADDED_TO_LIST })
+        assertEquals("adContentId", TestEventAdapter.testAdEvents.first().adId)
+        assertEquals("testZoneId", TestEventAdapter.testAdEvents.first().zoneId)
     }
 
     @Test
     fun failed() {
-        val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId", payload = Payload(testAddTolistItems)))
-        testAppEventSink.testErrors = mutableSetOf()
+        val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId", payload = Payload(detailedListItems = testAddTolistItems)))
+        TestEventAdapter.testSdkErrors = mutableListOf()
         testAdContent.failed("adContentFail")
-        AppEventClient.getInstance().onPublishEvents()
-        assertEquals(EventStrings.ATL_ADDED_TO_LIST_FAILED, testAppEventSink.testErrors.first().code)
-        assertEquals("adContentFail", testAppEventSink.testErrors.first().message)
+        EventClient.onPublishEvents()
+        assertEquals(EventStrings.ATL_ADDED_TO_LIST_FAILED, TestEventAdapter.testSdkErrors.first().code)
+        assertEquals("adContentFail", TestEventAdapter.testSdkErrors.first().message)
         testAdContent.failed("adContentFail")
     }
 
     @Test
     fun itemFailed() {
-        val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId", payload = Payload(testAddTolistItems)))
-        testAppEventSink.testErrors = mutableSetOf()
+        val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId", payload = Payload(detailedListItems = testAddTolistItems)))
+        TestEventAdapter.testSdkErrors = mutableListOf()
         testAdContent.itemFailed(testAddTolistItems.first(), "adContentFail")
-        AppEventClient.getInstance().onPublishEvents()
-        assertEquals(EventStrings.ATL_ADDED_TO_LIST_ITEM_FAILED, testAppEventSink.testErrors.first().code)
-        assertEquals("adContentFail", testAppEventSink.testErrors.first().message)
+        EventClient.onPublishEvents()
+        assertEquals(EventStrings.ATL_ADDED_TO_LIST_ITEM_FAILED, TestEventAdapter.testSdkErrors.first().code)
+        assertEquals("adContentFail", TestEventAdapter.testSdkErrors.first().message)
     }
 
     @Test
     fun emptyPayload() {
         val testAdContent = AdContent.createAddToListContent(Ad("adContentId", "testZoneId"))
-        testAppEventSink.testErrors = mutableSetOf()
+        TestEventAdapter.testSdkErrors = mutableListOf()
         testAdContent.failed("adContentFail")
-        AppEventClient.getInstance().onPublishEvents()
-        assertTrue(testAppEventSink.testErrors.any { event -> event.code == EventStrings.AD_PAYLOAD_IS_EMPTY})
+        EventClient.onPublishEvents()
+        assertTrue(TestEventAdapter.testSdkErrors.any { event -> event.code == EventStrings.AD_PAYLOAD_IS_EMPTY})
     }
 
     @Test

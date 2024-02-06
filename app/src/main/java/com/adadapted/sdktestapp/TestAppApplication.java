@@ -10,10 +10,10 @@ import androidx.annotation.NonNull;
 import com.adadapted.android.sdk.AdAdapted;
 import com.adadapted.android.sdk.core.atl.AddToListContent;
 import com.adadapted.android.sdk.core.atl.AddToListItem;
-import com.adadapted.android.sdk.ui.messaging.AaSdkAdditContentListener;
-import com.adadapted.android.sdk.ui.messaging.AaSdkEventListener;
-import com.adadapted.android.sdk.ui.messaging.AaSdkSessionListener;
 
+import com.adadapted.android.sdk.core.interfaces.AaSdkAdditContentListener;
+import com.adadapted.android.sdk.core.interfaces.AaSdkEventListener;
+import com.adadapted.android.sdk.core.interfaces.AaSdkSessionListener;
 import com.adadapted.sdktestapp.core.todo.TodoList;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;
 import com.adadapted.sdktestapp.ui.todo.activity.TodoListsActivity;

@@ -1,17 +1,21 @@
 package com.adadapted.android.sdk.core.addit
 
 import android.net.Uri
-import com.adadapted.android.sdk.config.EventStrings
+import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.atl.AddToListContent
+import com.adadapted.android.sdk.core.atl.AdditContent
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
+import com.adadapted.android.sdk.core.deeplink.DeeplinkContentParser
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.core.event.AppEventClient
-import com.adadapted.android.sdk.core.event.TestAppEventSink
+import com.adadapted.android.sdk.core.event.EventClient
+import com.adadapted.android.sdk.core.payload.PayloadClient
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
+import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.mock
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -19,18 +23,18 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.lang.Exception
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 class DeeplinkContentParserTest {
-    private var testTransporter = TestCoroutineDispatcher()
+    private var testTransporter = UnconfinedTestDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
-    private var testAppEventSink = TestAppEventSink()
 
     @Before
     fun setup() {
-        DeviceInfoClient.createInstance(mock(),"", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
+        DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
-        AppEventClient.createInstance(testAppEventSink, testTransporterScope)
-        PayloadClient.createInstance(mock(), AppEventClient.getInstance(), mock())
+        EventClient.createInstance(TestEventAdapter, testTransporterScope)
+        PayloadClient.createInstance(mock(), EventClient, mock())
     }
 
     @Test
@@ -52,7 +56,7 @@ class DeeplinkContentParserTest {
 
         try {
             parser.parse(null)
-            Assert.assertEquals(EventStrings.ADDIT_NO_DEEPLINK_RECEIVED, testAppEventSink.testErrors.first().code)
+            Assert.assertEquals(EventStrings.ADDIT_NO_DEEPLINK_RECEIVED, TestEventAdapter.testSdkErrors.first().code)
             Assert.fail()
         } catch (ex: Exception) {
             //success
@@ -65,7 +69,7 @@ class DeeplinkContentParserTest {
             val uri = Uri.parse(TEST_FAIL_URL_STRING)
             val parser = DeeplinkContentParser()
             parser.parse(uri)
-            Assert.assertEquals(EventStrings.ADDIT_PAYLOAD_PARSE_FAILED, testAppEventSink.testErrors.first().code)
+            Assert.assertEquals(EventStrings.ADDIT_PAYLOAD_PARSE_FAILED, TestEventAdapter.testSdkErrors.first().code)
         } catch (ex: Exception) {
             //success
         }
@@ -77,7 +81,7 @@ class DeeplinkContentParserTest {
             val uri = Uri.parse(TEST_UNKNOWN_URL_STRING)
             val parser = DeeplinkContentParser()
             parser.parse(uri)
-            Assert.assertEquals(EventStrings.ADDIT_UNKNOWN_PAYLOAD_TYPE, testAppEventSink.testErrors.first().code)
+            Assert.assertEquals(EventStrings.ADDIT_PAYLOAD_PARSE_FAILED, TestEventAdapter.testSdkErrors.first().code)
         } catch (ex: Exception) {
             //success
         }

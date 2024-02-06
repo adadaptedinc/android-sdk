@@ -1,65 +1,40 @@
 package com.adadapted.android.sdk.core.atl
 
-import com.adadapted.android.sdk.core.atl.AddToListContent.Sources
-import com.adadapted.android.sdk.core.atl.PopupClient.markPopupContentAcknowledged
-import com.adadapted.android.sdk.core.atl.PopupClient.markPopupContentFailed
-import com.adadapted.android.sdk.core.atl.PopupClient.markPopupContentItemAcknowledged
-import com.adadapted.android.sdk.core.atl.PopupClient.markPopupContentItemFailed
-import java.util.concurrent.locks.Lock
-import java.util.concurrent.locks.ReentrantLock
+import com.adadapted.android.sdk.constants.EventStrings
+import com.adadapted.android.sdk.core.event.EventClient
 
-class PopupContent(val payloadId: String, private val items: List<AddToListItem>) : AddToListContent {
+class PopupContent(val payloadId: String, private val items: List<AddToListItem>) :
+    AddToListContent {
     private var handled = false
-    private val lock: Lock = ReentrantLock()
 
     override fun acknowledge() {
-        lock.lock()
-        try {
-            if (!handled) {
-                handled = true
-                markPopupContentAcknowledged(this)
-            }
-        } finally {
-            lock.unlock()
+        if (!handled) {
+            handled = true
+            markPopupContentAcknowledged(this)
         }
     }
 
     override fun itemAcknowledge(item: AddToListItem) {
-        lock.lock()
-        try {
-            if (!handled) {
-                handled = true
-                markPopupContentAcknowledged(this)
-            }
-            markPopupContentItemAcknowledged(this, item)
-        } finally {
-            lock.unlock()
+        if (!handled) {
+            handled = true
+            markPopupContentAcknowledged(this)
         }
+        markPopupContentItemAcknowledged(this, item)
     }
 
     override fun failed(message: String) {
-        lock.lock()
-        try {
-            if (!handled) {
-                handled = true
-                markPopupContentFailed(this, message)
-            }
-        } finally {
-            lock.unlock()
+        if (!handled) {
+            handled = true
+            markPopupContentFailed(this, message)
         }
     }
 
     override fun itemFailed(item: AddToListItem, message: String) {
-        lock.lock()
-        try {
-            markPopupContentItemFailed(this, item, message)
-        } finally {
-            lock.unlock()
-        }
+        markPopupContentItemFailed(this, item, message)
     }
 
     override fun getSource(): String {
-        return Sources.IN_APP
+        return AddToListContent.Sources.IN_APP
     }
 
     override fun getItems(): List<AddToListItem> {
@@ -74,5 +49,40 @@ class PopupContent(val payloadId: String, private val items: List<AddToListItem>
         fun createPopupContent(payloadId: String, items: List<AddToListItem>): PopupContent {
             return PopupContent(payloadId, items)
         }
+
+        fun markPopupContentAcknowledged(content: PopupContent) {
+            val params: MutableMap<String, String> = HashMap()
+            params[PAYLOAD_ID] = content.payloadId
+            EventClient.trackSdkEvent(EventStrings.POPUP_ADDED_TO_LIST, params)
+        }
+
+        fun markPopupContentItemAcknowledged(content: PopupContent, item: AddToListItem) {
+            val params: MutableMap<String, String> = HashMap()
+            params[PAYLOAD_ID] = content.payloadId
+            params[TRACKING_ID] = item.trackingId
+            params[ITEM_NAME] = item.title
+            EventClient.trackSdkEvent(EventStrings.POPUP_ITEM_ADDED_TO_LIST, params)
+        }
+
+        fun markPopupContentFailed(content: PopupContent, message: String) {
+            val eventParams: MutableMap<String, String> = HashMap()
+            eventParams[PAYLOAD_ID] = content.payloadId
+            EventClient.trackSdkError(EventStrings.POPUP_CONTENT_FAILED, message, eventParams)
+        }
+
+        fun markPopupContentItemFailed(
+            content: PopupContent,
+            item: AddToListItem,
+            message: String
+        ) {
+            val eventParams: MutableMap<String, String> = HashMap()
+            eventParams[PAYLOAD_ID] = content.payloadId
+            eventParams[TRACKING_ID] = item.trackingId
+            EventClient.trackSdkError(EventStrings.POPUP_CONTENT_ITEM_FAILED, message, eventParams)
+        }
+
+        private const val PAYLOAD_ID = "payload_id"
+        private const val TRACKING_ID = "tracking_id"
+        private const val ITEM_NAME = "item_name"
     }
 }
