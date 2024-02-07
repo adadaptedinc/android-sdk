@@ -48,7 +48,7 @@ class KeywordKeywordInterceptMatcherTest {
         InterceptClient.createInstance(testInterceptAdapter, testTransporterScope)
         InterceptClient.getInstance().onSessionAvailable(MockData.session)
         KeywordInterceptMatcher.match("INIT")
-        SessionClient.onSessionInitialized(Session("newSessionId", willServeAds = true, hasAds = true, refreshTime = 30, expiration = Date().time, zones = mutableMapOf()))
+        SessionClient.onSessionInitialized(Session("newSessionId", willServeAds = true, hasAds = true, refreshTime = 30, expiration = Date().time.plus(10000000), zones = mutableMapOf()))
         clearEvents()
     }
 
