@@ -41,8 +41,6 @@ To create a new release, it must be named as only the version number (i.e. 1.0.0
 ## Built With
 
 * [Google Play Services](https://developers.google.com/android/guides/overview) - Specifically the Ad library for access to device Advertiser information
-* [Volley](https://github.com/google/volley) - HTTP library
-* [LeakCanary](https://square.github.io/leakcanary/) - Memory leak detection
 
 ## Versioning
 
