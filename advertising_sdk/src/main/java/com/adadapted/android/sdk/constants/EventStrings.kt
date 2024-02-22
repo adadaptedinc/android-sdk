@@ -43,6 +43,8 @@ object EventStrings {
     const val ATL_ADDED_TO_LIST_ITEM_FAILED = "ATL_ADDED_TO_LIST_ITEM_FAILED"
     const val ATL_AD_CLICKED = "atl_ad_clicked"
 
+    const val RECIPE_CONTEXT = "recipe_context"
+
     const val POPUP_ADDED_TO_LIST = "popup_added_to_list"
     const val POPUP_ITEM_ADDED_TO_LIST = "popup_item_added_to_list"
     const val POPUP_CONTENT_FAILED = "POPUP_CONTENT_FAILED"

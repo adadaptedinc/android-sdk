@@ -135,10 +135,7 @@ object EventClient : SessionListener {
         EventClient.session = session
     }
 
-    fun trackSdkEvent(
-        name: String,
-        params: Map<String, String> = HashMap()
-    ) {
+    fun trackSdkEvent(name: String, params: Map<String, String> = HashMap()) {
         transporter.dispatchToThread {
             performTrackSdkEvent(name, params)
         }
@@ -182,6 +179,13 @@ object EventClient : SessionListener {
         transporter.dispatchToThread {
             fileEvent(ad, AdEventTypes.POPUP_BEGIN)
         }
+    }
+
+    fun trackRecipeContextEvent(contextId: String, zoneId: String) {
+        val eventParams: MutableMap<String, String> = mutableMapOf()
+        eventParams[RecipeSources.CONTEXT_ID] = contextId
+        eventParams[RecipeSources.ZONE_ID] = zoneId
+        trackSdkEvent(EventStrings.RECIPE_CONTEXT, eventParams)
     }
 
     fun createInstance(eventAdapter: EventAdapter, transporter: TransporterCoroutineScope) {
