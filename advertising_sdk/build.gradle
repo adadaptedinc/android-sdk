@@ -96,7 +96,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.adadapted'
                 artifactId = 'android-sdk'
-                version = '4.0.3'
+                version = '4.0.4'
             }
         }
     }
