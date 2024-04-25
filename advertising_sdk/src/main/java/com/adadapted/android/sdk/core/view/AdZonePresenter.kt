@@ -24,6 +24,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
     SessionListener {
     private var currentAd: Ad = Ad()
     private var zoneId: String = ""
+    private var isZoneVisible: Boolean = true
     var adZonePresenterListener: AdZonePresenterListener? = null
     private var attached: Boolean
     private var sessionId: String? = null
@@ -106,7 +107,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
 
     private fun completeCurrentAd() {
         if (!currentAd.isEmpty && adStarted && !adCompleted) {
-            if (!currentAd.impressionWasTracked()) {
+            if (!currentAd.impressionWasTracked() && !isZoneVisible) {
                 eventClient.trackInvisibleImpression(currentAd)
             }
             currentAd.resetImpressionTracking() //this is critical to make sure rotating ads can get more than one impression total
@@ -115,12 +116,14 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
     }
 
     fun onAdDisplayed(ad: Ad, isAdVisible: Boolean) {
+        isZoneVisible = isAdVisible
         startZoneTimer()
         adStarted = true
         trackAdImpression(ad, isAdVisible)
     }
 
     fun onAdVisibilityChanged(isAdVisible: Boolean) {
+        isZoneVisible = isAdVisible
         adZonePresenterListener?.onAdVisibilityChanged(currentAd)
         trackAdImpression(currentAd, isAdVisible)
     }
