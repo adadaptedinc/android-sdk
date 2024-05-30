@@ -23,7 +23,7 @@ android {
         minSdkVersion 23
         //noinspection EditedTargetSdkVersion
         targetSdkVersion 34
-        versionName "3.4.5"
+        versionName "4.0.5"
         buildConfigField("String","VERSION_NAME", "\"${defaultConfig.versionName}\"")
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'aasdk-proguard-rules.pro'
@@ -62,12 +62,12 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-datetime:0.4.0'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1'
-    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'com.google.android.material:material:1.12.0'
     implementation 'io.ktor:ktor-client-android:2.2.4'
-    implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
-    implementation 'androidx.compose.ui:ui:1.5.2'
-    implementation 'androidx.compose.foundation:foundation:1.5.2'
-    implementation 'androidx.compose.material:material:1.5.2'
+    implementation 'com.google.android.gms:play-services-ads-identifier:18.1.0'
+    implementation 'androidx.compose.ui:ui:1.6.7'
+    implementation 'androidx.compose.foundation:foundation:1.6.7'
+    implementation 'androidx.compose.material:material:1.6.7'
 
     testImplementation 'junit:junit:4.13.2'
     //testImplementation 'io.ktor:ktor-client-mock2.2.4'
@@ -96,7 +96,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.adadapted'
                 artifactId = 'android-sdk'
-                version = '4.0.4'
+                version = '4.0.5'
             }
         }
     }
