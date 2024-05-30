@@ -82,7 +82,7 @@ internal class AdWebView(context: Context, private val listener: Listener) :
                         return true
                     }
                     MotionEvent.ACTION_UP -> {
-                        // Only notify ad clicked if no significant move event was detected
+                        //Only accept the click if no significant move event was detected
                         if (!isMoved && currentAd.id.isNotEmpty()) {
                             notifyAdClicked()
                         }
