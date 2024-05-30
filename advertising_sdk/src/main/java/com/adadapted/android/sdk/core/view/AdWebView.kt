@@ -5,15 +5,15 @@ import android.content.Context
 import android.graphics.Color
 import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnTouchListener
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.adadapted.android.sdk.core.ad.Ad
+import kotlin.math.abs
 
 @SuppressLint("ClickableViewAccessibility", "SetJavaScriptEnabled", "ViewConstructor")
-internal class AdWebView constructor(context: Context, private val listener: Listener) :
+internal class AdWebView(context: Context, private val listener: Listener) :
     WebView(context.applicationContext) {
     internal interface Listener {
         fun onAdLoadedInWebView(ad: Ad)
@@ -59,17 +59,38 @@ internal class AdWebView constructor(context: Context, private val listener: Lis
         setLayerType(View.LAYER_TYPE_SOFTWARE, null)
         setBackgroundColor(Color.TRANSPARENT)
 
-        setOnTouchListener(OnTouchListener { _, event ->
-            when (event.action) {
-                MotionEvent.ACTION_MOVE -> return@OnTouchListener true
-                MotionEvent.ACTION_UP -> {
-                    if (currentAd.id.isNotEmpty()) {
-                        notifyAdClicked()
+        setOnTouchListener(object : OnTouchListener {
+            var isMoved = false
+            private var startX = 0f
+            private var startY = 0f
+            private val moveThreshold = 20f
+
+            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+                when (event?.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        isMoved = false
+                        startX = event.x
+                        startY = event.y
+                        return true
                     }
-                    return@OnTouchListener true
+                    MotionEvent.ACTION_MOVE -> {
+                        val deltaX = abs(event.x - startX)
+                        val deltaY = abs(event.y - startY)
+                        if (deltaX > moveThreshold || deltaY > moveThreshold) {
+                            isMoved = true
+                        }
+                        return true
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        //Only accept the click if no significant move event was detected
+                        if (!isMoved && currentAd.id.isNotEmpty()) {
+                            notifyAdClicked()
+                        }
+                        return true
+                    }
                 }
+                return false
             }
-            false
         })
         webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(
