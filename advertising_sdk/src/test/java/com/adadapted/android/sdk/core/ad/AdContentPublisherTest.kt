@@ -69,14 +69,29 @@ class AdContentPublisherTest {
         assertEquals("", testListener.resultZoneId)
         assertNull(testListener.resultContent)
     }
+
+    @Test
+    fun listenerIsAddedAndNonContentPublished() {
+        val testListener = TestAdContentListener()
+        AdContentPublisher.addListener(testListener)
+        AdContentPublisher.publishNonContentNotification("testZoneId", "testAdId")
+        assertEquals("testZoneId", testListener.resultZoneId)
+        assertEquals("testAdId", testListener.resultAdId)
+    }
 }
 
 class TestAdContentListener: AdContentListener {
     var resultZoneId = ""
+    var resultAdId = ""
     var resultContent: AddToListContent? = null
 
     override fun onContentAvailable(zoneId: String, content: AddToListContent) {
         resultZoneId = zoneId
         resultContent = content
+    }
+
+    override fun onNonContentAction(zoneId: String, adId: String) {
+        resultZoneId = zoneId
+        resultAdId = adId
     }
 }

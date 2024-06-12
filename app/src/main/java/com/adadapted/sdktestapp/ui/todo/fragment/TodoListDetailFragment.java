@@ -241,6 +241,12 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
         content.acknowledge();
     }
 
+    @Override
+    public void onNonContentAction(String zoneId, String adId) {
+        String checkZone = zoneId;
+        String checkAd = adId;
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

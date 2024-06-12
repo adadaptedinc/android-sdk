@@ -211,10 +211,12 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
 
     private fun handleLinkAction(ad: Ad) {
         adViewHandler.handleLink(ad)
+        AdContentPublisher.publishNonContentNotification(zoneId, ad.id)
     }
 
     private fun handlePopupAction(ad: Ad) {
         adViewHandler.handlePopup(ad)
+        AdContentPublisher.publishNonContentNotification(zoneId, ad.id)
     }
 
     private fun notifyZoneAvailable() {
