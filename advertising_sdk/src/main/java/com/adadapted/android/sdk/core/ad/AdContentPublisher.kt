@@ -20,8 +20,16 @@ object AdContentPublisher {
             return
         }
         transporter.dispatchToMain {
-        for (listener in listeners) {
+            for (listener in listeners) {
                 listener.onContentAvailable(zoneId, content)
+            }
+        }
+    }
+
+    fun publishNonContentNotification(zoneId: String, adId: String) {
+        transporter.dispatchToMain {
+            for (listener in listeners) {
+                listener.onNonContentAction(zoneId, adId)
             }
         }
     }
