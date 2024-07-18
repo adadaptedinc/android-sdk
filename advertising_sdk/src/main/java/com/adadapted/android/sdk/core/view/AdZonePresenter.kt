@@ -10,7 +10,7 @@ import com.adadapted.android.sdk.core.log.AALogger
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.session.SessionListener
-import kotlinx.datetime.Clock
+import java.util.Date
 
 interface AdZonePresenterListener {
     fun onZoneAvailable(zone: Zone)
@@ -274,6 +274,6 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
         attached = false
         zoneLoaded = false
         currentZone = Zone()
-        randomAdStartPosition = (Clock.System.now().epochSeconds.toInt() % 10)
+        randomAdStartPosition = ((Date().time / 1000).toInt() % 10)
     }
 }

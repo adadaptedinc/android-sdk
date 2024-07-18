@@ -7,7 +7,7 @@ import com.adadapted.android.sdk.core.view.Zone
 import junit.framework.Assert.assertFalse
 import org.junit.Assert
 import org.junit.Test
-import java.time.Instant
+import java.util.Date
 
 class SessionTest {
     @Test
@@ -74,6 +74,6 @@ class SessionTest {
     }
 
     fun buildTestSession(): Session {
-        return Session("testId", willServeAds = true, hasAds = true, refreshTime = 1L, expiration = Instant.now().epochSecond - 1)
+        return Session("testId", willServeAds = true, hasAds = true, refreshTime = 1L, expiration = Date().time / 1000 - 1)
     }
 }
