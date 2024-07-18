@@ -1,10 +1,10 @@
 package com.adadapted.android.sdk.core.payload
 
 import com.adadapted.android.sdk.core.device.DeviceInfo
-import kotlinx.datetime.Clock
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import java.util.Date
 
 object PayloadRequestBuilder {
     fun buildRequest(deviceInfo: DeviceInfo): PayloadRequest {
@@ -18,7 +18,7 @@ object PayloadRequestBuilder {
                 os,
                 osv,
                 sdkVersion,
-                Clock.System.now().epochSeconds
+                Date().time / 1000
             )
         }
     }

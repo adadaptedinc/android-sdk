@@ -1,7 +1,7 @@
 package com.adadapted.android.sdk.core.payload
 
-import kotlinx.datetime.Clock
+import java.util.Date
 
 class PayloadEvent internal constructor(val payloadId: String, val status: String) {
-    val timestamp: Long = Clock.System.now().epochSeconds
+    val timestamp: Long = Date().time / 1000
 }

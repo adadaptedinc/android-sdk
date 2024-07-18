@@ -1,8 +1,8 @@
 package com.adadapted.android.sdk.core.event
 
-import kotlinx.datetime.Clock
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.Date
 
 @Serializable
 data class AdEvent(
@@ -14,5 +14,5 @@ data class AdEvent(
     @SerialName("event_type")
     val eventType: String,
     @SerialName("created_at")
-    val createdAt: Long = Clock.System.now().epochSeconds
+    val createdAt: Long = Date().time / 1000
 )

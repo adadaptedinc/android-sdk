@@ -3,9 +3,9 @@ package com.adadapted.android.sdk.core.session
 import com.adadapted.android.sdk.constants.Config
 import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.view.Zone
-import kotlinx.datetime.Clock
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.Date
 
 @Serializable
 data class Session(
@@ -29,7 +29,7 @@ data class Session(
     }
 
     fun hasExpired(): Boolean {
-        return Clock.System.now().epochSeconds > expiration
+        return Date().time / 1000 > expiration
     }
 
     fun getZone(zoneId: String): Zone {
