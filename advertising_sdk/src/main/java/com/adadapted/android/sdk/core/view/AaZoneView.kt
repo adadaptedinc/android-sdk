@@ -31,7 +31,6 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     private var webViewLoaded = false
     private var isAdaptiveSizingEnabled = false
 
-
     constructor(context: Context) : super(context.applicationContext) {
         setup(context)
     }
@@ -106,6 +105,10 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
 
     fun clearAdZoneContext() {
         presenter.clearZoneContext()
+    }
+
+    fun setAdRefreshRate(rate: Long) {
+        presenter.setRefreshRate(rate)
     }
 
     fun onStop() {
