@@ -36,6 +36,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
     private var timerRunning = false
     private lateinit var timer: Timer
     private val eventClient: EventClient = EventClient
+    private var adRefreshRate = 60000L
 
     fun init(zoneId: String) {
         if (this.zoneId.isEmpty()) {
@@ -63,6 +64,10 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
             completeCurrentAd()
             sessionClient?.removePresenter(this)
         }
+    }
+
+    fun setRefreshRate(rate: Long) {
+        adRefreshRate = rate
     }
 
     fun setZoneContext(contextId: String) {
@@ -182,7 +187,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
         if (!zoneLoaded || timerRunning) {
             return
         }
-        val timerDelay = currentAd.refreshTime * 1000
+        val timerDelay = adRefreshRate //currentAd.refreshTime * 1000
         timerRunning = true
         timer = Timer({
             setNextAd()

@@ -109,6 +109,7 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
 
         aaZoneView = new AaZoneView(getActivity());
         aaZoneView.init("102110");
+        aaZoneView.setAdRefreshRate(10000);
         //aaZoneView.enableAdaptiveSizing(true);
 
         aaZoneViewTwo = new AaZoneView(getActivity());
@@ -128,6 +129,7 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
         });
 
         getListView().addHeaderView(aaZoneView);
+        getListView().addHeaderView(aaZoneViewTwo);
     }
 
     @Override
