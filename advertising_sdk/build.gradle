@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 plugins {
     id("org.barfuin.gradle.jacocolog") version "3.1.0"
     id 'maven-publish'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.10'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.24'
 }
 
 apply plugin: 'com.android.library'
@@ -23,7 +23,7 @@ android {
         minSdkVersion 23
         //noinspection EditedTargetSdkVersion
         targetSdkVersion 34
-        versionName "4.0.7"
+        versionName "4.0.8"
         buildConfigField("String","VERSION_NAME", "\"${defaultConfig.versionName}\"")
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'aasdk-proguard-rules.pro'
@@ -49,7 +49,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.3"
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
 }
 
@@ -59,21 +59,21 @@ dependencies {
     implementation("io.ktor:ktor-client-core:2.2.4")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.4")
     implementation("io.ktor:ktor-client-content-negotiation:2.2.4")
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.24'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'io.ktor:ktor-client-android:2.2.4'
     implementation 'com.google.android.gms:play-services-ads-identifier:18.1.0'
-    implementation 'androidx.compose.ui:ui:1.6.7'
-    implementation 'androidx.compose.foundation:foundation:1.6.7'
-    implementation 'androidx.compose.material:material:1.6.7'
+    implementation 'androidx.compose.ui:ui:1.6.8'
+    implementation 'androidx.compose.foundation:foundation:1.6.8'
+    implementation 'androidx.compose.material:material:1.6.8'
 
     testImplementation 'junit:junit:4.13.2'
     //testImplementation 'io.ktor:ktor-client-mock2.2.4'
     testImplementation 'org.json:json:20200518'
     testImplementation 'org.robolectric:robolectric:4.11.1'
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
     testImplementation project(path: ':advertising_sdk')
 }
@@ -95,7 +95,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.adadapted'
                 artifactId = 'android-sdk'
-                version = '4.0.7'
+                version = '4.0.8'
             }
         }
     }
