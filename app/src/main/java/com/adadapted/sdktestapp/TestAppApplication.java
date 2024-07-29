@@ -18,6 +18,7 @@ import com.adadapted.sdktestapp.core.todo.TodoList;
 import com.adadapted.sdktestapp.core.todo.TodoListManager;
 import com.adadapted.sdktestapp.ui.todo.activity.TodoListsActivity;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,11 +35,15 @@ public class TestAppApplication extends Application {
 
         //AdAdapted.INSTANCE.disableAdTracking(this); //Disable ad tracking completely
 
+        HashMap<String, String> params = new HashMap<>();
+        params.put("test","testvalue");
+
         AdAdapted.INSTANCE
                 .withAppId("7D58810X6333241C") // #YOUR API KEY GOES HERE#
                 .inEnv(AdAdapted.Env.DEV)
                 .enableKeywordIntercept(true)
                 .enablePayloads(true)
+                .setOptionalParams(params)
                 //.setCustomIdentifier("customTestId")
                 .setSdkSessionListener(new AaSdkSessionListener() {
                     @Override
