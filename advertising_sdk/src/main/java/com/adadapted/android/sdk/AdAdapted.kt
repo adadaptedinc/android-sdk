@@ -32,7 +32,7 @@ object AdAdapted {
     private var customIdentifier: String = ""
     private var isKeywordInterceptEnabled = false
     private var isPayloadEnabled = false
-    val params: Map<String, String> = HashMap()
+    private var params: Map<String, String> = HashMap()
     lateinit var sessionListener: AaSdkSessionListener
     private lateinit var eventListener: AaSdkEventListener
     private lateinit var contentListener: AaSdkAdditContentListener
@@ -69,6 +69,11 @@ object AdAdapted {
 
     fun setSdkAdditContentListener(listener: AaSdkAdditContentListener): AdAdapted {
         contentListener = listener
+        return this
+    }
+
+    fun setOptionalParams(params:HashMap<String, String>): AdAdapted {
+        this.params = params
         return this
     }
 
