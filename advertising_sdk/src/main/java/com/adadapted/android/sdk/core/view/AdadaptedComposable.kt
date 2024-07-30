@@ -90,7 +90,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
                     .clickable {
                         val cachedDeviceInfo = DeviceInfoClient.getCachedDeviceInfo()
                         cachedDeviceInfo?.udid?.let { udid ->
-                            presenter.onReportAdClicked(webView.currentAd.id, udid)
+                            webView.currentAd?.id?.let { presenter.onReportAdClicked(it, udid) }
                         }
                     }
             )

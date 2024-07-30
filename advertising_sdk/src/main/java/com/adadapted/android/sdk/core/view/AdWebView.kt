@@ -22,13 +22,13 @@ internal class AdWebView(context: Context, private val listener: Listener) :
         fun onBlankAdInWebViewLoaded()
     }
 
-    lateinit var currentAd: Ad
+    var currentAd: Ad? = null
     private var loaded = false
 
     fun loadAd(ad: Ad) {
         currentAd = ad
         loaded = false
-        loadUrl(currentAd.url)
+        currentAd?.url?.let { loadUrl(it) }
     }
 
     fun loadBlank() {
@@ -40,7 +40,7 @@ internal class AdWebView(context: Context, private val listener: Listener) :
     }
 
     private fun notifyAdLoaded() {
-        listener.onAdLoadedInWebView(currentAd)
+        currentAd?.let { listener.onAdLoadedInWebView(it) }
     }
 
     private fun notifyAdLoadFailed() {
@@ -52,7 +52,7 @@ internal class AdWebView(context: Context, private val listener: Listener) :
     }
 
     private fun notifyAdClicked() {
-        listener.onAdInWebViewClicked(currentAd)
+        currentAd?.let { listener.onAdInWebViewClicked(it) }
     }
 
     init {
@@ -83,7 +83,7 @@ internal class AdWebView(context: Context, private val listener: Listener) :
                     }
                     MotionEvent.ACTION_UP -> {
                         //Only accept the click if no significant move event was detected
-                        if (!isMoved && currentAd.id.isNotEmpty()) {
+                        if (!isMoved && currentAd?.id?.isNotEmpty() == true) {
                             notifyAdClicked()
                         }
                         return true
@@ -102,7 +102,7 @@ internal class AdWebView(context: Context, private val listener: Listener) :
 
             override fun onPageFinished(view: WebView, url: String) {
                 super.onPageFinished(view, url)
-                if (currentAd.id.isNotEmpty() && !loaded) {
+                if (currentAd?.id?.isNotEmpty() == true && !loaded) {
                     loaded = true
                     notifyAdLoaded()
                 }
@@ -114,7 +114,7 @@ internal class AdWebView(context: Context, private val listener: Listener) :
                 error: WebResourceError
             ) {
                 super.onReceivedError(view, request, error)
-                if (currentAd.id.isNotEmpty() && !loaded) {
+                if (currentAd?.id?.isNotEmpty() == true && !loaded) {
                     loaded = true
                     notifyAdLoadFailed()
                 }
