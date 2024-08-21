@@ -23,7 +23,7 @@ android {
         minSdkVersion 23
         //noinspection EditedTargetSdkVersion
         targetSdkVersion 34
-        versionName "4.0.10"
+        versionName "4.0.10-listonic"
         buildConfigField("String","VERSION_NAME", "\"${defaultConfig.versionName}\"")
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'aasdk-proguard-rules.pro'
