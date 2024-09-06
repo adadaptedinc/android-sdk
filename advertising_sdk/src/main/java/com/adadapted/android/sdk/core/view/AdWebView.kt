@@ -10,7 +10,6 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.adadapted.android.sdk.core.ad.Ad
-import kotlin.math.abs
 
 @SuppressLint("ClickableViewAccessibility", "SetJavaScriptEnabled", "ViewConstructor")
 internal class AdWebView(context: Context, private val listener: Listener) :
@@ -59,39 +58,17 @@ internal class AdWebView(context: Context, private val listener: Listener) :
         setLayerType(View.LAYER_TYPE_SOFTWARE, null)
         setBackgroundColor(Color.TRANSPARENT)
 
-        setOnTouchListener(object : OnTouchListener {
-            var isMoved = false
-            private var startX = 0f
-            private var startY = 0f
-            private val moveThreshold = 20f
-
-            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-                when (event?.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        isMoved = false
-                        startX = event.x
-                        startY = event.y
-                        return true
-                    }
-                    MotionEvent.ACTION_MOVE -> {
-                        val deltaX = abs(event.x - startX)
-                        val deltaY = abs(event.y - startY)
-                        if (deltaX > moveThreshold || deltaY > moveThreshold) {
-                            isMoved = true
-                        }
-                        return true
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        //Only accept the click if no significant move event was detected
-                        if (!isMoved && currentAd?.id?.isNotEmpty() == true) {
-                            notifyAdClicked()
-                        }
-                        return true
-                    }
+        setOnTouchListener(OnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_MOVE -> return@OnTouchListener true
+                MotionEvent.ACTION_UP -> {
+                    currentAd?.id?.let { notifyAdClicked() }
+                    return@OnTouchListener true
                 }
-                return false
             }
+            false
         })
+
         webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(
                 view: WebView,
