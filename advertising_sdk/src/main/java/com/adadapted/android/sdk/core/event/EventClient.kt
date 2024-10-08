@@ -23,10 +23,12 @@ object EventClient : SessionListener {
     private var session: Session? = null
     private var hasInstance: Boolean = false
 
+    @Synchronized
     private fun performTrackSdkEvent(name: String, params: Map<String, String>) {
         sdkEvents.add(SdkEvent(SDK_EVENT_TYPE, name, params = params))
     }
 
+    @Synchronized
     private fun performTrackSdkError(code: String, message: String, params: Map<String, String>) {
         AALogger.logError("App Error: $code - $message")
         sdkErrors.add(SdkError(code, message, params))
@@ -37,7 +39,7 @@ object EventClient : SessionListener {
         if (session == null || sdkErrors.isEmpty()) {
             return
         }
-        val currentSdkErrors: Set<SdkError> = HashSet(sdkErrors)
+        val currentSdkErrors: Set<SdkError> = sdkErrors.map { it.copy() }.toSet()
         sdkErrors.clear()
         session?.let {
             transporter.dispatchToThread {
@@ -51,7 +53,7 @@ object EventClient : SessionListener {
         if (session == null || sdkEvents.isEmpty()) {
             return
         }
-        val currentSdkEvents: Set<SdkEvent> = HashSet(sdkEvents)
+        val currentSdkEvents: Set<SdkEvent> = sdkEvents.map { it.copy() }.toSet()
         sdkEvents.clear()
         session?.let {
             transporter.dispatchToThread {
@@ -65,7 +67,7 @@ object EventClient : SessionListener {
         if (session == null || adEvents.isEmpty()) {
             return
         }
-        val currentAdEvents: Set<AdEvent> = HashSet(adEvents)
+        val currentAdEvents: Set<AdEvent> = adEvents.map { it.copy() }.toSet()
         adEvents.clear()
         session?.let {
             transporter.dispatchToThread {

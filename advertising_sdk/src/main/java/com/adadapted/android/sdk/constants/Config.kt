@@ -3,7 +3,7 @@ package com.adadapted.android.sdk.constants
 object Config {
     private var isProd = false
 
-    const val LIBRARY_VERSION: String = "4.0.11"
+    const val LIBRARY_VERSION: String = "4.0.12"
     const val LOG_TAG = "ADADAPTED_ANDROID_SDK"
 
     const val DEFAULT_AD_POLLING = 300000L // If the new Ad polling isn't set it will default to every 5 minutes
