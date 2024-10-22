@@ -10,7 +10,7 @@ object AdAdaptedListManager {
     private const val ITEM_NAME = "item_name"
 
     @Synchronized
-    fun itemAddedToList(item: String, list: String = "") {
+    fun itemAddedToList(list: String = "", item: String,) {
         if (item.isEmpty()) {
             return
         }
@@ -19,7 +19,7 @@ object AdAdaptedListManager {
     }
 
     @Synchronized
-    fun itemCrossedOffList(item: String, list: String = "") {
+    fun itemCrossedOffList(list: String = "", item: String) {
         if (item.isEmpty()) {
             return
         }
@@ -28,7 +28,7 @@ object AdAdaptedListManager {
     }
 
     @Synchronized
-    fun itemDeletedFromList(item: String, list: String = "") {
+    fun itemDeletedFromList(list: String = "", item: String) {
         if (item.isEmpty()) {
             return
         }

@@ -42,7 +42,7 @@ class AdAdaptedListManagerTest {
 
     @Test
     fun itemAddedToListTest() {
-        AdAdaptedListManager.itemAddedToList("TestItem")
+        AdAdaptedListManager.itemAddedToList(item = "TestItem")
         EventClient.onPublishEvents()
         assertEquals(EventStrings.USER_ADDED_TO_LIST, TestEventAdapter.testSdkEvents.first().name)
         assertEquals("TestItem", TestEventAdapter.testSdkEvents.first().params.getValue("item_name"))
@@ -59,7 +59,7 @@ class AdAdaptedListManagerTest {
 
     @Test
     fun itemCrossedOffListTest() {
-        AdAdaptedListManager.itemCrossedOffList("TestItem")
+        AdAdaptedListManager.itemCrossedOffList(item = "TestItem")
         EventClient.onPublishEvents()
         assertEquals(EventStrings.USER_CROSSED_OFF_LIST, TestEventAdapter.testSdkEvents.first().name)
         assertEquals("TestItem", TestEventAdapter.testSdkEvents.first().params.getValue("item_name"))
@@ -76,7 +76,7 @@ class AdAdaptedListManagerTest {
 
     @Test
     fun itemDeletedFromListTest() {
-        AdAdaptedListManager.itemDeletedFromList("TestItem")
+        AdAdaptedListManager.itemDeletedFromList(item = "TestItem")
         EventClient.onPublishEvents()
         assertEquals(EventStrings.USER_DELETED_FROM_LIST, TestEventAdapter.testSdkEvents.first().name)
         assertEquals("TestItem", TestEventAdapter.testSdkEvents.first().params.getValue("item_name"))
