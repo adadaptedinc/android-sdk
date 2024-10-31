@@ -250,8 +250,10 @@ object SessionClient : SessionAdapterListener {
     }
 
     fun removeZoneContext(zoneId: String) {
-        zoneContexts.removeAll { z -> z.zoneId == zoneId }
-        performRefreshAds()
+        val wasRemoved = zoneContexts.removeAll { z -> z.zoneId == zoneId }
+        if (wasRemoved) {
+            performRefreshAds()
+        }
     }
 
     fun clearZoneContext(){
