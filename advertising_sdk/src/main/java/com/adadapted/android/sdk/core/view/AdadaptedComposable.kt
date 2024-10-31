@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,7 +38,9 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     private var presenter: AdZonePresenter = AdZonePresenter(AdViewHandler(context), SessionClient)
     private var storedContentListener: AdContentListener? = null
     private var zoneViewListener: Listener? = null
+    private var isViewVisible = false
     private var isAdVisible = true
+    private var contextId = ""
     private var webViewLoaded = false
     private var webView = AdWebView(context, object : AdWebView.Listener {
         override fun onAdInWebViewClicked(ad: Ad) {
@@ -59,26 +63,67 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     }).apply { currentAd = Ad() }
 
     @Composable
-    fun CustomZoneView(modifier: Modifier) {
-        InternalZoneView(modifier = modifier)
-    }
+    fun CustomZoneView(
+        zoneId: String,
+        zoneListener: Listener?,
+        contentListener: AdContentListener?,
+        modifier: Modifier,
+        isVisible: MutableState<Boolean> = mutableStateOf(true),
+        adContextId: MutableState<String> = mutableStateOf("")
 
-    @Composable
-    fun ZoneView() {
+    ) {
         InternalZoneView(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .padding(start = 4.dp, end = 4.dp)
+            modifier = modifier,
+            zoneId = zoneId,
+            zoneListener = zoneListener,
+            contentListener = contentListener,
+            isVisible = isVisible,
+            adContextId = adContextId
         )
     }
 
     @Composable
-    private fun InternalZoneView(modifier: Modifier) {
+    fun ZoneView(
+        zoneId: String,
+        zoneListener: Listener?,
+        contentListener: AdContentListener?,
+        isVisible: MutableState<Boolean> = mutableStateOf(true),
+        adContextId: MutableState<String> = mutableStateOf("")
+    ) {
+        InternalZoneView(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .padding(start = 4.dp, end = 4.dp),
+            zoneId = zoneId,
+            zoneListener = zoneListener,
+            contentListener = contentListener,
+            isVisible = isVisible,
+            adContextId = adContextId
+        )
+    }
+
+    @Composable
+    private fun InternalZoneView(
+        zoneId: String,
+        zoneListener: Listener?,
+        contentListener: AdContentListener?,
+        modifier: Modifier,
+        isVisible: MutableState<Boolean>,
+        adContextId: MutableState<String>
+    ) {
+        initializeComposable(zoneId, zoneListener, contentListener, isVisible, adContextId)
         Box(modifier = modifier) {
-            AndroidView(factory = {
-                webView
-            })
+            AndroidView(
+                factory = {
+                    webView
+                },
+                update = {
+                    setInitialVisibility(isAdVisible)
+                    setAdZoneVisibility(isAdVisible)
+                    setAdZoneContextId(contextId)
+                },
+            )
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.report_ad),
                 contentDescription = "Report Ad",
@@ -102,8 +147,17 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         }
     }
 
-    fun init(zoneId: String, zoneListener: Listener?, contentListener: AdContentListener?) {
+    private fun initializeComposable(
+        zoneId: String,
+        zoneListener: Listener?,
+        contentListener: AdContentListener?,
+        isVisible: MutableState<Boolean>,
+        adContextId: MutableState<String>
+    ) {
         presenter.init(zoneId)
+        contextId = adContextId.value
+        isAdVisible = isVisible.value
+        if(contextId.isNotEmpty()) { setAdZoneContextId(contextId) }
         storedContentListener = contentListener
         zoneViewListener = zoneListener
         if (contentListener != null) {
@@ -116,21 +170,17 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         )
     }
 
-    fun setAdZoneVisibility(isViewable: Boolean) {
+    private fun setAdZoneVisibility(isViewable: Boolean) {
         isAdVisible = isViewable
         presenter.onAdVisibilityChanged(isAdVisible)
     }
 
-    fun setAdZoneContextId(contextId: String) {
-        presenter.setZoneContext(contextId)
-    }
-
-    fun removeAdZoneContext() {
-        presenter.removeZoneContext()
-    }
-
-    fun clearAdZoneContext() {
-        presenter.clearZoneContext()
+    private fun setAdZoneContextId(contextId: String) {
+        if (contextId.isEmpty()) {
+            presenter.removeZoneContext()
+        } else {
+            presenter.setZoneContext(contextId)
+        }
     }
 
     private fun dispose() {
@@ -138,6 +188,12 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         storedContentListener = null
         zoneViewListener = null
         presenter.onDetach()
+    }
+
+    private fun setInitialVisibility(isVisible: Boolean) {
+        if (isVisible) {
+            isViewVisible = true
+        }
     }
 
     override fun onAdAvailable(ad: Ad) {
@@ -163,8 +219,10 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     }
 
     private fun loadWebViewAd(ad: Ad) {
-        if (isAdVisible) {
+        if (isViewVisible && isAdVisible && !webViewLoaded) {
             webViewLoaded = true
+            Handler(Looper.getMainLooper()).post { webView.loadAd(ad) }
+        } else if (isViewVisible && webViewLoaded) {
             Handler(Looper.getMainLooper()).post { webView.loadAd(ad) }
         }
     }

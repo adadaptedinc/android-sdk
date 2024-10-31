@@ -165,6 +165,7 @@ object EventClient : SessionListener {
     }
 
     fun trackInvisibleImpression(ad: Ad) {
+        AALogger.logDebug("Ad Invisible Impression Tracked.")
         transporter.dispatchToThread {
             fileEvent(ad, AdEventTypes.INVISIBLE_IMPRESSION)
         }
