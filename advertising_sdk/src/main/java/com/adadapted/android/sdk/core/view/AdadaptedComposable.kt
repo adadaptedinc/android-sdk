@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -112,7 +113,15 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         isVisible: MutableState<Boolean>,
         adContextId: MutableState<String>
     ) {
-        initializeComposable(zoneId, zoneListener, contentListener, isVisible, adContextId)
+        val isInitialized = remember { mutableStateOf(false) }
+
+        // Initialize composable only once
+        if (!isInitialized.value) {
+            initializeComposable(zoneId, zoneListener, contentListener, isVisible, adContextId)
+            isInitialized.value = true
+        }
+        isAdVisible = isVisible.value
+
         Box(modifier = modifier) {
             AndroidView(
                 factory = {
@@ -140,7 +149,8 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
                     }
             )
         }
-        DisposableEffect(key1 = this) {
+
+        DisposableEffect(key1 = zoneId) {
             onDispose {
                 dispose()
             }

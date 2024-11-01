@@ -61,6 +61,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
             adZonePresenterListener = null
             completeCurrentAd()
             sessionClient?.removePresenter(this)
+            stopTimer()
         }
     }
 
@@ -200,6 +201,13 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
             timer.cancelTimer()
             timerRunning = false
             startZoneTimer()
+        }
+    }
+
+    private fun stopTimer() {
+        if (::timer.isInitialized) {
+            timer.cancelTimer()
+            timerRunning = false
         }
     }
 
