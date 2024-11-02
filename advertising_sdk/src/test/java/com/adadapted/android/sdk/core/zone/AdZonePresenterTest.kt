@@ -13,6 +13,7 @@ import com.adadapted.android.sdk.core.event.AdEvent
 import com.adadapted.android.sdk.core.event.AdEventTypes
 import com.adadapted.android.sdk.core.event.EventClient
 import com.adadapted.android.sdk.core.interfaces.EventClientListener
+import com.adadapted.android.sdk.core.keyword.InterceptClient
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.session.SessionTest
 import com.adadapted.android.sdk.core.view.AaWebViewPopupActivity
@@ -60,6 +61,7 @@ class AdZonePresenterTest {
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
+        InterceptClient.createInstance(mock(), mock())
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
         EventClient.onSessionAvailable(MockData.session)
 
@@ -83,6 +85,7 @@ class AdZonePresenterTest {
 
         val testListener = TestAdZonePresenterListener()
         testAdZonePresenter.onSessionAvailable(testSession)
+        SessionClient.onSessionInitialized(testSession)
         testAdZonePresenter.onAttach(testListener)
 
         assertEquals("TestAdId", testListener.testAd.id)
@@ -143,6 +146,7 @@ class AdZonePresenterTest {
         val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(testAd, testAd))))
         testSession.updateZones(zones)
         testAdZonePresenter.onSessionAvailable(testSession)
+        SessionClient.onSessionInitialized(testSession)
 
         val testAdEventListener = TestAdEventClientListener()
         EventClient.addListener(testAdEventListener)
