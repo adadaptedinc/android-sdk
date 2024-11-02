@@ -39,7 +39,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     private var presenter: AdZonePresenter = AdZonePresenter(AdViewHandler(context), SessionClient)
     private var storedContentListener: AdContentListener? = null
     private var zoneViewListener: Listener? = null
-    private var isViewVisible = false
+    private var viewVisibilityInitialized = false
     private var isAdVisible = true
     private var contextId = ""
     private var webViewLoaded = false
@@ -64,38 +64,19 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     }).apply { currentAd = Ad() }
 
     @Composable
-    fun CustomZoneView(
-        zoneId: String,
-        zoneListener: Listener?,
-        contentListener: AdContentListener?,
-        modifier: Modifier,
-        isVisible: MutableState<Boolean> = mutableStateOf(true),
-        adContextId: MutableState<String> = mutableStateOf("")
-
-    ) {
-        InternalZoneView(
-            modifier = modifier,
-            zoneId = zoneId,
-            zoneListener = zoneListener,
-            contentListener = contentListener,
-            isVisible = isVisible,
-            adContextId = adContextId
-        )
-    }
-
-    @Composable
     fun ZoneView(
         zoneId: String,
         zoneListener: Listener?,
         contentListener: AdContentListener?,
         isVisible: MutableState<Boolean> = mutableStateOf(true),
-        adContextId: MutableState<String> = mutableStateOf("")
+        adContextId: MutableState<String> = mutableStateOf(""),
+        modifier: Modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp)
+            .padding(start = 4.dp, end = 4.dp)
     ) {
         InternalZoneView(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .padding(start = 4.dp, end = 4.dp),
+            modifier = modifier,
             zoneId = zoneId,
             zoneListener = zoneListener,
             contentListener = contentListener,
@@ -151,9 +132,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         }
 
         DisposableEffect(key1 = zoneId) {
-            onDispose {
-                dispose()
-            }
+            onDispose { dispose() }
         }
     }
 
@@ -202,7 +181,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
 
     private fun setInitialVisibility(isVisible: Boolean) {
         if (isVisible) {
-            isViewVisible = true
+            viewVisibilityInitialized = true
         }
     }
 
@@ -229,10 +208,10 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     }
 
     private fun loadWebViewAd(ad: Ad) {
-        if (isViewVisible && isAdVisible && !webViewLoaded) {
+        if (viewVisibilityInitialized && isAdVisible && !webViewLoaded) {
             webViewLoaded = true
             Handler(Looper.getMainLooper()).post { webView.loadAd(ad) }
-        } else if (isViewVisible && webViewLoaded) {
+        } else if (viewVisibilityInitialized && webViewLoaded) {
             Handler(Looper.getMainLooper()).post { webView.loadAd(ad) }
         }
     }
