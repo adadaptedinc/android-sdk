@@ -69,7 +69,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         zoneListener: Listener?,
         contentListener: AdContentListener?,
         isZoneVisible: MutableState<Boolean> = mutableStateOf(true),
-        adContextId: MutableState<String> = mutableStateOf(""),
+        zoneContextId: MutableState<String> = mutableStateOf(""),
         modifier: Modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
@@ -81,7 +81,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
             zoneListener = zoneListener,
             contentListener = contentListener,
             isZoneVisible = isZoneVisible,
-            adContextId = adContextId
+            zoneContextId = zoneContextId
         )
     }
 
@@ -92,13 +92,13 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         contentListener: AdContentListener?,
         modifier: Modifier,
         isZoneVisible: MutableState<Boolean>,
-        adContextId: MutableState<String>
+        zoneContextId: MutableState<String>
     ) {
         val isInitialized = remember { mutableStateOf(false) }
 
         // Initialize composable only once
         if (!isInitialized.value) {
-            initializeComposable(zoneId, zoneListener, contentListener, isZoneVisible, adContextId)
+            initializeComposable(zoneId, zoneListener, contentListener, isZoneVisible, zoneContextId)
             isInitialized.value = true
         }
         isAdVisible = isZoneVisible.value
