@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,7 +39,9 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     private var presenter: AdZonePresenter = AdZonePresenter(AdViewHandler(context), SessionClient)
     private var storedContentListener: AdContentListener? = null
     private var zoneViewListener: Listener? = null
+    private var viewVisibilityInitialized = false
     private var isAdVisible = true
+    private var contextId = ""
     private var webViewLoaded = false
     private var webView = AdWebView(context, object : AdWebView.Listener {
         override fun onAdInWebViewClicked(ad: Ad) {
@@ -59,26 +64,56 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     }).apply { currentAd = Ad() }
 
     @Composable
-    fun CustomZoneView(modifier: Modifier) {
-        InternalZoneView(modifier = modifier)
-    }
-
-    @Composable
-    fun ZoneView() {
+    fun ZoneView(
+        zoneId: String,
+        zoneListener: Listener?,
+        contentListener: AdContentListener?,
+        isZoneVisible: MutableState<Boolean> = mutableStateOf(true),
+        zoneContextId: MutableState<String> = mutableStateOf(""),
+        modifier: Modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp)
+            .padding(start = 4.dp, end = 4.dp)
+    ) {
         InternalZoneView(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .padding(start = 4.dp, end = 4.dp)
+            modifier = modifier,
+            zoneId = zoneId,
+            zoneListener = zoneListener,
+            contentListener = contentListener,
+            isZoneVisible = isZoneVisible,
+            zoneContextId = zoneContextId
         )
     }
 
     @Composable
-    private fun InternalZoneView(modifier: Modifier) {
+    private fun InternalZoneView(
+        zoneId: String,
+        zoneListener: Listener?,
+        contentListener: AdContentListener?,
+        modifier: Modifier,
+        isZoneVisible: MutableState<Boolean>,
+        zoneContextId: MutableState<String>
+    ) {
+        val isInitialized = remember { mutableStateOf(false) }
+
+        // Initialize composable only once
+        if (!isInitialized.value) {
+            initializeComposable(zoneId, zoneListener, contentListener, isZoneVisible, zoneContextId)
+            isInitialized.value = true
+        }
+        isAdVisible = isZoneVisible.value
+
         Box(modifier = modifier) {
-            AndroidView(factory = {
-                webView
-            })
+            AndroidView(
+                factory = {
+                    webView
+                },
+                update = {
+                    setInitialVisibility(isAdVisible)
+                    setAdZoneVisibility(isAdVisible)
+                    setAdZoneContextId(contextId)
+                },
+            )
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.report_ad),
                 contentDescription = "Report Ad",
@@ -95,15 +130,23 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
                     }
             )
         }
-        DisposableEffect(key1 = this) {
-            onDispose {
-                dispose()
-            }
+
+        DisposableEffect(key1 = zoneId) {
+            onDispose { dispose() }
         }
     }
 
-    fun init(zoneId: String, zoneListener: Listener?, contentListener: AdContentListener?) {
+    private fun initializeComposable(
+        zoneId: String,
+        zoneListener: Listener?,
+        contentListener: AdContentListener?,
+        isVisible: MutableState<Boolean>,
+        adContextId: MutableState<String>
+    ) {
         presenter.init(zoneId)
+        contextId = adContextId.value
+        isAdVisible = isVisible.value
+        if(contextId.isNotEmpty()) { setAdZoneContextId(contextId) }
         storedContentListener = contentListener
         zoneViewListener = zoneListener
         if (contentListener != null) {
@@ -116,21 +159,17 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         )
     }
 
-    fun setAdZoneVisibility(isViewable: Boolean) {
+    private fun setAdZoneVisibility(isViewable: Boolean) {
         isAdVisible = isViewable
         presenter.onAdVisibilityChanged(isAdVisible)
     }
 
-    fun setAdZoneContextId(contextId: String) {
-        presenter.setZoneContext(contextId)
-    }
-
-    fun removeAdZoneContext() {
-        presenter.removeZoneContext()
-    }
-
-    fun clearAdZoneContext() {
-        presenter.clearZoneContext()
+    private fun setAdZoneContextId(contextId: String) {
+        if (contextId.isEmpty()) {
+            presenter.removeZoneContext()
+        } else {
+            presenter.setZoneContext(contextId)
+        }
     }
 
     private fun dispose() {
@@ -138,6 +177,12 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         storedContentListener = null
         zoneViewListener = null
         presenter.onDetach()
+    }
+
+    private fun setInitialVisibility(isVisible: Boolean) {
+        if (isVisible) {
+            viewVisibilityInitialized = true
+        }
     }
 
     override fun onAdAvailable(ad: Ad) {
@@ -149,7 +194,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     }
 
     override fun onNoAdAvailable() {
-        Handler(Looper.getMainLooper()).post { webView.loadBlank() }
+        runOnMainThread { webView.loadBlank() }
     }
 
     override fun onAdVisibilityChanged(ad: Ad) {
@@ -163,27 +208,33 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     }
 
     private fun loadWebViewAd(ad: Ad) {
-        if (isAdVisible) {
+        if (viewVisibilityInitialized && isAdVisible && !webViewLoaded) {
             webViewLoaded = true
-            Handler(Looper.getMainLooper()).post { webView.loadAd(ad) }
+            runOnMainThread { webView.loadAd(ad) }
+        } else if (viewVisibilityInitialized && webViewLoaded) {
+            runOnMainThread { webView.loadAd(ad) }
         }
     }
 
     private fun notifyClientZoneHasAds(hasAds: Boolean) {
-        Handler(Looper.getMainLooper()).post {
+        runOnMainThread {
             zoneViewListener?.onZoneHasAds(hasAds)
         }
     }
 
     private fun notifyClientAdLoaded() {
-        Handler(Looper.getMainLooper()).post {
+        runOnMainThread {
             zoneViewListener?.onAdLoaded()
         }
     }
 
     private fun notifyClientAdLoadFailed() {
-        Handler(Looper.getMainLooper()).post {
+        runOnMainThread {
             zoneViewListener?.onAdLoadFailed()
         }
+    }
+
+    private fun runOnMainThread(action: () -> Unit) {
+        Handler(Looper.getMainLooper()).post(action)
     }
 }
