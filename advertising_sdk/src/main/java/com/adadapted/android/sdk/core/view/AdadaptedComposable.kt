@@ -194,7 +194,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     }
 
     override fun onNoAdAvailable() {
-        Handler(Looper.getMainLooper()).post { webView.loadBlank() }
+        runOnMainThread { webView.loadBlank() }
     }
 
     override fun onAdVisibilityChanged(ad: Ad) {
@@ -210,27 +210,31 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     private fun loadWebViewAd(ad: Ad) {
         if (viewVisibilityInitialized && isAdVisible && !webViewLoaded) {
             webViewLoaded = true
-            Handler(Looper.getMainLooper()).post { webView.loadAd(ad) }
+            runOnMainThread { webView.loadAd(ad) }
         } else if (viewVisibilityInitialized && webViewLoaded) {
-            Handler(Looper.getMainLooper()).post { webView.loadAd(ad) }
+            runOnMainThread { webView.loadAd(ad) }
         }
     }
 
     private fun notifyClientZoneHasAds(hasAds: Boolean) {
-        Handler(Looper.getMainLooper()).post {
+        runOnMainThread {
             zoneViewListener?.onZoneHasAds(hasAds)
         }
     }
 
     private fun notifyClientAdLoaded() {
-        Handler(Looper.getMainLooper()).post {
+        runOnMainThread {
             zoneViewListener?.onAdLoaded()
         }
     }
 
     private fun notifyClientAdLoadFailed() {
-        Handler(Looper.getMainLooper()).post {
+        runOnMainThread {
             zoneViewListener?.onAdLoadFailed()
         }
+    }
+
+    private fun runOnMainThread(action: () -> Unit) {
+        Handler(Looper.getMainLooper()).post(action)
     }
 }
