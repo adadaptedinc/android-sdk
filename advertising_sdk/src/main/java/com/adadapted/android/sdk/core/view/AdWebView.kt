@@ -5,11 +5,14 @@ import android.content.Context
 import android.graphics.Color
 import android.view.MotionEvent
 import android.view.View
+import android.webkit.ConsoleMessage
+import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.adadapted.android.sdk.core.ad.Ad
+import com.adadapted.android.sdk.core.log.AALogger
 
 @SuppressLint("ClickableViewAccessibility", "SetJavaScriptEnabled", "ViewConstructor")
 internal class AdWebView(context: Context, private val listener: Listener) :
@@ -69,13 +72,21 @@ internal class AdWebView(context: Context, private val listener: Listener) :
             false
         })
 
-        webViewClient = object : WebViewClient() {
-            override fun shouldOverrideUrlLoading(
-                view: WebView,
-                request: WebResourceRequest
-            ): Boolean {
-                return true
+        webChromeClient = object : WebChromeClient() {
+            override fun onConsoleMessage(message: ConsoleMessage?): Boolean {
+                AALogger.logDebug("Console message: ${message?.message()}")
+                return super.onConsoleMessage(message)
             }
+        }
+
+
+        webViewClient = object : WebViewClient() {
+//            override fun shouldOverrideUrlLoading(
+//                view: WebView,
+//                request: WebResourceRequest
+//            ): Boolean {
+//                return true
+//            }
 
             override fun onPageFinished(view: WebView, url: String) {
                 super.onPageFinished(view, url)
@@ -98,5 +109,9 @@ internal class AdWebView(context: Context, private val listener: Listener) :
             }
         }
         settings.javaScriptEnabled = true
+        settings.domStorageEnabled = true  // Enables localStorage if needed by JavaScript
+        settings.setSupportMultipleWindows(true)  // To support opening multiple windows if required
+        settings.javaScriptCanOpenWindowsAutomatically = true  // Allow popups if required
+        settings.loadsImagesAutomatically = true
     }
 }

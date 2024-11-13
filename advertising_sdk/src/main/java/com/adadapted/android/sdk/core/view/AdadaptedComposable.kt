@@ -28,6 +28,7 @@ import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdContentListener
 import com.adadapted.android.sdk.core.ad.AdContentPublisher
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
+import com.adadapted.android.sdk.core.log.AALogger
 import com.adadapted.android.sdk.core.session.SessionClient
 
 class AdadaptedComposable(context: Context): AdZonePresenterListener {
@@ -162,6 +163,9 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     private fun setAdZoneVisibility(isViewable: Boolean) {
         isAdVisible = isViewable
         presenter.onAdVisibilityChanged(isAdVisible)
+            webView.evaluateJavascript("showTestMessage()") { result ->
+                AALogger.logDebug("Result from JavaScript: $result")
+            }
     }
 
     private fun setAdZoneContextId(contextId: String) {
