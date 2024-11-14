@@ -39,7 +39,6 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         fun onAdLoaded()
         fun onAdLoadFailed()
     }
-    var zoneId: String = ""
     private var presenter: AdZonePresenter = AdZonePresenter(AdViewHandler(context), SessionClient)
     private var storedContentListener: AdContentListener? = null
     private var zoneViewListener: Listener? = null
@@ -103,26 +102,21 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
 
         DisposableEffect(lifecycleOwner) {
             val observer = LifecycleEventObserver { _, event ->
-                if (event == Lifecycle.Event.ON_DESTROY) {
-                    dispose()
-                    //lifecycleOwner.lifecycle.removeObserver(observer)
+                if (event == Lifecycle.Event.ON_START) {
+                    if (!isInitialized.value) {
+                        initializeComposable(zoneId, zoneListener, contentListener, isZoneVisible, zoneContextId)
+                        isInitialized.value = true
+                    }
                 }
             }
 
             lifecycleOwner.lifecycle.addObserver(observer)
 
             onDispose {
-//                isZoneVisible.value = false // Backgrounded
-//                setAdZoneVisibility(isZoneVisible.value)
-                //lifecycleOwner.lifecycle.removeObserver(observer)
+                lifecycleOwner.lifecycle.removeObserver(observer)
             }
         }
 
-        // Initialize composable only once
-        if (!isInitialized.value) {
-            initializeComposable(zoneId, zoneListener, contentListener, isZoneVisible, zoneContextId)
-            isInitialized.value = true
-        }
         isAdVisible = isZoneVisible.value
 
         Box(modifier = modifier) {
@@ -155,8 +149,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
 
         DisposableEffect(key1 = zoneId) {
             onDispose {
-                isZoneVisible.value = false // Backgrounded
-                setAdZoneVisibility(isZoneVisible.value)
+                dispose()
             }
         }
     }
@@ -168,8 +161,6 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         isVisible: MutableState<Boolean>,
         adContextId: MutableState<String>
     ) {
-        this.zoneId = zoneId
-        ZoneViewComposableManager.shared.addComposable(this)
         presenter.init(zoneId)
         contextId = adContextId.value
         isAdVisible = isVisible.value
