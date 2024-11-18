@@ -12,9 +12,9 @@ import android.webkit.WebViewClient
 import com.adadapted.android.sdk.core.ad.Ad
 
 @SuppressLint("ClickableViewAccessibility", "SetJavaScriptEnabled", "ViewConstructor")
-internal class AdWebView(context: Context, private val listener: Listener) :
+class AdWebView(context: Context, private val listener: Listener) :
     WebView(context.applicationContext) {
-    internal interface Listener {
+    interface Listener {
         fun onAdLoadedInWebView(ad: Ad)
         fun onAdLoadInWebViewFailed()
         fun onAdInWebViewClicked(ad: Ad)
@@ -22,7 +22,7 @@ internal class AdWebView(context: Context, private val listener: Listener) :
     }
 
     var currentAd: Ad? = null
-    private var loaded = false
+    var loaded = false
 
     fun loadAd(ad: Ad) {
         currentAd = ad

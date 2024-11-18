@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.core.view
 
+import android.webkit.WebView
 import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdActionType
@@ -36,11 +37,16 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
     private var timerRunning = false
     private lateinit var timer: Timer
     private val eventClient: EventClient = EventClient
+    private var webView: AdWebView? = null
 
     fun init(zoneId: String) {
         if (this.zoneId.isEmpty()) {
             this.zoneId = zoneId
         }
+    }
+
+    fun setWebView(webView: AdWebView) {
+        this.webView = webView
     }
 
     fun onAttach(adZonePresenterListener: AdZonePresenterListener?) {
@@ -173,9 +179,29 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
     }
 
     private fun trackAdImpression(ad: Ad, isAdVisible: Boolean) {
-        if (!isAdVisible || ad.impressionWasTracked() || ad.isEmpty) return
+        if (!isAdVisible || ad.impressionWasTracked() || ad.isEmpty || webView?.loaded == false) return
         ad.setImpressionTracked()
+        callPixelTrackingJavaScript()
         eventClient.trackImpression(ad)
+    }
+
+    private fun callPixelTrackingJavaScript() {
+        webView?.evaluateJavascript("document.documentElement.outerHTML.toString()") { result ->
+            if (result != null) {
+                val html = result
+                println("HTML of the page: $html")
+            } else {
+                println("Error fetching DOM structure: Result is null")
+            }
+        }
+
+        webView?.evaluateJavascript("loadTrackingPixels()") { result ->
+            if (result != null) {
+                AALogger.logDebug("JavaScript function returned: $result")
+            } else {
+                AALogger.logDebug("JavaScript function returned null or unexpected result")
+            }
+        }
     }
 
     private fun startZoneTimer() {

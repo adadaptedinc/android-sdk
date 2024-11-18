@@ -162,6 +162,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         adContextId: MutableState<String>
     ) {
         presenter.init(zoneId)
+        presenter.setWebView(webView)
         contextId = adContextId.value
         isAdVisible = isVisible.value
         if(contextId.isNotEmpty()) { setAdZoneContextId(contextId) }
