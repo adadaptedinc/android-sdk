@@ -1,6 +1,5 @@
 package com.adadapted.android.sdk.core.view
 
-import android.webkit.WebView
 import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdActionType
@@ -26,7 +25,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
     private var currentAd: Ad = Ad()
     private var zoneId: String = ""
     private var isZoneVisible: Boolean = true
-    var adZonePresenterListener: AdZonePresenterListener? = null
+    private var adZonePresenterListener: AdZonePresenterListener? = null
     private var attached: Boolean
     private var sessionId: String? = null
     private var zoneLoaded: Boolean
@@ -39,13 +38,10 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
     private val eventClient: EventClient = EventClient
     private var webView: AdWebView? = null
 
-    fun init(zoneId: String) {
+    fun init(zoneId: String, webView: AdWebView) {
         if (this.zoneId.isEmpty()) {
             this.zoneId = zoneId
         }
-    }
-
-    fun setWebView(webView: AdWebView) {
         this.webView = webView
     }
 
@@ -186,22 +182,8 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
     }
 
     private fun callPixelTrackingJavaScript() {
-        webView?.evaluateJavascript("document.documentElement.outerHTML.toString()") { result ->
-            if (result != null) {
-                val html = result
-                println("HTML of the page: $html")
-            } else {
-                println("Error fetching DOM structure: Result is null")
-            }
-        }
-
-        webView?.evaluateJavascript("loadTrackingPixels()") { result ->
-            if (result != null) {
-                AALogger.logDebug("JavaScript function returned: $result")
-            } else {
-                AALogger.logDebug("JavaScript function returned null or unexpected result")
-            }
-        }
+        webView?.evaluateJavascript("loadTrackingPixels()") {}
+        AALogger.logDebug("Pixel Tracking Called.")
     }
 
     private fun startZoneTimer() {
