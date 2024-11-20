@@ -20,8 +20,7 @@ interface AdZonePresenterListener {
     fun onAdVisibilityChanged(ad: Ad)
 }
 
-class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sessionClient: SessionClient?) :
-    SessionListener {
+class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sessionClient: SessionClient?) : SessionListener {
     private var currentAd: Ad = Ad()
     private var zoneId: String = ""
     private var isZoneVisible: Boolean = true
@@ -182,7 +181,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
     }
 
     private fun callPixelTrackingJavaScript() {
-        webView?.evaluateJavascript("loadTrackingPixels()") {}
+        webView?.evaluateJavascript(PIXEL_TRACKING_JS) {}
         AALogger.logDebug("Pixel Tracking Called.")
     }
 
@@ -290,5 +289,9 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
         zoneLoaded = false
         currentZone = Zone()
         randomAdStartPosition = ((Date().time / 1000).toInt() % 10)
+    }
+
+    companion object {
+        private const val PIXEL_TRACKING_JS = "loadTrackingPixels()"
     }
 }
