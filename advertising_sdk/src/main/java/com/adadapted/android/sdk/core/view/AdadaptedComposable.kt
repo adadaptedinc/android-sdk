@@ -20,9 +20,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.adadapted.R
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdContentListener
@@ -95,12 +98,25 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         zoneContextId: MutableState<String>
     ) {
         val isInitialized = remember { mutableStateOf(false) }
+        val lifecycleOwner = LocalLifecycleOwner.current
 
-        // Initialize composable only once
-        if (!isInitialized.value) {
-            initializeComposable(zoneId, zoneListener, contentListener, isZoneVisible, zoneContextId)
-            isInitialized.value = true
+        DisposableEffect(lifecycleOwner) {
+            val observer = LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_START) {
+                    if (!isInitialized.value) {
+                        initializeComposable(zoneId, zoneListener, contentListener, isZoneVisible, zoneContextId)
+                        isInitialized.value = true
+                    }
+                }
+            }
+
+            lifecycleOwner.lifecycle.addObserver(observer)
+
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
         }
+
         isAdVisible = isZoneVisible.value
 
         Box(modifier = modifier) {
@@ -132,7 +148,9 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         }
 
         DisposableEffect(key1 = zoneId) {
-            onDispose { dispose() }
+            onDispose {
+                dispose()
+            }
         }
     }
 
@@ -143,7 +161,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         isVisible: MutableState<Boolean>,
         adContextId: MutableState<String>
     ) {
-        presenter.init(zoneId)
+        presenter.init(zoneId, webView)
         contextId = adContextId.value
         isAdVisible = isVisible.value
         if(contextId.isNotEmpty()) { setAdZoneContextId(contextId) }
@@ -172,7 +190,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         }
     }
 
-    private fun dispose() {
+    fun dispose() {
         storedContentListener?.let { AdContentPublisher.removeListener(it) }
         storedContentListener = null
         zoneViewListener = null

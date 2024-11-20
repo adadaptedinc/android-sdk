@@ -69,7 +69,7 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     }
 
     fun init(zoneId: String) {
-        presenter.init(zoneId)
+        presenter.init(zoneId, webView)
     }
 
     fun onStart() {

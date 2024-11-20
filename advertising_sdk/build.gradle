@@ -23,7 +23,7 @@ android {
         minSdkVersion 23
         //noinspection EditedTargetSdkVersion
         targetSdkVersion 34
-        versionName "4.1.0"
+        versionName "4.1.1"
         buildConfigField("String","VERSION_NAME", "\"${defaultConfig.versionName}\"")
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'aasdk-proguard-rules.pro'
@@ -68,6 +68,7 @@ dependencies {
     implementation 'androidx.compose.foundation:foundation:1.6.8'
     implementation 'androidx.compose.material:material:1.6.8'
 
+    testImplementation 'androidx.test:core-ktx:1.6.1'
     testImplementation 'junit:junit:4.13.2'
     //testImplementation 'io.ktor:ktor-client-mock2.2.4'
     testImplementation 'org.json:json:20200518'
@@ -95,7 +96,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.adadapted'
                 artifactId = 'android-sdk'
-                version = '4.1.0'
+                version = '4.1.1'
             }
         }
     }

@@ -20,12 +20,11 @@ interface AdZonePresenterListener {
     fun onAdVisibilityChanged(ad: Ad)
 }
 
-class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sessionClient: SessionClient?) :
-    SessionListener {
+class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sessionClient: SessionClient?) : SessionListener {
     private var currentAd: Ad = Ad()
     private var zoneId: String = ""
     private var isZoneVisible: Boolean = true
-    var adZonePresenterListener: AdZonePresenterListener? = null
+    private var adZonePresenterListener: AdZonePresenterListener? = null
     private var attached: Boolean
     private var sessionId: String? = null
     private var zoneLoaded: Boolean
@@ -36,11 +35,13 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
     private var timerRunning = false
     private lateinit var timer: Timer
     private val eventClient: EventClient = EventClient
+    private var webView: AdWebView? = null
 
-    fun init(zoneId: String) {
+    fun init(zoneId: String, webView: AdWebView) {
         if (this.zoneId.isEmpty()) {
             this.zoneId = zoneId
         }
+        this.webView = webView
     }
 
     fun onAttach(adZonePresenterListener: AdZonePresenterListener?) {
@@ -173,9 +174,15 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
     }
 
     private fun trackAdImpression(ad: Ad, isAdVisible: Boolean) {
-        if (!isAdVisible || ad.impressionWasTracked() || ad.isEmpty) return
+        if (!isAdVisible || ad.impressionWasTracked() || ad.isEmpty || webView?.loaded == false) return
         ad.setImpressionTracked()
+        callPixelTrackingJavaScript()
         eventClient.trackImpression(ad)
+    }
+
+    private fun callPixelTrackingJavaScript() {
+        webView?.evaluateJavascript(PIXEL_TRACKING_JS) {}
+        AALogger.logDebug("Pixel Tracking Called.")
     }
 
     private fun startZoneTimer() {
@@ -282,5 +289,9 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
         zoneLoaded = false
         currentZone = Zone()
         randomAdStartPosition = ((Date().time / 1000).toInt() % 10)
+    }
+
+    companion object {
+        private const val PIXEL_TRACKING_JS = "loadTrackingPixels()"
     }
 }
