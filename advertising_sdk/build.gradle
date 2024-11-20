@@ -68,6 +68,7 @@ dependencies {
     implementation 'androidx.compose.foundation:foundation:1.6.8'
     implementation 'androidx.compose.material:material:1.6.8'
 
+    testImplementation 'androidx.test:core-ktx:1.6.1'
     testImplementation 'junit:junit:4.13.2'
     //testImplementation 'io.ktor:ktor-client-mock2.2.4'
     testImplementation 'org.json:json:20200518'
