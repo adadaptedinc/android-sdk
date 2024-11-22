@@ -40,6 +40,7 @@ public class TestAppApplication extends Application {
                 .enableKeywordIntercept(true)
                 .enablePayloads(true)
                 //.setCustomIdentifier("customTestId")
+                .enableDebugLogging()
                 .setSdkSessionListener(new AaSdkSessionListener() {
                     @Override
                     public void onHasAdsToServe(boolean hasAds, @NonNull List<String> availableZoneIds) {
