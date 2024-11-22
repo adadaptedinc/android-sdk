@@ -79,15 +79,17 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
         sessionClient?.clearZoneContext()
     }
 
-    private fun setNextAd() {
+    private fun setNextAd(isFreshLoad: Boolean = false) {
         if (!zoneLoaded || sessionClient?.hasStaleAds() == true) {
             return
         }
         completeCurrentAd()
 
         currentAd = if (adZonePresenterListener != null && currentZone.hasAds()) {
+            if (!isFreshLoad) {
+                randomAdStartPosition++
+            }
             val adPosition = randomAdStartPosition % currentZone.ads.size
-            randomAdStartPosition++
             currentZone.ads[adPosition]
         } else {
             Ad()
@@ -258,11 +260,11 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
         return false
     }
 
-    private fun updateCurrentZone(zone: Zone) {
+    private fun updateCurrentZone(zone: Zone, isFromRefresh: Boolean = false) {
         zoneLoaded = true
         currentZone = zone
         restartTimer()
-        setNextAd()
+        setNextAd(isFreshLoad = !isFromRefresh)
     }
 
     override fun onSessionAvailable(session: Session) {
@@ -276,7 +278,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
     }
 
     override fun onAdsAvailable(session: Session) {
-        updateCurrentZone(session.getZone(zoneId))
+        updateCurrentZone(session.getZone(zoneId), isFromRefresh = true)
         notifyAdsRefreshed()
     }
 
