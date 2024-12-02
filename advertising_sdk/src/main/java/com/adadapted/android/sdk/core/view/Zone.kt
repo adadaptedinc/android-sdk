@@ -31,11 +31,25 @@ data class Zone(val id: String = "", val ads: List<Ad> = listOf()) {
         return@lazy dimensionsToReturn
     }
 
+    val pixelAccurateDimensions by lazy {
+        val dimensionsToReturn: MutableMap<String, Dimension> = HashMap()
+        val scaledDimenPort = calculatePixelAccurateDimensionValue(portWidth.toInt(), portHeight.toInt())
+        val scaledDimenLand = calculatePixelAccurateDimensionValue(landWidth.toInt(), landHeight.toInt())
+
+        dimensionsToReturn[Dimension.Orientation.PORT] = scaledDimenPort
+        dimensionsToReturn[Dimension.Orientation.LAND] = scaledDimenLand
+        return@lazy dimensionsToReturn
+    }
+
     fun hasAds(): Boolean {
         return ads.isNotEmpty()
     }
 
     private fun calculateDimensionValue(value: Int): Int {
         return DimensionConverter.convertDpToPx(value)
+    }
+
+    private fun calculatePixelAccurateDimensionValue(width: Int, height: Int): Dimension {
+        return DimensionConverter.scaleDimensions(width, height)
     }
 }

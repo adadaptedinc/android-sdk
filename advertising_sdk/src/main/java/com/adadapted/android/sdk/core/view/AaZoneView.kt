@@ -30,6 +30,7 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     private var isAdVisible = true
     private var webViewLoaded = false
     private var isAdaptiveSizingEnabled = false
+    private var isFixedAspectRatioEnabled = false
 
 
     constructor(context: Context) : super(context.applicationContext) {
@@ -126,12 +127,8 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
         isAdaptiveSizingEnabled = value
     }
 
-    fun resizeAdZoneView(width: Int, height: Int) {
-        Handler(Looper.getMainLooper()).post {
-            val resizedLayoutParams = LayoutParams(width, height)
-            this.layoutParams = resizedLayoutParams
-            webView.layoutParams = resizedLayoutParams
-        }
+    fun enableFixedAspectRatio(value: Boolean) {
+        isFixedAspectRatioEnabled = value
     }
 
     override fun onZoneAvailable(zone: Zone) {
@@ -143,11 +140,19 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
                     LayoutParams.MATCH_PARENT
                 )
             } else {
-                val dimension = zone.dimensions[Dimension.Orientation.PORT]
-                LayoutParams(
-                    dimension?.width ?: LayoutParams.MATCH_PARENT,
-                    dimension?.height ?: LayoutParams.MATCH_PARENT
-                )
+                if(isFixedAspectRatioEnabled) {
+                    val paDimensions = zone.pixelAccurateDimensions[Dimension.Orientation.PORT]
+                    LayoutParams(
+                        paDimensions?.width ?: LayoutParams.MATCH_PARENT,
+                        paDimensions?.height ?: LayoutParams.MATCH_PARENT
+                    )
+                } else {
+                    val dimensions = zone.dimensions[Dimension.Orientation.PORT]
+                    LayoutParams(
+                        dimensions?.width ?: LayoutParams.MATCH_PARENT,
+                        dimensions?.height ?: LayoutParams.MATCH_PARENT
+                    )
+                }
             }
         }
         Handler(Looper.getMainLooper()).post {
