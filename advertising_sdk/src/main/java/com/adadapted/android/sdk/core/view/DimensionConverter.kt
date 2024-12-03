@@ -1,16 +1,18 @@
 package com.adadapted.android.sdk.core.view
 
-import android.content.res.Resources
 import android.util.DisplayMetrics
 
 object DimensionConverter {
     private var scale: Float = 0f
-    private val displayMetrics: DisplayMetrics = Resources.getSystem().displayMetrics
-    private val screenWidthDp: Float =  displayMetrics.widthPixels / displayMetrics.density
-    private val screenHeightDp: Float = displayMetrics.heightPixels / displayMetrics.density
+    private var displayMetrics: DisplayMetrics = DisplayMetrics()
+    private var screenWidthDp: Float = 0f
+    private var screenHeightDp: Float = 0f
 
-    fun createInstance(scale: Float) {
+    fun createInstance(scale: Float, displayMetrics: DisplayMetrics) {
         DimensionConverter.scale = scale
+        DimensionConverter.displayMetrics = displayMetrics
+        screenWidthDp =  displayMetrics.widthPixels / displayMetrics.density
+        screenHeightDp = displayMetrics.heightPixels / displayMetrics.density
     }
 
     fun convertDpToPx(dpValue: Int): Int {

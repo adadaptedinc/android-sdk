@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.core.zone
 
+import android.util.DisplayMetrics
 import com.adadapted.android.sdk.core.view.DimensionConverter
 import com.adadapted.android.sdk.core.view.Zone
 import org.junit.Assert.assertEquals
@@ -10,7 +11,12 @@ import org.junit.Test
 class ZoneTest {
     @Before
     fun setup() {
-        DimensionConverter.createInstance(scale = 1f)
+        val mockDisplayMetrics = DisplayMetrics().apply {
+            widthPixels = 1080
+            heightPixels = 1920
+            density = 3.0f
+        }
+        DimensionConverter.createInstance(scale = 1f, mockDisplayMetrics)
     }
 
     @Test

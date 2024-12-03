@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.core.common
 
+import android.util.DisplayMetrics
 import com.adadapted.android.sdk.core.view.Dimension
 import com.adadapted.android.sdk.core.view.DimensionConverter
 import org.junit.Assert.assertEquals
@@ -9,7 +10,13 @@ import org.junit.Test
 class DimensionConverterTest {
     @Before
     fun setup() {
-        DimensionConverter.createInstance(2f)
+        val mockDisplayMetrics = DisplayMetrics().apply {
+            widthPixels = 1080
+            heightPixels = 1920
+            density = 3.0f
+        }
+
+        DimensionConverter.createInstance(2f, mockDisplayMetrics)
     }
 
     @Test
