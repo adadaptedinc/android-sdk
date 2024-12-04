@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.core.view
 
 import com.adadapted.android.sdk.core.ad.Ad
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Transient
 
 @kotlinx.serialization.Serializable
 data class Zone(val id: String = "", val ads: List<Ad> = listOf()) {
@@ -18,31 +19,34 @@ data class Zone(val id: String = "", val ads: List<Ad> = listOf()) {
     @SerialName("land_width")
     val landWidth: Long = 0
 
-    val dimensions by lazy {
-        val dimensionsToReturn: MutableMap<String, Dimension> = HashMap()
-        dimensionsToReturn[Dimension.Orientation.PORT] = Dimension(
-            calculateDimensionValue(portHeight.toInt()),
-            calculateDimensionValue(portWidth.toInt())
-        )
-        dimensionsToReturn[Dimension.Orientation.LAND] = Dimension(
-            calculateDimensionValue(landHeight.toInt()),
-            calculateDimensionValue(landWidth.toInt())
-        )
-        return@lazy dimensionsToReturn
-    }
+    @Transient
+    val dimensions: Map<String, Dimension> = initializeDimensions()
 
-    val pixelAccurateDimensions by lazy {
-        val dimensionsToReturn: MutableMap<String, Dimension> = HashMap()
-        val scaledDimenPort = calculatePixelAccurateDimensionValue(portWidth.toInt(), portHeight.toInt())
-        val scaledDimenLand = calculatePixelAccurateDimensionValue(landWidth.toInt(), landHeight.toInt())
-
-        dimensionsToReturn[Dimension.Orientation.PORT] = scaledDimenPort
-        dimensionsToReturn[Dimension.Orientation.LAND] = scaledDimenLand
-        return@lazy dimensionsToReturn
-    }
+    @Transient
+    val pixelAccurateDimensions: Map<String, Dimension> = initializePixelAccurateDimensions()
 
     fun hasAds(): Boolean {
         return ads.isNotEmpty()
+    }
+
+    private fun initializeDimensions(): Map<String, Dimension> {
+        return mapOf(
+            Dimension.Orientation.PORT to Dimension(
+                calculateDimensionValue(portHeight.toInt()),
+                calculateDimensionValue(portWidth.toInt())
+            ),
+            Dimension.Orientation.LAND to Dimension(
+                calculateDimensionValue(landHeight.toInt()),
+                calculateDimensionValue(landWidth.toInt())
+            )
+        )
+    }
+
+    private fun initializePixelAccurateDimensions(): Map<String, Dimension> {
+        return mapOf(
+            Dimension.Orientation.PORT to calculatePixelAccurateDimensionValue(portWidth.toInt(), portHeight.toInt())
+            //Dimension.Orientation.LAND to calculatePixelAccurateDimensionValue(landWidth.toInt(), landHeight.toInt()) - Not Currently Used
+        )
     }
 
     private fun calculateDimensionValue(value: Int): Int {

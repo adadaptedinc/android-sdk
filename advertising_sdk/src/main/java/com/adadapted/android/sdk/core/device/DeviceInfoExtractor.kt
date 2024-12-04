@@ -3,6 +3,7 @@ package com.adadapted.android.sdk.core.device
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.os.Build
 import android.provider.Settings
 import android.telephony.TelephonyManager
@@ -98,7 +99,7 @@ open class DeviceInfoExtractor(context: Context) {
     }
 
     private fun setDeviceScale(scale: Float) {
-        DimensionConverter.createInstance(scale)
+        DimensionConverter.createInstance(scale, Resources.getSystem().displayMetrics)
     }
 
     private fun getAdvertisingIdClientInfo(context: Context): AdvertisingIdClient.Info? {

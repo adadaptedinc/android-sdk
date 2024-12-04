@@ -1,6 +1,7 @@
 package com.adadapted.android.sdk.core.zone
 
 import android.os.Looper
+import android.util.DisplayMetrics
 import android.view.View
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.constants.EventStrings
@@ -43,12 +44,17 @@ class AaZoneViewTest {
 
     @Before
     fun setup() {
+        val mockDisplayMetrics = DisplayMetrics().apply {
+            widthPixels = 1080
+            heightPixels = 1920
+            density = 3.0f
+        }
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.createInstance(mock(), mock())
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
         EventClient.onSessionAvailable(MockData.session)
-        DimensionConverter.createInstance(0f)
+        DimensionConverter.createInstance(0f, mockDisplayMetrics)
         testAaZoneView = AaZoneView(testContext)
     }
 

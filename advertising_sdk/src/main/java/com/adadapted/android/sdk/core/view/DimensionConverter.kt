@@ -1,13 +1,18 @@
 package com.adadapted.android.sdk.core.view
 
-import android.content.res.Resources
 import android.util.DisplayMetrics
 
 object DimensionConverter {
     private var scale: Float = 0f
+    private var displayMetrics: DisplayMetrics = DisplayMetrics()
+    private var screenWidthDp: Float = 0f
+    private var screenHeightDp: Float = 0f
 
-    fun createInstance(scale: Float) {
+    fun createInstance(scale: Float, displayMetrics: DisplayMetrics) {
         DimensionConverter.scale = scale
+        DimensionConverter.displayMetrics = displayMetrics
+        screenWidthDp =  displayMetrics.widthPixels / displayMetrics.density
+        screenHeightDp = displayMetrics.heightPixels / displayMetrics.density
     }
 
     fun convertDpToPx(dpValue: Int): Int {
@@ -17,24 +22,20 @@ object DimensionConverter {
     }
 
     fun scaleDimensions(originalWidth: Int, originalHeight: Int): Dimension {
-        val displayMetrics: DisplayMetrics = Resources.getSystem().displayMetrics
-        val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density
-        val screenHeightDp = displayMetrics.heightPixels / displayMetrics.density
-
-        // Calculate the aspect ratio of the original dimensions
         val aspectRatio = originalWidth.toFloat() / originalHeight.toFloat()
 
-        // Scale dimensions proportionally to fit the device
-        val scaledWidth: Int
-        val scaledHeight: Int
-        if (screenWidthDp / aspectRatio <= screenHeightDp) {
-            scaledWidth = (screenWidthDp * displayMetrics.density).toInt()
-            scaledHeight = (scaledWidth / aspectRatio).toInt()
+        return if (screenWidthDp / aspectRatio <= screenHeightDp) {
+            val scaledWidth = (screenWidthDp * displayMetrics.density).toInt()
+            Dimension(
+                width = scaledWidth,
+                height = (scaledWidth / aspectRatio).toInt()
+            )
         } else {
-            scaledHeight = (screenHeightDp * displayMetrics.density).toInt()
-            scaledWidth = (scaledHeight * aspectRatio).toInt()
+            val scaledHeight = (screenHeightDp * displayMetrics.density).toInt()
+            Dimension(
+                width = (scaledHeight * aspectRatio).toInt(),
+                height = scaledHeight
+            )
         }
-
-        return Dimension(width = scaledWidth, height = scaledHeight)
     }
 }
