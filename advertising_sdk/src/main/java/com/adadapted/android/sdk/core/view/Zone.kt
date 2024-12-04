@@ -44,8 +44,8 @@ data class Zone(val id: String = "", val ads: List<Ad> = listOf()) {
 
     private fun initializePixelAccurateDimensions(): Map<String, Dimension> {
         return mapOf(
-            Dimension.Orientation.PORT to calculatePixelAccurateDimensionValue(portWidth.toInt(), portHeight.toInt()),
-            Dimension.Orientation.LAND to calculatePixelAccurateDimensionValue(landWidth.toInt(), landHeight.toInt())
+            Dimension.Orientation.PORT to calculatePixelAccurateDimensionValue(portWidth.toInt(), portHeight.toInt())
+            //Dimension.Orientation.LAND to calculatePixelAccurateDimensionValue(landWidth.toInt(), landHeight.toInt()) - Not Currently Used
         )
     }
 

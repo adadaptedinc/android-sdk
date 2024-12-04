@@ -3,7 +3,7 @@ package com.adadapted.android.sdk.core.view
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.view.ViewGroup
+import android.widget.RelativeLayout.LayoutParams
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -45,6 +45,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     private var viewVisibilityInitialized = false
     private var isAdVisible = true
     private var contextId = ""
+    private var isFixedAspectRatioEnabled = false
     private var webViewLoaded = false
     private var webView = AdWebView(context, object : AdWebView.Listener {
         override fun onAdInWebViewClicked(ad: Ad) {
@@ -73,6 +74,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         contentListener: AdContentListener?,
         isZoneVisible: MutableState<Boolean> = mutableStateOf(true),
         zoneContextId: MutableState<String> = mutableStateOf(""),
+        isFixedAspectRatioEnabled: Boolean = false,
         modifier: Modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
@@ -84,7 +86,8 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
             zoneListener = zoneListener,
             contentListener = contentListener,
             isZoneVisible = isZoneVisible,
-            zoneContextId = zoneContextId
+            zoneContextId = zoneContextId,
+            isFixedAspectRatioEnabled = isFixedAspectRatioEnabled
         )
     }
 
@@ -95,7 +98,8 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         contentListener: AdContentListener?,
         modifier: Modifier,
         isZoneVisible: MutableState<Boolean>,
-        zoneContextId: MutableState<String>
+        zoneContextId: MutableState<String>,
+        isFixedAspectRatioEnabled: Boolean = false
     ) {
         val isInitialized = remember { mutableStateOf(false) }
         val lifecycleOwner = LocalLifecycleOwner.current
@@ -117,7 +121,8 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
             }
         }
 
-        isAdVisible = isZoneVisible.value
+        this.isAdVisible = isZoneVisible.value
+        this.isFixedAspectRatioEnabled = isFixedAspectRatioEnabled
 
         Box(modifier = modifier) {
             AndroidView(
@@ -171,10 +176,6 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
             AdContentPublisher.addListener(contentListener)
         }
         presenter.onAttach(this)
-        webView.layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
     }
 
     private fun setAdZoneVisibility(isViewable: Boolean) {
@@ -222,6 +223,26 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     }
 
     override fun onZoneAvailable(zone: Zone) {
+        val adjustedLayoutParams: LayoutParams
+
+        if (isFixedAspectRatioEnabled) {
+            val paDimensions = zone.pixelAccurateDimensions[Dimension.Orientation.PORT]
+            adjustedLayoutParams = LayoutParams(
+                paDimensions?.width ?: LayoutParams.MATCH_PARENT,
+                paDimensions?.height ?: LayoutParams.MATCH_PARENT
+            )
+        } else {
+            val dimensions = zone.dimensions[Dimension.Orientation.PORT]
+            adjustedLayoutParams = LayoutParams(
+                dimensions?.width ?: LayoutParams.MATCH_PARENT,
+                dimensions?.height ?: LayoutParams.MATCH_PARENT
+            )
+        }
+
+        runOnMainThread {
+            webView.layoutParams = adjustedLayoutParams
+        }
+
         notifyClientZoneHasAds(zone.hasAds())
     }
 
