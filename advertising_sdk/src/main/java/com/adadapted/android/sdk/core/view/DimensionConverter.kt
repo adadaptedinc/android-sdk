@@ -7,11 +7,12 @@ object DimensionConverter {
     private var displayMetrics: DisplayMetrics = DisplayMetrics()
     private var screenWidthDp: Float = 0f
     private var screenHeightDp: Float = 0f
-    private var paddingConversion: Double = 3.1
+    private var paddingConversion: Double = 0.0
 
     fun createInstance(scale: Float, displayMetrics: DisplayMetrics) {
         DimensionConverter.scale = scale
         DimensionConverter.displayMetrics = displayMetrics
+        paddingConversion = scale.toDouble()
         screenWidthDp =  displayMetrics.widthPixels / displayMetrics.density
         screenHeightDp = displayMetrics.heightPixels / displayMetrics.density
     }
