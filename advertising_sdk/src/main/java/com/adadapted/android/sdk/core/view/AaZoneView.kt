@@ -31,6 +31,7 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     private var webViewLoaded = false
     private var isAdaptiveSizingEnabled = false
     private var isFixedAspectRatioEnabled = false
+    private var paddingOffset = 0
 
 
     constructor(context: Context) : super(context.applicationContext) {
@@ -131,6 +132,10 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
         isFixedAspectRatioEnabled = value
     }
 
+    fun setFixedAspectPaddingOffset(value: Int) {
+        paddingOffset = value
+    }
+
     override fun onZoneAvailable(zone: Zone) {
         var adjustedLayoutParams = LayoutParams(width, height)
         if (width == 0 || height == 0) {
@@ -156,7 +161,14 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
             }
         }
         Handler(Looper.getMainLooper()).post {
-            webView.layoutParams = adjustedLayoutParams
+            var test = DimensionConverter.adjustDimensionsForPadding(adjustedLayoutParams.width, adjustedLayoutParams.height, paddingOffset) //feed this in from a method
+            //var test2 = DimensionConverter.adjustDimensionsForPadding2(adjustedLayoutParams.width, adjustedLayoutParams.height, 16)
+            var newdimen = LayoutParams(
+                test.width,
+                test.height
+            )
+
+            webView.layoutParams = newdimen
             if (this.indexOfChild(reportButton) == -1) {
                 addView(reportButton)
             }
