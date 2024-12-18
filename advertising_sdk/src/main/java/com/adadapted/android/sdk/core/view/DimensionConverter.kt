@@ -39,7 +39,6 @@ object DimensionConverter {
         }
     }
 
-    // New Method: Adjust already converted dimensions based on padding
     fun adjustDimensionsForPadding(convertedWidth: Int, convertedHeight: Int, padding: Int): Dimension {
         val adjustedWidth = (convertedWidth - 3.1 * padding).coerceAtLeast(0.0).toInt()
         val adjustedHeight = (convertedHeight - 3.1 * padding).coerceAtLeast(0.0).toInt()

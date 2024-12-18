@@ -31,7 +31,7 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     private var webViewLoaded = false
     private var isAdaptiveSizingEnabled = false
     private var isFixedAspectRatioEnabled = false
-    private var paddingOffset = 0
+    private var fixedAspectPaddingOffset = 0
 
 
     constructor(context: Context) : super(context.applicationContext) {
@@ -128,47 +128,42 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
         isAdaptiveSizingEnabled = value
     }
 
-    fun enableFixedAspectRatio(value: Boolean) {
-        isFixedAspectRatioEnabled = value
-    }
-
-    fun setFixedAspectPaddingOffset(value: Int) {
-        paddingOffset = value
+    fun configureFixedAspectRatio(isEnabled: Boolean, paddingOffsetValue: Int = 0) {
+        isFixedAspectRatioEnabled = isEnabled
+        fixedAspectPaddingOffset = paddingOffsetValue
     }
 
     override fun onZoneAvailable(zone: Zone) {
-        var adjustedLayoutParams = LayoutParams(width, height)
-        if (width == 0 || height == 0) {
-            adjustedLayoutParams = if (isAdaptiveSizingEnabled) {
-                LayoutParams(
-                    LayoutParams.MATCH_PARENT,
-                    LayoutParams.MATCH_PARENT
-                )
-            } else {
-                if(isFixedAspectRatioEnabled) {
+        val matchParent = LayoutParams.MATCH_PARENT
+        val adjustedLayoutParams = if (width == 0 || height == 0) {
+            when {
+                isAdaptiveSizingEnabled -> LayoutParams(matchParent, matchParent)
+                isFixedAspectRatioEnabled -> {
                     val paDimensions = zone.pixelAccurateDimensions[Dimension.Orientation.PORT]
-                    LayoutParams(
-                        paDimensions?.width ?: LayoutParams.MATCH_PARENT,
-                        paDimensions?.height ?: LayoutParams.MATCH_PARENT
-                    )
-                } else {
+                    if (fixedAspectPaddingOffset > 0 && paDimensions != null) {
+                        val offSetDimens = DimensionConverter.adjustDimensionsForPadding(paDimensions.width, paDimensions.height, fixedAspectPaddingOffset)
+                        LayoutParams(offSetDimens.width, offSetDimens.height)
+                    } else {
+                        LayoutParams(
+                            paDimensions?.width ?: matchParent,
+                            paDimensions?.height ?: matchParent
+                        )
+                    }
+                }
+                else -> {
                     val dimensions = zone.dimensions[Dimension.Orientation.PORT]
                     LayoutParams(
-                        dimensions?.width ?: LayoutParams.MATCH_PARENT,
-                        dimensions?.height ?: LayoutParams.MATCH_PARENT
+                        dimensions?.width ?: matchParent,
+                        dimensions?.height ?: matchParent
                     )
                 }
             }
+        } else {
+            LayoutParams(width, height)
         }
-        Handler(Looper.getMainLooper()).post {
-            var test = DimensionConverter.adjustDimensionsForPadding(adjustedLayoutParams.width, adjustedLayoutParams.height, paddingOffset) //feed this in from a method
-            //var test2 = DimensionConverter.adjustDimensionsForPadding2(adjustedLayoutParams.width, adjustedLayoutParams.height, 16)
-            var newdimen = LayoutParams(
-                test.width,
-                test.height
-            )
 
-            webView.layoutParams = newdimen
+        Handler(Looper.getMainLooper()).post {
+            webView.layoutParams = adjustedLayoutParams
             if (this.indexOfChild(reportButton) == -1) {
                 addView(reportButton)
             }
