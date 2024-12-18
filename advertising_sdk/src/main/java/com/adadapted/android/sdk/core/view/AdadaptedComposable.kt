@@ -46,7 +46,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     private var isAdVisible = true
     private var contextId = ""
     private var isFixedAspectRatioEnabled = false
-    private var fixedAspectPaddingOffset = 0
+    private var fixedAspectZonePaddingOffset = ZonePadding(0, 0, 0, 0)
     private var webViewLoaded = false
     private var webView = AdWebView(context, object : AdWebView.Listener {
         override fun onAdInWebViewClicked(ad: Ad) {
@@ -76,7 +76,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         isZoneVisible: MutableState<Boolean> = mutableStateOf(true),
         zoneContextId: MutableState<String> = mutableStateOf(""),
         isFixedAspectRatioEnabled: Boolean = false,
-        fixedAspectPaddingOffset: Int = 0,
+        fixedAspectZonePaddingOffset: ZonePadding = ZonePadding(0 ,0, 0, 0),
         modifier: Modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
@@ -90,7 +90,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
             isZoneVisible = isZoneVisible,
             zoneContextId = zoneContextId,
             isFixedAspectRatioEnabled = isFixedAspectRatioEnabled,
-            fixedAspectPaddingOffset =  fixedAspectPaddingOffset
+            fixedAspectZonePaddingOffset =  fixedAspectZonePaddingOffset
         )
     }
 
@@ -103,7 +103,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         isZoneVisible: MutableState<Boolean>,
         zoneContextId: MutableState<String>,
         isFixedAspectRatioEnabled: Boolean = false,
-        fixedAspectPaddingOffset: Int = 0,
+        fixedAspectZonePaddingOffset: ZonePadding = ZonePadding(0, 0, 0, 0),
     ) {
         val isInitialized = remember { mutableStateOf(false) }
         val lifecycleOwner = LocalLifecycleOwner.current
@@ -127,7 +127,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
 
         this.isAdVisible = isZoneVisible.value
         this.isFixedAspectRatioEnabled = isFixedAspectRatioEnabled
-        this.fixedAspectPaddingOffset = fixedAspectPaddingOffset
+        this.fixedAspectZonePaddingOffset = fixedAspectZonePaddingOffset
 
         Box(modifier = modifier) {
             AndroidView(
@@ -232,8 +232,8 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
 
         if (isFixedAspectRatioEnabled) {
             val paDimensions = zone.pixelAccurateDimensions[Dimension.Orientation.PORT]
-            if (fixedAspectPaddingOffset > 0 && paDimensions != null) {
-                val offSetDimens = DimensionConverter.adjustDimensionsForPadding(paDimensions.width, paDimensions.height, fixedAspectPaddingOffset)
+            if (fixedAspectZonePaddingOffset.isNotZero() && paDimensions != null) {
+                val offSetDimens = DimensionConverter.adjustDimensionsForPadding(paDimensions.width, paDimensions.height, fixedAspectZonePaddingOffset)
                 adjustedLayoutParams = LayoutParams(offSetDimens.width, offSetDimens.height)
             } else {
                 adjustedLayoutParams = LayoutParams(

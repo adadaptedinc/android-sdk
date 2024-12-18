@@ -1,13 +1,13 @@
 package com.adadapted.android.sdk.core.view
 
 import android.util.DisplayMetrics
+import kotlin.math.roundToInt
 
 object DimensionConverter {
     private var scale: Float = 0f
     private var displayMetrics: DisplayMetrics = DisplayMetrics()
     private var screenWidthDp: Float = 0f
     private var screenHeightDp: Float = 0f
-    private var paddingConversion: Double = 3.1
 
     fun createInstance(scale: Float, displayMetrics: DisplayMetrics) {
         DimensionConverter.scale = scale
@@ -40,13 +40,22 @@ object DimensionConverter {
         }
     }
 
-    fun adjustDimensionsForPadding(convertedWidth: Int, convertedHeight: Int, padding: Int): Dimension {
-        val adjustedWidth = (convertedWidth - paddingConversion * padding).coerceAtLeast(0.0).toInt()
-        val adjustedHeight = (convertedHeight - paddingConversion * padding).coerceAtLeast(0.0).toInt()
+    fun adjustDimensionsForPadding(
+        originalWidth: Int,
+        originalHeight: Int,
+        zonePadding: ZonePadding
+    ): Dimension {
+        val paddingThreshold = 0
+        val coefficient = 0.85f
+        var totalHorizontalPaddingPx = (zonePadding.start + zonePadding.end) * scale
+        var totalVerticalPaddingPx = (zonePadding.top + zonePadding.bottom) * scale
 
-        return Dimension(
-            width = adjustedWidth,
-            height = adjustedHeight
-        )
+        if (totalHorizontalPaddingPx > paddingThreshold) totalHorizontalPaddingPx *= coefficient
+        if (totalVerticalPaddingPx > paddingThreshold) totalVerticalPaddingPx *= coefficient
+
+        val adjustedWidth = (originalWidth - totalHorizontalPaddingPx).coerceAtLeast(0f)
+        val adjustedHeight = (originalHeight - totalVerticalPaddingPx).coerceAtLeast(0f)
+        val scaledDimensions = scaleDimensions(adjustedWidth.roundToInt(), adjustedHeight.roundToInt())
+        return scaledDimensions
     }
 }

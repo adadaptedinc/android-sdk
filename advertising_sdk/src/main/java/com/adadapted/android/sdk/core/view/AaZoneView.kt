@@ -31,8 +31,7 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     private var webViewLoaded = false
     private var isAdaptiveSizingEnabled = false
     private var isFixedAspectRatioEnabled = false
-    private var fixedAspectPaddingOffset = 0
-
+    private var fixedAspectZonePaddingOffset = ZonePadding(0, 0, 0, 0)
 
     constructor(context: Context) : super(context.applicationContext) {
         setup(context)
@@ -128,9 +127,9 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
         isAdaptiveSizingEnabled = value
     }
 
-    fun configureFixedAspectRatio(isEnabled: Boolean, paddingOffsetValue: Int = 0) {
+    fun configureFixedAspectRatio(isEnabled: Boolean, zonePaddingOffsetValue: ZonePadding = ZonePadding(0, 0, 0, 0)) {
         isFixedAspectRatioEnabled = isEnabled
-        fixedAspectPaddingOffset = paddingOffsetValue
+        fixedAspectZonePaddingOffset = zonePaddingOffsetValue
     }
 
     override fun onZoneAvailable(zone: Zone) {
@@ -140,8 +139,8 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
                 isAdaptiveSizingEnabled -> LayoutParams(matchParent, matchParent)
                 isFixedAspectRatioEnabled -> {
                     val paDimensions = zone.pixelAccurateDimensions[Dimension.Orientation.PORT]
-                    if (fixedAspectPaddingOffset > 0 && paDimensions != null) {
-                        val offSetDimens = DimensionConverter.adjustDimensionsForPadding(paDimensions.width, paDimensions.height, fixedAspectPaddingOffset)
+                    if (fixedAspectZonePaddingOffset.isNotZero() && paDimensions != null) {
+                        val offSetDimens = DimensionConverter.adjustDimensionsForPadding(paDimensions.width, paDimensions.height, fixedAspectZonePaddingOffset)
                         LayoutParams(offSetDimens.width, offSetDimens.height)
                     } else {
                         LayoutParams(
