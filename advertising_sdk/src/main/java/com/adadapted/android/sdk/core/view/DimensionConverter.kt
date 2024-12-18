@@ -7,6 +7,7 @@ object DimensionConverter {
     private var displayMetrics: DisplayMetrics = DisplayMetrics()
     private var screenWidthDp: Float = 0f
     private var screenHeightDp: Float = 0f
+    private var paddingConversion: Double = 3.1
 
     fun createInstance(scale: Float, displayMetrics: DisplayMetrics) {
         DimensionConverter.scale = scale
@@ -40,8 +41,8 @@ object DimensionConverter {
     }
 
     fun adjustDimensionsForPadding(convertedWidth: Int, convertedHeight: Int, padding: Int): Dimension {
-        val adjustedWidth = (convertedWidth - 3.1 * padding).coerceAtLeast(0.0).toInt()
-        val adjustedHeight = (convertedHeight - 3.1 * padding).coerceAtLeast(0.0).toInt()
+        val adjustedWidth = (convertedWidth - paddingConversion * padding).coerceAtLeast(0.0).toInt()
+        val adjustedHeight = (convertedHeight - paddingConversion * padding).coerceAtLeast(0.0).toInt()
 
         return Dimension(
             width = adjustedWidth,
