@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.core.view
 
+import android.content.res.Resources
 import android.util.DisplayMetrics
 
 object DimensionConverter {
@@ -8,6 +9,7 @@ object DimensionConverter {
     private var screenWidthDp: Float = 0f
     private var screenHeightDp: Float = 0f
     private var paddingConversion: Float = 0f
+    private var isTablet: Boolean = false
 
     fun createInstance(scale: Float, displayMetrics: DisplayMetrics) {
         DimensionConverter.scale = scale
@@ -15,6 +17,23 @@ object DimensionConverter {
         paddingConversion = scale + 0.2f
         screenWidthDp =  displayMetrics.widthPixels / displayMetrics.density
         screenHeightDp = displayMetrics.heightPixels / displayMetrics.density
+
+        //Initial check to determine if device is a tablet
+        val smallestWidthDp = minOf(screenWidthDp, screenHeightDp)
+        if (!isTablet) {
+            isTablet = smallestWidthDp >= 600
+        }
+    }
+
+    fun adaptDisplayMetrics() {
+        val newMetrics = Resources.getSystem().displayMetrics
+        displayMetrics = newMetrics
+        screenWidthDp =  displayMetrics.widthPixels / displayMetrics.density
+        screenHeightDp = displayMetrics.heightPixels / displayMetrics.density
+    }
+
+    fun isTablet(): Boolean {
+        return isTablet
     }
 
     fun convertDpToPx(dpValue: Int): Int {
