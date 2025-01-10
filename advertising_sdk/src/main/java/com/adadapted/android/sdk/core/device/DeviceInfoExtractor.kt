@@ -52,7 +52,7 @@ open class DeviceInfoExtractor(context: Context) {
             val packageInfo = contextRef?.packageName?.let { contextRef?.packageManager?.getPackageInfo(it, 0) }
             val version =
                 if (packageInfo != null) packageInfo.versionName else DeviceInfo.UNKNOWN_VALUE
-            version
+            version.toString()
         } catch (ex: PackageManager.NameNotFoundException) {
             DeviceInfo.UNKNOWN_VALUE
         }
