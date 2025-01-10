@@ -16,13 +16,13 @@ group='com.adadapted'
 android.buildFeatures.buildConfig true
 
 android {
-    compileSdk 34
+    compileSdk 35
     namespace 'com.adadapted'
 
     defaultConfig {
         minSdkVersion 23
         //noinspection EditedTargetSdkVersion
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionName "4.1.6"
         buildConfigField("String","VERSION_NAME", "\"${defaultConfig.versionName}\"")
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -72,7 +72,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     //testImplementation 'io.ktor:ktor-client-mock2.2.4'
     testImplementation 'org.json:json:20200518'
-    testImplementation 'org.robolectric:robolectric:4.11.1'
+    testImplementation 'org.robolectric:robolectric:4.14.1'
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'

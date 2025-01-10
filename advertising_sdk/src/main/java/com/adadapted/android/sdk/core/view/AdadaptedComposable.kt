@@ -230,7 +230,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     override fun onZoneAvailable(zone: Zone) {
         val adjustedLayoutParams: LayoutParams
         if (DimensionConverter.isTablet()) {
-            DimensionConverter.adaptDisplayMetrics()
+            DimensionConverter.refreshDisplayMetrics()
         }
         if (isFixedAspectRatioEnabled) {
             val paDimensions = zone.pixelAccurateDimensions[Dimension.Orientation.PORT]

@@ -25,9 +25,8 @@ object DimensionConverter {
         }
     }
 
-    fun adaptDisplayMetrics() {
-        val newMetrics = Resources.getSystem().displayMetrics
-        displayMetrics = newMetrics
+    fun refreshDisplayMetrics() {
+        displayMetrics = Resources.getSystem().displayMetrics
         screenWidthDp =  displayMetrics.widthPixels / displayMetrics.density
         screenHeightDp = displayMetrics.heightPixels / displayMetrics.density
     }
