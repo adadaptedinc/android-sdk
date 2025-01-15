@@ -22,9 +22,6 @@ data class Zone(val id: String = "", val ads: List<Ad> = listOf()) {
     @Transient
     val dimensions: Map<String, Dimension> = initializeDimensions()
 
-    @Transient
-    val pixelAccurateDimensions: Map<String, Dimension> = initializePixelAccurateDimensions()
-
     fun hasAds(): Boolean {
         return ads.isNotEmpty()
     }
@@ -42,18 +39,7 @@ data class Zone(val id: String = "", val ads: List<Ad> = listOf()) {
         )
     }
 
-    private fun initializePixelAccurateDimensions(): Map<String, Dimension> {
-        return mapOf(
-            Dimension.Orientation.PORT to calculatePixelAccurateDimensionValue(portWidth.toInt(), portHeight.toInt())
-            //Dimension.Orientation.LAND to calculatePixelAccurateDimensionValue(landWidth.toInt(), landHeight.toInt()) - Not Currently Used
-        )
-    }
-
     private fun calculateDimensionValue(value: Int): Int {
         return DimensionConverter.convertDpToPx(value)
-    }
-
-    private fun calculatePixelAccurateDimensionValue(width: Int, height: Int): Dimension {
-        return DimensionConverter.scaleDimensions(width, height)
     }
 }

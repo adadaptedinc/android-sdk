@@ -233,14 +233,14 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
             DimensionConverter.refreshDisplayMetrics()
         }
         if (isFixedAspectRatioEnabled) {
-            val paDimensions = zone.pixelAccurateDimensions[Dimension.Orientation.PORT]
-            if (fixedAspectPaddingOffset > 0 && paDimensions != null) {
+            val paDimensions = DimensionConverter.scaleDimensions(zone.portWidth.toInt(), zone.portHeight.toInt())
+            if (fixedAspectPaddingOffset > 0) {
                 val offSetDimens = DimensionConverter.adjustDimensionsForPadding(paDimensions.width, paDimensions.height, fixedAspectPaddingOffset)
                 adjustedLayoutParams = LayoutParams(offSetDimens.width, offSetDimens.height)
             } else {
                 adjustedLayoutParams = LayoutParams(
-                    paDimensions?.width ?: LayoutParams.MATCH_PARENT,
-                    paDimensions?.height ?: LayoutParams.MATCH_PARENT
+                    paDimensions.width,
+                    paDimensions.height
                 )
             }
         } else {

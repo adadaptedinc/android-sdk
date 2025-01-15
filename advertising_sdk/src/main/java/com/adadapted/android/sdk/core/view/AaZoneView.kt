@@ -14,7 +14,6 @@ import com.adadapted.android.sdk.core.ad.AdContentPublisher
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.R.drawable.report_ad
-import com.adadapted.android.sdk.core.log.AALogger
 
 class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     interface Listener {
@@ -34,7 +33,6 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     private var isFixedAspectRatioEnabled = false
     private var fixedAspectPaddingOffset = 0
 
-
     constructor(context: Context) : super(context.applicationContext) {
         setup(context)
     }
@@ -50,6 +48,9 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
         reportButton.setColorFilter(Color.rgb(0, 175, 204))
         reportButton.setBackgroundColor(Color.TRANSPARENT)
 
+        if(DimensionConverter.isTablet()) {
+            DimensionConverter.refreshDisplayMetrics()
+        }
 
         val params = LayoutParams(
             LayoutParams.WRAP_CONTENT,
@@ -135,24 +136,19 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     }
 
     override fun onZoneAvailable(zone: Zone) {
-        if(DimensionConverter.isTablet()) {
-            DimensionConverter.refreshDisplayMetrics()
-        }
         val matchParent = LayoutParams.MATCH_PARENT
         val adjustedLayoutParams = if (width == 0 || height == 0) {
             when {
                 isAdaptiveSizingEnabled -> LayoutParams(matchParent, matchParent)
                 isFixedAspectRatioEnabled -> {
                     val paDimensions = DimensionConverter.scaleDimensions(zone.portWidth.toInt(), zone.portHeight.toInt())
-                    //val paDimensions = zone.pixelAccurateDimensions[Dimension.Orientation.PORT]
-                    if (fixedAspectPaddingOffset > 0 && paDimensions != null) {
+                    if (fixedAspectPaddingOffset > 0) {
                         val offSetDimens = DimensionConverter.adjustDimensionsForPadding(paDimensions.width, paDimensions.height, fixedAspectPaddingOffset)
-                        AALogger.logError("WIDTH= ${offSetDimens.width}")
                         LayoutParams(offSetDimens.width, offSetDimens.height)
                     } else {
                         LayoutParams(
-                            paDimensions?.width ?: matchParent,
-                            paDimensions?.height ?: matchParent
+                            paDimensions.width,
+                            paDimensions.height
                         )
                     }
                 }
@@ -170,7 +166,6 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
 
         Handler(Looper.getMainLooper()).post {
             webView.layoutParams = adjustedLayoutParams
-            AALogger.logError("LAYOUT WIDTH= ${adjustedLayoutParams.width}")
             if (this.indexOfChild(reportButton) == -1) {
                 addView(reportButton)
             }
