@@ -263,6 +263,9 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
     private fun updateCurrentZone(zone: Zone, isFromRefresh: Boolean = false) {
         zoneLoaded = true
         currentZone = zone
+        if(DimensionConverter.isTablet()) {
+            currentZone.rescaleDimensionsForTablet()
+        }
         restartTimer()
         setNextAd(isFreshLoad = !isFromRefresh)
     }

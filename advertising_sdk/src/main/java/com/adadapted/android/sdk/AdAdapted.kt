@@ -102,9 +102,7 @@ object AdAdapted {
             AALogger.logError("The AdAdapted Api Key is missing or NULL")
         }
         if (hasStarted) {
-            if (!isProd) {
-                AALogger.logError("AdAdapted Android Advertising SDK has already been started.")
-            }
+            return
         }
         hasStarted = true
         setupClients(context)

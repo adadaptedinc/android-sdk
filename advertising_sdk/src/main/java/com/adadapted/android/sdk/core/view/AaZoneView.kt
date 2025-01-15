@@ -33,7 +33,6 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     private var isFixedAspectRatioEnabled = false
     private var fixedAspectPaddingOffset = 0
 
-
     constructor(context: Context) : super(context.applicationContext) {
         setup(context)
     }
@@ -48,7 +47,6 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
         reportButton.setImageResource(report_ad)
         reportButton.setColorFilter(Color.rgb(0, 175, 204))
         reportButton.setBackgroundColor(Color.TRANSPARENT)
-
 
         val params = LayoutParams(
             LayoutParams.WRAP_CONTENT,
@@ -134,9 +132,6 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     }
 
     override fun onZoneAvailable(zone: Zone) {
-        if(DimensionConverter.isTablet()) {
-            DimensionConverter.refreshDisplayMetrics()
-        }
         val matchParent = LayoutParams.MATCH_PARENT
         val adjustedLayoutParams = if (width == 0 || height == 0) {
             when {

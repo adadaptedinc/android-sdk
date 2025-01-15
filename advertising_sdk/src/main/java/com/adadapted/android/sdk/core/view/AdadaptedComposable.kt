@@ -229,9 +229,6 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
 
     override fun onZoneAvailable(zone: Zone) {
         val adjustedLayoutParams: LayoutParams
-        if (DimensionConverter.isTablet()) {
-            DimensionConverter.refreshDisplayMetrics()
-        }
         if (isFixedAspectRatioEnabled) {
             val paDimensions = zone.pixelAccurateDimensions[Dimension.Orientation.PORT]
             if (fixedAspectPaddingOffset > 0 && paDimensions != null) {
