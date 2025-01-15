@@ -48,10 +48,6 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
         reportButton.setColorFilter(Color.rgb(0, 175, 204))
         reportButton.setBackgroundColor(Color.TRANSPARENT)
 
-        if(DimensionConverter.isTablet()) {
-            DimensionConverter.refreshDisplayMetrics()
-        }
-
         val params = LayoutParams(
             LayoutParams.WRAP_CONTENT,
             LayoutParams.WRAP_CONTENT
@@ -141,14 +137,14 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
             when {
                 isAdaptiveSizingEnabled -> LayoutParams(matchParent, matchParent)
                 isFixedAspectRatioEnabled -> {
-                    val paDimensions = DimensionConverter.scaleDimensions(zone.portWidth.toInt(), zone.portHeight.toInt())
-                    if (fixedAspectPaddingOffset > 0) {
+                    val paDimensions = zone.pixelAccurateDimensions[Dimension.Orientation.PORT]
+                    if (fixedAspectPaddingOffset > 0 && paDimensions != null) {
                         val offSetDimens = DimensionConverter.adjustDimensionsForPadding(paDimensions.width, paDimensions.height, fixedAspectPaddingOffset)
                         LayoutParams(offSetDimens.width, offSetDimens.height)
                     } else {
                         LayoutParams(
-                            paDimensions.width,
-                            paDimensions.height
+                            paDimensions?.width ?: matchParent,
+                            paDimensions?.height ?: matchParent
                         )
                     }
                 }
