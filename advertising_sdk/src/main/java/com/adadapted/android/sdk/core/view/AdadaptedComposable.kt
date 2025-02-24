@@ -129,16 +129,14 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         this.isFixedAspectRatioEnabled = isFixedAspectRatioEnabled
         this.fixedAspectPaddingOffset = fixedAspectPaddingOffset
 
+        setAdZoneVisibility(isAdVisible)
+        setAdZoneContextId(contextId)
+
         Box(modifier = modifier) {
             AndroidView(
                 factory = {
                     webView
-                },
-                update = {
-                    setInitialVisibility(isAdVisible)
-                    setAdZoneVisibility(isAdVisible)
-                    setAdZoneContextId(contextId)
-                },
+                }
             )
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.report_ad),
@@ -184,6 +182,9 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
     }
 
     private fun setAdZoneVisibility(isViewable: Boolean) {
+        if (isViewable && !viewVisibilityInitialized) {
+            viewVisibilityInitialized = true
+        }
         isAdVisible = isViewable
         presenter.onAdVisibilityChanged(isAdVisible)
     }
@@ -201,12 +202,6 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         storedContentListener = null
         zoneViewListener = null
         presenter.onDetach()
-    }
-
-    private fun setInitialVisibility(isVisible: Boolean) {
-        if (isVisible) {
-            viewVisibilityInitialized = true
-        }
     }
 
     override fun onAdAvailable(ad: Ad) {
