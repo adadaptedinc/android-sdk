@@ -78,6 +78,29 @@ class AdContentPublisherTest {
         assertEquals("testZoneId", testListener.resultZoneId)
         assertEquals("testAdId", testListener.resultAdId)
     }
+
+    @Test
+    fun multipleListenersCreatedAndCalled() {
+        val testListener1 = TestAdContentListener()
+        val testListener2 = TestAdContentListener()
+        AdContentPublisher.addListener(testListener1)
+        AdContentPublisher.addListener(testListener2)
+        AdContentPublisher.publishNonContentNotification("testZoneId", "testAdId")
+        assertEquals("testZoneId", testListener1.resultZoneId)
+        assertEquals("testAdId", testListener1.resultAdId)
+        assertEquals("testZoneId", testListener2.resultZoneId)
+        assertEquals("testAdId", testListener2.resultAdId)
+    }
+
+    @Test
+    fun listenersAreUnique() {
+        val testListener1 = TestAdContentListener()
+        AdContentPublisher.addListener(testListener1)
+        AdContentPublisher.addListener(testListener1)
+        AdContentPublisher.publishNonContentNotification("testZoneId", "testAdId")
+        assertEquals("testZoneId", testListener1.resultZoneId)
+        assertEquals("testAdId", testListener1.resultAdId)
+    }
 }
 
 class TestAdContentListener: AdContentListener {
