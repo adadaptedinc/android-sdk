@@ -6,15 +6,17 @@ import com.adadapted.android.sdk.core.log.AALogger
 object AdContentPublisher {
 
     private var transporter: Transporter = Transporter()
-    private val listeners: MutableCollection<AdContentListener> = mutableListOf()
+    private val listeners: MutableSet<AdContentListener> = mutableSetOf()
 
     fun addListener(listener: AdContentListener) {
-        listeners.add(listener)
-        AALogger.logDebug("Listener Count: " + listeners.count())
+        if (listeners.none { it.listenerId == listener.listenerId }) {
+            listeners.add(listener)
+            AALogger.logDebug("Listener Count: ${listeners.size}")
+        }
     }
 
     fun removeListener(listener: AdContentListener) {
-        listeners.remove(listener)
+        listeners.removeAll { it.listenerId == listener.listenerId }
     }
 
     fun publishContent(zoneId: String, content: AdContent) {
