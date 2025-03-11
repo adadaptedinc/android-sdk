@@ -14,7 +14,7 @@ import java.util.Date
 
 interface AdZonePresenterListener {
     fun onZoneAvailable(zone: Zone)
-    fun onAdsRefreshed(zone: Zone) //TODO on zone ad refreshed?
+    fun onAdsRefreshed(zone: Zone)
     fun onAdAvailable(ad: Ad)
     fun onNoAdAvailable()
     fun onAdVisibilityChanged(ad: Ad)
@@ -89,7 +89,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
             if (!isFreshLoad) {
                 randomAdStartPosition++
             }
-            val adPosition = randomAdStartPosition % currentZone.ads.size //TODO call for 'ZoneAd' here again
+            val adPosition = randomAdStartPosition % currentZone.ads.size
             currentZone.ads[adPosition]
         } else {
             Ad()
@@ -274,7 +274,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
         if (zoneId.isEmpty()) {
             AALogger.logError("AdZoneId is empty. Was onStop() called outside the host view's overriding function?")
         }
-        updateCurrentZone(session.getZone(zoneId)) //TODO Get 'ZoneAd" here?
+        updateCurrentZone(session.getZone(zoneId))
         if (updateSessionId(session.id)) {
             notifyZoneAvailable()
         }

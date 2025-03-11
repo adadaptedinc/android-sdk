@@ -164,7 +164,7 @@ object SessionClient : SessionAdapterListener {
         }
     }
 
-    private fun notifyAdsAvailable() { //TODO zone ad available?
+    private fun notifyAdsAvailable() {
         for (l in sessionListeners) {
             currentSession.let { l.onAdsAvailable(it) }
         }
