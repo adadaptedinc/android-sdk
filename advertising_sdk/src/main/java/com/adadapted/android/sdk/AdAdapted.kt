@@ -1,6 +1,7 @@
 package com.adadapted.android.sdk
 
 import android.content.Context
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.adadapted.android.sdk.constants.Config
 import com.adadapted.android.sdk.core.atl.AddItContentPublisher
 import com.adadapted.android.sdk.core.concurrency.Transporter
@@ -20,6 +21,7 @@ import com.adadapted.android.sdk.core.network.HttpInterceptAdapter
 import com.adadapted.android.sdk.core.network.HttpPayloadAdapter
 import com.adadapted.android.sdk.core.network.HttpSessionAdapter
 import com.adadapted.android.sdk.core.payload.PayloadClient
+import com.adadapted.android.sdk.core.session.NewSessionClient
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.session.SessionListener
@@ -193,6 +195,7 @@ object AdAdapted {
                 HttpConnector
             ), EventClient, Transporter()
         )
+        ProcessLifecycleOwner.get().lifecycle.addObserver(NewSessionClient())
     }
 }
 
