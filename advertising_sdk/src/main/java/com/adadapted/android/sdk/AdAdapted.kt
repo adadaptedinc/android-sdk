@@ -195,12 +195,6 @@ object AdAdapted {
                 HttpConnector
             ), EventClient, Transporter()
         )
-        NewSessionClient.createInstance(
-            HttpSessionAdapter(
-                Config.getInitSessionUrl(),
-                Config.getRefreshAdsUrl(),
-                HttpConnector
-            ), Transporter())
-        ProcessLifecycleOwner.get().lifecycle.addObserver(NewSessionClient)
+        ProcessLifecycleOwner.get().lifecycle.addObserver(NewSessionClient())
     }
 }
