@@ -195,6 +195,6 @@ object AdAdapted {
                 HttpConnector
             ), EventClient, Transporter()
         )
-        ProcessLifecycleOwner.get().lifecycle.addObserver(NewSessionClient())
+        ProcessLifecycleOwner.get().lifecycle.addObserver(NewSessionClient)
     }
 }

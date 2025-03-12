@@ -138,7 +138,7 @@ object SessionClient : SessionAdapterListener {
         refreshTimer.startTimer()
     }
 
-    private fun startPublishTimer() {
+    private fun startPublishTimer() { //Move to Event Client
         if (eventTimerRunning) {
             return
         }
@@ -152,7 +152,7 @@ object SessionClient : SessionAdapterListener {
         eventTimer.startTimer()
     }
 
-    private fun notifyPublishEvents() {
+    private fun notifyPublishEvents() { //Move to Event Client
         for (l in sessionListeners) {
             l.onPublishEvents()
         }
@@ -242,21 +242,21 @@ object SessionClient : SessionAdapterListener {
         return hasInstance
     }
 
-    fun setZoneContext(zoneContext: ZoneContext){
+    fun setZoneContext(zoneContext: ZoneContext){ //Move to AdZonePresenter
         if (zoneContexts.none { it.zoneId == zoneContext.zoneId }) {
             zoneContexts.add(zoneContext)
             performRefreshAds()
         }
     }
 
-    fun removeZoneContext(zoneId: String) {
+    fun removeZoneContext(zoneId: String) { //Move to AdZonePresenter
         val wasRemoved = zoneContexts.removeAll { z -> z.zoneId == zoneId }
         if (wasRemoved) {
             performRefreshAds()
         }
     }
 
-    fun clearZoneContext(){
+    fun clearZoneContext(){ //Move to AdZonePresenter
         zoneContexts = mutableSetOf()
         performRefreshAds()
     }

@@ -270,7 +270,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sess
         setNextAd(isFreshLoad = !isFromRefresh)
     }
 
-    override fun onSessionAvailable(session: Session) {
+    override fun onSessionAvailable(session: Session) { //Make it so it calls ZoneAvailable after the first ad returns?
         if (zoneId.isEmpty()) {
             AALogger.logError("AdZoneId is empty. Was onStop() called outside the host view's overriding function?")
         }

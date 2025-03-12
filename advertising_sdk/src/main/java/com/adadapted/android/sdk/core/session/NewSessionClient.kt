@@ -5,10 +5,12 @@ import androidx.lifecycle.LifecycleOwner
 import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.event.EventClient
 
-class NewSessionClient: DefaultLifecycleObserver {
-    private val prefix = "ANDROID"
+object NewSessionClient: DefaultLifecycleObserver {
+    private const val PREFIX = "ANDROID"
+    private const val THIRTY_MINUTES = 30 * 60 * 1000L
+    private val ID_CHARACTERS by lazy { ('A'..'Z') + ('0'..'9') }
     private var sessionId: String = ""
-    private var backgroundTimer: Long = 0
+    private var backgroundTime: Long = 0
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
@@ -22,15 +24,15 @@ class NewSessionClient: DefaultLifecycleObserver {
 
     private fun createOrResumeSession() {
         val currentTime = System.currentTimeMillis()
-        val isNewSession = sessionId.isEmpty() || (currentTime - backgroundTimer) >= THIRTY_MINUTES
+        val isNewSession = sessionId.isEmpty() || (currentTime - backgroundTime) >= THIRTY_MINUTES
 
-        if (isNewSession) sessionId = generateId() else backgroundTimer = currentTime
+        if (isNewSession) sessionId = generateId() else backgroundTime = currentTime
 
         trackEvent(if (isNewSession) EventStrings.SESSION_CREATED else EventStrings.SESSION_RESUMED)
     }
 
     private fun sessionBackgrounded() {
-        backgroundTimer = System.currentTimeMillis()
+        backgroundTime = System.currentTimeMillis()
         trackEvent(EventStrings.SESSION_BACKGROUNDED)
     }
 
@@ -38,10 +40,5 @@ class NewSessionClient: DefaultLifecycleObserver {
         EventClient.trackSdkEvent(event, mapOf("sessionId" to sessionId))
     }
 
-    private fun generateId(): String = prefix + List(32) { ID_CHARACTERS.random() }.joinToString("")
-
-    companion object {
-        private val ID_CHARACTERS by lazy { ('A'..'Z') + ('0'..'9') }
-        private const val THIRTY_MINUTES = 30 * 60 * 1000L
-    }
+    private fun generateId(): String = PREFIX + List(32) { ID_CHARACTERS.random() }.joinToString("")
 }
