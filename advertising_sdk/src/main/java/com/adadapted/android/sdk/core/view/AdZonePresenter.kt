@@ -20,7 +20,7 @@ interface AdZonePresenterListener {
     fun onAdVisibilityChanged(ad: Ad)
 }
 
-class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sessionClient: SessionClient?) : SessionListener {
+class AdZonePresenter(private val adViewHandler: AdViewHandler, private val sessionClient: SessionClient?) : SessionListener { //Todo ZoneAdListener
     private var currentAd: Ad = Ad()
     private var zoneId: String = ""
     private var isZoneVisible: Boolean = true

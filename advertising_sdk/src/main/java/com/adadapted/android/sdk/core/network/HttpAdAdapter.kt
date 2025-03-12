@@ -1,7 +1,7 @@
 package com.adadapted.android.sdk.core.network
 
 import com.adadapted.android.sdk.core.interfaces.AdAdapter
-import com.adadapted.android.sdk.core.interfaces.AdZoneListener
+import com.adadapted.android.sdk.core.interfaces.ZoneAdListener
 import io.ktor.client.statement.HttpResponse
 import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.ad.ZoneAd
@@ -17,7 +17,7 @@ class HttpAdAdapter(
     private val zoneAdRequestUrl: String,
     private val httpConnector: HttpConnector
 ) : AdAdapter {
-    override suspend fun requestAd(listener: AdZoneListener) {
+    override suspend fun requestAd(listener: ZoneAdListener) {
         try {
             val response: HttpResponse = httpConnector.client.post(zoneAdRequestUrl) {
                 contentType(ContentType.Application.Json)
