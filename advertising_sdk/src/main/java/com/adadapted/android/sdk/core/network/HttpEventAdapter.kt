@@ -14,7 +14,7 @@ import io.ktor.http.*
 
 class HttpEventAdapter(private val adEventUrl: String, private val sdkEventUrl: String, private val errorUrl: String, private val httpConnector: HttpConnector) :
     EventAdapter {
-    override suspend fun publishAdEvents(session: Session, adEvents: Set<AdEvent>) {
+    override suspend fun publishAdEvents(appId: String, adEvents: Set<AdEvent>) {
         try {
             httpConnector.client.post(adEventUrl) {
                 contentType(ContentType.Application.Json)
@@ -32,7 +32,7 @@ class HttpEventAdapter(private val adEventUrl: String, private val sdkEventUrl: 
         }
     }
 
-    override suspend fun publishSdkEvents(session: Session, events: Set<SdkEvent>) {
+    override suspend fun publishSdkEvents(appId: String, events: Set<SdkEvent>) {
         try {
             httpConnector.client.post(sdkEventUrl) {
                 contentType(ContentType.Application.Json)
@@ -50,7 +50,7 @@ class HttpEventAdapter(private val adEventUrl: String, private val sdkEventUrl: 
         }
     }
 
-    override suspend fun publishSdkErrors(session: Session, errors: Set<SdkError>) {
+    override suspend fun publishSdkErrors(appId: String, errors: Set<SdkError>) {
         try {
             httpConnector.client.post(errorUrl) {
                 contentType(ContentType.Application.Json)

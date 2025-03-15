@@ -1,8 +1,8 @@
 package com.adadapted.android.sdk.core.interfaces
 
-import com.adadapted.android.sdk.core.ad.ZoneAd
+import com.adadapted.android.sdk.core.ad.AdZoneData
 
 interface ZoneAdListener {
-    fun onAdLoaded(zoneAd: ZoneAd)
+    fun onAdLoaded(adZoneData: AdZoneData)
     fun onAdLoadFailed()
 }

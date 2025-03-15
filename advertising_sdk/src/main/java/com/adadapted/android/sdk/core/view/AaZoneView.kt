@@ -12,8 +12,9 @@ import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdContentListener
 import com.adadapted.android.sdk.core.ad.AdContentPublisher
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.R.drawable.report_ad
+import com.adadapted.android.sdk.core.ad.AdClient
+import com.adadapted.android.sdk.core.ad.AdZoneData
 
 class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     interface Listener {
@@ -24,7 +25,7 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
 
     private lateinit var webView: AdWebView
     private lateinit var reportButton: ImageButton
-    private var presenter: AdZonePresenter = AdZonePresenter(AdViewHandler(context), SessionClient)
+    private var presenter: AdZonePresenter = AdZonePresenter(AdViewHandler(context), AdClient)
     private var zoneViewListener: Listener? = null
     private var isVisible = true
     private var isAdVisible = true
@@ -61,7 +62,7 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
 
         reportButton.setOnClickListener {
             val cachedDeviceInfo = DeviceInfoClient.getCachedDeviceInfo()
-            cachedDeviceInfo?.udid?.let { udid ->
+            cachedDeviceInfo.udid?.let { udid ->
                 webView.currentAd?.id?.let { it1 -> presenter.onReportAdClicked(it1, udid) }
             }
         }
@@ -104,10 +105,6 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
         presenter.removeZoneContext()
     }
 
-    fun clearAdZoneContext() {
-        presenter.clearZoneContext()
-    }
-
     fun onStop() {
         zoneViewListener = null
         presenter.onDetach()
@@ -131,29 +128,28 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
         fixedAspectPaddingOffset = paddingOffsetValue
     }
 
-    override fun onZoneAvailable(zone: Zone) {
+    override fun onZoneAvailable(adZoneData: AdZoneData) {
         val matchParent = LayoutParams.MATCH_PARENT
         val adjustedLayoutParams = if (width == 0 || height == 0) {
             when {
                 isAdaptiveSizingEnabled -> LayoutParams(matchParent, matchParent)
                 isFixedAspectRatioEnabled -> {
-                    val paDimensions = zone.pixelAccurateDimensions[Dimension.Orientation.PORT]
-                    if (fixedAspectPaddingOffset > 0 && paDimensions != null) {
-                        val offSetDimens = DimensionConverter.adjustDimensionsForPadding(paDimensions.width, paDimensions.height, fixedAspectPaddingOffset)
+                    val paDimensions = adZoneData.pixelAccurateDimensions
+                    if (fixedAspectPaddingOffset > 0) {
+                        val offSetDimens = DimensionConverter.adjustDimensionsForPadding(
+                            paDimensions.width,
+                            paDimensions.height,
+                            fixedAspectPaddingOffset
+                        )
                         LayoutParams(offSetDimens.width, offSetDimens.height)
                     } else {
-                        LayoutParams(
-                            paDimensions?.width ?: matchParent,
-                            paDimensions?.height ?: matchParent
-                        )
+                        LayoutParams(paDimensions.width, paDimensions.height)
                     }
                 }
+
                 else -> {
-                    val dimensions = zone.dimensions[Dimension.Orientation.PORT]
-                    LayoutParams(
-                        dimensions?.width ?: matchParent,
-                        dimensions?.height ?: matchParent
-                    )
+                    val dimensions = adZoneData.dimensions
+                    LayoutParams(dimensions.width, dimensions.height)
                 }
             }
         } else {
@@ -166,11 +162,7 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
                 addView(reportButton)
             }
         }
-        notifyClientZoneHasAds(zone.hasAds())
-    }
-
-    override fun onAdsRefreshed(zone: Zone) {
-        notifyClientZoneHasAds(zone.hasAds())
+        notifyClientZoneHasAds(adZoneData.hasAd())
     }
 
     override fun onAdAvailable(ad: Ad) {
@@ -208,9 +200,9 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     override fun onVisibilityChanged(changedView: View, visibility: Int) {
         super.onVisibilityChanged(changedView, visibility)
         when (visibility) {
-            View.GONE -> setInvisible()
-            View.INVISIBLE -> setInvisible()
-            View.VISIBLE -> setVisible()
+            GONE -> setInvisible()
+            INVISIBLE -> setInvisible()
+            VISIBLE -> setVisible()
         }
     }
 
