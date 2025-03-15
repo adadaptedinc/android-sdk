@@ -3,6 +3,7 @@ package com.adadapted.android.sdk
 import android.content.Context
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.adadapted.android.sdk.constants.Config
+import com.adadapted.android.sdk.core.ad.AdClient
 import com.adadapted.android.sdk.core.atl.AddItContentPublisher
 import com.adadapted.android.sdk.core.concurrency.Transporter
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
@@ -15,6 +16,7 @@ import com.adadapted.android.sdk.core.interfaces.AaSdkSessionListener
 import com.adadapted.android.sdk.core.keyword.InterceptClient
 import com.adadapted.android.sdk.core.keyword.KeywordInterceptMatcher
 import com.adadapted.android.sdk.core.log.AALogger
+import com.adadapted.android.sdk.core.network.HttpAdAdapter
 import com.adadapted.android.sdk.core.network.HttpConnector
 import com.adadapted.android.sdk.core.network.HttpEventAdapter
 import com.adadapted.android.sdk.core.network.HttpInterceptAdapter
@@ -165,6 +167,12 @@ object AdAdapted {
             customIdentifier,
             deviceInfoExtractor,
             Transporter()
+        )
+        AdClient.createInstance(
+            HttpAdAdapter(
+                "https://dev.adadapted.dev/api/ad-service/v100-alpha/ad/retrieve", //TODO TEMP
+                HttpConnector
+            ), Transporter()
         )
         SessionClient.createInstance(
             HttpSessionAdapter(

@@ -28,10 +28,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.adadapted.R
 import com.adadapted.android.sdk.core.ad.Ad
+import com.adadapted.android.sdk.core.ad.AdClient
 import com.adadapted.android.sdk.core.ad.AdContentListener
 import com.adadapted.android.sdk.core.ad.AdContentPublisher
+import com.adadapted.android.sdk.core.ad.AdZoneData
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
-import com.adadapted.android.sdk.core.session.SessionClient
 
 class AdadaptedComposable(context: Context): AdZonePresenterListener {
     interface Listener {
@@ -39,7 +40,7 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         fun onAdLoaded()
         fun onAdLoadFailed()
     }
-    private var presenter: AdZonePresenter = AdZonePresenter(AdViewHandler(context), SessionClient)
+    private var presenter: AdZonePresenter = AdZonePresenter(AdViewHandler(context), AdClient)
     private var storedContentListener: AdContentListener? = null
     private var zoneViewListener: Listener? = null
     private var viewVisibilityInitialized = false
@@ -208,10 +209,6 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         loadWebViewAd(ad)
     }
 
-    override fun onAdsRefreshed(zone: Zone) {
-        notifyClientZoneHasAds(zone.hasAds())
-    }
-
     override fun onNoAdAvailable() {
         runOnMainThread { webView.loadBlank() }
     }
@@ -222,31 +219,31 @@ class AdadaptedComposable(context: Context): AdZonePresenterListener {
         }
     }
 
-    override fun onZoneAvailable(zone: Zone) {
+    override fun onZoneAvailable(adZoneData: AdZoneData) {
         val adjustedLayoutParams: LayoutParams
         if (isFixedAspectRatioEnabled) {
-            val paDimensions = zone.pixelAccurateDimensions[Dimension.Orientation.PORT]
-            if (fixedAspectPaddingOffset > 0 && paDimensions != null) {
+            val paDimensions = adZoneData.pixelAccurateDimensions
+            if (fixedAspectPaddingOffset > 0) {
                 val offSetDimens = DimensionConverter.adjustDimensionsForPadding(paDimensions.width, paDimensions.height, fixedAspectPaddingOffset)
                 adjustedLayoutParams = LayoutParams(offSetDimens.width, offSetDimens.height)
             } else {
                 adjustedLayoutParams = LayoutParams(
-                    paDimensions?.width ?: LayoutParams.MATCH_PARENT,
-                    paDimensions?.height ?: LayoutParams.MATCH_PARENT
+                    paDimensions.width,
+                    paDimensions.height
                 )
             }
         } else {
-            val dimensions = zone.dimensions[Dimension.Orientation.PORT]
+            val dimensions = adZoneData.dimensions
             adjustedLayoutParams = LayoutParams(
-                dimensions?.width ?: LayoutParams.MATCH_PARENT,
-                dimensions?.height ?: LayoutParams.MATCH_PARENT
+                dimensions.width,
+                dimensions.height
             )
         }
 
         runOnMainThread {
             webView.layoutParams = adjustedLayoutParams
         }
-        notifyClientZoneHasAds(zone.hasAds())
+        notifyClientZoneHasAds(adZoneData.hasAd())
     }
 
     private fun loadWebViewAd(ad: Ad) {

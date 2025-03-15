@@ -10,28 +10,24 @@ object DeviceInfoClient {
     private var isProd: Boolean = false
     private var params: Map<String, String> = emptyMap()
     private var customIdentifier: String =""
-    private var deviceInfoExtractor: DeviceInfoExtractor? = null
+    private lateinit var deviceInfoExtractor: DeviceInfoExtractor
     private var transporter: TransporterCoroutineScope = Transporter()
-    private var deviceInfo: DeviceInfo? = null
+    private var deviceInfo: DeviceInfo = DeviceInfo()
     private var deviceCallbacks: MutableSet<DeviceCallback> = HashSet()
 
     private fun performGetInfo(deviceCallback: DeviceCallback) {
-        if (deviceInfo != null) {
-            deviceInfo?.let { deviceCallback.onDeviceInfoCollected(it) }
-        } else {
-            deviceCallbacks.add(deviceCallback)
-        }
+        deviceInfo.let { deviceCallback.onDeviceInfoCollected(it) }
     }
 
     private fun collectDeviceInfo() {
-        deviceInfo = deviceInfoExtractor?.extractDeviceInfo(appId, isProd, customIdentifier, params)
+        deviceInfo = deviceInfoExtractor.extractDeviceInfo(appId, isProd, customIdentifier, params)
         notifyCallbacks()
     }
 
     private fun notifyCallbacks() {
         val currentDeviceCallbacks: Set<DeviceCallback> = HashSet(deviceCallbacks)
         for (caller in currentDeviceCallbacks) {
-            deviceInfo?.let { caller.onDeviceInfoCollected(it) }
+            deviceInfo.let { caller.onDeviceInfoCollected(it) }
             deviceCallbacks.remove(caller)
         }
     }
@@ -42,12 +38,8 @@ object DeviceInfoClient {
         }
     }
 
-    fun getCachedDeviceInfo(): DeviceInfo? {
-        return if (deviceInfo != null) {
-            deviceInfo
-        } else {
-            null
-        }
+    fun getCachedDeviceInfo(): DeviceInfo {
+        return deviceInfo
     }
 
     fun createInstance(
