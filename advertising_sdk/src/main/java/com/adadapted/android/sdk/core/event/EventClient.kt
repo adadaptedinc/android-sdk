@@ -1,18 +1,19 @@
 package com.adadapted.android.sdk.core.event
 
+import com.adadapted.android.sdk.constants.Config
 import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.constants.EventStrings.SDK_EVENT_TYPE
 import com.adadapted.android.sdk.core.ad.Ad
+import com.adadapted.android.sdk.core.concurrency.Timer
 import com.adadapted.android.sdk.core.concurrency.Transporter
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
+import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.interfaces.EventClientListener
 import com.adadapted.android.sdk.core.log.AALogger
-import com.adadapted.android.sdk.core.session.Session
-import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.core.session.SessionListener
+import com.adadapted.android.sdk.core.session.NewSessionClient
 import kotlin.jvm.Synchronized
 
-object EventClient : SessionListener {
+object EventClient {
 
     private lateinit var eventAdapter: EventAdapter
     private var transporter: TransporterCoroutineScope = Transporter()
@@ -20,7 +21,7 @@ object EventClient : SessionListener {
     private val adEvents: MutableSet<AdEvent> = HashSet()
     private val sdkEvents: MutableSet<SdkEvent> = HashSet()
     private val sdkErrors: MutableSet<SdkError> = HashSet()
-    private var session: Session? = null
+    private var eventTimerRunning: Boolean = false
     private var hasInstance: Boolean = false
 
     @Synchronized
@@ -36,51 +37,42 @@ object EventClient : SessionListener {
 
     @Synchronized
     private fun performPublishSdkErrors() {
-        if (session == null || sdkErrors.isEmpty()) {
+        if (sdkErrors.isEmpty()) {
             return
         }
         val currentSdkErrors: Set<SdkError> = sdkErrors.map { it.copy() }.toSet()
         sdkErrors.clear()
-        session?.let {
-            transporter.dispatchToThread {
-                eventAdapter.publishSdkErrors(it, currentSdkErrors)
-            }
+        transporter.dispatchToThread {
+            eventAdapter.publishSdkErrors(NewSessionClient.getSessionId(), DeviceInfoClient.getCachedDeviceInfo(), currentSdkErrors)
         }
     }
 
     @Synchronized
     private fun performPublishSdkEvents() {
-        if (session == null || sdkEvents.isEmpty()) {
+        if (sdkEvents.isEmpty()) {
             return
         }
         val currentSdkEvents: Set<SdkEvent> = sdkEvents.map { it.copy() }.toSet()
         sdkEvents.clear()
-        session?.let {
-            transporter.dispatchToThread {
-                eventAdapter.publishSdkEvents(it, currentSdkEvents)
-            }
+        transporter.dispatchToThread {
+            eventAdapter.publishSdkEvents(NewSessionClient.getSessionId(), DeviceInfoClient.getCachedDeviceInfo(), currentSdkEvents)
         }
     }
 
     @Synchronized
     private fun performPublishAdEvents() {
-        if (session == null || adEvents.isEmpty()) {
+        if (adEvents.isEmpty()) {
             return
         }
         val currentAdEvents: Set<AdEvent> = adEvents.map { it.copy() }.toSet()
         adEvents.clear()
-        session?.let {
-            transporter.dispatchToThread {
-                eventAdapter.publishAdEvents(it, currentAdEvents)
-            }
+        transporter.dispatchToThread {
+            eventAdapter.publishAdEvents(NewSessionClient.getSessionId(), DeviceInfoClient.getCachedDeviceInfo(), currentAdEvents)
         }
     }
 
     @Synchronized
     private fun fileEvent(ad: Ad, eventType: String) {
-        if (session == null) {
-            return
-        }
         val event = AdEvent(
             ad.id,
             ad.zoneId,
@@ -99,8 +91,8 @@ object EventClient : SessionListener {
         listeners.remove(listener)
     }
 
-    private fun trackGAIDAvailability(session: Session) {
-        if (!session.deviceInfo.isAllowRetargetingEnabled) {
+    private fun trackGAIDAvailability() {
+        if (!DeviceInfoClient.getCachedDeviceInfo().isAllowRetargetingEnabled) {
             trackSdkError(
                 EventStrings.GAID_UNAVAILABLE,
                 "GAID and/or tracking has been disabled for this device."
@@ -115,26 +107,27 @@ object EventClient : SessionListener {
         }
     }
 
+    private fun startPublishTimer() {
+        if (eventTimerRunning) {
+            return
+        }
+        eventTimerRunning = true
+
+        val eventTimer = Timer(
+            { onPublishEvents() },
+            repeatMillis = Config.DEFAULT_EVENT_POLLING,
+            delayMillis = Config.DEFAULT_EVENT_POLLING
+        )
+        eventTimer.startTimer()
+    }
+
     @Synchronized
-    override fun onPublishEvents() {
+    fun onPublishEvents() {
         transporter.dispatchToThread {
             performPublishAdEvents()
             performPublishSdkEvents()
             performPublishSdkErrors()
         }
-    }
-
-    override fun onSessionAvailable(session: Session) {
-        EventClient.session = session
-        trackGAIDAvailability(session)
-    }
-
-    override fun onSessionExpired() {
-        trackSdkEvent(EventStrings.EXPIRED_EVENT)
-    }
-
-    override fun onAdsAvailable(session: Session) {
-        EventClient.session = session
     }
 
     fun trackSdkEvent(name: String, params: Map<String, String> = HashMap()) {
@@ -200,6 +193,7 @@ object EventClient : SessionListener {
     }
 
     init {
-        SessionClient.addListener(this)
+        startPublishTimer()
+        trackGAIDAvailability()
     }
 }

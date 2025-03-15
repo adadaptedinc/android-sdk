@@ -30,7 +30,6 @@ object SessionClient : SessionAdapterListener {
     var status: Status
         private set
     private var pollingTimerRunning: Boolean
-    private var eventTimerRunning: Boolean
     private var hasInstance: Boolean = false
     private var zoneContexts: MutableSet<ZoneContext> = mutableSetOf()
 
@@ -113,7 +112,7 @@ object SessionClient : SessionAdapterListener {
 
     private fun updateCurrentSession(session: Session) {
         currentSession = session
-        startPublishTimer()
+        //startPublishTimer()
         startPollingTimer()
     }
 
@@ -136,26 +135,6 @@ object SessionClient : SessionAdapterListener {
             delayMillis = currentSession.refreshTime
         )
         refreshTimer.startTimer()
-    }
-
-    private fun startPublishTimer() { //Move to Event Client
-        if (eventTimerRunning) {
-            return
-        }
-        eventTimerRunning = true
-
-        val eventTimer = Timer(
-            { notifyPublishEvents() },
-            repeatMillis = Config.DEFAULT_EVENT_POLLING,
-            delayMillis = Config.DEFAULT_EVENT_POLLING
-        )
-        eventTimer.startTimer()
-    }
-
-    private fun notifyPublishEvents() { //Move to Event Client
-        for (l in sessionListeners) {
-            l.onPublishEvents()
-        }
     }
 
     private fun notifySessionAvailable() {
@@ -271,7 +250,6 @@ object SessionClient : SessionAdapterListener {
         sessionListeners = HashSet()
         presenters = HashSet()
         pollingTimerRunning = false
-        eventTimerRunning = false
         status = Status.OK
     }
 }
