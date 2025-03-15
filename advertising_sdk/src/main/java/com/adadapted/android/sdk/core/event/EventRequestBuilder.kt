@@ -1,12 +1,12 @@
 package com.adadapted.android.sdk.core.event
 
-import com.adadapted.android.sdk.core.session.Session
+import com.adadapted.android.sdk.core.device.DeviceInfo
 
 object EventRequestBuilder {
-    fun buildAdEventRequest(session: Session, adEvents: Set<AdEvent>): AdEventRequest {
-        session.run {
+    fun buildAdEventRequest(sessionId: String, deviceInfo: DeviceInfo, adEvents: Set<AdEvent>): AdEventRequest {
+        deviceInfo.run {
             return AdEventRequest(
-                id,
+                sessionId,
                 deviceInfo.appId,
                 deviceInfo.udid,
                 deviceInfo.sdkVersion,
@@ -15,10 +15,10 @@ object EventRequestBuilder {
         }
     }
 
-    fun buildEventRequest(session: Session, sdkEvents: Set<SdkEvent> = setOf(), sdkErrors: Set<SdkError> = setOf()): EventRequest {
-        session.deviceInfo.run {
+    fun buildEventRequest(sessionId: String, deviceInfo: DeviceInfo, sdkEvents: Set<SdkEvent> = setOf(), sdkErrors: Set<SdkError> = setOf()): EventRequest {
+        deviceInfo.run {
             return EventRequest(
-                session.id,
+                sessionId,
                 appId,
                 bundleId,
                 bundleVersion,

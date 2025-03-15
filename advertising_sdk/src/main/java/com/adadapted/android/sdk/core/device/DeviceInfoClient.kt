@@ -24,7 +24,7 @@ object DeviceInfoClient {
         notifyCallbacks()
     }
 
-    private fun notifyCallbacks() {
+    private fun notifyCallbacks() { //TODO is this necessary anymore?
         val currentDeviceCallbacks: Set<DeviceCallback> = HashSet(deviceCallbacks)
         for (caller in currentDeviceCallbacks) {
             deviceInfo.let { caller.onDeviceInfoCollected(it) }
