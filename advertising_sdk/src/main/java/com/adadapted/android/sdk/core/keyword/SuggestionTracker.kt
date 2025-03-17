@@ -19,7 +19,7 @@ object SuggestionTracker {
         val lcReplacement = convertToLowerCase(replacement)
         items[lcTerm] = lcUserInput
         replacements[lcReplacement] = lcTerm
-        InterceptClient.getInstance().trackMatched(searchId, termId, lcTerm, lcUserInput)
+        InterceptClient.trackMatched(searchId, termId, lcTerm, lcUserInput)
     }
 
     @Synchronized
@@ -28,8 +28,7 @@ object SuggestionTracker {
         if (replacements.containsKey(lcReplacement)) {
             val term = replacements[lcReplacement]
             val userInput = items[term]
-            InterceptClient.getInstance()
-                .trackPresented(searchId, termId, term ?: "", userInput ?: "")
+            InterceptClient.trackPresented(searchId, termId, term ?: "", userInput ?: "")
         }
     }
 
@@ -39,15 +38,14 @@ object SuggestionTracker {
         if (replacements.containsKey(lcReplacement)) {
             val term = replacements[lcReplacement]
             val userInput = items[term]
-            InterceptClient.getInstance()
-                .trackSelected(searchId, termId, term ?: "", userInput ?: "")
+            InterceptClient.trackSelected(searchId, termId, term ?: "", userInput ?: "")
         }
     }
 
     @Synchronized
     fun suggestionNotMatched(searchId: String, userInput: String) {
         val lcUserInput = convertToLowerCase(userInput)
-        InterceptClient.getInstance().trackNotMatched(searchId, lcUserInput)
+        InterceptClient.trackNotMatched(searchId, lcUserInput)
     }
 
     private fun convertToLowerCase(str: String?): String {

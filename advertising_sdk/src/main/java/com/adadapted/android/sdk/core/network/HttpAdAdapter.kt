@@ -39,8 +39,7 @@ class HttpAdAdapter(
                 header(API_HEADER, deviceInfo.appId)
             }
             val rawJson = response.body<String>()
-            Log.i("junk", rawJson) //TODO cleanup
-            Log.e("Ad Title:", response.body<AdResponse>().data.ad.payload.detailedListItems.first().title)
+            Log.e("Ad junk", rawJson) //TODO cleanup
             listener.onAdLoaded(response.body<AdResponse>().data)
         } catch (e: Exception) {
             e.message?.let { AALogger.logError(it) }
