@@ -1,26 +1,26 @@
 package com.adadapted.android.sdk.core.keyword
 
+import com.adadapted.android.sdk.constants.Config
+import com.adadapted.android.sdk.core.concurrency.Timer
+import com.adadapted.android.sdk.core.concurrency.Transporter
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.interfaces.InterceptListener
-import com.adadapted.android.sdk.core.session.Session
-import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.core.session.SessionListener
+import com.adadapted.android.sdk.core.session.NewSessionClient
 import kotlin.jvm.Synchronized
 
-class InterceptClient private constructor(
-    private val adapter: InterceptAdapter,
-    private val transporter: TransporterCoroutineScope
-) : SessionListener {
+object InterceptClient {
+    private lateinit var adapter: InterceptAdapter
+    private var transporter: TransporterCoroutineScope = Transporter()
+    private var interceptEventTimerRunning = false
+    private val events: MutableSet<InterceptEvent> = HashSet()
 
-    private val events: MutableSet<InterceptEvent>
-    private lateinit var currentSession: Session
-
-    private fun performInitialize(session: Session?, interceptListener: InterceptListener?) {
-        if (session == null || interceptListener == null) {
+    private fun performInitialize(sessionId: String, interceptListener: InterceptListener?) {
+        if (interceptListener == null) {
             return
         }
+
         transporter.dispatchToThread {
-            adapter.retrieve(session, object :
+            adapter.retrieve(sessionId, object :
                 InterceptAdapter.Listener {
                 override fun onSuccess(intercept: Intercept) {
                     interceptListener.onKeywordInterceptInitialized(intercept)
@@ -53,6 +53,28 @@ class InterceptClient private constructor(
     }
 
     @Synchronized
+    private fun trackEvent(
+        searchId: String,
+        termId: String,
+        term: String,
+        userInput: String,
+        eventType: String
+    ) {
+
+        val event = InterceptEvent(
+            searchId,
+            eventType,
+            userInput,
+            termId,
+            term
+        )
+
+        transporter.dispatchToThread {
+            fileEvent(event)
+        }
+    }
+
+    @Synchronized
     private fun performPublishEvents() {
         if (events.isEmpty()) {
             return
@@ -60,23 +82,27 @@ class InterceptClient private constructor(
         val currentEvents: MutableSet<InterceptEvent> = HashSet(events)
         events.clear()
         transporter.dispatchToThread {
-            adapter.sendEvents(currentSession, currentEvents)
+            adapter.sendEvents(NewSessionClient.getSessionId(), currentEvents)
         }
     }
 
-    override fun onSessionAvailable(session: Session) {
-        currentSession = session
-    }
-
-    override fun onPublishEvents() {
-        transporter.dispatchToThread {
-            performPublishEvents()
+    private fun startPublishTimer() {
+        if (interceptEventTimerRunning) {
+            return
         }
+        interceptEventTimerRunning = true
+
+        val eventTimer = Timer(
+            { performPublishEvents() },
+            repeatMillis = Config.DEFAULT_EVENT_POLLING,
+            delayMillis = Config.DEFAULT_EVENT_POLLING
+        )
+        eventTimer.startTimer()
     }
 
-    fun initialize(session: Session?, interceptListener: InterceptListener?) {
+    fun initialize(sessionId: String, interceptListener: InterceptListener?) {
         transporter.dispatchToThread {
-            performInitialize(session, interceptListener)
+            performInitialize(sessionId, interceptListener)
         }
     }
 
@@ -115,42 +141,11 @@ class InterceptClient private constructor(
         trackEvent(searchId, "", "NA", userInput, InterceptEvent.NOT_MATCHED)
     }
 
-    @Synchronized
-    private fun trackEvent(
-        searchId: String,
-        termId: String,
-        term: String,
-        userInput: String,
-        eventType: String
-    ) {
-
-        val event = InterceptEvent(
-            searchId,
-            eventType,
-            userInput,
-            termId,
-            term
-        )
-
-        transporter.dispatchToThread {
-            fileEvent(event)
+    fun createInstance(adapter: InterceptAdapter, transporter: TransporterCoroutineScope, isKeywordInterceptEnabled: Boolean) {
+        InterceptClient.adapter = adapter
+        InterceptClient.transporter = transporter
+        if (isKeywordInterceptEnabled) {
+            startPublishTimer()
         }
-    }
-
-    companion object {
-        private lateinit var instance: InterceptClient
-
-        fun getInstance(): InterceptClient {
-            return instance
-        }
-
-        fun createInstance(adapter: InterceptAdapter, transporter: TransporterCoroutineScope) {
-            instance = InterceptClient(adapter, transporter)
-        }
-    }
-
-    init {
-        events = HashSet()
-        SessionClient.addListener(this)
     }
 }

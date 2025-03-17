@@ -22,7 +22,6 @@ object EventClient {
     private val sdkEvents: MutableSet<SdkEvent> = HashSet()
     private val sdkErrors: MutableSet<SdkError> = HashSet()
     private var eventTimerRunning: Boolean = false
-    private var hasInstance: Boolean = false
 
     @Synchronized
     private fun performTrackSdkEvent(name: String, params: Map<String, String>) {
@@ -43,7 +42,7 @@ object EventClient {
         val currentSdkErrors: Set<SdkError> = sdkErrors.map { it.copy() }.toSet()
         sdkErrors.clear()
         transporter.dispatchToThread {
-            eventAdapter.publishSdkErrors(NewSessionClient.getSessionId(), DeviceInfoClient.getCachedDeviceInfo(), currentSdkErrors)
+            DeviceInfoClient.getCachedDeviceInfo().let { eventAdapter.publishSdkErrors(NewSessionClient.getSessionId(), it, currentSdkErrors) }
         }
     }
 
@@ -55,7 +54,7 @@ object EventClient {
         val currentSdkEvents: Set<SdkEvent> = sdkEvents.map { it.copy() }.toSet()
         sdkEvents.clear()
         transporter.dispatchToThread {
-            eventAdapter.publishSdkEvents(NewSessionClient.getSessionId(), DeviceInfoClient.getCachedDeviceInfo(), currentSdkEvents)
+            DeviceInfoClient.getCachedDeviceInfo().let { eventAdapter.publishSdkEvents(NewSessionClient.getSessionId(), it, currentSdkEvents) }
         }
     }
 
@@ -67,7 +66,7 @@ object EventClient {
         val currentAdEvents: Set<AdEvent> = adEvents.map { it.copy() }.toSet()
         adEvents.clear()
         transporter.dispatchToThread {
-            eventAdapter.publishAdEvents(NewSessionClient.getSessionId(), DeviceInfoClient.getCachedDeviceInfo(), currentAdEvents)
+            DeviceInfoClient.getCachedDeviceInfo().let { eventAdapter.publishAdEvents(NewSessionClient.getSessionId(), it, currentAdEvents) }
         }
     }
 
@@ -185,11 +184,8 @@ object EventClient {
     }
 
     fun createInstance(eventAdapter: EventAdapter, transporter: TransporterCoroutineScope) {
-        if (!hasInstance) {
-            EventClient.eventAdapter = eventAdapter
-            EventClient.transporter = transporter
-            hasInstance = true
-        }
+        EventClient.eventAdapter = eventAdapter
+        EventClient.transporter = transporter
     }
 
     init {

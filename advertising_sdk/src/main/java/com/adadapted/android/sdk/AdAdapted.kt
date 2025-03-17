@@ -6,6 +6,7 @@ import com.adadapted.android.sdk.constants.Config
 import com.adadapted.android.sdk.core.ad.AdClient
 import com.adadapted.android.sdk.core.atl.AddItContentPublisher
 import com.adadapted.android.sdk.core.concurrency.Transporter
+import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.device.DeviceInfoExtractor
 import com.adadapted.android.sdk.core.event.EventBroadcaster
@@ -13,6 +14,7 @@ import com.adadapted.android.sdk.core.event.EventClient
 import com.adadapted.android.sdk.core.interfaces.AaSdkAdditContentListener
 import com.adadapted.android.sdk.core.interfaces.AaSdkEventListener
 import com.adadapted.android.sdk.core.interfaces.AaSdkSessionListener
+import com.adadapted.android.sdk.core.interfaces.DeviceCallback
 import com.adadapted.android.sdk.core.keyword.InterceptClient
 import com.adadapted.android.sdk.core.keyword.KeywordInterceptMatcher
 import com.adadapted.android.sdk.core.log.AALogger
@@ -21,12 +23,8 @@ import com.adadapted.android.sdk.core.network.HttpConnector
 import com.adadapted.android.sdk.core.network.HttpEventAdapter
 import com.adadapted.android.sdk.core.network.HttpInterceptAdapter
 import com.adadapted.android.sdk.core.network.HttpPayloadAdapter
-import com.adadapted.android.sdk.core.network.HttpSessionAdapter
 import com.adadapted.android.sdk.core.payload.PayloadClient
 import com.adadapted.android.sdk.core.session.NewSessionClient
-import com.adadapted.android.sdk.core.session.Session
-import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.core.session.SessionListener
 
 object AdAdapted {
     enum class Env { PROD, DEV }
@@ -113,37 +111,23 @@ object AdAdapted {
         eventListener.let { EventBroadcaster.setListener(it) }
         contentListener.let { AddItContentPublisher.addListener(it) }
 
-        if (isPayloadEnabled) {
-            PayloadClient.pickupPayloads {
-                if (it.isNotEmpty()) {
-                    for (content in it) {
-                        AddItContentPublisher.publishAddItContent(content)
-                    }
-                }
-            }
-        }
-
-        val startListener: SessionListener = object : SessionListener {
-            override fun onSessionAvailable(session: Session) {
-                sessionListener.onHasAdsToServe(session.hasActiveCampaigns(), session.getZonesWithAds())
-                if (session.hasActiveCampaigns() && session.getZonesWithAds().isEmpty()) {
-                    AALogger.logError("The session has ads to show but none were loaded properly. Is an obfuscation tool obstructing the AdAdapted Library?")
-                }
-            }
-
-            override fun onAdsAvailable(session: Session) {
-                sessionListener.onHasAdsToServe(session.hasActiveCampaigns(), session.getZonesWithAds())
-            }
-
-            override fun onSessionInitFailed() {
-                sessionListener.onHasAdsToServe(false, listOf())
-            }
-        }
-        SessionClient.start(startListener)
-
-        if (isKeywordInterceptEnabled) {
-            KeywordInterceptMatcher.match("INIT") //init the matcher
-        }
+//        val startListener: SessionListener = object : SessionListener {
+//            override fun onSessionAvailable(session: Session) {
+//                sessionListener.onHasAdsToServe(session.hasActiveCampaigns(), session.getZonesWithAds())
+//                if (session.hasActiveCampaigns() && session.getZonesWithAds().isEmpty()) {
+//                    AALogger.logError("The session has ads to show but none were loaded properly. Is an obfuscation tool obstructing the AdAdapted Library?")
+//                }
+//            }
+//
+//            override fun onAdsAvailable(session: Session) {
+//                sessionListener.onHasAdsToServe(session.hasActiveCampaigns(), session.getZonesWithAds())
+//            }
+//
+//            override fun onSessionInitFailed() {
+//                sessionListener.onHasAdsToServe(false, listOf())
+//            }
+//        }
+        //SessionClient.start(startListener)
         AALogger.logInfo("AdAdapted Android SDK ${Config.LIBRARY_VERSION} initialized.")
     }
 
@@ -168,16 +152,20 @@ object AdAdapted {
             deviceInfoExtractor,
             Transporter()
         )
+
+        DeviceInfoClient.getDeviceInfo(object : DeviceCallback {
+            override fun onDeviceInfoCollected(deviceInfo: DeviceInfo) {
+                setupDependentClients()
+            }
+        })
+
+        ProcessLifecycleOwner.get().lifecycle.addObserver(NewSessionClient)
+    }
+
+    private fun setupDependentClients() {
         AdClient.createInstance(
             HttpAdAdapter(
                 "https://dev.adadapted.dev/api/ad-service/v100-alpha/ad/retrieve", //TODO TEMP
-                HttpConnector
-            ), Transporter()
-        )
-        SessionClient.createInstance(
-            HttpSessionAdapter(
-                Config.getInitSessionUrl(),
-                Config.getRefreshAdsUrl(),
                 HttpConnector
             ), Transporter()
         )
@@ -194,7 +182,8 @@ object AdAdapted {
                 Config.getRetrieveInterceptsUrl(),
                 Config.getInterceptEventsUrl(),
                 HttpConnector
-            ), Transporter()
+            ), Transporter(),
+            isKeywordInterceptEnabled
         )
         PayloadClient.createInstance(
             HttpPayloadAdapter(
@@ -203,6 +192,19 @@ object AdAdapted {
                 HttpConnector
             ), EventClient, Transporter()
         )
-        ProcessLifecycleOwner.get().lifecycle.addObserver(NewSessionClient)
+
+        if (isKeywordInterceptEnabled) {
+            KeywordInterceptMatcher.match("INIT") //init the matcher
+        }
+
+        if (isPayloadEnabled) {
+            PayloadClient.pickupPayloads {
+                if (it.isNotEmpty()) {
+                    for (content in it) {
+                        AddItContentPublisher.publishAddItContent(content)
+                    }
+                }
+            }
+        }
     }
 }

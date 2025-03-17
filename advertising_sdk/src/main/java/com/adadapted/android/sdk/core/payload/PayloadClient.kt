@@ -5,10 +5,8 @@ import com.adadapted.android.sdk.core.atl.AdditContent
 import com.adadapted.android.sdk.core.atl.AddToListItem
 import com.adadapted.android.sdk.core.concurrency.Transporter
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.EventClient
-import com.adadapted.android.sdk.core.interfaces.DeviceCallback
 import kotlin.jvm.Synchronized
 
 object PayloadClient {
@@ -21,24 +19,10 @@ object PayloadClient {
     private const val ITEM_NAME = "item_name"
     private var deeplinkInProgress = false
 
-    private fun performPickupPayload(callback: (content: List<AdditContent>) -> Unit) {
-        DeviceInfoClient.getDeviceInfo(object : DeviceCallback {
-            override fun onDeviceInfoCollected(deviceInfo: DeviceInfo) {
-                eventClient?.trackSdkEvent(EventStrings.PAYLOAD_PICKUP_ATTEMPT)
-                transporter.dispatchToThread {
-                    adapter?.pickup(deviceInfo) {
-                        callback(it)
-                    }
-                }
-            }
-        })
-    }
-
     private fun trackPayload(content: AdditContent, result: String) {
         val event = PayloadEvent(content.payloadId, result)
         transporter.dispatchToThread {
-            DeviceInfoClient.getCachedDeviceInfo()
-                ?.let { adapter?.publishEvent(it, event) }
+            DeviceInfoClient.getCachedDeviceInfo().let { adapter?.publishEvent(it, event) }
         }
     }
 
@@ -47,7 +31,10 @@ object PayloadClient {
             return
         }
         transporter.dispatchToThread {
-            performPickupPayload(callback)
+            eventClient?.trackSdkEvent(EventStrings.PAYLOAD_PICKUP_ATTEMPT)
+            adapter?.pickup(DeviceInfoClient.getCachedDeviceInfo()) {
+                callback(it)
+            }
         }
     }
 

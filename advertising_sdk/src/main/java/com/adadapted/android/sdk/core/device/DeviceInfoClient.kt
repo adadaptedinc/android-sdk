@@ -12,14 +12,18 @@ object DeviceInfoClient {
     private var customIdentifier: String =""
     private lateinit var deviceInfoExtractor: DeviceInfoExtractor
     private var transporter: TransporterCoroutineScope = Transporter()
-    private var deviceInfo: DeviceInfo = DeviceInfo()
+    private var deviceInfo: DeviceInfo? = null
     private var deviceCallbacks: MutableSet<DeviceCallback> = HashSet()
 
     private fun performGetInfo(deviceCallback: DeviceCallback) {
-        deviceInfo.let { deviceCallback.onDeviceInfoCollected(it) }
+        if (deviceInfo != null) {
+            deviceInfo?.let { deviceCallback.onDeviceInfoCollected(it) }
+        } else {
+            deviceCallbacks.add(deviceCallback)
+        }
     }
 
-    private fun collectDeviceInfo() {
+    private suspend fun collectDeviceInfo() {
         deviceInfo = deviceInfoExtractor.extractDeviceInfo(appId, isProd, customIdentifier, params)
         notifyCallbacks()
     }
@@ -27,7 +31,7 @@ object DeviceInfoClient {
     private fun notifyCallbacks() { //TODO is this necessary anymore?
         val currentDeviceCallbacks: Set<DeviceCallback> = HashSet(deviceCallbacks)
         for (caller in currentDeviceCallbacks) {
-            deviceInfo.let { caller.onDeviceInfoCollected(it) }
+            deviceInfo?.let { caller.onDeviceInfoCollected(it) }
             deviceCallbacks.remove(caller)
         }
     }
@@ -39,7 +43,7 @@ object DeviceInfoClient {
     }
 
     fun getCachedDeviceInfo(): DeviceInfo {
-        return deviceInfo
+        return deviceInfo ?: DeviceInfo()
     }
 
     fun createInstance(

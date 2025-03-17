@@ -1,14 +1,12 @@
 package com.adadapted.android.sdk.core.keyword
 
 import com.adadapted.android.sdk.core.interfaces.InterceptListener
-import com.adadapted.android.sdk.core.session.Session
-import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.core.session.SessionListener
+import com.adadapted.android.sdk.core.session.NewSessionClient
 
-object KeywordInterceptMatcher : SessionListener, InterceptListener {
+object KeywordInterceptMatcher : InterceptListener {
     private var intercept: Intercept = Intercept()
     private var mLoaded = false
-    private var hasInstance: Boolean = false
+
     private fun matchKeyword(constraint: CharSequence): Set<Suggestion> {
         val suggestions: MutableSet<Suggestion> = HashSet()
         val input = constraint.toString()
@@ -53,33 +51,11 @@ object KeywordInterceptMatcher : SessionListener, InterceptListener {
         mLoaded = true
     }
 
-    override fun onSessionAvailable(session: Session) {
-        if (session.id.isNotEmpty()) {
-            InterceptClient.getInstance().initialize(session, this)
-        }
-    }
-
-    private fun createInstance() {
-        hasInstance = true
-    }
-
-    public fun match(constraint: CharSequence): Set<Suggestion> {
-        return if (hasInstance) {
-            matchKeyword(constraint)
-        } else {
-            when {
-                SessionClient.hasInstance() -> {
-                    createInstance()
-                    matchKeyword(constraint)
-                }
-                else -> {
-                    return emptySet()
-                }
-            }
-        }
+    fun match(constraint: CharSequence): Set<Suggestion> {
+        return matchKeyword(constraint)
     }
 
     init {
-        SessionClient.addListener(this)
+        InterceptClient.initialize(NewSessionClient.getSessionId(), this)
     }
 }
