@@ -24,7 +24,7 @@ android {
         minSdkVersion 23
         //noinspection EditedTargetSdkVersion
         targetSdkVersion 35
-        versionName "4.1.8"
+        versionName "5.0.0"
         buildConfigField("String","VERSION_NAME", "\"${defaultConfig.versionName}\"")
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'aasdk-proguard-rules.pro'
@@ -94,7 +94,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.adadapted'
                 artifactId = 'android-sdk'
-                version = '4.1.8'
+                version = '5.0.0'
             }
         }
     }
