@@ -129,31 +129,26 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     }
 
     override fun onZoneAvailable(adZoneData: AdZoneData) {
-        val matchParent = LayoutParams.MATCH_PARENT
-        val adjustedLayoutParams = if (width == 0 || height == 0) {
-            when {
-                isAdaptiveSizingEnabled -> LayoutParams(matchParent, matchParent)
-                isFixedAspectRatioEnabled -> {
-                    val paDimensions = adZoneData.pixelAccurateDimensions
-                    if (fixedAspectPaddingOffset > 0) {
-                        val offSetDimens = DimensionConverter.adjustDimensionsForPadding(
-                            paDimensions.width,
-                            paDimensions.height,
-                            fixedAspectPaddingOffset
-                        )
-                        LayoutParams(offSetDimens.width, offSetDimens.height)
-                    } else {
-                        LayoutParams(paDimensions.width, paDimensions.height)
-                    }
-                }
+        val dimensions = adZoneData.dimensions
+        val adjustedLayoutParams: LayoutParams
 
-                else -> {
-                    val dimensions = adZoneData.dimensions
-                    LayoutParams(dimensions.width, dimensions.height)
-                }
+        if (isFixedAspectRatioEnabled) {
+            val paDimensions = adZoneData.pixelAccurateDimensions
+            if (fixedAspectPaddingOffset > 0) {
+                val offSetDimens = DimensionConverter.adjustDimensionsForPadding(
+                    paDimensions.width,
+                    paDimensions.height,
+                    fixedAspectPaddingOffset
+                )
+                adjustedLayoutParams = LayoutParams(offSetDimens.width, offSetDimens.height)
+            } else {
+                adjustedLayoutParams = LayoutParams(paDimensions.width, paDimensions.height)
             }
         } else {
-            LayoutParams(width, height)
+            adjustedLayoutParams = LayoutParams(
+                dimensions.width,
+                dimensions.height
+            )
         }
 
         Handler(Looper.getMainLooper()).post {
