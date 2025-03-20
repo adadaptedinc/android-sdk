@@ -8,7 +8,6 @@ import com.adadapted.android.sdk.core.event.AdEventTypes
 import com.adadapted.android.sdk.core.event.EventClient
 import com.adadapted.android.sdk.core.payload.Payload
 import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
@@ -34,9 +33,8 @@ class AdContentTest {
     fun setup() {
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
-        SessionClient.createInstance(mock(), mock())
+        SessionClient.onStart(mock())
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
-        EventClient.onSessionAvailable(MockData.session)
     }
 
     @After
@@ -80,9 +78,9 @@ class AdContentTest {
         TestEventAdapter.testSdkErrors = mutableListOf()
         testAdContent.failed("adContentFail")
         EventClient.onPublishEvents()
-        assertEquals(EventStrings.ATL_ADDED_TO_LIST_FAILED, TestEventAdapter.testSdkErrors.first().code)
-        assertEquals("adContentFail", TestEventAdapter.testSdkErrors.first().message)
-        testAdContent.failed("adContentFail")
+        assert(TestEventAdapter.testSdkErrors.any { error -> error.code == EventStrings.ATL_ADDED_TO_LIST_FAILED })
+        var event = TestEventAdapter.testSdkErrors.first { error -> error.code == EventStrings.ATL_ADDED_TO_LIST_FAILED }
+        assertEquals("adContentFail", event.message)
     }
 
     @Test

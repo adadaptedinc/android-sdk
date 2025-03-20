@@ -19,7 +19,7 @@ class AutoCompleteAdapterTest {
 
     @Before
     fun setup() {
-        SessionClient.createInstance(mock(), mock())
+        SessionClient.onStart(mock())
         val items: ArrayList<String> = arrayListOf("Milk", "Eggs", "Bread")
         testAutoCompleteAdapter = AutoCompleteAdapter(testContext, R.layout.simple_list_item_1, items)
     }

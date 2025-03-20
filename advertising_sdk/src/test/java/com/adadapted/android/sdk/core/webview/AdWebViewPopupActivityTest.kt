@@ -4,6 +4,7 @@ import android.content.Intent
 import android.view.KeyEvent
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.core.ad.Ad
+import com.adadapted.android.sdk.core.ad.TestAdEventClientListener
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.AdEventTypes
@@ -11,8 +12,6 @@ import com.adadapted.android.sdk.core.event.EventClient
 import com.adadapted.android.sdk.core.payload.Payload
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.view.AaWebViewPopupActivity
-import com.adadapted.android.sdk.core.zone.TestAdEventClientListener
-import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
@@ -37,15 +36,14 @@ class AdWebViewPopupActivityTest {
     private var testContext = InstrumentationRegistry.getInstrumentation().targetContext
     private var testTransporter = UnconfinedTestDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
-    private var testAd = Ad("TestAdId", "imp", "url", "type", "http://example.com", Payload(detailedListItems = listOf()), 5)
+    private var testAd = Ad("TestAdId", "imp", "url", "type", "http://example.com", Payload(detailedListItems = listOf()))
 
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
-        SessionClient.createInstance(mock(), mock())
+        SessionClient.onStart(mock())
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
-        EventClient.onSessionAvailable(MockData.session)
 
         val testIntent = Intent(testContext, AaWebViewPopupActivity::class.java)
         testIntent.putExtra(AaWebViewPopupActivity::class.java.name + ".EXTRA_POPUP_AD", Json.encodeToString(
@@ -69,7 +67,7 @@ class AdWebViewPopupActivityTest {
         val testAdEventListener = TestAdEventClientListener()
         EventClient.addListener(testAdEventListener)
         testAaWebViewPopupActivity.onStart()
-        assertEquals(AdEventTypes.POPUP_BEGIN, testAdEventListener.testAdEvent?.eventType)
+        assertEquals(AdEventTypes.POPUP_BEGIN, testAdEventListener.getTrackedEvent()?.eventType)
     }
 
     @Test

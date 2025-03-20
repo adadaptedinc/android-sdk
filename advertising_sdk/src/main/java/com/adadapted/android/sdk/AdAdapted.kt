@@ -24,7 +24,7 @@ import com.adadapted.android.sdk.core.network.HttpEventAdapter
 import com.adadapted.android.sdk.core.network.HttpInterceptAdapter
 import com.adadapted.android.sdk.core.network.HttpPayloadAdapter
 import com.adadapted.android.sdk.core.payload.PayloadClient
-import com.adadapted.android.sdk.core.session.NewSessionClient
+import com.adadapted.android.sdk.core.session.SessionClient
 
 object AdAdapted {
     enum class Env { PROD, DEV }
@@ -110,24 +110,6 @@ object AdAdapted {
         setupClients(context)
         eventListener.let { EventBroadcaster.setListener(it) }
         contentListener.let { AddItContentPublisher.addListener(it) }
-
-//        val startListener: SessionListener = object : SessionListener {
-//            override fun onSessionAvailable(session: Session) {
-//                sessionListener.onHasAdsToServe(session.hasActiveCampaigns(), session.getZonesWithAds())
-//                if (session.hasActiveCampaigns() && session.getZonesWithAds().isEmpty()) {
-//                    AALogger.logError("The session has ads to show but none were loaded properly. Is an obfuscation tool obstructing the AdAdapted Library?")
-//                }
-//            }
-//
-//            override fun onAdsAvailable(session: Session) {
-//                sessionListener.onHasAdsToServe(session.hasActiveCampaigns(), session.getZonesWithAds())
-//            }
-//
-//            override fun onSessionInitFailed() {
-//                sessionListener.onHasAdsToServe(false, listOf())
-//            }
-//        }
-        //SessionClient.start(startListener)
         AALogger.logInfo("AdAdapted Android SDK ${Config.LIBRARY_VERSION} initialized.")
     }
 
@@ -159,7 +141,7 @@ object AdAdapted {
             }
         })
 
-        ProcessLifecycleOwner.get().lifecycle.addObserver(NewSessionClient)
+        ProcessLifecycleOwner.get().lifecycle.addObserver(SessionClient)
     }
 
     private fun setupDependentClients() {

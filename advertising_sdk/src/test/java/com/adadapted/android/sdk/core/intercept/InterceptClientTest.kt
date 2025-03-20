@@ -6,9 +6,7 @@ import com.adadapted.android.sdk.core.keyword.Intercept
 import com.adadapted.android.sdk.core.keyword.InterceptAdapter
 import com.adadapted.android.sdk.core.keyword.InterceptClient
 import com.adadapted.android.sdk.core.keyword.InterceptEvent
-import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -33,51 +31,50 @@ class InterceptClientTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        SessionClient.createInstance(mock(), mock())
-        testInterceptClient.createInstance(testInterceptAdapter, testTransporterScope)
-        testInterceptClient.getInstance().onSessionAvailable(MockData.session)
+        SessionClient.onStart(mock())
+        testInterceptClient.createInstance(testInterceptAdapter, testTransporterScope, true)
     }
 
     @Test
     fun createInstance() {
-        assertNotNull(testInterceptClient.getInstance())
+        assertNotNull(testInterceptClient)
     }
 
     @Test
     fun initialize() {
         val mockListener = mock<InterceptListener>()
-        testInterceptClient.getInstance().initialize(MockData.session, mockListener)
+        testInterceptClient.initialize(SessionClient.getSessionId(), mockListener)
         verify(mockListener).onKeywordInterceptInitialized(any())
     }
 
     @Test
     fun trackMatched() {
-        testInterceptClient.getInstance().trackMatched(testEvent.searchId, testEvent.termId, testEvent.term, testEvent.userInput)
-        testInterceptClient.getInstance().onPublishEvents()
+        testInterceptClient.trackMatched(testEvent.searchId, testEvent.termId, testEvent.term, testEvent.userInput)
+        testInterceptClient.performPublishEvents()
 
         assertEquals(InterceptEvent.MATCHED, testInterceptAdapter.testEvents.first().event)
     }
 
     @Test
     fun trackPresented() {
-        testInterceptClient.getInstance().trackPresented(testEvent.searchId, testEvent.termId, testEvent.term, testEvent.userInput)
-        testInterceptClient.getInstance().onPublishEvents()
+        testInterceptClient.trackPresented(testEvent.searchId, testEvent.termId, testEvent.term, testEvent.userInput)
+        testInterceptClient.performPublishEvents()
 
         assertEquals(InterceptEvent.PRESENTED, testInterceptAdapter.testEvents.first().event)
     }
 
     @Test
     fun trackSelected() {
-        testInterceptClient.getInstance().trackSelected(testEvent.searchId, testEvent.termId, testEvent.term, testEvent.userInput)
-        testInterceptClient.getInstance().onPublishEvents()
+        testInterceptClient.trackSelected(testEvent.searchId, testEvent.termId, testEvent.term, testEvent.userInput)
+        testInterceptClient.performPublishEvents()
 
         assertEquals(InterceptEvent.SELECTED, testInterceptAdapter.testEvents.first().event)
     }
 
     @Test
     fun trackNotMatched() {
-        testInterceptClient.getInstance().trackNotMatched(testEvent.searchId, testEvent.userInput)
-        testInterceptClient.getInstance().onPublishEvents()
+        testInterceptClient.trackNotMatched(testEvent.searchId, testEvent.userInput)
+        testInterceptClient.performPublishEvents()
 
         assertEquals(InterceptEvent.NOT_MATCHED, testInterceptAdapter.testEvents.first().event)
     }
@@ -86,11 +83,11 @@ class InterceptClientTest {
 class TestInterceptAdapter: InterceptAdapter {
     var testEvents = mutableSetOf<InterceptEvent>()
     var testIntercept = Intercept()
-    override suspend fun retrieve(session: Session, listener: InterceptAdapter.Listener) {
+    override suspend fun retrieve(sessionId: String, listener: InterceptAdapter.Listener) {
         listener.onSuccess(testIntercept)
     }
 
-    override suspend fun sendEvents(session: Session, events: MutableSet<InterceptEvent>) {
+    override suspend fun sendEvents(sessionId: String, events: MutableSet<InterceptEvent>) {
         testEvents = events
     }
 }
