@@ -1,6 +1,5 @@
 package com.adadapted.android.sdk.core.network
 
-import android.util.Log
 import com.adadapted.android.sdk.core.interfaces.AdAdapter
 import com.adadapted.android.sdk.core.interfaces.ZoneAdListener
 import io.ktor.client.statement.HttpResponse
@@ -10,7 +9,7 @@ import com.adadapted.android.sdk.core.ad.ZoneAdRequest
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.log.AALogger
 import com.adadapted.android.sdk.core.network.HttpConnector.API_HEADER
-import com.adadapted.android.sdk.core.session.NewSessionClient
+import com.adadapted.android.sdk.core.session.SessionClient
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.ContentType
@@ -29,7 +28,7 @@ class HttpAdAdapter(
             zoneId = zoneId,
             storeId = storeId,
             contextId = contextId,
-            sessionId = NewSessionClient.getSessionId(),
+            sessionId = SessionClient.getSessionId(),
             extra = extra
         )
         try {
@@ -38,8 +37,6 @@ class HttpAdAdapter(
                 setBody(zoneAdRequest)
                 header(API_HEADER, deviceInfo.appId)
             }
-            val rawJson = response.body<String>()
-            Log.e("Ad junk", rawJson) //TODO cleanup
             listener.onAdLoaded(response.body<AdResponse>().data)
         } catch (e: Exception) {
             e.message?.let { AALogger.logError(it) }

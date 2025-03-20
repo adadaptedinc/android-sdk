@@ -7,13 +7,13 @@ import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.EventClient
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.view.JavascriptBridge
-import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.mock
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import org.junit.Assert.assertEquals
+import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
 
@@ -25,10 +25,10 @@ class PopupJavascriptBridgeTest {
 
     @Before
     fun setup() {
+        Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance("", false, mock(), "", mock(), mock())
-        SessionClient.createInstance(mock(), mock())
+        SessionClient.onStart(mock())
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
-        EventClient.onSessionAvailable(MockData.session)
         TestEventAdapter.testSdkEvents = mutableListOf()
         TestEventAdapter.testSdkErrors = mutableListOf()
     }
@@ -37,13 +37,13 @@ class PopupJavascriptBridgeTest {
     fun deliverContentTest() {
         testBridge.deliverAdContent()
         EventClient.onPublishEvents()
-        assertEquals(EventStrings.POPUP_CONTENT_CLICKED, TestEventAdapter.testSdkEvents.first().name)
+        assert(TestEventAdapter.testSdkEvents.any {e -> e.name == EventStrings.POPUP_CONTENT_CLICKED})
     }
 
     @Test
     fun addItemToListTest() {
         testBridge.addItemToList("payloadId", "trackingId", "title", "brand", "category", "barCode", "retailerSku", "discount", "image")
         EventClient.onPublishEvents()
-        assertEquals(EventStrings.POPUP_ATL_CLICKED, TestEventAdapter.testSdkEvents.first().name)
+        assert(TestEventAdapter.testSdkEvents.any {e -> e.name == EventStrings.POPUP_ATL_CLICKED})
     }
 }

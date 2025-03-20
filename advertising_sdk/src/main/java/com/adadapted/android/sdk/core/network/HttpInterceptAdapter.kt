@@ -1,6 +1,5 @@
 package com.adadapted.android.sdk.core.network
 
-import android.util.Log
 import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.keyword.InterceptAdapter
@@ -23,8 +22,6 @@ class HttpInterceptAdapter(private val initUrl: String, private val eventUrl: St
                 contentType(ContentType.Application.Json)
                 header(API_HEADER, deviceInfo.appId)
             }
-            val rawJson = response.body<String>()
-            Log.i("junk", rawJson) //TODO cleanup
             listener.onSuccess(response.body())
         } catch (e: Exception) {
             e.message?.let { AALogger.logError(it) }

@@ -6,7 +6,6 @@ import com.adadapted.android.sdk.core.event.AdEventTypes
 import com.adadapted.android.sdk.core.event.EventClient
 import com.adadapted.android.sdk.core.interfaces.EventClientListener
 import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.any
@@ -30,11 +29,9 @@ class AdEventClientTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        SessionClient.createInstance(mock(), mock())
+        SessionClient.onStart(mock())
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
         testAdEventClientFailSafes()
-        EventClient.onSessionAvailable(MockData.session)
-        EventClient.onAdsAvailable(MockData.session)
     }
 
     @Test
@@ -76,16 +73,6 @@ class AdEventClientTest {
         EventClient.addListener(mockListener)
         EventClient.trackPopupBegin(testAd)
         assert(mockListener.getTrackedEvent()?.eventType == AdEventTypes.POPUP_BEGIN)
-    }
-
-    @Test
-    fun onSessionInitFailed() {
-        EventClient.onSessionInitFailed()
-
-        val mockListener = mock<EventClientListener>()
-        EventClient.addListener(mockListener)
-        EventClient.trackImpression(testAd)
-        verify(mockListener).onAdEventTracked(any())
     }
 
     private fun testAdEventClientFailSafes() {

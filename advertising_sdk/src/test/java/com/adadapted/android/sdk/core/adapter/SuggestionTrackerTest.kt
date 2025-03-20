@@ -6,7 +6,6 @@ import com.adadapted.android.sdk.core.keyword.InterceptClient
 import com.adadapted.android.sdk.core.keyword.InterceptEvent
 import com.adadapted.android.sdk.core.keyword.SuggestionTracker
 import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.Dispatchers
@@ -28,15 +27,15 @@ class SuggestionTrackerTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        SessionClient.createInstance(mock(), mock())
-        testInterceptClient.createInstance(testInterceptAdapter, testTransporterScope)
-        testInterceptClient.getInstance().onSessionAvailable(MockData.session)
+        SessionClient.onStart(mock())
+        testInterceptClient.createInstance(testInterceptAdapter, testTransporterScope, true)
+        testInterceptClient.initialize(SessionClient.getSessionId(), null)
     }
 
     @Test
     fun suggestionMatchedTest() {
         SuggestionTracker.suggestionMatched("testMatchId", "testTermId", "testTerm", "testReplacement", "testInput")
-        testInterceptClient.getInstance().onPublishEvents()
+        testInterceptClient.performPublishEvents()
         assertEquals(InterceptEvent.MATCHED, testInterceptAdapter.testEvents.first().event)
         assertEquals("testMatchId", testInterceptAdapter.testEvents.first().searchId)
     }
@@ -45,7 +44,7 @@ class SuggestionTrackerTest {
     fun suggestionPresentedTest() {
         SuggestionTracker.suggestionMatched("testPresentedId", "testTermId", "testTerm", "testReplacement", "testInput")
         SuggestionTracker.suggestionPresented("testPresentedId", "testTermId", "testReplacement")
-        testInterceptClient.getInstance().onPublishEvents()
+        testInterceptClient.performPublishEvents()
         assert(testInterceptAdapter.testEvents.any { event -> event.event == InterceptEvent.PRESENTED })
         assertEquals("testPresentedId", testInterceptAdapter.testEvents.first().searchId)
     }
@@ -54,7 +53,7 @@ class SuggestionTrackerTest {
     fun suggestionSelectedTest() {
         SuggestionTracker.suggestionMatched("testSelectedId", "testTermId", "testTerm", "testReplacement", "testInput")
         SuggestionTracker.suggestionSelected("testSelectedId", "testTermId", "testReplacement")
-        testInterceptClient.getInstance().onPublishEvents()
+        testInterceptClient.performPublishEvents()
         assert(testInterceptAdapter.testEvents.any { event -> event.event == InterceptEvent.SELECTED })
         assertEquals("testSelectedId", testInterceptAdapter.testEvents.first().searchId)
     }
@@ -62,7 +61,7 @@ class SuggestionTrackerTest {
     @Test
     fun suggestionNotMatchedTest() {
         SuggestionTracker.suggestionNotMatched("testNotMatchedId", "testInput")
-        testInterceptClient.getInstance().onPublishEvents()
+        testInterceptClient.performPublishEvents()
         assertEquals(InterceptEvent.NOT_MATCHED, testInterceptAdapter.testEvents.first().event)
         assertEquals("testNotMatchedId", testInterceptAdapter.testEvents.first().searchId)
     }

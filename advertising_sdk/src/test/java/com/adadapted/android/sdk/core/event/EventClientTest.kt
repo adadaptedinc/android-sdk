@@ -1,10 +1,8 @@
 package com.adadapted.android.sdk.core.event
 
-import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
@@ -27,9 +25,8 @@ class EventClientTest {
     fun setup() {
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
-        SessionClient.createInstance(mock(), mock())
+        SessionClient.onStart(mock())
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
-        EventClient.onSessionAvailable(MockData.session)
     }
 
     @AfterTest
@@ -41,16 +38,18 @@ class EventClientTest {
     fun trackAppEvent() {
         EventClient.trackSdkEvent("testTrackAppEvent")
         EventClient.onPublishEvents()
-        assertEquals("sdk", TestEventAdapter.testSdkEvents.first().type)
-        assertEquals("testTrackAppEvent", TestEventAdapter.testSdkEvents.first().name)
+        assert(TestEventAdapter.testSdkEvents.any { event -> event.type == "sdk" })
+        var event = TestEventAdapter.testSdkEvents.first { event -> event.name == "testTrackAppEvent" }
+        assertEquals("testTrackAppEvent", event.name)
     }
 
     @Test
     fun trackSdkEvent() {
         EventClient.trackSdkEvent("testTrackSdkEvent", hashMapOf())
         EventClient.onPublishEvents()
-        assertEquals("sdk", TestEventAdapter.testSdkEvents.first().type)
-        assertEquals("testTrackSdkEvent", TestEventAdapter.testSdkEvents.first().name)
+        assert(TestEventAdapter.testSdkEvents.any { event -> event.type == "sdk" })
+        var event = TestEventAdapter.testSdkEvents.first { event -> event.name == "testTrackSdkEvent" }
+        assertEquals("testTrackSdkEvent", event.name)
     }
 
     @Test
@@ -59,13 +58,5 @@ class EventClientTest {
         EventClient.onPublishEvents()
         assertEquals("testErrorCode", TestEventAdapter.testSdkErrors.last().code)
         assertEquals("testTrackError", TestEventAdapter.testSdkErrors.last().message)
-    }
-
-    @Test
-    fun onSessionExpired() {
-        EventClient.onSessionExpired()
-        EventClient.onPublishEvents()
-        assertEquals("sdk", TestEventAdapter.testSdkEvents.first().type)
-        assertEquals(EventStrings.EXPIRED_EVENT, TestEventAdapter.testSdkEvents.first().name)
     }
 }

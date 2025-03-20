@@ -10,12 +10,13 @@ import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.EventClient
 import com.adadapted.android.sdk.core.payload.PayloadClient
 import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.mock
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -30,10 +31,10 @@ class AdditContentTest {
 
     @Before
     fun setup() {
+        Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance("", false, mock(), "", mock(), mock())
-        SessionClient.createInstance(mock(), mock())
+        SessionClient.onStart(mock())
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
-        EventClient.onSessionAvailable(MockData.session)
         PayloadClient.createInstance(testPayloadAdapter, EventClient, testTransporterScope)
         TestEventAdapter.testAdEvents = mutableListOf()
         TestEventAdapter.testSdkErrors = mutableListOf()
@@ -75,8 +76,8 @@ class AdditContentTest {
         content.acknowledge()
         content.acknowledge()
         EventClient.onPublishEvents()
-        assertEquals(EventStrings.ADDIT_ADDED_TO_LIST, TestEventAdapter.testSdkEvents.first().name)
-        assertEquals(1, TestEventAdapter.testSdkEvents.count())
+        assert(TestEventAdapter.testSdkEvents.any { event -> event.name == EventStrings.ADDIT_ADDED_TO_LIST })
+        assertEquals(2, TestEventAdapter.testSdkEvents.count())
     }
 
     @Test

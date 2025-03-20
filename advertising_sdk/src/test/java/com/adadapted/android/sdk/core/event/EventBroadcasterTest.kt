@@ -4,7 +4,6 @@ import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.interfaces.AaSdkEventListener
 import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
@@ -17,7 +16,6 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import kotlin.collections.HashMap
 import kotlin.test.AfterTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -30,9 +28,8 @@ class EventBroadcasterTest {
     fun setup() {
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
-        SessionClient.createInstance(mock(), mock())
+        SessionClient.onStart(mock())
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
-        EventClient.onSessionAvailable(MockData.session)
         EventBroadcaster.setListener(testListener, testTransporterScope)
     }
 

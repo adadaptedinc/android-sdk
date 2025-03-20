@@ -5,7 +5,7 @@ import com.adadapted.android.sdk.core.concurrency.Timer
 import com.adadapted.android.sdk.core.concurrency.Transporter
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.interfaces.InterceptListener
-import com.adadapted.android.sdk.core.session.NewSessionClient
+import com.adadapted.android.sdk.core.session.SessionClient
 import kotlin.jvm.Synchronized
 
 object InterceptClient {
@@ -75,14 +75,14 @@ object InterceptClient {
     }
 
     @Synchronized
-    private fun performPublishEvents() {
+    fun performPublishEvents() {
         if (events.isEmpty()) {
             return
         }
         val currentEvents: MutableSet<InterceptEvent> = HashSet(events)
         events.clear()
         transporter.dispatchToThread {
-            adapter.sendEvents(NewSessionClient.getSessionId(), currentEvents)
+            adapter.sendEvents(SessionClient.getSessionId(), currentEvents)
         }
     }
 
