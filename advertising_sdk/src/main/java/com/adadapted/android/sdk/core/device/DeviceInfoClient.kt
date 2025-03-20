@@ -23,7 +23,7 @@ object DeviceInfoClient {
         }
     }
 
-    private suspend fun collectDeviceInfo() {
+    private fun collectDeviceInfo() {
         deviceInfo = deviceInfoExtractor.extractDeviceInfo(appId, isProd, customIdentifier, params)
         notifyCallbacks()
     }

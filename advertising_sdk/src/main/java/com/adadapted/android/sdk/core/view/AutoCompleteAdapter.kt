@@ -6,11 +6,11 @@ import android.widget.Filter
 import com.adadapted.android.sdk.core.keyword.KeywordInterceptMatcher
 import com.adadapted.android.sdk.core.keyword.Suggestion
 
-public class AutoCompleteAdapter(context: Context, resource: Int, items: List<String>) : ArrayAdapter<String>(context.applicationContext, resource, items) {
+class AutoCompleteAdapter(context: Context, resource: Int, items: List<String>) : ArrayAdapter<String>(context.applicationContext, resource, items) {
     private val allItems: List<String> = ArrayList(items)
     private val currentSuggestions: MutableSet<Suggestion> = HashSet()
 
-    public fun suggestionSelected(name: String) {
+    fun suggestionSelected(name: String) {
         currentSuggestions.firstOrNull { s -> s.name == name }?.selected()
     }
 

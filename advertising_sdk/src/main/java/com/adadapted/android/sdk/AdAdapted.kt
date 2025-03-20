@@ -13,7 +13,6 @@ import com.adadapted.android.sdk.core.event.EventBroadcaster
 import com.adadapted.android.sdk.core.event.EventClient
 import com.adadapted.android.sdk.core.interfaces.AaSdkAdditContentListener
 import com.adadapted.android.sdk.core.interfaces.AaSdkEventListener
-import com.adadapted.android.sdk.core.interfaces.AaSdkSessionListener
 import com.adadapted.android.sdk.core.interfaces.DeviceCallback
 import com.adadapted.android.sdk.core.keyword.InterceptClient
 import com.adadapted.android.sdk.core.keyword.KeywordInterceptMatcher
@@ -35,7 +34,6 @@ object AdAdapted {
     private var isKeywordInterceptEnabled = false
     private var isPayloadEnabled = false
     private var params: Map<String, String> = HashMap()
-    lateinit var sessionListener: AaSdkSessionListener
     private lateinit var eventListener: AaSdkEventListener
     private lateinit var contentListener: AaSdkAdditContentListener
 
@@ -46,11 +44,6 @@ object AdAdapted {
 
     fun inEnv(env: Env): AdAdapted {
         isProd = env == Env.PROD
-        return this
-    }
-
-    fun setSdkSessionListener(listener: AaSdkSessionListener): AdAdapted {
-        sessionListener = listener
         return this
     }
 
