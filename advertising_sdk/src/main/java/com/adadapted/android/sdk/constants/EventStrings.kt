@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.constants
 
 object EventStrings {
-    const val EXPIRED_EVENT = "session_expired"
     const val EXCEPTION_MESSAGE = "exception_message"
     const val GAID_UNAVAILABLE = "GAID_UNAVAILABLE"
     const val SDK_EVENT_REQUEST_FAILED = "APP_EVENT_REQUEST_FAILED"
@@ -21,19 +20,16 @@ object EventStrings {
     const val LISTENER_REGISTRATION_ERROR = "App did not register an AddIt Content listener"
 
     const val AD_PAYLOAD_IS_EMPTY = "AD_PAYLOAD_IS_EMPTY"
-    const val AD_GET_REQUEST_FAILED = "AD_GET_REQUEST_FAILED"
     const val AD_EVENT_TRACK_REQUEST_FAILED = "AD_EVENT_TRACK_REQUEST_FAILED"
 
     const val PAYLOAD_PICKUP_ATTEMPT = "payload_pickup_attempt"
     const val PAYLOAD_PICKUP_REQUEST_FAILED = "PAYLOAD_PICKUP_REQUEST_FAILED"
     const val PAYLOAD_EVENT_REQUEST_FAILED = "PAYLOAD_EVENT_REQUEST_FAILED"
-    const val NO_DEEPLINK_URL = "Did not receive a deeplink url."
 
     const val SESSION_CREATED = "SESSION_CREATED"
     const val SESSION_RESUMED = "SESSION_RESUMED"
     const val SESSION_BACKGROUNDED = "SESSION_BACKGROUNDED"
 
-    const val SESSION_REQUEST_FAILED = "SESSION_REQUEST_FAILED"
     const val AD_REQUEST_FAILED = "AD_REQUEST_FAILED"
 
     const val KI_INIT_REQUEST_FAILED = "KI_INIT_REQUEST_FAILED"
