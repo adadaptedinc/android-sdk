@@ -242,11 +242,13 @@ object SessionClient : SessionAdapterListener {
         return hasInstance
     }
 
-    fun setZoneContext(zoneContext: ZoneContext){
-        if (zoneContexts.none { it.zoneId == zoneContext.zoneId }) {
-            zoneContexts.add(zoneContext)
-            performRefreshAds()
+    fun setZoneContext(zoneContext: ZoneContext) {
+        val existingContext = zoneContexts.find { it.zoneId == zoneContext.zoneId }
+        if (existingContext != null) {
+            zoneContexts.remove(existingContext)
         }
+        zoneContexts.add(zoneContext)
+        performRefreshAds()
     }
 
     fun removeZoneContext(zoneId: String) {
