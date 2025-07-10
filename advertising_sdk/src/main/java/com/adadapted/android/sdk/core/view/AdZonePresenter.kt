@@ -50,7 +50,9 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
         if (!attached) {
             attached = true
             this.adZonePresenterListener = adZonePresenterListener
-            adClient.fetchNewAd(zoneId,this) //FIRST INITIAL CALL
+            if(currentAd.id.isEmpty()) { //First attach only
+                adClient.fetchNewAd(zoneId,this) //FIRST INITIAL CALL
+            }
         }
     }
 

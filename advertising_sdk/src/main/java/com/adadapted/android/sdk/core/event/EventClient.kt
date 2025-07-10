@@ -36,7 +36,7 @@ object EventClient {
 
     @Synchronized
     private fun performPublishSdkErrors() {
-        if (sdkErrors.isEmpty()) {
+        if (sdkErrors.isEmpty() || (!::eventAdapter.isInitialized)) {
             return
         }
         val currentSdkErrors: Set<SdkError> = sdkErrors.map { it.copy() }.toSet()
@@ -48,7 +48,7 @@ object EventClient {
 
     @Synchronized
     private fun performPublishSdkEvents() {
-        if (sdkEvents.isEmpty()) {
+        if (sdkEvents.isEmpty() || (!::eventAdapter.isInitialized)) {
             return
         }
         val currentSdkEvents: Set<SdkEvent> = sdkEvents.map { it.copy() }.toSet()
@@ -60,7 +60,7 @@ object EventClient {
 
     @Synchronized
     private fun performPublishAdEvents() {
-        if (adEvents.isEmpty()) {
+        if (adEvents.isEmpty() || (!::eventAdapter.isInitialized)) {
             return
         }
         val currentAdEvents: Set<AdEvent> = adEvents.map { it.copy() }.toSet()
