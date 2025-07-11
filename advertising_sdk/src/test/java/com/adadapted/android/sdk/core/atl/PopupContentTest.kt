@@ -62,9 +62,8 @@ class PopupContentTest {
         testPopupContent.itemAcknowledge(testPopupContent.getItems().first())
         EventClient.onPublishEvents()
         assert(TestEventAdapter.testSdkEvents.any { event -> event.name == EventStrings.POPUP_ADDED_TO_LIST })
-        assert(TestEventAdapter.testSdkEvents.any { event -> event.name == EventStrings.POPUP_ITEM_ADDED_TO_LIST })
-
-        assertEquals("testPayloadId", TestEventAdapter.testSdkEvents.last().params.getValue("payload_id"))
+        var event = TestEventAdapter.testSdkEvents.first { event -> event.name == EventStrings.POPUP_ITEM_ADDED_TO_LIST }
+        assertEquals("testPayloadId", event.params.getValue("payload_id"))
     }
 
     @Test
