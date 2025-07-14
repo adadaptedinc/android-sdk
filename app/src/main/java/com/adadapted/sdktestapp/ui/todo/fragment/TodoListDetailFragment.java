@@ -46,6 +46,7 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
     private AaZoneView aaZoneViewTwo;
 
     private OnFragmentInteractionListener mListener;
+    private boolean userScrolling = false;
 
     /**
      * Use this factory method to create a new instance of
@@ -116,14 +117,17 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
 
         getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
-            public void onScrollStateChanged(AbsListView absListView, int i) {
-
+            public void onScrollStateChanged(AbsListView absListView, int scrollState) {
+                // Scroll state: 0 = idle, 1 = touch scroll, 2 = fling
+                userScrolling = scrollState != AbsListView.OnScrollListener.SCROLL_STATE_IDLE;
             }
 
             @Override
             public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                boolean isShown = aaZoneView.isShown(); //this determines if the adZoneView is actually visible on screen
-                aaZoneView.setAdZoneVisibility(isShown); //set here for a more accurate representation of impressions
+                if (!userScrolling) return; // skip unless user is actively scrolling
+
+                boolean isShown = aaZoneView.isShown();
+                aaZoneView.setAdZoneVisibility(isShown);
             }
         });
 
