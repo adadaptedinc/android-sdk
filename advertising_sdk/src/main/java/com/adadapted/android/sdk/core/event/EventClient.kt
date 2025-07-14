@@ -151,6 +151,7 @@ object EventClient {
 
     fun trackImpression(ad: Ad) {
         AALogger.logDebug("Ad Impression Tracked.")
+        ad.setImpressionTracked()
         transporter.dispatchToThread {
             fileEvent(ad, AdEventTypes.IMPRESSION)
         }

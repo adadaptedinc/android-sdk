@@ -13,11 +13,21 @@ data class Ad(
     val payload: Payload = Payload(),
 ) {
 
+    private var isImpressionTracked: Boolean = false
+
     val isEmpty: Boolean
         get() = id.isEmpty()
 
     fun getContent(): AdContent {
         return AdContent.createAddToListContent(this)
+    }
+
+    fun setImpressionTracked() {
+        isImpressionTracked = true
+    }
+
+    fun impressionWasTracked(): Boolean {
+        return isImpressionTracked
     }
 
     val zoneId: String

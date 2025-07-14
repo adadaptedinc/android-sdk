@@ -171,7 +171,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
     }
 
     private fun trackAdImpression(ad: Ad, isAdVisible: Boolean) {
-        if (!isAdVisible || ad.isEmpty || webView?.loaded == false) return
+        if (!isAdVisible || ad.impressionWasTracked() || ad.isEmpty || webView?.loaded == false) return
         callPixelTrackingJavaScript()
         eventClient.trackImpression(ad)
     }
