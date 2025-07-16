@@ -2,9 +2,9 @@ package com.adadapted.android.sdk.core.intercept
 
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.interfaces.InterceptListener
-import com.adadapted.android.sdk.core.keyword.Intercept
 import com.adadapted.android.sdk.core.keyword.InterceptAdapter
 import com.adadapted.android.sdk.core.keyword.InterceptClient
+import com.adadapted.android.sdk.core.keyword.InterceptData
 import com.adadapted.android.sdk.core.keyword.InterceptEvent
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.tools.TestTransporter
@@ -82,7 +82,7 @@ class InterceptClientTest {
 
 class TestInterceptAdapter: InterceptAdapter {
     var testEvents = mutableSetOf<InterceptEvent>()
-    var testIntercept = Intercept()
+    var testIntercept = InterceptData()
     override suspend fun retrieve(sessionId: String, listener: InterceptAdapter.Listener) {
         listener.onSuccess(testIntercept)
     }
