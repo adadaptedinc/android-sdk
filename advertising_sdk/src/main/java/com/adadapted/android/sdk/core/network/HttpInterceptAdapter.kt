@@ -9,7 +9,6 @@ import com.adadapted.android.sdk.core.keyword.KeywordRequest
 import com.adadapted.android.sdk.core.keyword.KeywordResponse
 import com.adadapted.android.sdk.core.log.AALogger
 import com.adadapted.android.sdk.core.network.HttpConnector.API_HEADER
-import com.adadapted.android.sdk.core.session.SessionClient
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -21,11 +20,11 @@ class HttpInterceptAdapter(private val keywordRequestUrl: String, private val ev
         val deviceInfo = DeviceInfoClient.getCachedDeviceInfo()
         try {
             val keywordRequest = KeywordRequest(
-                sdkId = deviceInfo.appId,
+                sdkId = deviceInfo.sdkVersion,
                 bundleId = "",
                 userId = deviceInfo.udid,
                 zoneId = "",
-                sessionId = SessionClient.getSessionId(),
+                sessionId = sessionId,
                 extra = ""
             )
 
@@ -35,7 +34,7 @@ class HttpInterceptAdapter(private val keywordRequestUrl: String, private val ev
                 header(API_HEADER, deviceInfo.appId)
             }
 
-            listener.onSuccess(response.body<KeywordResponse>().data)
+            response.body<KeywordResponse>().data?.let { listener.onSuccess(it) }
         } catch (e: Exception) {
             e.message?.let { AALogger.logError(it) }
             HttpErrorTracker.trackHttpError(

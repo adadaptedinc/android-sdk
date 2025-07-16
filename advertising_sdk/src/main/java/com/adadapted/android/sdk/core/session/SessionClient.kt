@@ -26,6 +26,7 @@ object SessionClient: DefaultLifecycleObserver {
         return sessionId
     }
 
+    @Synchronized
     private fun createOrResumeSession() {
         val currentTime = System.currentTimeMillis()
         val isNewSession = sessionId.isEmpty() || (currentTime - backgroundTime) >= THIRTY_MINUTES
