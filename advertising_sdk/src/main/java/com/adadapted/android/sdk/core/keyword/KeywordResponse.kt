@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 
 @Serializable
 data class KeywordResponse(
-    val data: InterceptData,
+    val data: InterceptData?,
     val success: Boolean
 )
 
