@@ -1,7 +1,7 @@
 package com.adadapted.android.sdk.core.adapter
 
+import com.adadapted.android.sdk.core.keyword.InterceptTerm
 import com.adadapted.android.sdk.core.keyword.Suggestion
-import com.adadapted.android.sdk.core.keyword.Term
 import org.junit.Test
 
 class SuggestionTest {
@@ -21,6 +21,6 @@ class SuggestionTest {
     }
 
     private fun getTestSuggestion(): Suggestion {
-        return Suggestion("searchId", Term("testTermId", "testTerm", "testReplacement", "testIcon", "testTagLine", 0))
+        return Suggestion("searchId", InterceptTerm("testTermId", "testTerm", "testReplacement", 0))
     }
 }

@@ -22,7 +22,7 @@ object InterceptClient {
         transporter.dispatchToThread {
             adapter.retrieve(sessionId, object :
                 InterceptAdapter.Listener {
-                override fun onSuccess(intercept: Intercept) {
+                override fun onSuccess(intercept: InterceptData) {
                     interceptListener.onKeywordInterceptInitialized(intercept)
                 }
             })

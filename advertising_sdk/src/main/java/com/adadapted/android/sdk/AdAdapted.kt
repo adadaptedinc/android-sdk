@@ -154,7 +154,8 @@ object AdAdapted {
         )
         InterceptClient.createInstance(
             HttpInterceptAdapter(
-                Config.getRetrieveInterceptsUrl(),
+                "https://dev.adadapted.dev/api/ad-service/v100-alpha/intercept/retrieve", //TODO TEMP
+                //Config.getRetrieveInterceptsUrl(),
                 Config.getInterceptEventsUrl(),
                 HttpConnector
             ), Transporter(),

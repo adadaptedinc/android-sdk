@@ -2,7 +2,7 @@ package com.adadapted.android.sdk.core.keyword
 
 interface InterceptAdapter {
     interface Listener {
-        fun onSuccess(intercept: Intercept)
+        fun onSuccess(intercept: InterceptData)
     }
 
     suspend fun retrieve(sessionId: String, listener: Listener)

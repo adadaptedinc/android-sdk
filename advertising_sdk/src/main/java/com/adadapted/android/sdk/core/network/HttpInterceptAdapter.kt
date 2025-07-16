@@ -5,37 +5,50 @@ import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.keyword.InterceptAdapter
 import com.adadapted.android.sdk.core.keyword.InterceptEvent
 import com.adadapted.android.sdk.core.keyword.InterceptEventWrapper
+import com.adadapted.android.sdk.core.keyword.KeywordRequest
+import com.adadapted.android.sdk.core.keyword.KeywordResponse
 import com.adadapted.android.sdk.core.log.AALogger
 import com.adadapted.android.sdk.core.network.HttpConnector.API_HEADER
+import com.adadapted.android.sdk.core.session.SessionClient
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 
-class HttpInterceptAdapter(private val initUrl: String, private val eventUrl: String, private val httpConnector: HttpConnector) :
+class HttpInterceptAdapter(private val keywordRequestUrl: String, private val eventUrl: String, private val httpConnector: HttpConnector) :
     InterceptAdapter {
     override suspend fun retrieve(sessionId: String, listener: InterceptAdapter.Listener) {
-        var deviceInfo = DeviceInfoClient.getCachedDeviceInfo()
+        val deviceInfo = DeviceInfoClient.getCachedDeviceInfo()
         try {
-            val url = initUrl + "?aid=" + deviceInfo.appId + "&uid=" + deviceInfo.udid + "&sid=" + sessionId + "&sdk=" + deviceInfo.sdkVersion
-            val response: HttpResponse = httpConnector.client.get(url) {
+            val keywordRequest = KeywordRequest(
+                sdkId = deviceInfo.appId,
+                bundleId = "",
+                userId = deviceInfo.udid,
+                zoneId = "",
+                sessionId = SessionClient.getSessionId(),
+                extra = ""
+            )
+
+            val response: HttpResponse = httpConnector.client.post(keywordRequestUrl) {
                 contentType(ContentType.Application.Json)
+                setBody(keywordRequest)
                 header(API_HEADER, deviceInfo.appId)
             }
-            listener.onSuccess(response.body())
+
+            listener.onSuccess(response.body<KeywordResponse>().data)
         } catch (e: Exception) {
             e.message?.let { AALogger.logError(it) }
             HttpErrorTracker.trackHttpError(
                 e.cause.toString(),
                 e.message.toString(),
                 EventStrings.KI_INIT_REQUEST_FAILED,
-                initUrl
+                keywordRequestUrl
             )
         }
     }
 
     override suspend fun sendEvents(sessionId: String, events: MutableSet<InterceptEvent>) {
-        var deviceInfo = DeviceInfoClient.getCachedDeviceInfo()
+        val deviceInfo = DeviceInfoClient.getCachedDeviceInfo()
         val compiledInterceptEventRequest = InterceptEventWrapper(
             sessionId,
             deviceInfo.appId,

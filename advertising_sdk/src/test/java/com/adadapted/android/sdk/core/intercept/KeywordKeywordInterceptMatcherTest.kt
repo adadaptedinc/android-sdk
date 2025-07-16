@@ -3,11 +3,11 @@ package com.adadapted.android.sdk.core.intercept
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.EventClient
-import com.adadapted.android.sdk.core.keyword.Intercept
 import com.adadapted.android.sdk.core.keyword.InterceptClient
+import com.adadapted.android.sdk.core.keyword.InterceptData
 import com.adadapted.android.sdk.core.keyword.InterceptEvent
+import com.adadapted.android.sdk.core.keyword.InterceptTerm
 import com.adadapted.android.sdk.core.keyword.KeywordInterceptMatcher
-import com.adadapted.android.sdk.core.keyword.Term
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestEventAdapter
@@ -34,11 +34,24 @@ class KeywordKeywordInterceptMatcherTest {
         DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.onStart(mock())
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
-        val testIntercept = Intercept("test_searchId", 5, 3, listOf(
-                Term("testTermId", "testTerm", "replacementTerm", "testIcon", "testTagLine", 1),
-                Term("twoTermId", "twoTestTerm", "replacementTerm", "testIcon", "testTagLine", 1),
-                Term("threeTermId", "threeTestTerm", "replacementTerm", "testIcon", "testTagLine", 1),
-                Term("testTermTwoId", "testTermTwo", "replacementTermTwo", "testIcon", "testTagLine", 2)))
+        val testIntercept = InterceptData(
+            "test_searchId", listOf(
+                InterceptTerm("testTermId", "testTerm", "replacementTerm", 1),
+                InterceptTerm("twoTermId", "twoTestTerm", "replacementTerm", 1),
+                InterceptTerm(
+                    "threeTermId",
+                    "threeTestTerm",
+                    "replacementTerm",
+                    1
+                ),
+                InterceptTerm(
+                    "testTermTwoId",
+                    "testTermTwo",
+                    "replacementTermTwo",
+                    2
+                )
+            )
+        )
         testInterceptAdapter.testIntercept = testIntercept
         InterceptClient.createInstance(testInterceptAdapter, testTransporterScope, true)
         KeywordInterceptMatcher.match("INIT")
