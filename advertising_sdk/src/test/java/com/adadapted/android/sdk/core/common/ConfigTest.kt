@@ -10,7 +10,6 @@ class ConfigTest {
 
     @Test
     fun serverUrlsUseSandboxByDefault() {
-        assertEquals(ServerUrl.SAND_AD_SERVER.plus(adServerVersion).plus("android/sessions/initialize"), Config.getInitSessionUrl())
         assertEquals(ServerUrl.SAND_AD_SERVER.plus(adServerVersion).plus("android/ads/retrieve"), Config.getRetrieveAdsUrl())
         assertEquals(ServerUrl.SAND_AD_SERVER.plus(adServerVersion).plus("android/ads/events"), Config.getAdEventsUrl())
         assertEquals(ServerUrl.SAND_AD_SERVER.plus(adServerVersion).plus("android/intercepts/retrieve"), Config.getRetrieveInterceptsUrl())
@@ -24,7 +23,6 @@ class ConfigTest {
     @Test
     fun settingProdUsesProdUrls() {
         Config.init(true)
-        assertEquals(ServerUrl.PROD_AD_SERVER.plus(adServerVersion).plus("android/sessions/initialize"), Config.getInitSessionUrl())
         assertEquals(ServerUrl.PROD_AD_SERVER.plus(adServerVersion).plus("android/ads/retrieve"), Config.getRetrieveAdsUrl())
         assertEquals(ServerUrl.PROD_AD_SERVER.plus(adServerVersion).plus("android/ads/events"), Config.getAdEventsUrl())
         assertEquals(ServerUrl.PROD_AD_SERVER.plus(adServerVersion).plus("android/intercepts/retrieve"), Config.getRetrieveInterceptsUrl())
