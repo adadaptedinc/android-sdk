@@ -29,8 +29,5 @@ data class DeviceInfo(
 
     companion object {
         const val UNKNOWN_VALUE = "Unknown"
-        fun empty(): DeviceInfo {
-            return DeviceInfo()
-        }
     }
 }
