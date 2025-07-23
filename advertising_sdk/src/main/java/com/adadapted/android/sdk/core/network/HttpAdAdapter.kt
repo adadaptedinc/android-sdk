@@ -22,7 +22,7 @@ class HttpAdAdapter(
     override suspend fun requestAd(zoneId: String, listener: ZoneAdListener, storeId: String, contextId: String, extra: String) {
         val deviceInfo = DeviceInfoClient.getCachedDeviceInfo()
         val zoneAdRequest = ZoneAdRequest(
-            sdkId = deviceInfo.appId,
+            sdkId = deviceInfo.sdkVersion,
             bundleId = "",
             userId = deviceInfo.udid,
             zoneId = zoneId,
