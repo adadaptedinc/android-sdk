@@ -10,7 +10,7 @@ object SessionClient: DefaultLifecycleObserver {
     private const val THIRTY_MINUTES = 30 * 60 * 1000L
     private val ID_CHARACTERS by lazy { ('A'..'Z') + ('0'..'9') }
     private var sessionId: String = ""
-    private var backgroundTime: Long = 0
+    private var backgroundTime: Long = System.currentTimeMillis()
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
