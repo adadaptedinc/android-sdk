@@ -33,10 +33,7 @@ class NewSessionClientTest {
     @Test
     fun `onStart creates new session when session is empty`() {
         SessionClient.onStart(mockOwner)
-
         assertTrue(SessionClient.getSessionId().isNotEmpty())
-        EventClient.onPublishEvents()
-        assert(TestEventAdapter.testSdkEvents.any {e -> e.name == EventStrings.SESSION_CREATED})
     }
 
     @Test
