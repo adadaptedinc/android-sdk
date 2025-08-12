@@ -7,23 +7,24 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdActionType
+import com.adadapted.android.sdk.core.ad.AdClient
+import com.adadapted.android.sdk.core.ad.AdZoneData
+import com.adadapted.android.sdk.core.atl.AddToListItem
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
-import com.adadapted.android.sdk.core.device.DeviceInfo
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.AdEvent
 import com.adadapted.android.sdk.core.event.AdEventTypes
 import com.adadapted.android.sdk.core.event.EventClient
+import com.adadapted.android.sdk.core.interfaces.AdAdapter
 import com.adadapted.android.sdk.core.interfaces.EventClientListener
-import com.adadapted.android.sdk.core.keyword.InterceptClient
+import com.adadapted.android.sdk.core.interfaces.ZoneAdListener
+import com.adadapted.android.sdk.core.payload.Payload
 import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.core.session.SessionTest
 import com.adadapted.android.sdk.core.view.AaWebViewPopupActivity
 import com.adadapted.android.sdk.core.view.AdViewHandler
 import com.adadapted.android.sdk.core.view.AdWebView
 import com.adadapted.android.sdk.core.view.AdZonePresenter
 import com.adadapted.android.sdk.core.view.AdZonePresenterListener
-import com.adadapted.android.sdk.core.view.Zone
-import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
@@ -42,7 +43,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
-import kotlin.collections.HashMap
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
@@ -53,24 +53,42 @@ class AdZonePresenterTest {
     private lateinit var testAaWebViewPopupActivity: AaWebViewPopupActivity
     private var testTransporter = UnconfinedTestDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
-    private var testSession = SessionTest().buildTestSession()
     private var mockWebView: AdWebView? = null
+    private var testAdAdapter: TestAdAdapter = TestAdAdapter()
 
     @Before
     fun setup() {
-        MockData.session.deviceInfo = DeviceInfo()
         whenever(mockContext.applicationContext).thenReturn(mock())
         whenever(mockContext.resources).thenReturn(mock())
         whenever(mockContext.resources.displayMetrics).thenReturn(mock())
         mockWebView = AdWebView(ApplicationProvider.getApplicationContext(), mock())
         mockWebView?.loaded = true
+        testAdAdapter.setMockData(
+            AdZoneData(
+                Ad(
+                    id = "TestAdId", "123", "testUrl", "action", "path", Payload(
+                        "payloadId", "msg", "img", "campaign", "appid", 0, listOf(
+                            AddToListItem(
+                                "trackingId",
+                                "TestAdItem",
+                                "brand",
+                                "category",
+                                "upc",
+                                "sku",
+                                "retail",
+                                "img"
+                            )
+                        )
+                    )
+                )
+            )
+        )
 
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
-        SessionClient.createInstance(mock(), mock())
-        InterceptClient.createInstance(mock(), mock())
+        SessionClient.onStart(mock())
+        AdClient.createInstance(testAdAdapter, testTransporterScope)
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
-        EventClient.onSessionAvailable(MockData.session)
 
         val testIntent = Intent(testContext, AaWebViewPopupActivity::class.java)
         testIntent.putExtra(AaWebViewPopupActivity::class.java.name + ".EXTRA_POPUP_AD", Json.encodeToString(
@@ -81,18 +99,13 @@ class AdZonePresenterTest {
                 .resume()
                 .get()
 
-        testAdZonePresenter = AdZonePresenter(AdViewHandler(testContext), SessionClient)
+        testAdZonePresenter = AdZonePresenter(AdViewHandler(testContext), AdClient)
     }
 
     @Test
     fun testOnAttach() {
         testAdZonePresenter.init("testZoneId", mockWebView!!)
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(Ad("TestAdId")))))
-        testSession.updateZones(zones)
-
         val testListener = TestAdZonePresenterListener()
-        testAdZonePresenter.onSessionAvailable(testSession)
-        SessionClient.onSessionInitialized(testSession)
         testAdZonePresenter.onAttach(testListener)
 
         assertEquals("TestAdId", testListener.testAd.id)
@@ -101,11 +114,8 @@ class AdZonePresenterTest {
     @Test
     fun testOnDetach() {
         testAdZonePresenter.init("testZoneId", mockWebView!!)
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(Ad("TestAdId")))))
-        testSession.updateZones(zones)
 
         val testListener = TestAdZonePresenterListener()
-        testAdZonePresenter.onSessionAvailable(testSession)
         testAdZonePresenter.onAttach(testListener)
         assertEquals("TestAdId", testListener.testAd.id)
 
@@ -115,15 +125,12 @@ class AdZonePresenterTest {
         testAdZonePresenter.onAdDisplayed(Ad("TestAdId"), true)
         testAdZonePresenter.onDetach()
 
-        assertEquals("", testListener.testZone.id)
+        assertEquals("TestAdId", testListener.testAd.id)
     }
 
     @Test
     fun testOnAdDisplayed() {
         testAdZonePresenter.init("testZoneId", mockWebView!!)
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(Ad("TestAdId")))))
-        testSession.updateZones(zones)
-        testAdZonePresenter.onSessionAvailable(testSession)
 
         val testAdEventListener = TestAdEventClientListener()
         EventClient.addListener(testAdEventListener)
@@ -135,9 +142,6 @@ class AdZonePresenterTest {
     @Test
     fun testOnAdDisplayedButZoneNotVisible() {
         testAdZonePresenter.init("testZoneId", mockWebView!!)
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(Ad("TestAdId")))))
-        testSession.updateZones(zones)
-        testAdZonePresenter.onSessionAvailable(testSession)
 
         val testAdEventListener = TestAdEventClientListener()
         EventClient.addListener(testAdEventListener)
@@ -150,17 +154,11 @@ class AdZonePresenterTest {
     fun testOnAdCompletedButZoneNotVisible() {
         testAdZonePresenter.init("testZoneId", mockWebView!!)
         val testAd = Ad(id = "TestAdId")
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(testAd, testAd))))
-        testSession.updateZones(zones)
-        testAdZonePresenter.onSessionAvailable(testSession)
-        SessionClient.onSessionInitialized(testSession)
-
         val testAdEventListener = TestAdEventClientListener()
         EventClient.addListener(testAdEventListener)
         testAdZonePresenter.onAdDisplayed(testAd, false)
         testAdZonePresenter.onAttach(object : AdZonePresenterListener{
-            override fun onZoneAvailable(zone: Zone) {}
-            override fun onAdsRefreshed(zone: Zone) {}
+            override fun onZoneAvailable(adZoneData: AdZoneData) {}
             override fun onAdAvailable(ad: Ad) {}
             override fun onNoAdAvailable() {}
             override fun onAdVisibilityChanged(ad: Ad) {}
@@ -176,16 +174,11 @@ class AdZonePresenterTest {
     fun testAdNotCompletedBecauseThereIsOnlyOne() {
         testAdZonePresenter.init("testZoneId", mockWebView!!)
         val testAd = Ad(id = "TestAdId")
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(testAd))))
-        testSession.updateZones(zones)
-        testAdZonePresenter.onSessionAvailable(testSession)
-
         val testAdEventListener = TestAdEventClientListener()
         EventClient.addListener(testAdEventListener)
         testAdZonePresenter.onAdDisplayed(testAd, false)
         testAdZonePresenter.onAttach(object : AdZonePresenterListener{
-            override fun onZoneAvailable(zone: Zone) {}
-            override fun onAdsRefreshed(zone: Zone) {}
+            override fun onZoneAvailable(adZoneData: AdZoneData) {}
             override fun onAdAvailable(ad: Ad) {}
             override fun onNoAdAvailable() {}
             override fun onAdVisibilityChanged(ad: Ad) {}
@@ -199,10 +192,6 @@ class AdZonePresenterTest {
    fun testOnAdClickedContent() {
        testAdZonePresenter.init("testZoneId", mockWebView!!)
        val testAd = Ad("TestAdId", "impressionId", "url", AdActionType.CONTENT)
-       val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(testAd))))
-       testSession.updateZones(zones)
-       testAdZonePresenter.onSessionAvailable(testSession)
-
        val testAdEventListener = TestAdEventClientListener()
        EventClient.addListener(testAdEventListener)
        testAdZonePresenter.onAdDisplayed(testAd, true)
@@ -214,13 +203,8 @@ class AdZonePresenterTest {
 
     @Test
     fun testOnAdClickedLink() {
-        testAdZonePresenter = AdZonePresenter(AdViewHandler(mockContext), SessionClient)
         testAdZonePresenter.init("testZoneId", mockWebView!!)
         val testAd = Ad("TestAdId", "impressionId", "url", AdActionType.LINK)
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(testAd))))
-        testSession.updateZones(zones)
-        testAdZonePresenter.onSessionAvailable(testSession)
-
         val testAdEventListener = TestAdEventClientListener()
         EventClient.addListener(testAdEventListener)
         testAdZonePresenter.onAdDisplayed(testAd, true)
@@ -233,10 +217,6 @@ class AdZonePresenterTest {
     fun testOnAdClickedPopup() {
         testAdZonePresenter.init("testZoneId", mockWebView!!)
         val testAd = Ad("TestAdId", "impressionId", "url", AdActionType.POPUP)
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(testAd))))
-        testSession.updateZones(zones)
-        testAdZonePresenter.onSessionAvailable(testSession)
-
         val testAdEventListener = TestAdEventClientListener()
         EventClient.addListener(testAdEventListener)
         testAdZonePresenter.onAdDisplayed(testAd, true)
@@ -249,10 +229,6 @@ class AdZonePresenterTest {
     fun testOnAdClickedContentPopup() {
         testAdZonePresenter.init("testZoneId", mockWebView!!)
         val testAd = Ad("TestAdId", "impressionId", "url", AdActionType.CONTENT_POPUP)
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(testAd))))
-        testSession.updateZones(zones)
-        testAdZonePresenter.onSessionAvailable(testSession)
-
         val testAdEventListener = TestAdEventClientListener()
         EventClient.addListener(testAdEventListener)
         testAdZonePresenter.onAdDisplayed(testAd, true)
@@ -263,67 +239,38 @@ class AdZonePresenterTest {
     }
 
     @Test
-    fun testOnSessionAvailable() {
-        testAdZonePresenter.init("testZoneId", mockWebView!!)
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(Ad("TestAdId")))))
-        testSession.updateZones(zones)
-
-        val testListener = TestAdZonePresenterListener()
-        testAdZonePresenter.onAttach(testListener)
-        testAdZonePresenter.onSessionAvailable(testSession)
-
-        assertEquals("testZoneId", testListener.testZone.id)
-    }
-
-    @Test
-    fun testOnAdsAvailable() {
-        testAdZonePresenter.init("testZoneId", mockWebView!!)
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(Ad("TestAdId")))))
-        testSession.updateZones(zones)
-
-        val testListener = TestAdZonePresenterListener()
-        testAdZonePresenter.onAttach(testListener)
-        testAdZonePresenter.onAdsAvailable(testSession)
-
-        assertEquals("testZoneId", testListener.testZone.id)
-    }
-
-    @Test
-    fun testOnSessioninitFailed() {
-        testAdZonePresenter.init("testZoneId", mockWebView!!)
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(Ad("TestAdId")))))
-        testSession.updateZones(zones)
-
-        val testListener = TestAdZonePresenterListener()
-        testAdZonePresenter.onAttach(testListener)
-        testAdZonePresenter.onSessionInitFailed()
-
-        assertEquals("NoAdAvail", testListener.testAd.id)
-    }
-
-    @Test
     fun testNullListener() {
         testAdZonePresenter.init("testZoneId", mockWebView!!)
-        val zones = mapOf<String, Zone>().plus(Pair("testZoneId", Zone("testZoneId", listOf(Ad("TestAdId")))))
-        testSession.updateZones(zones)
-
-        testAdZonePresenter.onSessionAvailable(testSession)
         testAdZonePresenter.onAttach(null)
 
         assertNotNull(testAdZonePresenter)
     }
 }
 
-class TestAdZonePresenterListener: AdZonePresenterListener {
-    var testZone = Zone()
-    var testAd = Ad()
+class TestAdAdapter: AdAdapter {
+    private var adZoneData: AdZoneData = AdZoneData()
 
-    override fun onZoneAvailable(zone: Zone) {
-        testZone = zone
+    fun setMockData(adZoneData: AdZoneData) {
+        this.adZoneData = adZoneData
     }
 
-    override fun onAdsRefreshed(zone: Zone) {
-        testZone = zone
+    override suspend fun requestAd(
+        zoneId: String,
+        listener: ZoneAdListener,
+        storeId: String,
+        contextId: String,
+        extra: String
+    ) {
+        listener.onAdLoaded(adZoneData)
+    }
+}
+
+class TestAdZonePresenterListener: AdZonePresenterListener {
+    var testZoneData = AdZoneData()
+    var testAd = Ad()
+
+    override fun onZoneAvailable(adZoneData: AdZoneData) {
+        testZoneData = adZoneData
     }
 
     override fun onAdAvailable(ad: Ad) {

@@ -10,7 +10,7 @@ object DeviceInfoClient {
     private var isProd: Boolean = false
     private var params: Map<String, String> = emptyMap()
     private var customIdentifier: String =""
-    private var deviceInfoExtractor: DeviceInfoExtractor? = null
+    private lateinit var deviceInfoExtractor: DeviceInfoExtractor
     private var transporter: TransporterCoroutineScope = Transporter()
     private var deviceInfo: DeviceInfo? = null
     private var deviceCallbacks: MutableSet<DeviceCallback> = HashSet()
@@ -24,7 +24,7 @@ object DeviceInfoClient {
     }
 
     private fun collectDeviceInfo() {
-        deviceInfo = deviceInfoExtractor?.extractDeviceInfo(appId, isProd, customIdentifier, params)
+        deviceInfo = deviceInfoExtractor.extractDeviceInfo(appId, isProd, customIdentifier, params)
         notifyCallbacks()
     }
 
@@ -42,12 +42,8 @@ object DeviceInfoClient {
         }
     }
 
-    fun getCachedDeviceInfo(): DeviceInfo? {
-        return if (deviceInfo != null) {
-            deviceInfo
-        } else {
-            null
-        }
+    fun getCachedDeviceInfo(): DeviceInfo {
+        return deviceInfo ?: DeviceInfo()
     }
 
     fun createInstance(

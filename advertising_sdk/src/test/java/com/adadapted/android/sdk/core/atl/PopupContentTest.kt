@@ -5,7 +5,6 @@ import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.EventClient
 import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
@@ -30,9 +29,8 @@ class PopupContentTest {
     fun setup() {
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
-        SessionClient.createInstance(mock(), mock())
+        SessionClient.onStart(mock())
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
-        EventClient.onSessionAvailable(MockData.session)
     }
 
     @After
@@ -52,8 +50,9 @@ class PopupContentTest {
         TestEventAdapter.testSdkEvents = mutableListOf()
         testPopupContent.acknowledge()
         EventClient.onPublishEvents()
-        assertEquals(EventStrings.POPUP_ADDED_TO_LIST, TestEventAdapter.testSdkEvents.first().name)
-        assertEquals("testPayloadId", TestEventAdapter.testSdkEvents.first().params.getValue("payload_id"))
+        assert(TestEventAdapter.testSdkEvents.any { event -> event.name == EventStrings.POPUP_ADDED_TO_LIST })
+        var event = TestEventAdapter.testSdkEvents.first { event -> event.name == EventStrings.POPUP_ADDED_TO_LIST }
+        assertEquals("testPayloadId", event.params.getValue("payload_id"))
     }
 
     @Test
@@ -62,11 +61,9 @@ class PopupContentTest {
         TestEventAdapter.testSdkEvents = mutableListOf()
         testPopupContent.itemAcknowledge(testPopupContent.getItems().first())
         EventClient.onPublishEvents()
-        assert(TestEventAdapter.testSdkEvents.count() == 2)
         assert(TestEventAdapter.testSdkEvents.any { event -> event.name == EventStrings.POPUP_ADDED_TO_LIST })
-        assert(TestEventAdapter.testSdkEvents.any { event -> event.name == EventStrings.POPUP_ITEM_ADDED_TO_LIST })
-        assertEquals("testPayloadId", TestEventAdapter.testSdkEvents.first().params.getValue("payload_id"))
-        assertEquals("testPayloadId", TestEventAdapter.testSdkEvents.last().params.getValue("payload_id"))
+        var event = TestEventAdapter.testSdkEvents.first { event -> event.name == EventStrings.POPUP_ITEM_ADDED_TO_LIST }
+        assertEquals("testPayloadId", event.params.getValue("payload_id"))
     }
 
     @Test
@@ -75,8 +72,9 @@ class PopupContentTest {
         TestEventAdapter.testSdkErrors = mutableListOf()
         testPopupContent.failed("popupFail")
         EventClient.onPublishEvents()
-        assertEquals(EventStrings.POPUP_CONTENT_FAILED, TestEventAdapter.testSdkErrors.first().code)
-        assertEquals("popupFail", TestEventAdapter.testSdkErrors.first().message)
+        assert(TestEventAdapter.testSdkErrors.any { event -> event.code == EventStrings.POPUP_CONTENT_FAILED })
+        var event = TestEventAdapter.testSdkErrors.first { event -> event.code == EventStrings.POPUP_CONTENT_FAILED }
+        assertEquals("popupFail", event.message)
     }
 
     @Test

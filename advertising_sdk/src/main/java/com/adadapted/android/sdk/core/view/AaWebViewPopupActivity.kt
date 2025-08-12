@@ -49,7 +49,7 @@ class AaWebViewPopupActivity : Activity() {
         ad = serializedAd?.let { Json.decodeFromString<Ad>(it) } ?: Ad()
 
         val url = ad.actionPath
-        if (url.startsWith("http")) {
+        if (url?.startsWith("http") == true) {
             loadPopup(ad.actionPath)
         } else {
             EventClient.trackSdkError(

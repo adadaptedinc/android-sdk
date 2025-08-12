@@ -11,7 +11,7 @@ object HttpErrorTracker {
         try {
             EventClient.trackSdkError(errorEventCode, errorMessage, params)
         } catch (illegalArg: IllegalArgumentException) {
-            AALogger.logError("AppEventClient was not initialized, is your API key valid? DETAIL: " + illegalArg.message)
+            AALogger.logError("EventClient was not initialized, is your API key valid? DETAIL: " + illegalArg.message)
         }
     }
 }

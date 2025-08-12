@@ -1,22 +1,21 @@
 package com.adadapted.android.sdk.core.keyword
 
 import com.adadapted.android.sdk.core.interfaces.InterceptListener
-import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.core.session.SessionListener
 
-object KeywordInterceptMatcher : SessionListener, InterceptListener {
-    private var intercept: Intercept = Intercept()
+object KeywordInterceptMatcher : InterceptListener {
+    private var intercept: InterceptData = InterceptData()
     private var mLoaded = false
-    private var hasInstance: Boolean = false
+    private const val MIN_MATCH_LENGTH = 3
+
     private fun matchKeyword(constraint: CharSequence): Set<Suggestion> {
         val suggestions: MutableSet<Suggestion> = HashSet()
         val input = constraint.toString()
         if (!isReadyToMatch(input)) {
             return suggestions
         }
-        for (interceptTerm in intercept.getTerms()) {
-            if (interceptTerm.searchTerm.startsWith(input, ignoreCase = true)) {
+        for (interceptTerm in intercept.getSortedTerms()) {
+            if (interceptTerm.term.startsWith(input, ignoreCase = true)) {
                 fileTerm(interceptTerm, input, suggestions)
             }
         }
@@ -26,21 +25,21 @@ object KeywordInterceptMatcher : SessionListener, InterceptListener {
         return suggestions
     }
 
-    private fun fileTerm(term: Term?, input: String, suggestions: MutableSet<Suggestion>) {
-        if (term != null) {
-            suggestions.add(Suggestion(intercept.searchId, term))
+    private fun fileTerm(interceptTerm: InterceptTerm?, input: String, suggestions: MutableSet<Suggestion>) {
+        if (interceptTerm != null) {
+            suggestions.add(Suggestion(intercept.searchId, interceptTerm))
             SuggestionTracker.suggestionMatched(
                 intercept.searchId,
-                term.termId,
-                term.searchTerm,
-                term.replacement,
+                interceptTerm.termId,
+                interceptTerm.term,
+                interceptTerm.replacement,
                 input
             )
         }
     }
 
     private fun isReadyToMatch(input: String?): Boolean {
-        return isLoaded && input != null && input.length >= intercept.minMatchLength
+        return isLoaded && input != null && input.length >= MIN_MATCH_LENGTH
     }
 
     private val isLoaded: Boolean
@@ -48,38 +47,16 @@ object KeywordInterceptMatcher : SessionListener, InterceptListener {
             return mLoaded
         }
 
-    override fun onKeywordInterceptInitialized(intercept: Intercept) {
+    override fun onKeywordInterceptInitialized(intercept: InterceptData) {
         KeywordInterceptMatcher.intercept = intercept
         mLoaded = true
     }
 
-    override fun onSessionAvailable(session: Session) {
-        if (session.id.isNotEmpty()) {
-            InterceptClient.getInstance().initialize(session, this)
-        }
-    }
-
-    private fun createInstance() {
-        hasInstance = true
-    }
-
-    public fun match(constraint: CharSequence): Set<Suggestion> {
-        return if (hasInstance) {
-            matchKeyword(constraint)
-        } else {
-            when {
-                SessionClient.hasInstance() -> {
-                    createInstance()
-                    matchKeyword(constraint)
-                }
-                else -> {
-                    return emptySet()
-                }
-            }
-        }
+    fun match(constraint: CharSequence): Set<Suggestion> {
+        return matchKeyword(constraint)
     }
 
     init {
-        SessionClient.addListener(this)
+        InterceptClient.initialize(SessionClient.getSessionId(), this)
     }
 }
