@@ -9,7 +9,7 @@ import com.adadapted.android.sdk.core.keyword.KeywordRequest
 import com.adadapted.android.sdk.core.keyword.KeywordResponse
 import com.adadapted.android.sdk.core.log.AALogger
 import com.adadapted.android.sdk.core.network.HttpConnector.API_HEADER
-import io.ktor.client.call.*
+import com.adadapted.android.sdk.core.network.HttpConnector.decompressAndDeserialize
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -34,7 +34,8 @@ class HttpInterceptAdapter(private val keywordRequestUrl: String, private val ev
                 header(API_HEADER, deviceInfo.appId)
             }
 
-            response.body<KeywordResponse>().data?.let { listener.onSuccess(it) }
+            val keywordResponse: KeywordResponse = response.decompressAndDeserialize()
+            keywordResponse.data?.let { listener.onSuccess(it) }
         } catch (e: Exception) {
             e.message?.let { AALogger.logError(it) }
             HttpErrorTracker.trackHttpError(
