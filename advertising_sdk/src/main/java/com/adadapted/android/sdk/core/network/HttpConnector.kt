@@ -14,6 +14,8 @@ val defaultPlatformEngine: HttpClientEngine = Android.create()
 
 object HttpConnector {
     const val API_HEADER = "X-API-KEY"
+    const val ENCODING_HEADER = "Accept-Encoding"
+    const val ENCODING_FORMATS = "gzip, deflate"
 
     val client = HttpClient {
         install(ContentNegotiation) {
