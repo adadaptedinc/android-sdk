@@ -14,6 +14,7 @@ import com.adadapted.android.sdk.core.view.ZoneContext
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 
@@ -35,8 +36,11 @@ class HttpSessionAdapter(
             }
 
             //REMOVE
+            val bat = response.bodyAsText()
+            AALogger.logInfo(bat)
             val encoding = response.headers["Content-Encoding"] ?: "none"
             AALogger.logInfo("sendInit response Content-Encoding: $encoding")
+
 
             listener.onSessionInitialized(response.body<Session>().apply { this.deviceInfo = deviceInfo })
 
