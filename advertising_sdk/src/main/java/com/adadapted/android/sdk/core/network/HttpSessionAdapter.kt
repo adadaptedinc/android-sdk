@@ -7,14 +7,11 @@ import com.adadapted.android.sdk.core.interfaces.SessionAdapter
 import com.adadapted.android.sdk.core.interfaces.SessionInitListener
 import com.adadapted.android.sdk.core.log.AALogger
 import com.adadapted.android.sdk.core.network.HttpConnector.API_HEADER
-import com.adadapted.android.sdk.core.network.HttpConnector.ENCODING_FORMATS
-import com.adadapted.android.sdk.core.network.HttpConnector.ENCODING_HEADER
 import com.adadapted.android.sdk.core.session.Session
 import com.adadapted.android.sdk.core.view.ZoneContext
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 
@@ -32,15 +29,7 @@ class HttpSessionAdapter(
                 contentType(ContentType.Application.Json)
                 setBody(deviceInfo)
                 header(API_HEADER, deviceInfo.appId)
-                header(ENCODING_HEADER, ENCODING_FORMATS)
             }
-
-            //REMOVE
-            val bat = response.bodyAsText()
-            AALogger.logInfo(bat)
-            val encoding = response.headers["Content-Encoding"] ?: "none"
-            AALogger.logInfo("sendInit response Content-Encoding: $encoding")
-
 
             listener.onSessionInitialized(response.body<Session>().apply { this.deviceInfo = deviceInfo })
 
@@ -73,7 +62,6 @@ class HttpSessionAdapter(
             val response: HttpResponse = httpConnector.client.get(url) {
                 contentType(ContentType.Application.Json)
                 header(API_HEADER, session.deviceInfo.appId)
-                header(ENCODING_HEADER, ENCODING_FORMATS)
             }
             listener.onNewAdsLoaded(
                 response.body<Session>().apply { this.deviceInfo = session.deviceInfo })

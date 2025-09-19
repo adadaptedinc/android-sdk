@@ -6,8 +6,6 @@ import com.adadapted.android.sdk.core.keyword.InterceptEvent
 import com.adadapted.android.sdk.core.keyword.InterceptEventWrapper
 import com.adadapted.android.sdk.core.log.AALogger
 import com.adadapted.android.sdk.core.network.HttpConnector.API_HEADER
-import com.adadapted.android.sdk.core.network.HttpConnector.ENCODING_FORMATS
-import com.adadapted.android.sdk.core.network.HttpConnector.ENCODING_HEADER
 import com.adadapted.android.sdk.core.session.Session
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -25,7 +23,6 @@ class HttpInterceptAdapter(private val initUrl: String, private val eventUrl: St
             val response: HttpResponse = httpConnector.client.get(url) {
                 contentType(ContentType.Application.Json)
                 header(API_HEADER, session.deviceInfo.appId)
-                header(ENCODING_HEADER, ENCODING_FORMATS)
             }
             listener.onSuccess(response.body())
         } catch (e: Exception) {
@@ -52,7 +49,6 @@ class HttpInterceptAdapter(private val initUrl: String, private val eventUrl: St
                 contentType(ContentType.Application.Json)
                 setBody(compiledInterceptEventRequest)
                 header(API_HEADER, session.deviceInfo.appId)
-                header(ENCODING_HEADER, ENCODING_FORMATS)
             }
         } catch (e: Exception) {
             e.message?.let { AALogger.logError(it) }

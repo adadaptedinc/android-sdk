@@ -53,14 +53,14 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
-    implementation("io.ktor:ktor-client-core:3.3.0")
-    implementation("io.ktor:ktor-client-encoding:3.3.0")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:3.3.0")
-    implementation("io.ktor:ktor-client-content-negotiation:3.3.0")
+    implementation 'io.ktor:ktor-client-core:3.3.0'
+    implementation 'io.ktor:ktor-client-encoding:3.3.0'
+    implementation 'io.ktor:ktor-client-android:3.3.0'
+    implementation 'io.ktor:ktor-serialization-kotlinx-json:3.3.0'
+    implementation 'io.ktor:ktor-client-content-negotiation:3.3.0'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.2.20'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2'
     implementation 'com.google.android.material:material:1.13.0'
-    implementation 'io.ktor:ktor-client-android:3.3.0'
     implementation 'com.google.android.gms:play-services-ads-identifier:18.2.0'
     implementation 'androidx.compose.ui:ui:1.9.1'
     implementation 'androidx.compose.foundation:foundation:1.9.1'
