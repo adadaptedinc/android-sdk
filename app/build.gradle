@@ -3,12 +3,12 @@ apply plugin: 'kotlin-android'
 //apply plugin: 'newrelic'
 
 android {
-    compileSdk 35
+    compileSdk 36
     namespace 'com.adadapted.sdktestapp'
 
     defaultConfig {
         minSdkVersion 23
-        targetSdkVersion 35
+        targetSdkVersion 36
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'

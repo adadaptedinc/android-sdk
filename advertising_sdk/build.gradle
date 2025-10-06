@@ -17,13 +17,13 @@ group='com.adadapted'
 android.buildFeatures.buildConfig true
 
 android {
-    compileSdk 35
+    compileSdk 36
     namespace 'com.adadapted'
 
     defaultConfig {
         minSdkVersion 23
         //noinspection EditedTargetSdkVersion
-        targetSdkVersion 35
+        targetSdkVersion 36
         versionName "4.1.9"
         buildConfigField("String","VERSION_NAME", "\"${defaultConfig.versionName}\"")
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
