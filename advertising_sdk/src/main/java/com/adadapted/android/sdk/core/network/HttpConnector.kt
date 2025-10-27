@@ -7,6 +7,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.compression.ContentEncoding
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.observer.*
+import io.ktor.client.request.header
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
@@ -33,6 +34,10 @@ object HttpConnector {
         install(ContentEncoding) {
             gzip()
             deflate()
+        }
+
+        defaultRequest {
+            header("Accept-Encoding", "gzip, deflate")
         }
     }
 }
