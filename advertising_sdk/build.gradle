@@ -24,7 +24,7 @@ android {
         minSdkVersion 23
         //noinspection EditedTargetSdkVersion
         targetSdkVersion 36
-        versionName "4.1.9"
+        versionName "4.2.0"
         buildConfigField("String","VERSION_NAME", "\"${defaultConfig.versionName}\"")
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'aasdk-proguard-rules.pro'
@@ -53,11 +53,11 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
-    implementation 'io.ktor:ktor-client-core:3.3.1'
-    implementation 'io.ktor:ktor-client-encoding:3.3.1'
-    implementation 'io.ktor:ktor-client-android:3.3.1'
-    implementation 'io.ktor:ktor-serialization-kotlinx-json:3.3.1'
-    implementation 'io.ktor:ktor-client-content-negotiation:3.3.1'
+    implementation 'io.ktor:ktor-client-core:3.3.2'
+    implementation 'io.ktor:ktor-client-encoding:3.3.2'
+    implementation 'io.ktor:ktor-client-android:3.3.2'
+    implementation 'io.ktor:ktor-serialization-kotlinx-json:3.3.2'
+    implementation 'io.ktor:ktor-client-content-negotiation:3.3.2'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.2.21'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2'
     implementation 'com.google.android.material:material:1.13.0'
@@ -94,7 +94,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.adadapted'
                 artifactId = 'android-sdk'
-                version = '4.1.9'
+                version = '4.2.0'
             }
         }
     }
