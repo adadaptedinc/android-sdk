@@ -16,7 +16,6 @@ data class Intercept(
 
     private val terms: List<Term> = ArrayList()
 ) {
-
     fun getTerms(): List<Term> {
         return terms.sortedWith(Comparator(Term::compareTo))
     }
