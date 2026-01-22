@@ -3,18 +3,15 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 
 plugins {
-    id("org.barfuin.gradle.jacocolog") version "3.1.0"
-    id 'maven-publish'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '2.3.0'
+    id("com.android.library")
+    id("kotlin-android")
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.0"
     id("org.jetbrains.kotlin.plugin.compose") version "2.3.0"
+    id("org.barfuin.gradle.jacocolog") version "3.1.0"
+    id("maven-publish")
 }
 
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply from: 'jacoco.gradle'
-
 group='com.adadapted'
-android.buildFeatures.buildConfig true
 
 android {
     compileSdk = 36
@@ -22,12 +19,16 @@ android {
 
     defaultConfig {
         minSdkVersion 23
-        //noinspection EditedTargetSdkVersion
         targetSdkVersion 36
         versionName "4.2.0"
         buildConfigField("String","VERSION_NAME", "\"${defaultConfig.versionName}\"")
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'aasdk-proguard-rules.pro'
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     testOptions {
@@ -46,6 +47,7 @@ android {
     }
 
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
@@ -79,6 +81,10 @@ dependencies {
 
 repositories {
     mavenCentral()
+    google()
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 kotlin {
