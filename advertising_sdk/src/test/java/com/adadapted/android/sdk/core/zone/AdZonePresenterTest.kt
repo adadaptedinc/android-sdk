@@ -42,10 +42,13 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import kotlin.collections.HashMap
+import kotlin.intArrayOf
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
+@Config(sdk = [33]) //temp until java21
 class AdZonePresenterTest {
     private var testContext = InstrumentationRegistry.getInstrumentation().targetContext
     private var mockContext = mock<Context>()

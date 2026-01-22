@@ -11,8 +11,10 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
+@Config(sdk = [33]) //temp until java21
 class AutoCompleteAdapterTest {
     private lateinit var testAutoCompleteAdapter: AutoCompleteAdapter
     private val testContext = InstrumentationRegistry.getInstrumentation().targetContext

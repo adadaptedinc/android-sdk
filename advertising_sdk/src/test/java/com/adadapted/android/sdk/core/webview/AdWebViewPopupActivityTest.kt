@@ -29,9 +29,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import kotlin.intArrayOf
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
+@Config(sdk = [33]) //temp until java21
 class AdWebViewPopupActivityTest {
     private lateinit var testAaWebViewPopupActivity: AaWebViewPopupActivity
     private var testContext = InstrumentationRegistry.getInstrumentation().targetContext
