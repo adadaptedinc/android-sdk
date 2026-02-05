@@ -16,3 +16,4 @@
 #   public *;
 #}
 -keep class com.adadapted.android.sdk.** { *; }
+-dontwarn org.slf4j.**
