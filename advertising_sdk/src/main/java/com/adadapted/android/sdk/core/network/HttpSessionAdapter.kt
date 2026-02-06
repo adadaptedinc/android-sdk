@@ -30,6 +30,7 @@ class HttpSessionAdapter(
                 setBody(deviceInfo)
                 header(API_HEADER, deviceInfo.appId)
             }
+
             listener.onSessionInitialized(response.body<Session>().apply { this.deviceInfo = deviceInfo })
 
         } catch (e: Exception) {

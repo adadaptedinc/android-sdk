@@ -33,9 +33,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows
+import org.robolectric.annotation.Config
+import kotlin.intArrayOf
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
+@Config(sdk = [33]) //temp until java21
 class AaZoneViewTest {
     private var testContext = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var testAaZoneView: AaZoneView
