@@ -23,6 +23,8 @@ object EventStrings {
     const val AD_PAYLOAD_IS_EMPTY = "AD_PAYLOAD_IS_EMPTY"
     const val AD_GET_REQUEST_FAILED = "AD_GET_REQUEST_FAILED"
     const val AD_EVENT_TRACK_REQUEST_FAILED = "AD_EVENT_TRACK_REQUEST_FAILED"
+    const val AD_ACTION_PATH_INVALID = "EXTERNAL_AD_ACTION_PATH_INVALID"
+    const val AD_REPORT_FAILED = "AD_REPORT_FAILED"
 
     const val PAYLOAD_PICKUP_ATTEMPT = "payload_pickup_attempt"
     const val PAYLOAD_PICKUP_REQUEST_FAILED = "PAYLOAD_PICKUP_REQUEST_FAILED"
@@ -54,4 +56,5 @@ object EventStrings {
     const val POPUP_ATL_CLICKED = "popup_atl_clicked"
     const val POPUP_URL_MALFORMED ="POPUP_URL_MALFORMED"
     const val POPUP_URL_LOAD_FAILED = "POPUP_URL_LOAD_FAILED"
+    const val AD_POPUP_FAILED = "AD_POPUP_FAILED"
 }
