@@ -18,7 +18,7 @@ class AdViewHandler(private val context: Context) {
             context.startActivity(intent)
         } catch (e: Exception) {
             HttpErrorTracker.trackHttpError(
-                e.cause?.toString() ?: "Unknown",
+                e.cause?.toString() ?: e.toString(),
                 e.message ?: "handleLink failed for ad ${ad.id}",
                 EventStrings.AD_ACTION_PATH_INVALID,
                 ad.actionPath
@@ -32,7 +32,7 @@ class AdViewHandler(private val context: Context) {
             context.startActivity(intent)
         } catch (e: Exception) {
             HttpErrorTracker.trackHttpError(
-                e.cause?.toString() ?: "Unknown",
+                e.cause?.toString() ?: e.toString(),
                 e.message ?: "handlePopup failed for ad ${ad.id}",
                 EventStrings.AD_POPUP_FAILED,
                 ad.actionPath
@@ -49,7 +49,7 @@ class AdViewHandler(private val context: Context) {
             context.startActivity(intent)
         } catch (e: Exception) {
             HttpErrorTracker.trackHttpError(
-                e.cause?.toString() ?: "Unknown",
+                e.cause?.toString() ?: e.toString(),
                 e.message ?: "handleReportAd failed for adId $adId",
                 EventStrings.AD_REPORT_FAILED,
                 adId
