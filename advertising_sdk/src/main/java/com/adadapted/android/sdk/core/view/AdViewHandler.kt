@@ -52,7 +52,7 @@ class AdViewHandler(private val context: Context) {
                 e.cause?.toString() ?: e.toString(),
                 e.message ?: "handleReportAd failed for adId $adId",
                 EventStrings.AD_REPORT_FAILED,
-                adId
+                Config.getAdReportingHost()
             )
         }
     }
