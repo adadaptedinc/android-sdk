@@ -31,6 +31,8 @@ class AdEventClientTest {
         Dispatchers.setMain(testTransporter)
         SessionClient.onStart(mock())
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
+        EventClient.onPublishEvents()
+        TestEventAdapter.cleanupEvents()
         testAdEventClientFailSafes()
     }
 

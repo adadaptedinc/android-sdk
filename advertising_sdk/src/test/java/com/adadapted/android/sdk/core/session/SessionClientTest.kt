@@ -28,6 +28,8 @@ class NewSessionClientTest {
     fun setup() {
         Dispatchers.setMain(testTransporter)
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
+        EventClient.onPublishEvents()
+        TestEventAdapter.cleanupEvents()
     }
 
     @Test

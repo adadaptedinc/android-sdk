@@ -34,6 +34,8 @@ class KeywordKeywordInterceptMatcherTest {
         DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
         SessionClient.onStart(mock())
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
+        EventClient.onPublishEvents()
+        TestEventAdapter.cleanupEvents()
         val testIntercept = InterceptData(
             "test_searchId", listOf(
                 InterceptTerm("testTermId", "testTerm", "replacementTerm", 1),
@@ -54,7 +56,7 @@ class KeywordKeywordInterceptMatcherTest {
         )
         testInterceptAdapter.testIntercept = testIntercept
         InterceptClient.createInstance(testInterceptAdapter, testTransporterScope, true)
-        KeywordInterceptMatcher.match("INIT")
+        KeywordInterceptMatcher.initialize()
         clearEvents()
     }
 

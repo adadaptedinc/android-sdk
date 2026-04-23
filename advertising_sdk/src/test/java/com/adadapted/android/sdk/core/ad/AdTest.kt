@@ -31,6 +31,8 @@ class AdTest {
         DeviceInfoClient.createInstance("", false, mock(), "", TestDeviceInfoExtractor(), mock())
         SessionClient.onStart(mock())
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
+        EventClient.onPublishEvents()
+        TestEventAdapter.cleanupEvents()
     }
 
     @Test

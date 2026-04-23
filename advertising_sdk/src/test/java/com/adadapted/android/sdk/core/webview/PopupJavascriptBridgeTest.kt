@@ -29,6 +29,8 @@ class PopupJavascriptBridgeTest {
         DeviceInfoClient.createInstance("", false, mock(), "", mock(), mock())
         SessionClient.onStart(mock())
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
+        EventClient.onPublishEvents()
+        TestEventAdapter.cleanupEvents()
         TestEventAdapter.testSdkEvents = mutableListOf()
         TestEventAdapter.testSdkErrors = mutableListOf()
     }

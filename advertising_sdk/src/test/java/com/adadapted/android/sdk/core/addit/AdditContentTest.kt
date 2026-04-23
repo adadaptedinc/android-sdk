@@ -35,6 +35,8 @@ class AdditContentTest {
         DeviceInfoClient.createInstance("", false, mock(), "", mock(), mock())
         SessionClient.onStart(mock())
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
+        EventClient.onPublishEvents()
+        TestEventAdapter.cleanupEvents()
         PayloadClient.createInstance(testPayloadAdapter, EventClient, testTransporterScope)
         TestEventAdapter.testAdEvents = mutableListOf()
         TestEventAdapter.testSdkErrors = mutableListOf()
@@ -74,10 +76,10 @@ class AdditContentTest {
             LinkedList()
         )
         content.acknowledge()
-        content.acknowledge()
+        content.acknowledge() // second call should be ignored due to handled guard
         EventClient.onPublishEvents()
         assert(TestEventAdapter.testSdkEvents.any { event -> event.name == EventStrings.ADDIT_ADDED_TO_LIST })
-        assertEquals(2, TestEventAdapter.testSdkEvents.count())
+        assertEquals(1, TestEventAdapter.testSdkEvents.count())
     }
 
     @Test
