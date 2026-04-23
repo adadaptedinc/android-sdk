@@ -4,12 +4,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
 
 @Serializable
-data class KeywordResponse(
-    val data: InterceptData?,
-    val success: Boolean
-)
-
-@Serializable
 data class InterceptData(
     @SerialName("search_id") val searchId: String = "",
     val terms: List<InterceptTerm> = listOf()

@@ -56,6 +56,7 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.lifecycle:lifecycle-process:2.10.0'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
     implementation 'io.ktor:ktor-client-core:3.4.0'
