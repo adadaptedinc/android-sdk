@@ -13,13 +13,13 @@ object Config {
     const val AASDK_PREFS_TRACKING_DISABLED_KEY = "TRACKING_DISABLED"
     const val AASDK_PREFS_GENERATED_ID_KEY = "GENERATED_ID"
 
-    private const val AD_SERVER_VERSION = "/v/0.9.5/"
+    private const val AD_SERVER_VERSION = "/v/1.0.0/"
     private const val TRACKING_SERVER_VERSION = "/v/1/"
     private const val PAYLOAD_SERVER_VERSION = "/v/1/"
 
-    private const val RETRIEVE_ADS_PATH = "android/ads/retrieve"
+    private const val RETRIEVE_AD_PATH = "ad/retrieve"
     private const val AD_EVENTS_PATH = "android/ads/events"
-    private const val RETRIEVE_INTERCEPTS_PATH = "android/intercepts/retrieve"
+    private const val RETRIEVE_INTERCEPTS_PATH = "intercept/retrieve"
     private const val INTERCEPT_EVENTS_PATH = "android/intercepts/events"
     private const val EVENT_TRACK_PATH = "android/events"
     private const val ERROR_TRACK_PATH = "android/errors"
@@ -28,7 +28,7 @@ object Config {
     const val AD_ID_PARAM = "aid"
     const val UDID_PARAM = "uid"
 
-    fun getRetrieveAdsUrl() = getAdServerFormattedUrl(RETRIEVE_ADS_PATH)
+    fun getRetrieveAdsUrl() = getAdServerFormattedUrl(RETRIEVE_AD_PATH)
     fun getAdEventsUrl() = getAdServerFormattedUrl(AD_EVENTS_PATH)
     fun getRetrieveInterceptsUrl() = getAdServerFormattedUrl(RETRIEVE_INTERCEPTS_PATH)
     fun getInterceptEventsUrl() = getAdServerFormattedUrl(INTERCEPT_EVENTS_PATH)

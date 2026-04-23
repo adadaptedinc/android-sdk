@@ -9,6 +9,7 @@ import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.log.AALogger
 import com.adadapted.android.sdk.core.network.HttpConnector.API_HEADER
 import com.adadapted.android.sdk.core.session.SessionClient
+import com.adadapted.android.sdk.core.ad.AdZoneResponse
 import io.ktor.client.call.body
 import io.ktor.client.request.*
 import io.ktor.http.ContentType
@@ -37,7 +38,8 @@ class HttpAdAdapter(
                 header(API_HEADER, deviceInfo.appId)
             }
 
-            listener.onAdLoaded(response.body())
+            val adZoneResponse = response.body<AdZoneResponse>()
+            listener.onAdLoaded(adZoneResponse.data)
         } catch (e: Exception) {
             e.message?.let { AALogger.logError(it) }
             HttpErrorTracker.trackHttpError(

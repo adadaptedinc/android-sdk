@@ -140,8 +140,7 @@ object AdAdapted {
     private fun setupDependentClients() {
         AdClient.createInstance(
             HttpAdAdapter(
-                "https://dev.adadapted.dev/api/ad-service-aa/dev/v/1.0.0/ad/retrieve", //TODO TEMP REMOVE
-                //Config.getRetrieveAdsUrl(),
+                Config.getRetrieveAdsUrl(),
                 HttpConnector
             ), Transporter()
         )
@@ -155,8 +154,7 @@ object AdAdapted {
         )
         InterceptClient.createInstance(
             HttpInterceptAdapter(
-                "https://dev.adadapted.dev/api/ad-service-aa/dev/v/1.0.0/intercept/retrieve", //TODO TEMP REMOVE
-                //Config.getRetrieveInterceptsUrl(),
+                Config.getRetrieveInterceptsUrl(),
                 Config.getInterceptEventsUrl(),
                 HttpConnector
             ), Transporter(),

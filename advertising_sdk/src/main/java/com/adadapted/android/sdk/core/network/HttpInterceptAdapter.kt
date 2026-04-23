@@ -4,6 +4,7 @@ import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.keyword.InterceptAdapter
 import com.adadapted.android.sdk.core.keyword.InterceptEvent
+import com.adadapted.android.sdk.core.keyword.InterceptResponse
 import com.adadapted.android.sdk.core.keyword.InterceptEventWrapper
 import com.adadapted.android.sdk.core.keyword.KeywordRequest
 import com.adadapted.android.sdk.core.log.AALogger
@@ -33,7 +34,8 @@ class HttpInterceptAdapter(private val keywordRequestUrl: String, private val ev
                 header(API_HEADER, deviceInfo.appId)
             }
 
-            listener.onSuccess(response.body())
+            val interceptResponse = response.body<InterceptResponse>()
+            listener.onSuccess(interceptResponse.data)
         } catch (e: Exception) {
             e.message?.let { AALogger.logError(it) }
             HttpErrorTracker.trackHttpError(
