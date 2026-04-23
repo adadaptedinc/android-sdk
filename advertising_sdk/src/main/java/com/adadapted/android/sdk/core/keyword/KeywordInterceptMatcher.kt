@@ -56,7 +56,7 @@ object KeywordInterceptMatcher : InterceptListener {
         return matchKeyword(constraint)
     }
 
-    init {
+    fun initialize() {
         InterceptClient.initialize(SessionClient.getSessionId(), this)
     }
 }

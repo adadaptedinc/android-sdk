@@ -187,9 +187,6 @@ object EventClient {
     fun createInstance(eventAdapter: EventAdapter, transporter: TransporterCoroutineScope) {
         EventClient.eventAdapter = eventAdapter
         EventClient.transporter = transporter
-    }
-
-    init {
         startPublishTimer()
         trackGAIDAvailability()
     }

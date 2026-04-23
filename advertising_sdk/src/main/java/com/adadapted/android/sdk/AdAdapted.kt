@@ -128,13 +128,13 @@ object AdAdapted {
             Transporter()
         )
 
+        ProcessLifecycleOwner.get().lifecycle.addObserver(SessionClient)
+
         DeviceInfoClient.getDeviceInfo(object : DeviceCallback {
             override fun onDeviceInfoCollected(deviceInfo: DeviceInfo) {
                 setupDependentClients()
             }
         })
-
-        ProcessLifecycleOwner.get().lifecycle.addObserver(SessionClient)
     }
 
     private fun setupDependentClients() {
@@ -169,7 +169,7 @@ object AdAdapted {
         )
 
         if (isKeywordInterceptEnabled) {
-            KeywordInterceptMatcher.match("INIT") //init the matcher
+            KeywordInterceptMatcher.initialize()
         }
 
         if (isPayloadEnabled) {
