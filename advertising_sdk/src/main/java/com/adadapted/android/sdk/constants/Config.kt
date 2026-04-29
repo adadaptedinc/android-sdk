@@ -14,6 +14,7 @@ object Config {
     const val AASDK_PREFS_GENERATED_ID_KEY = "GENERATED_ID"
 
     private const val AD_SERVER_VERSION = "/v/1.0.0/"
+    private const val EVENT_SERVER_VERSION = "/v/0.9.5/"
     private const val TRACKING_SERVER_VERSION = "/v/1/"
     private const val PAYLOAD_SERVER_VERSION = "/v/1/"
 
@@ -29,9 +30,9 @@ object Config {
     const val UDID_PARAM = "uid"
 
     fun getRetrieveAdsUrl() = getAdServerFormattedUrl(RETRIEVE_AD_PATH)
-    fun getAdEventsUrl() = getAdServerFormattedUrl(AD_EVENTS_PATH)
+    fun getAdEventsUrl() = getEventServerFormattedUrl(AD_EVENTS_PATH)
     fun getRetrieveInterceptsUrl() = getAdServerFormattedUrl(RETRIEVE_INTERCEPTS_PATH)
-    fun getInterceptEventsUrl() = getAdServerFormattedUrl(INTERCEPT_EVENTS_PATH)
+    fun getInterceptEventsUrl() = getEventServerFormattedUrl(INTERCEPT_EVENTS_PATH)
     fun getSdkEventsUrl() = getTrackingServerFormattedUrl(EVENT_TRACK_PATH)
     fun getSdkErrorsUrl() = getTrackingServerFormattedUrl(ERROR_TRACK_PATH)
     fun getPickupPayloadsUrl() = getPayloadServerFormattedUrl(PAYLOAD_PICKUP_PATH)
@@ -59,6 +60,10 @@ object Config {
 
     private fun getAdServerFormattedUrl(path: String): String {
         return getAdServerHost().plus(AD_SERVER_VERSION).plus(path)
+    }
+
+    private fun getEventServerFormattedUrl(path: String): String {
+        return getAdServerHost().plus(EVENT_SERVER_VERSION).plus(path)
     }
 
     private fun getTrackingServerFormattedUrl(path: String): String {
