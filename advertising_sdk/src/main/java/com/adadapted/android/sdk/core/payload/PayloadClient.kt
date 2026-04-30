@@ -26,6 +26,7 @@ object PayloadClient {
         }
     }
 
+    @Synchronized
     fun pickupPayloads(callback: (content: List<AdditContent>) -> Unit) {
         if (deeplinkInProgress) {
             return

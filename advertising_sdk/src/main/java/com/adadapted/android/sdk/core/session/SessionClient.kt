@@ -4,6 +4,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.event.EventClient
+import kotlin.jvm.Synchronized
 
 object SessionClient: DefaultLifecycleObserver {
     private const val PREFIX = "ANDROID"
@@ -22,6 +23,7 @@ object SessionClient: DefaultLifecycleObserver {
         sessionBackgrounded()
     }
 
+    @Synchronized
     fun getSessionId(): String {
         return sessionId
     }
@@ -36,6 +38,7 @@ object SessionClient: DefaultLifecycleObserver {
         trackEvent(if (isNewSession) EventStrings.SESSION_CREATED else EventStrings.SESSION_RESUMED)
     }
 
+    @Synchronized
     private fun sessionBackgrounded() {
         backgroundTime = System.currentTimeMillis()
         trackEvent(EventStrings.SESSION_BACKGROUNDED)

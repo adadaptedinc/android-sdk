@@ -82,10 +82,12 @@ object EventClient {
         notifyAdEventTracked(event)
     }
 
+    @Synchronized
     private fun performAddListener(listener: EventClientListener) {
         listeners.add(listener)
     }
 
+    @Synchronized
     private fun performRemoveListener(listener: EventClientListener) {
         listeners.remove(listener)
     }
@@ -106,6 +108,7 @@ object EventClient {
         }
     }
 
+    @Synchronized
     private fun startPublishTimer() {
         if (eventTimerRunning) {
             return

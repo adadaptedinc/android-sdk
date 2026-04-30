@@ -41,7 +41,7 @@ object InterceptClient {
         event: InterceptEvent,
         events: Set<InterceptEvent>
     ): Set<InterceptEvent> {
-        val resultingEvents: MutableSet<InterceptEvent> = HashSet(this.events)
+        val resultingEvents: MutableSet<InterceptEvent> = HashSet()
         // Creates a new Set of Events not superseded by the current Event
         for (e in events) {
             if (!event.supersedes(e)) {
@@ -86,6 +86,7 @@ object InterceptClient {
         }
     }
 
+    @Synchronized
     private fun startPublishTimer() {
         if (interceptEventTimerRunning) {
             return
