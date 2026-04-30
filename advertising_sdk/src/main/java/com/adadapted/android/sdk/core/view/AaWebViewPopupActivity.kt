@@ -15,7 +15,6 @@ import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.event.EventClient
 import com.adadapted.android.sdk.core.log.AALogger
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 
@@ -49,7 +48,7 @@ class AaWebViewPopupActivity : Activity() {
         ad = serializedAd?.let { Json.decodeFromString<Ad>(it) } ?: Ad()
 
         val url = ad.actionPath
-        if (url?.startsWith("http") == true) {
+        if (url.startsWith("http")) {
             loadPopup(ad.actionPath)
         } else {
             EventClient.trackSdkError(
@@ -62,6 +61,14 @@ class AaWebViewPopupActivity : Activity() {
     public override fun onStart() {
         super.onStart()
         EventClient.trackPopupBegin(ad)
+    }
+
+    override fun onDestroy() {
+        popupWebView.stopLoading()
+        popupWebView.removeJavascriptInterface("AdAdapted")
+        popupWebView.webViewClient = WebViewClient()
+        popupWebView.destroy()
+        super.onDestroy()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {

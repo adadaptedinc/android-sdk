@@ -29,5 +29,6 @@ class Timer(timedBackgroundFunc: () -> Unit, repeatMillis: Long, delayMillis: Lo
 
     fun cancelTimer() {
         timer.cancel()
+        job.cancel()
     }
 }

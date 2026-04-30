@@ -19,6 +19,10 @@ class DeeplinkContentParser {
             throw Exception(NO_DEEPLINK_URL)
         }
         val data = uri.getQueryParameter("data")
+        if (data == null) {
+            EventClient.trackSdkError(EventStrings.ADDIT_PAYLOAD_PARSE_FAILED, MISSING_DATA_PARAM)
+            throw Exception(MISSING_DATA_PARAM)
+        }
         val decodedData = Base64.decode(data, Base64.DEFAULT)
         val jsonString = String(decodedData)
 
@@ -37,6 +41,7 @@ class DeeplinkContentParser {
 
     companion object {
         private const val NO_DEEPLINK_URL = "Did not receive a deeplink url."
+        private const val MISSING_DATA_PARAM = "Deeplink url missing 'data' query parameter."
         private const val PAYLOAD_PARSE_ERROR = "Problem parsing content payload."
     }
 }
