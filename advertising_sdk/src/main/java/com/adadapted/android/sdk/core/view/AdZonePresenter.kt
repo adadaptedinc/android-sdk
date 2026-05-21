@@ -51,7 +51,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
             attached = true
             this.adZonePresenterListener = adZonePresenterListener
             if(currentAd.id.isEmpty()) { //First attach only
-                adClient.fetchNewAd(zoneId,this) //FIRST INITIAL CALL
+                adClient.fetchNewAd(zoneId, contextId = zoneContextId, listener = this) //FIRST INITIAL CALL
             }
             startZoneTimer()
         }
