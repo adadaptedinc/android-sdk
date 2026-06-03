@@ -70,4 +70,50 @@ class NewSessionClientTest {
         assertTrue(generatedId.startsWith("ANDROID"))
         assertEquals(39, generatedId.length) // "ANDROID" (7) + 32 random characters
     }
+
+    @Test
+    fun `generateId contains only valid characters`() {
+        val generateIdMethod = SessionClient::class.java.getDeclaredMethod("generateId")
+        generateIdMethod.isAccessible = true
+        val generatedId = generateIdMethod.invoke(SessionClient) as String
+
+        val randomPart = generatedId.removePrefix("ANDROID")
+        assertTrue(randomPart.all { it in 'A'..'Z' || it in '0'..'9' })
+    }
+
+    @Test
+    fun `onStart tracks a session lifecycle event`() {
+        SessionClient.onStart(mockOwner)
+        EventClient.onPublishEvents()
+
+        val hasSessionEvent = TestEventAdapter.testSdkEvents.any { e ->
+            e.name == EventStrings.SESSION_CREATED || e.name == EventStrings.SESSION_RESUMED
+        }
+        assertTrue(hasSessionEvent)
+    }
+
+    @Test
+    fun `tracked session events include sessionId param`() {
+        SessionClient.onStart(mockOwner)
+        EventClient.onPublishEvents()
+
+        val sessionEvent = TestEventAdapter.testSdkEvents.first { e ->
+            e.name == EventStrings.SESSION_CREATED || e.name == EventStrings.SESSION_RESUMED
+        }
+        assertTrue(sessionEvent.params.containsKey("sessionId"))
+        assertEquals(SessionClient.getSessionId(), sessionEvent.params["sessionId"])
+    }
+
+    @Test
+    fun `multiple start stop cycles maintain same session`() {
+        SessionClient.onStart(mockOwner)
+        val sessionId = SessionClient.getSessionId()
+
+        repeat(5) {
+            SessionClient.onStop(mockOwner)
+            SessionClient.onStart(mockOwner)
+        }
+
+        assertEquals(sessionId, SessionClient.getSessionId())
+    }
 }
