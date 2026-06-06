@@ -92,15 +92,6 @@ object EventClient {
         listeners.remove(listener)
     }
 
-    private fun trackGAIDAvailability() {
-        if (!DeviceInfoClient.getCachedDeviceInfo().isAllowRetargetingEnabled) {
-            trackSdkError(
-                EventStrings.GAID_UNAVAILABLE,
-                "GAID and/or tracking has been disabled for this device."
-            )
-        }
-    }
-
     @Synchronized
     private fun notifyAdEventTracked(event: AdEvent) {
         for (l in listeners) {
@@ -191,6 +182,5 @@ object EventClient {
         EventClient.eventAdapter = eventAdapter
         EventClient.transporter = transporter
         startPublishTimer()
-        trackGAIDAvailability()
     }
 }

@@ -2,7 +2,6 @@ package com.adadapted.android.sdk.constants
 
 object EventStrings {
     const val EXCEPTION_MESSAGE = "exception_message"
-    const val GAID_UNAVAILABLE = "GAID_UNAVAILABLE"
     const val SDK_EVENT_REQUEST_FAILED = "APP_EVENT_REQUEST_FAILED"
     const val SDK_EVENT_TYPE = "sdk"
 
