@@ -30,7 +30,7 @@ class AutoCompleteAdapter(context: Context, resource: Int, items: List<String>) 
                 suggestion.presented()
             }
 
-            val input = constraint.toString()
+            val input = constraint?.toString() ?: ""
             for (item in allItems) {
                 if (item.startsWith(input, ignoreCase = true)) {
                     listItems.add(item)

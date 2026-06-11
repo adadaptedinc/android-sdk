@@ -76,7 +76,7 @@ object InterceptClient {
 
     @Synchronized
     fun performPublishEvents() {
-        if (events.isEmpty()) {
+        if (events.isEmpty() || !::adapter.isInitialized) {
             return
         }
         val currentEvents: MutableSet<InterceptEvent> = HashSet(events)

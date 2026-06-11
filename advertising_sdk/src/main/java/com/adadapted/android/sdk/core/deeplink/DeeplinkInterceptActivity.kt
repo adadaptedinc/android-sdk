@@ -31,8 +31,8 @@ class DeeplinkInterceptActivity : AppCompatActivity() {
 
         } finally {
             packageManager.getLaunchIntentForPackage(packageName)?.let { startActivity(it) }
+            PayloadClient.deeplinkCompleted()
+            finish()
         }
-        PayloadClient.deeplinkCompleted()
-        finish()
     }
 }

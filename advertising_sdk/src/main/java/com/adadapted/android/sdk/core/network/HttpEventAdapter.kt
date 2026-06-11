@@ -45,7 +45,7 @@ class HttpEventAdapter(private val adEventUrl: String, private val sdkEventUrl: 
                 e.cause.toString(),
                 e.message.toString(),
                 EventStrings.SDK_EVENT_REQUEST_FAILED,
-                adEventUrl
+                sdkEventUrl
             )
         }
     }

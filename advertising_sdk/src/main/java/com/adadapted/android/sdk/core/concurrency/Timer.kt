@@ -7,7 +7,7 @@ class Timer(timedBackgroundFunc: () -> Unit, repeatMillis: Long, delayMillis: Lo
     private val scope = CoroutineScope(Dispatchers.Default + job)
 
     private fun startCoroutineTimer(delayMillis: Long = 0, repeatMillis: Long, action: () -> Unit) =
-        scope.launch(Dispatchers.Main) {
+        scope.launch(Dispatchers.Default) {
             delay(delayMillis)
             if (repeatMillis > 0) {
                 while (true) {

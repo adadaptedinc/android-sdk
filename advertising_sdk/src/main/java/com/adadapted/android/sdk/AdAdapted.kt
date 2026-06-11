@@ -34,8 +34,8 @@ object AdAdapted {
     private var isKeywordInterceptEnabled = false
     private var isPayloadEnabled = false
     private var params: Map<String, String> = HashMap()
-    private lateinit var eventListener: AaSdkEventListener
-    private lateinit var contentListener: AaSdkAdditContentListener
+    private var eventListener: AaSdkEventListener? = null
+    private var contentListener: AaSdkAdditContentListener? = null
 
     fun withAppId(key: String): AdAdapted {
         this.apiKey = key
@@ -95,14 +95,15 @@ object AdAdapted {
     fun start(context: Context) {
         if (apiKey.isEmpty()) {
             AALogger.logError("The AdAdapted Api Key is missing or NULL")
+            return
         }
         if (hasStarted) {
             return
         }
         hasStarted = true
         setupClients(context)
-        eventListener.let { EventBroadcaster.setListener(it) }
-        contentListener.let { AddItContentPublisher.addListener(it) }
+        eventListener?.let { EventBroadcaster.setListener(it) }
+        contentListener?.let { AddItContentPublisher.addListener(it) }
         AALogger.logInfo("AdAdapted Android SDK ${Config.LIBRARY_VERSION} initialized.")
     }
 

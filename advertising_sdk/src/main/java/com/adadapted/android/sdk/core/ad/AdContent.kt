@@ -13,6 +13,7 @@ class AdContent private constructor(
 ) : AddToListContent {
     private var isHandled: Boolean
 
+    @Synchronized
     override fun acknowledge() {
         if (isHandled) {
             return
@@ -53,8 +54,18 @@ class AdContent private constructor(
         )
     }
 
+    @Synchronized
     override fun itemFailed(item: AddToListItem, message: String) {
-        isHandled = true
+        if (!isHandled) {
+            isHandled = true
+            val failParams: MutableMap<String, String> = HashMap()
+            failParams[AD_ID] = ad.id
+            eventClient.trackSdkError(
+                EventStrings.ATL_ADDED_TO_LIST_FAILED,
+                message.ifEmpty { UNKNOWN_REASON },
+                failParams
+            )
+        }
         val params: MutableMap<String, String> = HashMap()
         params[AD_ID] = ad.id
         params[ITEM] = item.title

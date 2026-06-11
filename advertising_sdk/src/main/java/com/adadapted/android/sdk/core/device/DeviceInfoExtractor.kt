@@ -57,8 +57,8 @@ open class DeviceInfoExtractor(context: Context) {
             DeviceInfo.UNKNOWN_VALUE
         }
 
-        val manager = contextRef?.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        val mCarrier = manager.networkOperatorName.ifEmpty { NetworkOperatorDefault }
+        val manager = contextRef?.getSystemService(Context.TELEPHONY_SERVICE) as? TelephonyManager
+        val mCarrier = manager?.networkOperatorName?.ifEmpty { NetworkOperatorDefault } ?: NetworkOperatorDefault
 
         val metrics = contextRef?.resources?.displayMetrics
         if (metrics != null) {
