@@ -7,9 +7,8 @@ import com.adadapted.android.sdk.core.atl.AdditContent
 import com.adadapted.android.sdk.core.atl.AddItContentParser
 import com.adadapted.android.sdk.core.event.EventClient
 import com.adadapted.android.sdk.core.payload.Payload
-import io.ktor.utils.io.core.String
-import kotlinx.serialization.decodeFromString
-import org.json.JSONException
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
 
 class DeeplinkContentParser {
     @Throws(Exception::class)
@@ -24,14 +23,13 @@ class DeeplinkContentParser {
             throw Exception(MISSING_DATA_PARAM)
         }
         val decodedData = Base64.decode(data, Base64.DEFAULT)
-        val jsonString = String(decodedData)
+        val jsonString = String(decodedData, Charsets.UTF_8)
 
         try {
-            val payload = kotlinx.serialization.json.Json.decodeFromString<Payload>(jsonString)
+            val payload = Json.decodeFromString<Payload>(jsonString)
             return AddItContentParser.generateAddItContentFromDeeplink(payload)
-
-        } catch (ex: JSONException) {
-            val errorParams: MutableMap<String, String> = HashMap()
+        } catch (ex: SerializationException) {
+            val errorParams = mutableMapOf<String, String>()
             errorParams["payload"] = "{\"raw\":\"$data\", \"parsed\":\"$jsonString\"}"
             ex.message?.let { errorParams.put(EventStrings.EXCEPTION_MESSAGE, it) }
             EventClient.trackSdkError(EventStrings.ADDIT_PAYLOAD_PARSE_FAILED, "Problem parsing Deeplink JSON input", errorParams)

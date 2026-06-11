@@ -149,8 +149,8 @@ public class TodoListDetailFragment extends ListFragment implements AaZoneView.L
             return true;
         }
         if(item.getItemId() == R.id.zone_context_on) {
-            aaZoneView.setAdZoneContextId("organic");
-            aaZoneViewTwo.setAdZoneContextId("organic");
+            aaZoneView.setAdZoneContextId("original");
+            aaZoneViewTwo.setAdZoneContextId("original");
             return true;
         }
         if(item.getItemId() == R.id.zone_remove_context) {
