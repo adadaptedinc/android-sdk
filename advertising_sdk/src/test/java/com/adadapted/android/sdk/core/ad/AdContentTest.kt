@@ -91,8 +91,8 @@ class AdContentTest {
         TestEventAdapter.testSdkErrors = mutableListOf()
         testAdContent.itemFailed(testAddTolistItems.first(), "adContentFail")
         EventClient.onPublishEvents()
-        assertEquals(EventStrings.ATL_ADDED_TO_LIST_ITEM_FAILED, TestEventAdapter.testSdkErrors.first().code)
-        assertEquals("adContentFail", TestEventAdapter.testSdkErrors.first().message)
+        val itemError = TestEventAdapter.testSdkErrors.first { it.code == EventStrings.ATL_ADDED_TO_LIST_ITEM_FAILED }
+        assertEquals("adContentFail", itemError.message)
     }
 
     @Test

@@ -1,7 +1,7 @@
 package com.adadapted.android.sdk.core.session
 
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.event.EventClient
@@ -10,7 +10,9 @@ import com.adadapted.android.sdk.tools.TestTransporter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -20,16 +22,21 @@ class NewSessionClientTest {
     private var testTransporter = UnconfinedTestDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
     private val mockOwner = object : LifecycleOwner {
-        override val lifecycle: Lifecycle
-            get() = lifecycle
+        override val lifecycle = LifecycleRegistry(this)
     }
 
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
+        SessionClient.reset()
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
         EventClient.onPublishEvents()
         TestEventAdapter.cleanupEvents()
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test

@@ -107,7 +107,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
 
     private fun completeCurrentAd() {
         if (!currentAd.isEmpty && adStarted && !adCompleted) {
-            if (!isZoneVisible) {
+            if (!isZoneVisible && !currentAd.impressionWasTracked()) {
                 eventClient.trackInvisibleImpression(currentAd)
             }
             adCompleted = true

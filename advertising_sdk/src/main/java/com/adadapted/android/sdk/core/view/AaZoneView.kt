@@ -61,9 +61,10 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
         params.topMargin = 4
 
         reportButton.setOnClickListener {
-            val cachedDeviceInfo = DeviceInfoClient.getCachedDeviceInfo()
-            cachedDeviceInfo.udid?.let { udid ->
-                webView.currentAd?.id?.let { it1 -> presenter.onReportAdClicked(it1, udid) }
+            val udid = DeviceInfoClient.getCachedDeviceInfo().udid
+            val adId = webView.currentAd?.id
+            if (udid.isNotEmpty() && !adId.isNullOrEmpty()) {
+                presenter.onReportAdClicked(adId, udid)
             }
         }
         Handler(Looper.getMainLooper()).post { addView(webView) }

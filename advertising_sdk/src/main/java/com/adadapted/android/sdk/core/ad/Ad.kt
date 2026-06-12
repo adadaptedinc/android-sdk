@@ -23,10 +23,6 @@ data class Ad(
         return AdContent.createAddToListContent(this)
     }
 
-    fun resetImpressionTracking() {
-        isImpressionTracked = false
-    }
-
     fun setImpressionTracked() {
         isImpressionTracked = true
     }

@@ -49,4 +49,10 @@ object SessionClient: DefaultLifecycleObserver {
     }
 
     private fun generateId(): String = PREFIX + List(32) { ID_CHARACTERS.random() }.joinToString("")
+
+    @Synchronized
+    internal fun reset() {
+        sessionId = ""
+        backgroundTime = System.currentTimeMillis()
+    }
 }
