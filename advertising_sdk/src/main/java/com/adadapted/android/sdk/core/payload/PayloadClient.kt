@@ -22,7 +22,10 @@ object PayloadClient {
     private fun trackPayload(content: AdditContent, result: String) {
         val event = PayloadEvent(content.payloadId, result)
         transporter.dispatchToThread {
-            DeviceInfoClient.getCachedDeviceInfo().let { adapter?.publishEvent(it, event) }
+            val deviceInfo = DeviceInfoClient.getCachedDeviceInfo()
+            if (deviceInfo.udid.isNotEmpty()) {
+                adapter?.publishEvent(deviceInfo, event)
+            }
         }
     }
 
@@ -33,8 +36,11 @@ object PayloadClient {
         }
         transporter.dispatchToThread {
             eventClient?.trackSdkEvent(EventStrings.PAYLOAD_PICKUP_ATTEMPT)
-            adapter?.pickup(DeviceInfoClient.getCachedDeviceInfo()) {
-                callback(it)
+            val deviceInfo = DeviceInfoClient.getCachedDeviceInfo()
+            if (deviceInfo.udid.isNotEmpty()) {
+                adapter?.pickup(deviceInfo) {
+                    callback(it)
+                }
             }
         }
     }

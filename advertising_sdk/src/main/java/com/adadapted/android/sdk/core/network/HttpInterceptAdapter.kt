@@ -21,7 +21,7 @@ class HttpInterceptAdapter(private val keywordRequestUrl: String, private val ev
         try {
             val keywordRequest = KeywordRequest(
                 sdkId = deviceInfo.sdkVersion,
-                bundleId = "",
+                bundleId = deviceInfo.bundleId,
                 userId = deviceInfo.udid,
                 zoneId = "",
                 sessionId = sessionId,

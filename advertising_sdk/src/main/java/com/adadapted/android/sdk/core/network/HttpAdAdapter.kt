@@ -23,7 +23,7 @@ class HttpAdAdapter(
         val deviceInfo = DeviceInfoClient.getCachedDeviceInfo()
         val zoneAdRequest = ZoneAdRequest(
             sdkId = deviceInfo.sdkVersion,
-            bundleId = "",
+            bundleId = deviceInfo.bundleId,
             userId = deviceInfo.udid,
             zoneId = zoneId,
             storeId = storeId,
