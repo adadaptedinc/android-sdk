@@ -14,13 +14,13 @@ object InterceptClient {
     private var interceptEventTimerRunning = false
     private val events: MutableSet<InterceptEvent> = HashSet()
 
-    private fun performInitialize(sessionId: String, interceptListener: InterceptListener?) {
+    private fun performInitialize(interceptListener: InterceptListener?) {
         if (interceptListener == null) {
             return
         }
 
         transporter.dispatchToThread {
-            adapter.retrieve(sessionId, object :
+            adapter.retrieve(SessionClient.getSessionId(), object :
                 InterceptAdapter.Listener {
                 override fun onSuccess(intercept: InterceptData) {
                     interceptListener.onKeywordInterceptInitialized(intercept)
@@ -101,9 +101,9 @@ object InterceptClient {
         eventTimer.startTimer()
     }
 
-    fun initialize(sessionId: String, interceptListener: InterceptListener?) {
+    fun initialize(interceptListener: InterceptListener?) {
         transporter.dispatchToThread {
-            performInitialize(sessionId, interceptListener)
+            performInitialize(interceptListener)
         }
     }
 

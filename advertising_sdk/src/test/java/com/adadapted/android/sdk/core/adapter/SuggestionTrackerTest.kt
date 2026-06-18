@@ -29,7 +29,7 @@ class SuggestionTrackerTest {
         Dispatchers.setMain(testTransporter)
         SessionClient.onStart(mock())
         testInterceptClient.createInstance(testInterceptAdapter, testTransporterScope, true)
-        testInterceptClient.initialize(SessionClient.getSessionId(), null)
+        testInterceptClient.initialize(null)
     }
 
     @Test

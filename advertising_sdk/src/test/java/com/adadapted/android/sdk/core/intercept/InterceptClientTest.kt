@@ -43,7 +43,7 @@ class InterceptClientTest {
     @Test
     fun initialize() {
         val mockListener = mock<InterceptListener>()
-        testInterceptClient.initialize(SessionClient.getSessionId(), mockListener)
+        testInterceptClient.initialize(mockListener)
         verify(mockListener).onKeywordInterceptInitialized(any())
     }
 

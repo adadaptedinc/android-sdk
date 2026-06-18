@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk.core.keyword
 
 import com.adadapted.android.sdk.core.interfaces.InterceptListener
-import com.adadapted.android.sdk.core.session.SessionClient
 
 object KeywordInterceptMatcher : InterceptListener {
     private var intercept: InterceptData = InterceptData()
@@ -57,6 +56,6 @@ object KeywordInterceptMatcher : InterceptListener {
     }
 
     fun initialize() {
-        InterceptClient.initialize(SessionClient.getSessionId(), this)
+        InterceptClient.initialize(this)
     }
 }

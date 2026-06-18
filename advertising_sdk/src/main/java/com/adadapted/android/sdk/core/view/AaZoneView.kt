@@ -30,7 +30,6 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     private var isVisible = true
     private var isAdVisible = true
     private var webViewLoaded = false
-    private var isAdaptiveSizingEnabled = false
     private var isFixedAspectRatioEnabled = false
     private var fixedAspectPaddingOffset = 0
 
@@ -118,10 +117,6 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
 
     fun shutdown() {
         this.onStop()
-    }
-
-    fun enableAdaptiveSizing(value: Boolean) {
-        isAdaptiveSizingEnabled = value
     }
 
     fun configureFixedAspectRatio(isEnabled: Boolean, paddingOffsetValue: Int = 0) {
