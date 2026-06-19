@@ -31,7 +31,7 @@ class InterceptClientTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        SessionClient.onStart(mock())
+        SessionClient.createOrResumeSession()
         testInterceptClient.createInstance(testInterceptAdapter, testTransporterScope, true)
     }
 

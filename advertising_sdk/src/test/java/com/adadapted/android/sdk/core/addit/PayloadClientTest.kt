@@ -14,7 +14,6 @@ import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
-import com.nhaarman.mockitokotlin2.mock
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertNotNull
 import kotlinx.coroutines.Dispatchers
@@ -37,7 +36,7 @@ class PayloadClientTest {
     fun setup() {
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
-        SessionClient.onStart(mock())
+        SessionClient.createOrResumeSession()
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
         EventClient.onPublishEvents()
         TestEventAdapter.cleanupEvents()

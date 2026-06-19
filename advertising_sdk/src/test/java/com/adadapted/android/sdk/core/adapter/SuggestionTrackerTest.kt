@@ -7,7 +7,6 @@ import com.adadapted.android.sdk.core.keyword.InterceptEvent
 import com.adadapted.android.sdk.core.keyword.SuggestionTracker
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.tools.TestTransporter
-import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -27,7 +26,7 @@ class SuggestionTrackerTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        SessionClient.onStart(mock())
+        SessionClient.createOrResumeSession()
         testInterceptClient.createInstance(testInterceptAdapter, testTransporterScope, true)
         testInterceptClient.initialize(null)
     }

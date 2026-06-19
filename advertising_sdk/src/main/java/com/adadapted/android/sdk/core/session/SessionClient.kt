@@ -2,25 +2,36 @@ package com.adadapted.android.sdk.core.session
 
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.event.EventClient
 import kotlin.jvm.Synchronized
 
-object SessionClient: DefaultLifecycleObserver {
+object SessionClient {
     private const val PREFIX = "ANDROID"
     private const val THIRTY_MINUTES = 30 * 60 * 1000L
     private val ID_CHARACTERS by lazy { ('A'..'Z') + ('0'..'9') }
     private var sessionId: String = ""
     private var backgroundTime: Long = System.currentTimeMillis()
+    private var isObserving = false
 
-    override fun onStart(owner: LifecycleOwner) {
-        super.onStart(owner)
+    fun start() {
+        if (isObserving) return
+        isObserving = true
         createOrResumeSession()
-    }
 
-    override fun onStop(owner: LifecycleOwner) {
-        super.onStop(owner)
-        sessionBackgrounded()
+        ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
+            private var isFirstStart = true
+
+            override fun onStart(owner: LifecycleOwner) {
+                if (isFirstStart) { isFirstStart = false; return }
+                createOrResumeSession()
+            }
+
+            override fun onStop(owner: LifecycleOwner) {
+                sessionBackgrounded()
+            }
+        })
     }
 
     @Synchronized
@@ -29,7 +40,7 @@ object SessionClient: DefaultLifecycleObserver {
     }
 
     @Synchronized
-    private fun createOrResumeSession() {
+    internal fun createOrResumeSession() {
         val currentTime = System.currentTimeMillis()
         val isNewSession = sessionId.isEmpty() || (currentTime - backgroundTime) >= THIRTY_MINUTES
 
@@ -39,7 +50,7 @@ object SessionClient: DefaultLifecycleObserver {
     }
 
     @Synchronized
-    private fun sessionBackgrounded() {
+    internal fun sessionBackgrounded() {
         backgroundTime = System.currentTimeMillis()
         trackEvent(EventStrings.SESSION_BACKGROUNDED)
     }
@@ -54,5 +65,6 @@ object SessionClient: DefaultLifecycleObserver {
     internal fun reset() {
         sessionId = ""
         backgroundTime = System.currentTimeMillis()
+        isObserving = false
     }
 }

@@ -15,7 +15,6 @@ import com.adadapted.android.sdk.core.view.AaWebViewPopupActivity
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
-import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -45,7 +44,7 @@ class AdWebViewPopupActivityTest {
     fun setup() {
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
-        SessionClient.onStart(mock())
+        SessionClient.createOrResumeSession()
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
         EventClient.onPublishEvents()
         TestEventAdapter.cleanupEvents()

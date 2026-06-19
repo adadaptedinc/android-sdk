@@ -29,7 +29,7 @@ class AdTest {
     fun setup() {
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance("", false, mock(), "", TestDeviceInfoExtractor(), mock())
-        SessionClient.onStart(mock())
+        SessionClient.createOrResumeSession()
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
         EventClient.onPublishEvents()
         TestEventAdapter.cleanupEvents()

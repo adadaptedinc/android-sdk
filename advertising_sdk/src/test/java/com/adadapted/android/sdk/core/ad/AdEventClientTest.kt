@@ -29,7 +29,7 @@ class AdEventClientTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
-        SessionClient.onStart(mock())
+        SessionClient.createOrResumeSession()
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
         EventClient.onPublishEvents()
         TestEventAdapter.cleanupEvents()

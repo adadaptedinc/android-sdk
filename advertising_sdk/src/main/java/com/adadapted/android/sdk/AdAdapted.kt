@@ -1,7 +1,6 @@
 package com.adadapted.android.sdk
 
 import android.content.Context
-import androidx.lifecycle.ProcessLifecycleOwner
 import com.adadapted.android.sdk.constants.Config
 import com.adadapted.android.sdk.core.ad.AdClient
 import com.adadapted.android.sdk.core.atl.AddItContentPublisher
@@ -129,7 +128,7 @@ object AdAdapted {
             Transporter()
         )
 
-        ProcessLifecycleOwner.get().lifecycle.addObserver(SessionClient)
+        SessionClient.start()
 
         DeviceInfoClient.getDeviceInfo(object : DeviceCallback {
             override fun onDeviceInfoCollected(deviceInfo: DeviceInfo) {

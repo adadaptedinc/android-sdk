@@ -88,7 +88,7 @@ class AdZonePresenterTest {
 
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
-        SessionClient.onStart(mock())
+        SessionClient.createOrResumeSession()
         AdClient.createInstance(testAdAdapter, testTransporterScope)
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
         EventClient.onPublishEvents()

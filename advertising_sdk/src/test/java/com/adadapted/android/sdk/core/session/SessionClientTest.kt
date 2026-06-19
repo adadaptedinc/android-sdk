@@ -1,7 +1,5 @@
 package com.adadapted.android.sdk.core.session
 
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
 import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.event.EventClient
@@ -21,10 +19,6 @@ import org.junit.Test
 class NewSessionClientTest {
     private var testTransporter = UnconfinedTestDispatcher()
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
-    private val mockOwner = object : LifecycleOwner {
-        override val lifecycle = LifecycleRegistry(this)
-    }
-
     @Before
     fun setup() {
         Dispatchers.setMain(testTransporter)
@@ -41,17 +35,17 @@ class NewSessionClientTest {
 
     @Test
     fun `onStart creates new session when session is empty`() {
-        SessionClient.onStart(mockOwner)
+        SessionClient.createOrResumeSession()
         assertTrue(SessionClient.getSessionId().isNotEmpty())
     }
 
     @Test
     fun `onStart resumes session if within time limit`() {
-        SessionClient.onStart(mockOwner)
+        SessionClient.createOrResumeSession()
         val firstSessionId = SessionClient.getSessionId()
 
-        SessionClient.onStop(mockOwner)
-        SessionClient.onStart(mockOwner)
+        SessionClient.sessionBackgrounded()
+        SessionClient.createOrResumeSession()
         EventClient.onPublishEvents()
 
         assertEquals(firstSessionId, SessionClient.getSessionId()) // Should be the same session
@@ -60,9 +54,9 @@ class NewSessionClientTest {
 
     @Test
     fun `onStop updates backgroundTime and tracks event`() {
-        SessionClient.onStart(mockOwner)
+        SessionClient.createOrResumeSession()
         val initialSessionId = SessionClient.getSessionId()
-        SessionClient.onStop(mockOwner)
+        SessionClient.sessionBackgrounded()
         EventClient.onPublishEvents()
         assert(TestEventAdapter.testSdkEvents.any {e -> e.name == EventStrings.SESSION_BACKGROUNDED})
         assertEquals(initialSessionId, SessionClient.getSessionId()) // Session ID should remain unchanged
@@ -90,7 +84,7 @@ class NewSessionClientTest {
 
     @Test
     fun `onStart tracks a session lifecycle event`() {
-        SessionClient.onStart(mockOwner)
+        SessionClient.createOrResumeSession()
         EventClient.onPublishEvents()
 
         val hasSessionEvent = TestEventAdapter.testSdkEvents.any { e ->
@@ -101,7 +95,7 @@ class NewSessionClientTest {
 
     @Test
     fun `tracked session events include sessionId param`() {
-        SessionClient.onStart(mockOwner)
+        SessionClient.createOrResumeSession()
         EventClient.onPublishEvents()
 
         val sessionEvent = TestEventAdapter.testSdkEvents.first { e ->
@@ -113,12 +107,12 @@ class NewSessionClientTest {
 
     @Test
     fun `multiple start stop cycles maintain same session`() {
-        SessionClient.onStart(mockOwner)
+        SessionClient.createOrResumeSession()
         val sessionId = SessionClient.getSessionId()
 
         repeat(5) {
-            SessionClient.onStop(mockOwner)
-            SessionClient.onStart(mockOwner)
+            SessionClient.sessionBackgrounded()
+            SessionClient.createOrResumeSession()
         }
 
         assertEquals(sessionId, SessionClient.getSessionId())

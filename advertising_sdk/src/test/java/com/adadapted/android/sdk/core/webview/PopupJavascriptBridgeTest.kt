@@ -27,7 +27,7 @@ class PopupJavascriptBridgeTest {
     fun setup() {
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance("", false, mock(), "", mock(), mock())
-        SessionClient.onStart(mock())
+        SessionClient.createOrResumeSession()
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
         EventClient.onPublishEvents()
         TestEventAdapter.cleanupEvents()
