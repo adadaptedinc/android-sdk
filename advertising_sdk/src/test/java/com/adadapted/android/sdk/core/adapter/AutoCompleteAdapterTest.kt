@@ -5,7 +5,6 @@ import android.widget.AutoCompleteTextView
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.view.AutoCompleteAdapter
-import com.nhaarman.mockitokotlin2.mock
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -21,7 +20,7 @@ class AutoCompleteAdapterTest {
 
     @Before
     fun setup() {
-        SessionClient.createInstance(mock(), mock())
+        SessionClient.createOrResumeSession()
         val items: ArrayList<String> = arrayListOf("Milk", "Eggs", "Bread")
         testAutoCompleteAdapter = AutoCompleteAdapter(testContext, R.layout.simple_list_item_1, items)
     }

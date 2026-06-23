@@ -87,7 +87,7 @@ data class AdditContent(
         if (items.isEmpty()) {
             eventClient.trackSdkError(
                 EventStrings.ADDIT_PAYLOAD_IS_EMPTY,
-                ("Payload %s has empty payload$payloadId")
+                "Payload $payloadId has empty payload"
             )
         }
         handled = false

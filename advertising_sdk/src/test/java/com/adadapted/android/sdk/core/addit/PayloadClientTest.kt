@@ -11,11 +11,9 @@ import com.adadapted.android.sdk.core.payload.PayloadAdapter
 import com.adadapted.android.sdk.core.payload.PayloadClient
 import com.adadapted.android.sdk.core.payload.PayloadEvent
 import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
-import com.nhaarman.mockitokotlin2.mock
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertNotNull
 import kotlinx.coroutines.Dispatchers
@@ -38,9 +36,10 @@ class PayloadClientTest {
     fun setup() {
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
-        SessionClient.createInstance(mock(), mock())
+        SessionClient.createOrResumeSession()
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
-        EventClient.onSessionAvailable(MockData.session)
+        EventClient.onPublishEvents()
+        TestEventAdapter.cleanupEvents()
         testPayloadClient.createInstance(testPayloadAdapter, EventClient, testTransporterScope)
     }
 
@@ -93,9 +92,10 @@ class PayloadClientTest {
         val content = getTestAdditPayloadContent()
         testPayloadClient.markContentAcknowledged(content)
         EventClient.onPublishEvents()
-        assertEquals(EventStrings.ADDIT_ADDED_TO_LIST, TestEventAdapter.testSdkEvents.first().name)
-        assertEquals("testPayloadId", TestEventAdapter.testSdkEvents.first().params.getValue("payload_id"))
-        assertEquals(AdditContent.AdditSources.PAYLOAD, TestEventAdapter.testSdkEvents.first().params.getValue("source"))
+        assert(TestEventAdapter.testSdkEvents.any { event -> event.name == EventStrings.ADDIT_ADDED_TO_LIST })
+        var event = TestEventAdapter.testSdkEvents.first { event -> event.name == EventStrings.ADDIT_ADDED_TO_LIST }
+        assertEquals("testPayloadId", event.params.getValue("payload_id"))
+        assertEquals(AdditContent.AdditSources.PAYLOAD, event.params.getValue("source"))
         assertEquals("delivered", testPayloadAdapter.publishedEvent.status)
     }
 
@@ -105,9 +105,10 @@ class PayloadClientTest {
         TestEventAdapter.testSdkEvents = mutableListOf()
         testPayloadClient.markContentAcknowledged(content)
         EventClient.onPublishEvents()
-        assertEquals(EventStrings.ADDIT_ADDED_TO_LIST, TestEventAdapter.testSdkEvents.first().name)
-        assertEquals("testPayloadId", TestEventAdapter.testSdkEvents.first().params.getValue("payload_id"))
-        assertEquals("", TestEventAdapter.testSdkEvents.first().params.getValue("source"))
+        assert(TestEventAdapter.testSdkEvents.any { event -> event.name == EventStrings.ADDIT_ADDED_TO_LIST })
+        var event = TestEventAdapter.testSdkEvents.first { event -> event.name == EventStrings.ADDIT_ADDED_TO_LIST }
+        assertEquals("testPayloadId", event.params.getValue("payload_id"))
+        assertEquals("", event.params.getValue("source"))
         assertEquals("", testPayloadAdapter.publishedEvent.status)
     }
 
@@ -116,10 +117,11 @@ class PayloadClientTest {
         val content = getTestAdditPayloadContent()
         testPayloadClient.markContentItemAcknowledged(content, getTestAddToListItem())
         EventClient.onPublishEvents()
-        assertEquals(EventStrings.ADDIT_ITEM_ADDED_TO_LIST, TestEventAdapter.testSdkEvents.first().name)
-        assertEquals("testPayloadId", TestEventAdapter.testSdkEvents.first().params.getValue("payload_id"))
-        assertEquals("testTitle", TestEventAdapter.testSdkEvents.first().params.getValue("item_name"))
-        assertEquals(AdditContent.AdditSources.PAYLOAD, TestEventAdapter.testSdkEvents.first().params.getValue("source"))
+        assert(TestEventAdapter.testSdkEvents.any { event -> event.name == EventStrings.ADDIT_ITEM_ADDED_TO_LIST })
+        var event = TestEventAdapter.testSdkEvents.first { event -> event.name == EventStrings.ADDIT_ITEM_ADDED_TO_LIST }
+        assertEquals("testPayloadId", event.params.getValue("payload_id"))
+        assertEquals("testTitle", event.params.getValue("item_name"))
+        assertEquals(AdditContent.AdditSources.PAYLOAD, event.params.getValue("source"))
     }
 
     @Test

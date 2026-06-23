@@ -3,25 +3,24 @@ package com.adadapted.android.sdk.constants
 object Config {
     private var isProd = false
 
-    const val LIBRARY_VERSION: String = "4.2.1"
+    const val LIBRARY_VERSION: String = "5.0.0"
     const val LOG_TAG = "ADADAPTED_ANDROID_SDK"
 
-    const val DEFAULT_AD_POLLING = 300000L // If the new Ad polling isn't set it will default to every 5 minutes
     const val DEFAULT_EVENT_POLLING = 3000L // Events will be pushed to the server every 3 seconds
-    const val DEFAULT_AD_REFRESH = 6000L // If an Ad does not have a refresh time it will default to 60 seconds
+    const val DEFAULT_AD_REFRESH = 60000L // If an Ad does not have a refresh time it will default to 60 seconds
 
     const val AASDK_PREFS_KEY = "AASDK_PREFS"
     const val AASDK_PREFS_TRACKING_DISABLED_KEY = "TRACKING_DISABLED"
     const val AASDK_PREFS_GENERATED_ID_KEY = "GENERATED_ID"
 
-    private const val AD_SERVER_VERSION = "/v/0.9.5/"
+    private const val AD_SERVER_VERSION = "/v/1.0.0/"
+    private const val EVENT_SERVER_VERSION = "/v/0.9.5/"
     private const val TRACKING_SERVER_VERSION = "/v/1/"
     private const val PAYLOAD_SERVER_VERSION = "/v/1/"
 
-    private const val SESSION_INIT_PATH = "android/sessions/initialize"
-    private const val REFRESH_ADS_PATH = "android/ads/retrieve"
+    private const val RETRIEVE_AD_PATH = "ad/retrieve"
     private const val AD_EVENTS_PATH = "android/ads/events"
-    private const val RETRIEVE_INTERCEPTS_PATH = "android/intercepts/retrieve"
+    private const val RETRIEVE_INTERCEPTS_PATH = "intercept/retrieve"
     private const val INTERCEPT_EVENTS_PATH = "android/intercepts/events"
     private const val EVENT_TRACK_PATH = "android/events"
     private const val ERROR_TRACK_PATH = "android/errors"
@@ -30,11 +29,10 @@ object Config {
     const val AD_ID_PARAM = "aid"
     const val UDID_PARAM = "uid"
 
-    fun getInitSessionUrl() = getAdServerFormattedUrl(SESSION_INIT_PATH)
-    fun getRefreshAdsUrl() = getAdServerFormattedUrl(REFRESH_ADS_PATH)
-    fun getAdEventsUrl() = getAdServerFormattedUrl(AD_EVENTS_PATH)
+    fun getRetrieveAdsUrl() = getAdServerFormattedUrl(RETRIEVE_AD_PATH)
+    fun getAdEventsUrl() = getEventServerFormattedUrl(AD_EVENTS_PATH)
     fun getRetrieveInterceptsUrl() = getAdServerFormattedUrl(RETRIEVE_INTERCEPTS_PATH)
-    fun getInterceptEventsUrl() = getAdServerFormattedUrl(INTERCEPT_EVENTS_PATH)
+    fun getInterceptEventsUrl() = getEventServerFormattedUrl(INTERCEPT_EVENTS_PATH)
     fun getSdkEventsUrl() = getTrackingServerFormattedUrl(EVENT_TRACK_PATH)
     fun getSdkErrorsUrl() = getTrackingServerFormattedUrl(ERROR_TRACK_PATH)
     fun getPickupPayloadsUrl() = getPayloadServerFormattedUrl(PAYLOAD_PICKUP_PATH)
@@ -62,6 +60,10 @@ object Config {
 
     private fun getAdServerFormattedUrl(path: String): String {
         return getAdServerHost().plus(AD_SERVER_VERSION).plus(path)
+    }
+
+    private fun getEventServerFormattedUrl(path: String): String {
+        return getAdServerHost().plus(EVENT_SERVER_VERSION).plus(path)
     }
 
     private fun getTrackingServerFormattedUrl(path: String): String {

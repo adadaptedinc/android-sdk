@@ -3,6 +3,7 @@ package com.adadapted.android.sdk.core.device
 import com.adadapted.android.sdk.core.concurrency.Transporter
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.interfaces.DeviceCallback
+import kotlin.jvm.Synchronized
 
 object DeviceInfoClient {
 
@@ -10,11 +11,12 @@ object DeviceInfoClient {
     private var isProd: Boolean = false
     private var params: Map<String, String> = emptyMap()
     private var customIdentifier: String =""
-    private var deviceInfoExtractor: DeviceInfoExtractor? = null
+    private lateinit var deviceInfoExtractor: DeviceInfoExtractor
     private var transporter: TransporterCoroutineScope = Transporter()
     private var deviceInfo: DeviceInfo? = null
     private var deviceCallbacks: MutableSet<DeviceCallback> = HashSet()
 
+    @Synchronized
     private fun performGetInfo(deviceCallback: DeviceCallback) {
         if (deviceInfo != null) {
             deviceInfo?.let { deviceCallback.onDeviceInfoCollected(it) }
@@ -23,11 +25,13 @@ object DeviceInfoClient {
         }
     }
 
+    @Synchronized
     private fun collectDeviceInfo() {
-        deviceInfo = deviceInfoExtractor?.extractDeviceInfo(appId, isProd, customIdentifier, params)
+        deviceInfo = deviceInfoExtractor.extractDeviceInfo(appId, isProd, customIdentifier, params)
         notifyCallbacks()
     }
 
+    @Synchronized
     private fun notifyCallbacks() {
         val currentDeviceCallbacks: Set<DeviceCallback> = HashSet(deviceCallbacks)
         for (caller in currentDeviceCallbacks) {
@@ -42,12 +46,9 @@ object DeviceInfoClient {
         }
     }
 
-    fun getCachedDeviceInfo(): DeviceInfo? {
-        return if (deviceInfo != null) {
-            deviceInfo
-        } else {
-            null
-        }
+    @Synchronized
+    fun getCachedDeviceInfo(): DeviceInfo {
+        return deviceInfo ?: DeviceInfo()
     }
 
     fun createInstance(

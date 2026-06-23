@@ -35,8 +35,10 @@ class DeeplinkContentParserTest {
     @Before
     fun setup() {
         DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
-        SessionClient.createInstance(mock(), mock())
+        SessionClient.createOrResumeSession()
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
+        EventClient.onPublishEvents()
+        TestEventAdapter.cleanupEvents()
         PayloadClient.createInstance(mock(), EventClient, mock())
     }
 

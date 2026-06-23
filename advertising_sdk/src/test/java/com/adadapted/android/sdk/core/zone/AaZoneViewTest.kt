@@ -8,6 +8,7 @@ import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdContent
 import com.adadapted.android.sdk.core.ad.AdContentPublisher
+import com.adadapted.android.sdk.core.ad.AdZoneData
 import com.adadapted.android.sdk.core.ad.TestAdContentListener
 import com.adadapted.android.sdk.core.atl.AddToListItem
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
@@ -17,8 +18,6 @@ import com.adadapted.android.sdk.core.payload.Payload
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.view.AaZoneView
 import com.adadapted.android.sdk.core.view.DimensionConverter
-import com.adadapted.android.sdk.core.view.Zone
-import com.adadapted.android.sdk.tools.MockData
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestEventAdapter
 import com.adadapted.android.sdk.tools.TestTransporter
@@ -54,9 +53,10 @@ class AaZoneViewTest {
         }
         Dispatchers.setMain(testTransporter)
         DeviceInfoClient.createInstance("", false, HashMap(), "", TestDeviceInfoExtractor(), testTransporterScope)
-        SessionClient.createInstance(mock(), mock())
+        SessionClient.createOrResumeSession()
         EventClient.createInstance(TestEventAdapter, testTransporterScope)
-        EventClient.onSessionAvailable(MockData.session)
+        EventClient.onPublishEvents()
+        TestEventAdapter.cleanupEvents()
         DimensionConverter.createInstance(0f, mockDisplayMetrics)
         testAaZoneView = AaZoneView(testContext)
     }
@@ -120,7 +120,6 @@ class AaZoneViewTest {
         val testListener = TestAaZoneViewListener()
         testAaZoneView.init("TestZoneId")
         testAaZoneView.onStart(testListener)
-        testAaZoneView.onAdsRefreshed(Zone("TestZoneId",ads = listOf(Ad("NewZoneAdId"))))
         testAaZoneView.onStop()
         Shadows.shadowOf(Looper.getMainLooper()).idle()
 
@@ -133,7 +132,6 @@ class AaZoneViewTest {
         val testAdContentListener = TestAdContentListener()
         testAaZoneView.init("TestZoneId")
         testAaZoneView.onStart(testListener, testAdContentListener)
-        testAaZoneView.onAdsRefreshed(Zone("TestZoneId",ads = listOf(Ad("NewZoneAdId"))))
         testAaZoneView.onStop(testAdContentListener)
         Shadows.shadowOf(Looper.getMainLooper()).idle()
 
@@ -157,18 +155,7 @@ class AaZoneViewTest {
         val testListener = TestAaZoneViewListener()
         testAaZoneView.init("TestZoneId")
         testAaZoneView.onStart(testListener)
-        testAaZoneView.onZoneAvailable(Zone("TestZoneId",ads = listOf(Ad("NewZoneAdId"))))
-        Shadows.shadowOf(Looper.getMainLooper()).idle()
-
-        assertEquals(testListener.zoneHasAds, true)
-    }
-
-    @Test
-    fun testOnAdsRefreshed() {
-        val testListener = TestAaZoneViewListener()
-        testAaZoneView.init("TestZoneId")
-        testAaZoneView.onStart(testListener)
-        testAaZoneView.onAdsRefreshed(Zone("TestZoneId",ads = listOf(Ad("NewZoneAdId"))))
+        testAaZoneView.onZoneAvailable(AdZoneData(Ad("NewZoneAdId")))
         Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals(testListener.zoneHasAds, true)
