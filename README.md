@@ -6,7 +6,7 @@ Development is done using Android Studio. Updating the public facing API should 
 
 Documentation for integrating the SDK with an App can be found at [https://docs.adadapted.com/#/docs/android-getting-started](https://docs.adadapted.com/#/docs/android-getting-started)
 
-A valid API key is required to be able to run the SDK which can be dropped into the testing application in TestApplication.java.
+A valid API key is required to be able to run the SDK, supplied when initializing AdAdapted within the host application.
 
 ### Prerequisites
 
@@ -32,7 +32,7 @@ Step 2. Add the dependency (based on latest release version)
 
 ## Running the tests
 
-Unit tests can be run within the IDE and will report coverage on the gradle logs / merge request details. There is also a test app that can run basic implementation and verification of features.
+Unit tests can be run within the IDE and will report coverage on the gradle logs / merge request details.
 
 ## Deployment
 
