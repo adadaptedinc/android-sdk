@@ -4,15 +4,16 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.adadapted.android.sdk.constants.EventStrings
+import com.adadapted.android.sdk.core.concurrency.nowInSeconds
 import com.adadapted.android.sdk.core.event.EventClient
 import kotlin.jvm.Synchronized
 
 object SessionClient {
     private const val PREFIX = "ANDROID"
-    private const val THIRTY_MINUTES = 30 * 60 * 1000L
+    private const val THIRTY_MINUTES_IN_SECONDS = 30 * 60L
     private val ID_CHARACTERS by lazy { ('A'..'Z') + ('0'..'9') }
     private var sessionId: String = ""
-    private var backgroundTime: Long = System.currentTimeMillis()
+    private var backgroundTime: Long = nowInSeconds()
     private var isObserving = false
 
     fun start() {
@@ -41,8 +42,8 @@ object SessionClient {
 
     @Synchronized
     internal fun createOrResumeSession() {
-        val currentTime = System.currentTimeMillis()
-        val isNewSession = sessionId.isEmpty() || (currentTime - backgroundTime) >= THIRTY_MINUTES
+        val currentTime = nowInSeconds()
+        val isNewSession = sessionId.isEmpty() || (currentTime - backgroundTime) >= THIRTY_MINUTES_IN_SECONDS
 
         if (isNewSession) sessionId = generateId() else backgroundTime = currentTime
 
@@ -51,7 +52,7 @@ object SessionClient {
 
     @Synchronized
     internal fun sessionBackgrounded() {
-        backgroundTime = System.currentTimeMillis()
+        backgroundTime = nowInSeconds()
         trackEvent(EventStrings.SESSION_BACKGROUNDED)
     }
 
@@ -64,7 +65,7 @@ object SessionClient {
     @Synchronized
     internal fun reset() {
         sessionId = ""
-        backgroundTime = System.currentTimeMillis()
+        backgroundTime = nowInSeconds()
         isObserving = false
     }
 }

@@ -3,11 +3,11 @@ package com.adadapted.android.sdk.constants
 object Config {
     private var isProd = false
 
-    const val LIBRARY_VERSION: String = "5.0.0"
+    const val LIBRARY_VERSION: String = "5.1.0"
     const val LOG_TAG = "ADADAPTED_ANDROID_SDK"
 
-    const val DEFAULT_EVENT_POLLING = 3000L // Events will be pushed to the server every 3 seconds
-    const val DEFAULT_AD_REFRESH = 60000L // If an Ad does not have a refresh time it will default to 60 seconds
+    const val DEFAULT_EVENT_POLLING_SECONDS = 3L // Events will be pushed to the server every 3 seconds
+    const val DEFAULT_AD_REFRESH_SECONDS = 60L // Used when the server does not supply an Ad refresh time
 
     const val AASDK_PREFS_KEY = "AASDK_PREFS"
     const val AASDK_PREFS_TRACKING_DISABLED_KEY = "TRACKING_DISABLED"

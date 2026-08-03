@@ -1,6 +1,5 @@
 package com.adadapted.android.sdk.core.view
 
-import com.adadapted.android.sdk.constants.Config
 import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdActionType
@@ -94,6 +93,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
         currentAd = ad
         adStarted = false
         adCompleted = false
+        restartTimer() //Pick up the new Ad's refresh time
         displayAd()
     }
 
@@ -128,16 +128,20 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
     }
 
     fun onAdDisplayFailed() {
-        startZoneTimer()
         adStarted = true
-        currentAd = Ad()
+        currentAd = clearedAdKeepingRefreshTime()
+        startZoneTimer()
     }
 
     fun onBlankDisplayed() {
-        startZoneTimer()
         adStarted = true
-        currentAd = Ad()
+        currentAd = clearedAdKeepingRefreshTime()
+        startZoneTimer()
     }
+
+    //Clears the Ad content but keeps the served refresh, which on a no-fill is the backoff the
+    //server asked for and is often the value the zone timer is first armed with
+    private fun clearedAdKeepingRefreshTime() = Ad(refreshTime = currentAd.refreshTime)
 
     fun onAdClicked(ad: Ad) {
         val actionType = ad.actionType
@@ -186,11 +190,17 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
         if (!zoneLoaded || timerRunning) {
             return
         }
-        val timerDelay = Config.DEFAULT_AD_REFRESH
+        val refreshSeconds = currentAd.refreshTimeOrDefault
+        if (currentAd.refreshTimeWasRejected) {
+            AALogger.logError("Ad refresh time of ${currentAd.refreshTime}s was served but not honored. Using ${refreshSeconds}s")
+        }
+        AALogger.logDebug("Zone timer starting with a refresh of ${refreshSeconds}s")
         timerRunning = true
-        timer = Timer({
-            getNextAd()
-        }, timerDelay, timerDelay)
+        timer = Timer(
+            { getNextAd() },
+            repeatSeconds = refreshSeconds,
+            delaySeconds = refreshSeconds
+        )
     }
 
     private fun restartTimer() {
@@ -242,7 +252,6 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
         if(DimensionConverter.isTablet()) {
             currentAdZoneData.rescaleDimensionsForTablet()
         }
-        restartTimer()
         handleAd(adZoneData.ad)
     }
 

@@ -95,8 +95,8 @@ object InterceptClient {
 
         val eventTimer = Timer(
             { performPublishEvents() },
-            repeatMillis = Config.DEFAULT_EVENT_POLLING,
-            delayMillis = Config.DEFAULT_EVENT_POLLING
+            repeatSeconds = Config.DEFAULT_EVENT_POLLING_SECONDS,
+            delaySeconds = Config.DEFAULT_EVENT_POLLING_SECONDS
         )
         eventTimer.startTimer()
     }

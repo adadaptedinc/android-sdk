@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
+import com.adadapted.android.sdk.constants.Config as SdkConfig
 import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdActionType
@@ -36,6 +37,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
@@ -44,6 +46,7 @@ import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
@@ -105,6 +108,17 @@ class AdZonePresenterTest {
 
         testAdZonePresenter = AdZonePresenter(AdViewHandler(testContext), AdClient)
     }
+
+    @After
+    fun tearDown() {
+        //These tests share one virtual clock and AdClient is a singleton, so a repeating zone timer
+        //left running would fire ad requests against the next test's adapter
+        testAdZonePresenter.onDetach()
+    }
+
+    //The virtual clock runs in milliseconds, the refresh times under test are in seconds
+    private fun advanceTimeBySeconds(seconds: Long) =
+        testTransporter.scheduler.advanceTimeBy(TimeUnit.SECONDS.toMillis(seconds))
 
     @Test
     fun testOnAttach() {
@@ -243,6 +257,129 @@ class AdZonePresenterTest {
     }
 
     @Test
+    fun zoneTimerRefetchesOnTheServerSuppliedRefreshTime() {
+        val serverRefreshSeconds = 30L //Faster than the default, above the floor
+        val testAd = Ad(id = "TestAdId", impressionId = "123", refreshTime = serverRefreshSeconds)
+        testAdAdapter.setMockData(AdZoneData(testAd))
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        testAdZonePresenter.onAdDisplayed(testAd, true)
+
+        val requestsBeforeRefresh = testAdAdapter.requestCount
+        advanceTimeBySeconds(serverRefreshSeconds - 1)
+        assertEquals(
+            "Should not have refreshed before the server's refresh time elapsed",
+            requestsBeforeRefresh,
+            testAdAdapter.requestCount
+        )
+
+        advanceTimeBySeconds(2)
+        assertEquals(
+            "Should have refreshed once the server's refresh time elapsed",
+            requestsBeforeRefresh + 1,
+            testAdAdapter.requestCount
+        )
+    }
+
+    @Test
+    fun zoneTimerHonorsAServerRefreshTimeSlowerThanTheDefault() {
+        val serverRefreshSeconds = 70L //Slower than the 60 second default
+        val testAd = Ad(id = "TestAdId", impressionId = "123", refreshTime = serverRefreshSeconds)
+        testAdAdapter.setMockData(AdZoneData(testAd))
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        testAdZonePresenter.onAdDisplayed(testAd, true)
+
+        val requestsBeforeRefresh = testAdAdapter.requestCount
+        advanceTimeBySeconds(SdkConfig.DEFAULT_AD_REFRESH_SECONDS + 1)
+        assertEquals(
+            "Should not have refreshed at the default refresh time when the server asked for a slower one",
+            requestsBeforeRefresh,
+            testAdAdapter.requestCount
+        )
+
+        advanceTimeBySeconds(serverRefreshSeconds - SdkConfig.DEFAULT_AD_REFRESH_SECONDS)
+        assertEquals(
+            "Should have refreshed once the server's slower refresh time elapsed",
+            requestsBeforeRefresh + 1,
+            testAdAdapter.requestCount
+        )
+    }
+
+    @Test
+    fun zoneTimerDoesNotRefreshFasterThanTheFloorWhenTheServerAsksItTo() {
+        val testAd = Ad(id = "TestAdId", impressionId = "123", refreshTime = 1) //Below the floor
+        testAdAdapter.setMockData(AdZoneData(testAd))
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        testAdZonePresenter.onAdDisplayed(testAd, true)
+
+        val requestsBeforeRefresh = testAdAdapter.requestCount
+        advanceTimeBySeconds(Ad.MINIMUM_REFRESH_TIME_SECONDS - 1)
+        assertEquals(
+            "Should not have refreshed faster than the floor the below-floor value clamps up to",
+            requestsBeforeRefresh,
+            testAdAdapter.requestCount
+        )
+
+        advanceTimeBySeconds(2)
+        assertEquals(
+            "Should have refreshed once the floor elapsed, not waited out the default",
+            requestsBeforeRefresh + 1,
+            testAdAdapter.requestCount
+        )
+    }
+
+    //A no-fill carries the server's backoff on an otherwise empty Ad. In production the response
+    //lands after onAttach returns, so the zone timer is first armed from the blank-displayed
+    //callback - which must not have discarded the served refresh by then.
+    @Test
+    fun noFillBacksOffOnTheServedRefreshTimeWhenTheResponseLandsAfterAttach() {
+        val serverRefreshSeconds = 300L
+        val noFill = Ad(refreshTime = serverRefreshSeconds)
+        val silentAdapter = SilentAdAdapter()
+        AdClient.createInstance(silentAdapter, testTransporterScope)
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener()) //Fetch dispatched, no response yet
+
+        testAdZonePresenter.onAdLoaded(AdZoneData(noFill)) //Response lands late
+        testAdZonePresenter.onBlankDisplayed() //View finished loading blank
+
+        val requestsBeforeRefresh = silentAdapter.requestCount
+        advanceTimeBySeconds(SdkConfig.DEFAULT_AD_REFRESH_SECONDS + 1)
+        assertEquals(
+            "Should not have refetched at the default when the server asked to back off",
+            requestsBeforeRefresh,
+            silentAdapter.requestCount
+        )
+
+        advanceTimeBySeconds(serverRefreshSeconds - SdkConfig.DEFAULT_AD_REFRESH_SECONDS)
+        assertEquals(
+            "Should have refetched once the server's backoff elapsed",
+            requestsBeforeRefresh + 1,
+            silentAdapter.requestCount
+        )
+    }
+
+    @Test
+    fun zoneTimerWaitsForTheDefaultRefreshTimeWhenTheServerSuppliesNone() {
+        val testAd = Ad(id = "TestAdId", impressionId = "123")
+        testAdAdapter.setMockData(AdZoneData(testAd))
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        testAdZonePresenter.onAdDisplayed(testAd, true)
+
+        val requestsBeforeRefresh = testAdAdapter.requestCount
+        advanceTimeBySeconds(SdkConfig.DEFAULT_AD_REFRESH_SECONDS / 2)
+
+        assertEquals(
+            "Should not have refreshed halfway through the default refresh time",
+            requestsBeforeRefresh,
+            testAdAdapter.requestCount
+        )
+    }
+
+    @Test
     fun testNullListener() {
         testAdZonePresenter.init("testZoneId", mockWebView!!)
         testAdZonePresenter.onAttach(null)
@@ -253,6 +390,7 @@ class AdZonePresenterTest {
 
 class TestAdAdapter: AdAdapter {
     private var adZoneData: AdZoneData = AdZoneData()
+    var requestCount = 0
 
     fun setMockData(adZoneData: AdZoneData) {
         this.adZoneData = adZoneData
@@ -265,7 +403,23 @@ class TestAdAdapter: AdAdapter {
         contextId: String,
         extra: String
     ) {
+        requestCount++
         listener.onAdLoaded(adZoneData)
+    }
+}
+
+//Dispatches nothing back, so the presenter stays unloaded until a response is delivered by hand
+class SilentAdAdapter: AdAdapter {
+    var requestCount = 0
+
+    override suspend fun requestAd(
+        zoneId: String,
+        listener: ZoneAdListener,
+        storeId: String,
+        contextId: String,
+        extra: String
+    ) {
+        requestCount++
     }
 }
 
