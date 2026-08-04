@@ -16,6 +16,8 @@ import com.adadapted.android.sdk.tools.TestTransporter
 import com.nhaarman.mockitokotlin2.mock
 import junit.framework.Assert.assertNotNull
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
@@ -106,11 +108,11 @@ class AdTest {
 
     @Test
     fun onlyAServedRefreshTimeTheSdkWillNotHonorCountsAsRejected() {
-        assert(Ad(refreshTime = 1).refreshTimeWasRejected) //Clamped up to the floor
-        assert(Ad(refreshTime = -30).refreshTimeWasRejected) //Fell back to the default
-        assert(!Ad(refreshTime = Ad.MINIMUM_REFRESH_TIME_SECONDS).refreshTimeWasRejected)
-        assert(!Ad(refreshTime = 70).refreshTimeWasRejected)
-        assert(!Ad().refreshTimeWasRejected) //None supplied is expected, not a rejection
+        assertTrue(Ad(refreshTime = 1).refreshTimeWasRejected) //Clamped up to the floor
+        assertTrue(Ad(refreshTime = -30).refreshTimeWasRejected) //Fell back to the default
+        assertFalse(Ad(refreshTime = Ad.MINIMUM_REFRESH_TIME_SECONDS).refreshTimeWasRejected)
+        assertFalse(Ad(refreshTime = 70).refreshTimeWasRejected)
+        assertFalse(Ad().refreshTimeWasRejected) //None supplied is expected, not a rejection
     }
 
     @Test
@@ -161,7 +163,7 @@ class AdTest {
         val parsedAd = HttpConnector.jsonParser.decodeFromString<Ad>("""{"refresh_time":300}""")
 
         assertEquals(300L, parsedAd.refreshTimeOrDefault)
-        assert(parsedAd.isEmpty)
+        assertTrue(parsedAd.isEmpty)
         assertEquals("", parsedAd.id)
         assertEquals("", parsedAd.impressionId)
     }
@@ -174,7 +176,7 @@ class AdTest {
 
         assertEquals(true, parsedResponse.success)
         assertEquals(50, parsedResponse.data.portHeight)
-        assert(parsedResponse.data.ad.isEmpty)
+        assertTrue(parsedResponse.data.ad.isEmpty)
         assertEquals(300L, parsedResponse.data.ad.refreshTimeOrDefault)
     }
 

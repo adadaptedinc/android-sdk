@@ -20,12 +20,10 @@ internal class Timer(timedBackgroundFunc: () -> Unit, repeatSeconds: Long, delay
             }
         }
 
+    // Starts as soon as the Timer is constructed. The first invocation of
+    // timedBackgroundFunc happens after delaySeconds elapses.
     private val timer: Job = startCoroutineTimer(delaySeconds, repeatSeconds) {
         timedBackgroundFunc()
-    }
-
-    fun startTimer() {
-        timer.start()
     }
 
     fun cancelTimer() {

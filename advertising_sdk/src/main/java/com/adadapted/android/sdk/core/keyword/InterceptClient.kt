@@ -93,12 +93,11 @@ object InterceptClient {
         }
         interceptEventTimerRunning = true
 
-        val eventTimer = Timer(
+        Timer(
             { performPublishEvents() },
             repeatSeconds = Config.DEFAULT_EVENT_POLLING_SECONDS,
             delaySeconds = Config.DEFAULT_EVENT_POLLING_SECONDS
         )
-        eventTimer.startTimer()
     }
 
     fun initialize(interceptListener: InterceptListener?) {

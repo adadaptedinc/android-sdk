@@ -371,11 +371,51 @@ class AdZonePresenterTest {
 
         val requestsBeforeRefresh = testAdAdapter.requestCount
         advanceTimeBySeconds(SdkConfig.DEFAULT_AD_REFRESH_SECONDS / 2)
-
         assertEquals(
             "Should not have refreshed halfway through the default refresh time",
             requestsBeforeRefresh,
             testAdAdapter.requestCount
+        )
+
+        advanceTimeBySeconds(SdkConfig.DEFAULT_AD_REFRESH_SECONDS / 2 + 1)
+        assertEquals(
+            "Should have refreshed once the default refresh time elapsed",
+            requestsBeforeRefresh + 1,
+            testAdAdapter.requestCount
+        )
+    }
+
+    //A refetch that fails hands the presenter an empty Ad. The served backoff has to survive that,
+    //or a server that asked to be hit every 300s gets hit every 60s from the first failure onward.
+    @Test
+    fun aFailedRefetchKeepsTheServedRefreshTimeInsteadOfDroppingToTheDefault() {
+        val serverRefreshSeconds = 300L
+        val servedAd = Ad(id = "TestAdId", impressionId = "123", refreshTime = serverRefreshSeconds)
+        val failingAdapter = FailAfterFirstAdAdapter(servedAd)
+        AdClient.createInstance(failingAdapter, testTransporterScope)
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        testAdZonePresenter.onAdDisplayed(servedAd, true)
+
+        advanceTimeBySeconds(serverRefreshSeconds + 1) //First refetch fires on the served time, and fails
+        assertEquals(
+            "The first refetch should have fired once the served refresh time elapsed",
+            2,
+            failingAdapter.requestCount
+        )
+
+        advanceTimeBySeconds(SdkConfig.DEFAULT_AD_REFRESH_SECONDS + 1)
+        assertEquals(
+            "A failed refetch should not drop the zone back to the default refresh time",
+            2,
+            failingAdapter.requestCount
+        )
+
+        advanceTimeBySeconds(serverRefreshSeconds - SdkConfig.DEFAULT_AD_REFRESH_SECONDS)
+        assertEquals(
+            "Should have refetched again once the served refresh time elapsed a second time",
+            3,
+            failingAdapter.requestCount
         )
     }
 
@@ -405,6 +445,27 @@ class TestAdAdapter: AdAdapter {
     ) {
         requestCount++
         listener.onAdLoaded(adZoneData)
+    }
+}
+
+//Serves the Ad once and fails every fetch after it, the shape of a zone that loaded and then lost
+//the server
+class FailAfterFirstAdAdapter(private val ad: Ad): AdAdapter {
+    var requestCount = 0
+
+    override suspend fun requestAd(
+        zoneId: String,
+        listener: ZoneAdListener,
+        storeId: String,
+        contextId: String,
+        extra: String
+    ) {
+        requestCount++
+        if (requestCount == 1) {
+            listener.onAdLoaded(AdZoneData(ad))
+        } else {
+            listener.onAdLoadFailed()
+        }
     }
 }
 

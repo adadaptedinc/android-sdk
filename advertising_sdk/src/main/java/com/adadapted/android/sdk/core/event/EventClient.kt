@@ -106,12 +106,11 @@ object EventClient {
         }
         eventTimerRunning = true
 
-        val eventTimer = Timer(
+        Timer(
             { onPublishEvents() },
             repeatSeconds = Config.DEFAULT_EVENT_POLLING_SECONDS,
             delaySeconds = Config.DEFAULT_EVENT_POLLING_SECONDS
         )
-        eventTimer.startTimer()
     }
 
     @Synchronized

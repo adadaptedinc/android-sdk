@@ -85,7 +85,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
             contextId = zoneContextId,
             listener = object : ZoneAdListener {
                 override fun onAdLoaded(adZoneData: AdZoneData) = handleAd(adZoneData.ad)
-                override fun onAdLoadFailed() = handleAd(Ad())
+                override fun onAdLoadFailed() = handleAd(clearedAdKeepingRefreshTime())
             })
     }
 
@@ -140,7 +140,9 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
     }
 
     //Clears the Ad content but keeps the served refresh, which on a no-fill is the backoff the
-    //server asked for and is often the value the zone timer is first armed with
+    //server asked for and is often the value the zone timer is first armed with. Also used when a
+    //refetch fails, so the zone does not fall back to the faster default against a server that
+    //asked to be hit less often.
     private fun clearedAdKeepingRefreshTime() = Ad(refreshTime = currentAd.refreshTime)
 
     fun onAdClicked(ad: Ad) {
