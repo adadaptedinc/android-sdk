@@ -1,6 +1,5 @@
 package com.adadapted.android.sdk.core.view
 
-import com.adadapted.android.sdk.constants.Config
 import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdActionType
@@ -85,8 +84,13 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
             zoneId = zoneId,
             contextId = zoneContextId,
             listener = object : ZoneAdListener {
-                override fun onAdLoaded(adZoneData: AdZoneData) = handleAd(adZoneData.ad)
-                override fun onAdLoadFailed() = handleAd(Ad())
+                //Reported like the first fetch does, so a refresh that comes back a no-fill tells
+                //the host app the zone no longer has an ad to show
+                override fun onAdLoaded(adZoneData: AdZoneData) {
+                    updateCurrentZone(adZoneData)
+                    notifyZoneAvailable()
+                }
+                override fun onAdLoadFailed() = handleAd(clearedAdKeepingRefreshTime())
             })
     }
 
@@ -94,6 +98,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
         currentAd = ad
         adStarted = false
         adCompleted = false
+        restartTimer() //Pick up the new Ad's refresh time
         displayAd()
     }
 
@@ -128,16 +133,22 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
     }
 
     fun onAdDisplayFailed() {
-        startZoneTimer()
         adStarted = true
-        currentAd = Ad()
+        currentAd = clearedAdKeepingRefreshTime()
+        startZoneTimer()
     }
 
     fun onBlankDisplayed() {
-        startZoneTimer()
         adStarted = true
-        currentAd = Ad()
+        currentAd = clearedAdKeepingRefreshTime()
+        startZoneTimer()
     }
+
+    //Clears the Ad content but keeps the served refresh, which on a no-fill is the backoff the
+    //server asked for and is often the value the zone timer is first armed with. Also used when a
+    //refetch fails, so the zone does not fall back to the faster default against a server that
+    //asked to be hit less often.
+    private fun clearedAdKeepingRefreshTime() = Ad(refreshTime = currentAd.refreshTime)
 
     fun onAdClicked(ad: Ad) {
         val actionType = ad.actionType
@@ -186,11 +197,17 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
         if (!zoneLoaded || timerRunning) {
             return
         }
-        val timerDelay = Config.DEFAULT_AD_REFRESH
+        val refreshSeconds = currentAd.refreshTimeOrDefault
+        if (currentAd.refreshTimeWasRejected) {
+            AALogger.logError("Ad refresh time of ${currentAd.refreshTime}s was served but not honored. Using ${refreshSeconds}s")
+        }
+        AALogger.logDebug("Zone timer starting with a refresh of ${refreshSeconds}s")
         timerRunning = true
-        timer = Timer({
-            getNextAd()
-        }, timerDelay, timerDelay)
+        timer = Timer(
+            { getNextAd() },
+            repeatSeconds = refreshSeconds,
+            delaySeconds = refreshSeconds
+        )
     }
 
     private fun restartTimer() {
@@ -242,7 +259,6 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
         if(DimensionConverter.isTablet()) {
             currentAdZoneData.rescaleDimensionsForTablet()
         }
-        restartTimer()
         handleAd(adZoneData.ad)
     }
 

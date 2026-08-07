@@ -1,8 +1,8 @@
 package com.adadapted.android.sdk.core.keyword
 
+import com.adadapted.android.sdk.core.concurrency.nowInSeconds
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.util.Date
 
 @Serializable
 data class InterceptEvent(
@@ -16,7 +16,7 @@ data class InterceptEvent(
     val termId: String = "",
     val term: String = "",
     @SerialName("created_at")
-    val createdAt: Long = Date().time / 1000
+    val createdAt: Long = nowInSeconds()
 ) {
 
     fun supersedes(e: InterceptEvent): Boolean {

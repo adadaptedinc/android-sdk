@@ -13,14 +13,17 @@ import kotlinx.serialization.json.Json
 object HttpConnector {
     const val API_HEADER = "X-API-KEY"
 
+    internal val jsonParser = Json {
+        useAlternativeNames = false
+        ignoreUnknownKeys = true
+        isLenient = true
+        prettyPrint = true
+        coerceInputValues = true
+    }
+
     val client = HttpClient(Android.create()) {
         install(ContentNegotiation) {
-            json(Json {
-                useAlternativeNames = false
-                ignoreUnknownKeys = true
-                isLenient = true
-                prettyPrint = true
-            })
+            json(jsonParser)
         }
 
         install(HttpRequestRetry)
