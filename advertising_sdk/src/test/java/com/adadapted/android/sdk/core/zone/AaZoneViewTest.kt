@@ -13,6 +13,7 @@ import com.adadapted.android.sdk.core.ad.TestAdContentListener
 import com.adadapted.android.sdk.core.atl.AddToListItem
 import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
+import com.adadapted.android.sdk.core.event.AdEventTypes
 import com.adadapted.android.sdk.core.event.EventClient
 import com.adadapted.android.sdk.core.payload.Payload
 import com.adadapted.android.sdk.core.session.SessionClient
@@ -233,6 +234,37 @@ class AaZoneViewTest {
 
         assertEquals(testListener.adLoaded, true)
     }
+
+    //The zone's mount is the host's onStart/onStop, not the view going GONE and VISIBLE again.
+    //AdZonePresenterTest covers the presenter's side, this covers the path a host app actually takes
+    @Test
+    fun zoneMountsOnStartAndUnmountsOnStopRegardlessOfVisibility() {
+        val testListener = TestAaZoneViewListener()
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(testListener)
+        testAaZoneView.visibility = View.GONE
+        testAaZoneView.visibility = View.VISIBLE
+        EventClient.onPublishEvents()
+
+        assertEquals(
+            "The zone should have reported one mount and no unmount while it is still started",
+            listOf(AdEventTypes.ZONE_MOUNTED),
+            trackedZoneEventTypes()
+        )
+
+        testAaZoneView.onStop()
+        EventClient.onPublishEvents()
+
+        assertEquals(
+            "Stopping the zone should close out the mount exactly once",
+            listOf(AdEventTypes.ZONE_MOUNTED, AdEventTypes.ZONE_UNMOUNTED),
+            trackedZoneEventTypes()
+        )
+    }
+
+    private fun trackedZoneEventTypes() = TestEventAdapter.testAdEvents
+        .map { it.eventType }
+        .filter { it == AdEventTypes.ZONE_MOUNTED || it == AdEventTypes.ZONE_UNMOUNTED }
 
     @Test
     fun testOnAdClicked() {

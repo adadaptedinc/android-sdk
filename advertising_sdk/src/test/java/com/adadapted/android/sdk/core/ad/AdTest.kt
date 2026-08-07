@@ -21,6 +21,7 @@ import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.json.Json
 
 import org.junit.Before
 import org.junit.Test
@@ -57,6 +58,21 @@ class AdTest {
     fun verifyAdEventCreation() {
         val testAdEvent = AdEvent("adId", "zoneId", "impressionId", AdEventTypes.IMPRESSION)
         assertEquals("impressionId", testAdEvent.impressionId)
+    }
+
+    //The server reads snake_case keys. It resolves an ad event's zone from the impression id, so a
+    //camelCase zone key went unnoticed until zone events started shipping without an impression id
+    @Test
+    fun adEventIsSerializedWithTheKeysTheServerReads() {
+        val json = Json.encodeToString(
+            AdEvent.serializer(),
+            AdEvent.forZone("102691", AdEventTypes.ZONE_MOUNTED).copy(createdAt = 1)
+        )
+
+        assertEquals(
+            """{"ad_id":"","zone_id":"102691","impression_id":"","event_type":"zone_mounted","created_at":1}""",
+            json
+        )
     }
 
     @Test

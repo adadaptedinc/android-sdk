@@ -459,6 +459,56 @@ class AdZonePresenterTest {
         )
     }
 
+    //The zone's mount is the host's start/stop. It has to be reported for a zone that never gets an
+    //ad back, and going out of view and back is not a second mount
+    @Test
+    fun zoneMountsOnceOnStartAndUnmountsOnStopWithoutAnAd() {
+        startZoneThatNeverGetsAnAd()
+
+        testAdZonePresenter.onDetach() //Zone goes GONE
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener()) //And comes back VISIBLE
+        EventClient.onPublishEvents()
+
+        assertEquals("Going out of view and back should not report a second mount", 1, countOf(AdEventTypes.ZONE_MOUNTED))
+        assertEquals("Going out of view should not report the zone unmounted", 0, countOf(AdEventTypes.ZONE_UNMOUNTED))
+
+        testAdZonePresenter.onStop()
+        EventClient.onPublishEvents()
+
+        assertEquals("Stopping the zone should report it unmounted once", 1, countOf(AdEventTypes.ZONE_UNMOUNTED))
+        val zoneEvents = TestEventAdapter.testAdEvents.filter {
+            it.eventType == AdEventTypes.ZONE_MOUNTED || it.eventType == AdEventTypes.ZONE_UNMOUNTED
+        }
+        zoneEvents.forEach { event ->
+            assertEquals("mountedZoneId", event.zoneId)
+            assertTrue("${event.eventType} is a zone event and carries no ad", event.adId.isEmpty())
+            assertTrue("${event.eventType} is a zone event and carries no impression", event.impressionId.isEmpty())
+        }
+    }
+
+    //A zone stopped while it is out of view is already detached, and still has to report itself
+    //unmounted or its mount is never closed out
+    @Test
+    fun zoneStoppedWhileOutOfViewIsStillReportedUnmounted() {
+        startZoneThatNeverGetsAnAd()
+        testAdZonePresenter.onDetach() //Zone goes GONE and stays there
+        testAdZonePresenter.onStop()
+        EventClient.onPublishEvents()
+
+        assertEquals(1, countOf(AdEventTypes.ZONE_UNMOUNTED))
+    }
+
+    //The silent adapter leaves the zone unloaded, so it reports its own lifecycle with no ad and no
+    //zone timer running
+    private fun startZoneThatNeverGetsAnAd() {
+        AdClient.createInstance(SilentAdAdapter(), testTransporterScope)
+        testAdZonePresenter.init("mountedZoneId", mockWebView!!)
+        testAdZonePresenter.onStart(TestAdZonePresenterListener())
+    }
+
+    private fun countOf(eventType: String) =
+        TestEventAdapter.testAdEvents.count { it.eventType == eventType }
+
     @Test
     fun testNullListener() {
         testAdZonePresenter.init("testZoneId", mockWebView!!)

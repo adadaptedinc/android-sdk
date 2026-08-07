@@ -74,7 +74,7 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     }
 
     fun onStart() {
-        presenter.onAttach(this)
+        presenter.onStart(this)
     }
 
     fun onStart(listener: Listener) {
@@ -107,7 +107,7 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
 
     fun onStop() {
         zoneViewListener = null
-        presenter.onDetach()
+        presenter.onStop()
     }
 
     fun onStop(listener: AdContentListener) {

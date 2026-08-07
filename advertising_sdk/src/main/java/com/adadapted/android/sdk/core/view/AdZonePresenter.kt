@@ -24,6 +24,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
     private var isZoneVisible: Boolean = true
     private var adZonePresenterListener: AdZonePresenterListener? = null
     private var attached: Boolean
+    private var zoneMounted = false
     private var zoneContextId: String = ""
     private var zoneLoaded: Boolean
     private var currentAdZoneData: AdZoneData
@@ -39,6 +40,22 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
             this.zoneId = zoneId
         }
         this.webView = webView
+    }
+
+    fun onStart(adZonePresenterListener: AdZonePresenterListener?) {
+        if (!zoneMounted) {
+            zoneMounted = true
+            eventClient.trackZoneMounted(zoneId) //Reported for every zone, ad or not
+        }
+        onAttach(adZonePresenterListener)
+    }
+
+    fun onStop() {
+        onDetach()
+        if (zoneMounted) {
+            zoneMounted = false
+            eventClient.trackZoneUnmounted(zoneId)
+        }
     }
 
     fun onAttach(adZonePresenterListener: AdZonePresenterListener?) {
