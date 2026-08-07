@@ -39,7 +39,9 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -361,6 +363,44 @@ class AdZonePresenterTest {
         )
     }
 
+    //A no-fill is a valid response carrying an empty Ad, and the host app can only hide the zone if
+    //the refetch reports it the way the first fetch does.
+    @Test
+    fun refreshingIntoANoFillReportsTheZoneAsHavingNoAds() {
+        val servedRefreshSeconds = 30L
+        val noFillRefreshSeconds = 300L
+        val servedAd = Ad(id = "TestAdId", impressionId = "123", refreshTime = servedRefreshSeconds)
+        val noFillAdapter = NoFillAfterFirstAdAdapter(servedAd, Ad(refreshTime = noFillRefreshSeconds))
+        AdClient.createInstance(noFillAdapter, testTransporterScope)
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        val testListener = TestAdZonePresenterListener()
+        testAdZonePresenter.onAttach(testListener)
+        testAdZonePresenter.onAdDisplayed(servedAd, true)
+        assertTrue("The zone should start out reported as filled", testListener.testZoneData.hasAd())
+
+        advanceTimeBySeconds(servedRefreshSeconds + 1) //Refetch fires and comes back a no-fill
+
+        assertFalse(
+            "A no-fill on refresh should report the zone as having no ads instead of leaving the host app on the previous ad",
+            testListener.testZoneData.hasAd()
+        )
+
+        val requestsAfterNoFill = noFillAdapter.requestCount
+        advanceTimeBySeconds(SdkConfig.DEFAULT_AD_REFRESH_SECONDS + 1)
+        assertEquals(
+            "The no-fill's served refresh should back off the next fetch rather than polling on the default",
+            requestsAfterNoFill,
+            noFillAdapter.requestCount
+        )
+
+        advanceTimeBySeconds(noFillRefreshSeconds - SdkConfig.DEFAULT_AD_REFRESH_SECONDS)
+        assertEquals(
+            "Should have refetched once the no-fill's backoff elapsed",
+            requestsAfterNoFill + 1,
+            noFillAdapter.requestCount
+        )
+    }
+
     @Test
     fun zoneTimerWaitsForTheDefaultRefreshTimeWhenTheServerSuppliesNone() {
         val testAd = Ad(id = "TestAdId", impressionId = "123")
@@ -466,6 +506,22 @@ class FailAfterFirstAdAdapter(private val ad: Ad): AdAdapter {
         } else {
             listener.onAdLoadFailed()
         }
+    }
+}
+
+//Serves the Ad once and no-fills every fetch after it, the shape of a zone whose campaign ran out
+class NoFillAfterFirstAdAdapter(private val ad: Ad, private val noFill: Ad): AdAdapter {
+    var requestCount = 0
+
+    override suspend fun requestAd(
+        zoneId: String,
+        listener: ZoneAdListener,
+        storeId: String,
+        contextId: String,
+        extra: String
+    ) {
+        requestCount++
+        listener.onAdLoaded(AdZoneData(if (requestCount == 1) ad else noFill))
     }
 }
 

@@ -27,6 +27,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -59,6 +61,31 @@ class AaZoneViewTest {
         TestEventAdapter.cleanupEvents()
         DimensionConverter.createInstance(0f, mockDisplayMetrics)
         testAaZoneView = AaZoneView(testContext)
+    }
+
+    //A refreshed no-fill now reaches the view as onNoAdAvailable followed by onZoneAvailable
+    //carrying an empty zone. The host app only ever learns the zone went empty through the second
+    //of those, so it has to survive the blanking that precedes it rather than leaving the host on
+    //the ad that is no longer there. AdZonePresenterTest covers the presenter emitting the pair;
+    //this covers the view forwarding it.
+    @Test
+    fun aRefreshThatComesBackEmptyTellsTheHostAppTheZoneHasNoAds() {
+        val testListener = TestAaZoneViewListener()
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(testListener)
+        testAaZoneView.onZoneAvailable(AdZoneData(Ad("FilledAdId")))
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+        assertTrue("The zone should start out reported as filled", testListener.zoneHasAds)
+
+        testAaZoneView.onNoAdAvailable()
+        testAaZoneView.onZoneAvailable(AdZoneData(Ad(refreshTime = 300L)))
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+
+        assertFalse(
+            "A no-fill on refresh should reach the host app as onZoneHasAds(false) instead of leaving it on the previous ad",
+            testListener.zoneHasAds
+        )
+        assertFalse("A no-fill is not a loaded ad", testListener.adLoaded)
     }
 
     @Test

@@ -18,6 +18,7 @@ object HttpConnector {
         ignoreUnknownKeys = true
         isLenient = true
         prettyPrint = true
+        coerceInputValues = true
     }
 
     val client = HttpClient(Android.create()) {

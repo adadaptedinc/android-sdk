@@ -84,7 +84,12 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
             zoneId = zoneId,
             contextId = zoneContextId,
             listener = object : ZoneAdListener {
-                override fun onAdLoaded(adZoneData: AdZoneData) = handleAd(adZoneData.ad)
+                //Reported like the first fetch does, so a refresh that comes back a no-fill tells
+                //the host app the zone no longer has an ad to show
+                override fun onAdLoaded(adZoneData: AdZoneData) {
+                    updateCurrentZone(adZoneData)
+                    notifyZoneAvailable()
+                }
                 override fun onAdLoadFailed() = handleAd(clearedAdKeepingRefreshTime())
             })
     }
