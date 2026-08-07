@@ -15,15 +15,22 @@ data class AdEvent(
     val impressionId: String,
     @SerialName("event_type")
     val eventType: String,
+    @SerialName("event_name") //Optional server-side field. Left out of the payload entirely when null
+    val eventName: String? = null,
     @SerialName("created_at")
     val createdAt: Long = nowInSeconds()
 ) {
     companion object {
-        fun forAd(ad: Ad, eventType: String) =
-            AdEvent(ad.id, ad.zoneId, ad.impressionId, eventType)
+        fun forAd(ad: Ad, eventType: String, eventName: String? = null) =
+            AdEvent(ad.id, ad.zoneId, ad.impressionId, eventType, eventName)
 
-        //Zone lifecycle events belong to the zone itself, not to any ad served into it
-        fun forZone(zoneId: String, eventType: String) =
-            AdEvent(adId = "", zoneId = zoneId, impressionId = "", eventType = eventType)
+        fun forZone(zoneId: String, eventType: String, eventName: String? = null) =
+            AdEvent(
+                adId = "",
+                zoneId = zoneId,
+                impressionId = "",
+                eventType = eventType,
+                eventName = eventName
+            )
     }
 }

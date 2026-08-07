@@ -75,6 +75,21 @@ class AdTest {
         )
     }
 
+    //event_name is optional on the server, so an unnamed event must omit the key rather than send null
+    @Test
+    fun eventNameIsOnlySerializedWhenItIsSet() {
+        val json = Json.encodeToString(
+            AdEvent.serializer(),
+            AdEvent.forZone("102691", AdEventTypes.ZONE_MOUNTED, "mounted_on_launch")
+                .copy(createdAt = 1)
+        )
+
+        assertEquals(
+            """{"ad_id":"","zone_id":"102691","impression_id":"","event_type":"zone_mounted","event_name":"mounted_on_launch","created_at":1}""",
+            json
+        )
+    }
+
     @Test
     fun defaultAdIsCreated() {
         val mockAd = Ad()
