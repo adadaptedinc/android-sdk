@@ -16,6 +16,7 @@ import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.AdEvent
 import com.adadapted.android.sdk.core.event.AdEventTypes
 import com.adadapted.android.sdk.core.event.EventClient
+import com.adadapted.android.sdk.core.event.ZoneUnfilledReasons
 import com.adadapted.android.sdk.core.interfaces.AdAdapter
 import com.adadapted.android.sdk.core.interfaces.EventClientListener
 import com.adadapted.android.sdk.core.interfaces.ZoneAdListener
@@ -509,6 +510,93 @@ class AdZonePresenterTest {
     private fun countOf(eventType: String) =
         TestEventAdapter.testAdEvents.count { it.eventType == eventType }
 
+    //A zone that requested an ad and rendered nothing is unfilled, and the report carries the zone
+    //and the reason it ended up empty. There is no ad or impression to name
+    @Test
+    fun aNoFillReportsTheZoneUnfilledWithTheReasonAndNothingElse() {
+        testAdAdapter.setMockData(AdZoneData()) //The server answers fine with nothing to serve
+        testAdZonePresenter.init("unfilledZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        EventClient.onPublishEvents()
+
+        assertEquals(
+            "A visible zone that got no ad should report itself unfilled once",
+            1,
+            unfilledEvents().size
+        )
+        val unfilled = unfilledEvents().first()
+        assertEquals(ZoneUnfilledReasons.NO_AD, unfilled.eventName)
+        assertEquals("unfilledZoneId", unfilled.zoneId)
+        assertTrue("An unfilled zone has no ad to name", unfilled.adId.isEmpty())
+        assertTrue("An unfilled zone has no impression to name", unfilled.impressionId.isEmpty())
+    }
+
+    //A request that failed is a different problem from a server with nothing to serve, so the empty
+    //Ad the presenter falls back to must not report the same fetch a second time as a no-fill
+    @Test
+    fun aFailedRequestReportsRequestFailedInsteadOfNoAd() {
+        AdClient.createInstance(AlwaysFailingAdAdapter(), testTransporterScope)
+        testAdZonePresenter.init("unfilledZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        EventClient.onPublishEvents()
+
+        assertEquals(
+            "A failed fetch should report the zone unfilled once, naming the request",
+            listOf(ZoneUnfilledReasons.REQUEST_FAILED),
+            unfilledEvents().map { it.eventName }
+        )
+    }
+
+    //An ad the WebView cannot render leaves the zone as empty as one that was never served
+    @Test
+    fun anAdTheWebViewCannotRenderReportsRenderFailed() {
+        testAdZonePresenter.init("unfilledZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        testAdZonePresenter.onAdDisplayFailed()
+        EventClient.onPublishEvents()
+
+        assertEquals(
+            listOf(ZoneUnfilledReasons.RENDER_FAILED),
+            unfilledEvents().map { it.eventName }
+        )
+    }
+
+    //Off screen there is no missing ad for anyone to have seen, so there is nothing to report
+    @Test
+    fun aZoneThatIsNotVisibleDoesNotReportItselfUnfilled() {
+        AdClient.createInstance(SilentAdAdapter(), testTransporterScope)
+        testAdZonePresenter.init("unfilledZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        testAdZonePresenter.onAdVisibilityChanged(false) //Host app reports the zone out of view
+        testAdZonePresenter.onAdLoadFailed() //And the fetch it started comes back with nothing
+        EventClient.onPublishEvents()
+
+        assertEquals(emptyList<String>(), unfilledEvents().map { it.eventName })
+    }
+
+    //One report per fetch attempt, not one per zone. A zone that refetches into another no-fill is
+    //unfilled again, and a fetch that fails only reports the one time
+    @Test
+    fun everyFetchThatFillsNothingReportsItsOwnUnfilledEvent() {
+        testAdAdapter.setMockData(AdZoneData())
+        testAdZonePresenter.init("unfilledZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        EventClient.onPublishEvents() //Published between fetches, the two events are identical
+        assertEquals(1, unfilledEvents().size)
+
+        advanceTimeBySeconds(SdkConfig.DEFAULT_AD_REFRESH_SECONDS + 1) //Refetch, still a no-fill
+        EventClient.onPublishEvents()
+
+        assertEquals(
+            "The refetch that came back empty should report the zone unfilled again",
+            2,
+            unfilledEvents().size
+        )
+    }
+
+    private fun unfilledEvents() =
+        TestEventAdapter.testAdEvents.filter { it.eventType == AdEventTypes.ZONE_UNFILLED }
+
     @Test
     fun testNullListener() {
         testAdZonePresenter.init("testZoneId", mockWebView!!)
@@ -572,6 +660,19 @@ class NoFillAfterFirstAdAdapter(private val ad: Ad, private val noFill: Ad): AdA
     ) {
         requestCount++
         listener.onAdLoaded(AdZoneData(if (requestCount == 1) ad else noFill))
+    }
+}
+
+//Fails every fetch, the shape of a zone that cannot reach the server at all
+class AlwaysFailingAdAdapter: AdAdapter {
+    override suspend fun requestAd(
+        zoneId: String,
+        listener: ZoneAdListener,
+        storeId: String,
+        contextId: String,
+        extra: String
+    ) {
+        listener.onAdLoadFailed()
     }
 }
 

@@ -7,4 +7,5 @@ object AdEventTypes {
     const val POPUP_BEGIN = "popup_begin"
     const val ZONE_MOUNTED = "zone_mounted"
     const val ZONE_UNMOUNTED = "zone_unmounted"
+    const val ZONE_UNFILLED = "zone_unfilled"
 }

@@ -178,6 +178,13 @@ object EventClient {
         }
     }
 
+    fun trackZoneUnfilled(zoneId: String, reason: String) {
+        AALogger.logDebug("Zone Unfilled Tracked: $reason")
+        transporter.dispatchToThread {
+            fileEvent(AdEvent.forZone(zoneId, AdEventTypes.ZONE_UNFILLED, reason))
+        }
+    }
+
     fun trackRecipeContextEvent(contextId: String, zoneId: String) {
         val eventParams: MutableMap<String, String> = mutableMapOf()
         eventParams[RecipeSources.CONTEXT_ID] = contextId

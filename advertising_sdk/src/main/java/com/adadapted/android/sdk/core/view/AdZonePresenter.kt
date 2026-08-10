@@ -8,6 +8,7 @@ import com.adadapted.android.sdk.core.ad.AdContentPublisher
 import com.adadapted.android.sdk.core.ad.AdZoneData
 import com.adadapted.android.sdk.core.concurrency.Timer
 import com.adadapted.android.sdk.core.event.EventClient
+import com.adadapted.android.sdk.core.event.ZoneUnfilledReasons
 import com.adadapted.android.sdk.core.interfaces.ZoneAdListener
 import com.adadapted.android.sdk.core.log.AALogger
 
@@ -25,6 +26,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
     private var adZonePresenterListener: AdZonePresenterListener? = null
     private var attached: Boolean
     private var zoneMounted = false
+    private var unfilledReported = false
     private var zoneContextId: String = ""
     private var zoneLoaded: Boolean
     private var currentAdZoneData: AdZoneData
@@ -67,7 +69,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
             attached = true
             this.adZonePresenterListener = adZonePresenterListener
             if(currentAd.id.isEmpty()) { //First attach only
-                adClient.fetchNewAd(zoneId, contextId = zoneContextId, listener = this) //FIRST INITIAL CALL
+                fetchAd(this) //FIRST INITIAL CALL
             }
             startZoneTimer()
         }
@@ -97,18 +99,28 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
 
         completeCurrentAd()
 
-        adClient.fetchNewAd(
-            zoneId = zoneId,
-            contextId = zoneContextId,
-            listener = object : ZoneAdListener {
-                //Reported like the first fetch does, so a refresh that comes back a no-fill tells
-                //the host app the zone no longer has an ad to show
-                override fun onAdLoaded(adZoneData: AdZoneData) {
-                    updateCurrentZone(adZoneData)
-                    notifyZoneAvailable()
-                }
-                override fun onAdLoadFailed() = handleAd(clearedAdKeepingRefreshTime())
-            })
+        fetchAd(object : ZoneAdListener {
+            override fun onAdLoaded(adZoneData: AdZoneData) {
+                updateCurrentZone(adZoneData)
+                notifyZoneAvailable()
+            }
+
+            override fun onAdLoadFailed() {
+                reportZoneUnfilled(ZoneUnfilledReasons.REQUEST_FAILED)
+                handleAd(clearedAdKeepingRefreshTime())
+            }
+        })
+    }
+
+    private fun fetchAd(listener: ZoneAdListener) {
+        unfilledReported = false
+        adClient.fetchNewAd(zoneId = zoneId, contextId = zoneContextId, listener = listener)
+    }
+
+    private fun reportZoneUnfilled(reason: String) {
+        if (unfilledReported || !attached || !isZoneVisible) return
+        unfilledReported = true
+        eventClient.trackZoneUnfilled(zoneId, reason)
     }
 
     private fun handleAd(ad: Ad) {
@@ -121,6 +133,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
 
     private fun displayAd() {
         if (currentAd.isEmpty) {
+            reportZoneUnfilled(ZoneUnfilledReasons.NO_AD)
             notifyNoAdAvailable()
         } else {
             notifyAdAvailable(currentAd)
@@ -151,6 +164,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
 
     fun onAdDisplayFailed() {
         adStarted = true
+        reportZoneUnfilled(ZoneUnfilledReasons.RENDER_FAILED)
         currentAd = clearedAdKeepingRefreshTime()
         startZoneTimer()
     }
@@ -161,10 +175,6 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
         startZoneTimer()
     }
 
-    //Clears the Ad content but keeps the served refresh, which on a no-fill is the backoff the
-    //server asked for and is often the value the zone timer is first armed with. Also used when a
-    //refetch fails, so the zone does not fall back to the faster default against a server that
-    //asked to be hit less often.
     private fun clearedAdKeepingRefreshTime() = Ad(refreshTime = currentAd.refreshTime)
 
     fun onAdClicked(ad: Ad) {
@@ -288,6 +298,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
     }
 
     override fun onAdLoadFailed() {
+        reportZoneUnfilled(ZoneUnfilledReasons.REQUEST_FAILED)
         updateCurrentZone(AdZoneData())
         notifyNoAdAvailable()
     }
