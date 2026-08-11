@@ -22,6 +22,7 @@ data class Ad(
     val refreshTime: Long = NO_REFRESH_TIME
 ) {
     private var isImpressionTracked: Boolean = false
+    private var isImpressionEndTracked: Boolean = false
 
     val isEmpty: Boolean
         get() = id.isEmpty()
@@ -47,6 +48,14 @@ data class Ad(
 
     fun impressionWasTracked(): Boolean {
         return isImpressionTracked
+    }
+
+    fun setImpressionEndTracked() {
+        isImpressionEndTracked = true
+    }
+
+    fun impressionEndWasTracked(): Boolean {
+        return isImpressionEndTracked
     }
 
     val zoneId: String

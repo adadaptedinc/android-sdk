@@ -510,6 +510,107 @@ class AdZonePresenterTest {
     private fun countOf(eventType: String) =
         TestEventAdapter.testAdEvents.count { it.eventType == eventType }
 
+    //Dwell is end minus impression, so the end has to name the impression it closes out
+    @Test
+    fun anImpressionEndsWhenTheAdRotatesOutAndNamesTheImpressionItCloses() {
+        val servedAd = displayAVisibleAd()
+
+        advanceTimeBySeconds(SdkConfig.DEFAULT_AD_REFRESH_SECONDS + 1) //The ad rotates out
+        EventClient.onPublishEvents()
+
+        assertEquals(1, countOf(AdEventTypes.IMPRESSION_END))
+        val end = TestEventAdapter.testAdEvents.first { it.eventType == AdEventTypes.IMPRESSION_END }
+        assertEquals(servedAd.impressionId, end.impressionId)
+        assertEquals(servedAd.id, end.adId)
+    }
+
+    //A zone scrolling in and out of view is still the one impression, and dwell only closes once
+    @Test
+    fun anImpressionEndsOnceNoMatterHowOftenTheZoneIsHiddenAndShown() {
+        displayAVisibleAd()
+
+        val ends = impressionEndsFiledDuring {
+            testAdZonePresenter.onAdVisibilityChanged(false) //Scrolled out of view
+            testAdZonePresenter.onAdVisibilityChanged(true) //And back in
+            testAdZonePresenter.onAdVisibilityChanged(false) //And out again
+        }
+
+        assertEquals(1, ends)
+    }
+
+    @Test
+    fun anImpressionEndsOnceWhenTheZoneIsDetached() {
+        displayAVisibleAd()
+
+        val ends = impressionEndsFiledDuring {
+            testAdZonePresenter.onDetach() //Zone goes GONE
+            testAdZonePresenter.onAttach(TestAdZonePresenterListener()) //And comes back VISIBLE
+            testAdZonePresenter.onDetach()
+        }
+
+        assertEquals(1, ends)
+    }
+
+    //Where AaZoneView routes both the app being backgrounded and the view leaving the window, in
+    //neither case having gone through detach. AaZoneViewTest covers it reaching here
+    @Test
+    fun anImpressionEndsOnceWhenTheZoneEndsItOutsideOfDetach() {
+        displayAVisibleAd()
+
+        val ends = impressionEndsFiledDuring {
+            testAdZonePresenter.endImpression()
+            testAdZonePresenter.endImpression() //Backgrounded, resumed, and backgrounded again
+        }
+
+        assertEquals(1, ends)
+    }
+
+    private fun impressionEndsFiledDuring(block: () -> Unit): Int {
+        val counter = ImpressionEndCounter()
+        EventClient.addListener(counter)
+        block()
+        EventClient.removeListener(counter)
+        return counter.filed
+    }
+
+    //The end reports how long a rendered ad was on screen, and a click does not cut that short
+    @Test
+    fun aClickedAdStillEndsItsImpression() {
+        val servedAd = displayAVisibleAd()
+
+        testAdZonePresenter.onAdClicked(servedAd)
+        EventClient.onPublishEvents()
+
+        assertEquals(1, countOf(AdEventTypes.IMPRESSION_END))
+    }
+
+    //An ad the user never saw has no dwell to report, so there is nothing to end
+    @Test
+    fun anInvisibleImpressionNeverEnds() {
+        val servedAd = Ad(id = "TestAdId", impressionId = "testZoneId:456")
+        testAdAdapter.setMockData(AdZoneData(servedAd))
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        testAdZonePresenter.onAdDisplayed(servedAd, false) //Rendered while the zone was not visible
+
+        testAdZonePresenter.onDetach()
+        EventClient.onPublishEvents()
+
+        assertEquals(1, countOf(AdEventTypes.INVISIBLE_IMPRESSION))
+        assertEquals(0, countOf(AdEventTypes.IMPRESSION_END))
+    }
+
+    //The served Ad instance is the presenter's current ad, the same way the web view hands back the
+    //instance it was given
+    private fun displayAVisibleAd(): Ad {
+        val servedAd = Ad(id = "TestAdId", impressionId = "testZoneId:123")
+        testAdAdapter.setMockData(AdZoneData(servedAd))
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        testAdZonePresenter.onAdDisplayed(servedAd, true)
+        return servedAd
+    }
+
     //A zone that requested an ad and rendered nothing is unfilled, and the report carries the zone
     //and the reason it ended up empty. There is no ad or impression to name
     @Test
@@ -717,5 +818,16 @@ class TestAdEventClientListener: EventClientListener {
 
     override fun onAdEventTracked(event: AdEvent?) {
         testAdEvent = event
+    }
+}
+
+//Events are batched into a Set of AdEvents stamped in whole seconds, so a second end for the same
+//ad in the same second collapses into the first before anything is published. Counting them as
+//they are filed is what proves the event only fired once instead of the batch hiding that it did not
+class ImpressionEndCounter: EventClientListener {
+    var filed = 0
+
+    override fun onAdEventTracked(event: AdEvent?) {
+        if (event?.eventType == AdEventTypes.IMPRESSION_END) filed++
     }
 }

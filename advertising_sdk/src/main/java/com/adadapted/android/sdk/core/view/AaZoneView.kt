@@ -8,6 +8,9 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageButton
 import android.widget.RelativeLayout
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdContentListener
 import com.adadapted.android.sdk.core.ad.AdContentPublisher
@@ -32,6 +35,9 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     private var webViewLoaded = false
     private var isFixedAspectRatioEnabled = false
     private var fixedAspectPaddingOffset = 0
+    private val appBackgroundObserver = object : DefaultLifecycleObserver {
+        override fun onStop(owner: LifecycleOwner) = presenter.endImpression()
+    }
 
     constructor(context: Context) : super(context.applicationContext) {
         setup(context)
@@ -186,6 +192,17 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
 
     override fun onBlankAdInWebViewLoaded() {
         presenter.onBlankDisplayed()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        ProcessLifecycleOwner.get().lifecycle.addObserver(appBackgroundObserver)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        ProcessLifecycleOwner.get().lifecycle.removeObserver(appBackgroundObserver)
+        presenter.endImpression() //A zone taken out of the window is not showing an ad either
     }
 
     override fun onVisibilityChanged(changedView: View, visibility: Int) {

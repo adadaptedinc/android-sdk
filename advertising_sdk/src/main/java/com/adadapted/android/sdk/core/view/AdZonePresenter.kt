@@ -141,6 +141,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
     }
 
     private fun completeCurrentAd() {
+        endImpression() //Rotated out or detached, whichever got here first
         if (!currentAd.isEmpty && adStarted && !adCompleted) {
             if (!isZoneVisible && !currentAd.impressionWasTracked()) {
                 eventClient.trackInvisibleImpression(currentAd)
@@ -160,6 +161,7 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
         isZoneVisible = isAdVisible
         adZonePresenterListener?.onAdVisibilityChanged(currentAd)
         trackAdImpression(currentAd, isAdVisible)
+        if (!isAdVisible) endImpression()
     }
 
     fun onAdDisplayFailed() {
@@ -213,6 +215,10 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
         if (!isAdVisible || ad.impressionWasTracked() || ad.isEmpty || webView?.loaded == false) return
         callPixelTrackingJavaScript()
         eventClient.trackImpression(ad)
+    }
+
+    internal fun endImpression() {
+        eventClient.trackImpressionEnd(currentAd) //Only fires once, and only if a real impression was tracked
     }
 
     private fun callPixelTrackingJavaScript() {

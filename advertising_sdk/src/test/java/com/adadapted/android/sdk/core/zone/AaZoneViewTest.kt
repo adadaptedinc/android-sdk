@@ -1,13 +1,18 @@
 package com.adadapted.android.sdk.core.zone
 
+import android.app.Activity
 import android.os.Looper
 import android.util.DisplayMetrics
 import android.view.View
+import android.view.ViewGroup
+import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdContent
 import com.adadapted.android.sdk.core.ad.AdContentPublisher
+import com.adadapted.android.sdk.core.ad.AdClient
 import com.adadapted.android.sdk.core.ad.AdZoneData
 import com.adadapted.android.sdk.core.ad.TestAdContentListener
 import com.adadapted.android.sdk.core.atl.AddToListItem
@@ -18,6 +23,7 @@ import com.adadapted.android.sdk.core.event.EventClient
 import com.adadapted.android.sdk.core.payload.Payload
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.view.AaZoneView
+import com.adadapted.android.sdk.core.view.AdWebView
 import com.adadapted.android.sdk.core.view.DimensionConverter
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestEventAdapter
@@ -30,9 +36,11 @@ import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows
 import org.robolectric.annotation.Config
@@ -62,6 +70,13 @@ class AaZoneViewTest {
         TestEventAdapter.cleanupEvents()
         DimensionConverter.createInstance(0f, mockDisplayMetrics)
         testAaZoneView = AaZoneView(testContext)
+    }
+
+    @After
+    fun tearDown() {
+        //Zone timers run on Dispatchers.Main, which every test class rebinds to its own scheduler.
+        //A zone left running here fires ad requests against whichever adapter a later class installs
+        testAaZoneView.onStop()
     }
 
     //A refreshed no-fill now reaches the view as onNoAdAvailable followed by onZoneAvailable
@@ -265,6 +280,63 @@ class AaZoneViewTest {
     private fun trackedZoneEventTypes() = TestEventAdapter.testAdEvents
         .map { it.eventType }
         .filter { it == AdEventTypes.ZONE_MOUNTED || it == AdEventTypes.ZONE_UNMOUNTED }
+
+    //A zone can leave the hierarchy without ever going invisible or being stopped - a recycled row,
+    //a destroyed fragment view - and the impression it was showing has ended either way
+    @Test
+    fun aZoneTakenOutOfTheWindowEndsTheImpressionItWasShowing() {
+        val servedAd = Ad(id = "DetachedAdId", impressionId = "TestZoneId:789", refreshTime = 300L)
+        AdClient.createInstance(TestAdAdapter().apply { setMockData(AdZoneData(servedAd)) }, testTransporterScope)
+        val hostActivity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        hostActivity.setContentView(testAaZoneView)
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(TestAaZoneViewListener())
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+        markTheWebViewLoaded() //The impression only fires once the creative is up
+        testAaZoneView.onAdLoadedInWebView(servedAd)
+        EventClient.onPublishEvents()
+        assertEquals("The ad has to be impressed before detaching can end it", 1, countOf(AdEventTypes.IMPRESSION))
+
+        (testAaZoneView.parent as ViewGroup).removeView(testAaZoneView)
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+        EventClient.onPublishEvents()
+
+        assertEquals(1, countOf(AdEventTypes.IMPRESSION_END))
+    }
+
+    private fun markTheWebViewLoaded() {
+        val webViewField = AaZoneView::class.java.getDeclaredField("webView").apply { isAccessible = true }
+        (webViewField.get(testAaZoneView) as AdWebView).loaded = true
+    }
+
+    private fun countOf(eventType: String) =
+        TestEventAdapter.testAdEvents.count { it.eventType == eventType }
+
+    //A backgrounded app can only end its impressions through the process lifecycle, which outlives
+    //every zone. Observing it for exactly as long as the view is in a window is what keeps a zone
+    //the host app never stopped from being retained by it. AdZonePresenterTest covers the ending
+    @Test
+    fun aZoneObservesTheAppLifecycleOnlyWhileItIsInAWindow() {
+        val processLifecycle = ProcessLifecycleOwner.get().lifecycle as LifecycleRegistry
+        val hostActivity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val observersBeforeTheZone = processLifecycle.observerCount
+
+        hostActivity.setContentView(testAaZoneView)
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+        assertEquals(
+            "A zone in a window has to hear about the app being backgrounded",
+            observersBeforeTheZone + 1,
+            processLifecycle.observerCount
+        )
+
+        (testAaZoneView.parent as ViewGroup).removeView(testAaZoneView)
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+        assertEquals(
+            "A zone out of the window must not be left behind on the process lifecycle",
+            observersBeforeTheZone,
+            processLifecycle.observerCount
+        )
+    }
 
     @Test
     fun testOnAdClicked() {

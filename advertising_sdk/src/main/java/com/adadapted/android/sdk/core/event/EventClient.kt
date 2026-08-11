@@ -144,6 +144,16 @@ object EventClient {
         }
     }
 
+    @Synchronized
+    fun trackImpressionEnd(ad: Ad) {
+        if (!ad.impressionWasTracked() || ad.impressionEndWasTracked()) {
+            return
+        }
+        ad.setImpressionEndTracked()
+        AALogger.logDebug("Ad Impression End Tracked.")
+        fileEvent(AdEvent.forAd(ad, AdEventTypes.IMPRESSION_END))
+    }
+
     fun trackInvisibleImpression(ad: Ad) {
         AALogger.logDebug("Ad Invisible Impression Tracked.")
         transporter.dispatchToThread {

@@ -50,8 +50,13 @@ object SessionClient {
         trackEvent(if (isNewSession) EventStrings.SESSION_CREATED else EventStrings.SESSION_RESUMED)
     }
 
-    @Synchronized
     internal fun sessionBackgrounded() {
+        markBackgrounded()
+        EventClient.onPublishEvents()
+    }
+
+    @Synchronized
+    private fun markBackgrounded() {
         backgroundTime = nowInSeconds()
         trackEvent(EventStrings.SESSION_BACKGROUNDED)
     }
