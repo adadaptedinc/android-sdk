@@ -35,8 +35,9 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     private var webViewLoaded = false
     private var isFixedAspectRatioEnabled = false
     private var fixedAspectPaddingOffset = 0
-    private val appBackgroundObserver = object : DefaultLifecycleObserver {
-        override fun onStop(owner: LifecycleOwner) = presenter.endImpression()
+    private val appLifecycleObserver = object : DefaultLifecycleObserver {
+        override fun onStart(owner: LifecycleOwner) = presenter.onAppForegrounded()
+        override fun onStop(owner: LifecycleOwner) = presenter.onAppBackgrounded()
     }
 
     constructor(context: Context) : super(context.applicationContext) {
@@ -196,13 +197,14 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        ProcessLifecycleOwner.get().lifecycle.addObserver(appBackgroundObserver)
+        presenter.onEnteredWindow()
+        ProcessLifecycleOwner.get().lifecycle.addObserver(appLifecycleObserver)
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        ProcessLifecycleOwner.get().lifecycle.removeObserver(appBackgroundObserver)
-        presenter.endImpression() //A zone taken out of the window is not showing an ad either
+        ProcessLifecycleOwner.get().lifecycle.removeObserver(appLifecycleObserver)
+        presenter.onExitedWindow()
     }
 
     override fun onVisibilityChanged(changedView: View, visibility: Int) {

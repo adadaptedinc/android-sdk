@@ -154,13 +154,6 @@ object EventClient {
         fileEvent(AdEvent.forAd(ad, AdEventTypes.IMPRESSION_END))
     }
 
-    fun trackInvisibleImpression(ad: Ad) {
-        AALogger.logDebug("Ad Invisible Impression Tracked.")
-        transporter.dispatchToThread {
-            fileEvent(AdEvent.forAd(ad, AdEventTypes.INVISIBLE_IMPRESSION))
-        }
-    }
-
     fun trackInteraction(ad: Ad) {
         AALogger.logDebug("Ad Interaction Tracked.")
         transporter.dispatchToThread {

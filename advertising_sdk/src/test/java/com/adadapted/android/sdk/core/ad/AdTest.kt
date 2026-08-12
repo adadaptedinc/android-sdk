@@ -44,12 +44,10 @@ class AdTest {
     fun verifyAdEventStructure() {
         val adEventTypes = AdEventTypes
         val adEventImp = adEventTypes.IMPRESSION
-        val adEventInv = adEventTypes.INVISIBLE_IMPRESSION
         val adEventInt = adEventTypes.INTERACTION
         val adEventPop = adEventTypes.POPUP_BEGIN
 
         assertEquals(AdEventTypes.IMPRESSION, adEventImp)
-        assertEquals(AdEventTypes.INVISIBLE_IMPRESSION, adEventInv)
         assertEquals(AdEventTypes.INTERACTION, adEventInt)
         assertEquals(AdEventTypes.POPUP_BEGIN, adEventPop)
     }

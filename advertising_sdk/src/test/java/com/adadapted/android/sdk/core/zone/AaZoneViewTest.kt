@@ -44,6 +44,7 @@ import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows
 import org.robolectric.annotation.Config
+import java.util.concurrent.TimeUnit
 import kotlin.intArrayOf
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -302,6 +303,32 @@ class AaZoneViewTest {
         EventClient.onPublishEvents()
 
         assertEquals(1, countOf(AdEventTypes.IMPRESSION_END))
+    }
+
+    //And a zone out of the hierarchy is not one to keep fetching ads for either. AdZonePresenterTest
+    //covers the freezing and the return, this covers the view routing the window callback into it
+    @Test
+    fun aZoneTakenOutOfTheWindowStopsFetchingAds() {
+        val servedRefreshSeconds = 300L
+        val servedAd = Ad(id = "RecycledAdId", impressionId = "TestZoneId:789", refreshTime = servedRefreshSeconds)
+        val testAdAdapter = TestAdAdapter().apply { setMockData(AdZoneData(servedAd)) }
+        AdClient.createInstance(testAdAdapter, testTransporterScope)
+        val hostActivity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        hostActivity.setContentView(testAaZoneView)
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(TestAaZoneViewListener())
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+        val requestsBeforeLeavingTheWindow = testAdAdapter.requestCount
+
+        (testAaZoneView.parent as ViewGroup).removeView(testAaZoneView)
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+        testTransporter.scheduler.advanceTimeBy(TimeUnit.SECONDS.toMillis(servedRefreshSeconds + 1))
+
+        assertEquals(
+            "A zone out of the window should not have refreshed onto another ad",
+            requestsBeforeLeavingTheWindow,
+            testAdAdapter.requestCount
+        )
     }
 
     private fun markTheWebViewLoaded() {

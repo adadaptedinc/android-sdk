@@ -63,6 +63,7 @@ class AdZonePresenterTest {
     private val testTransporterScope: TransporterCoroutineScope = TestTransporter(testTransporter)
     private var mockWebView: AdWebView? = null
     private var testAdAdapter: TestAdAdapter = TestAdAdapter()
+    private var fakeClockSeconds = 0L //The presenter's wall clock, advanced alongside the virtual one
 
     @Before
     fun setup() {
@@ -109,7 +110,8 @@ class AdZonePresenterTest {
                 .resume()
                 .get()
 
-        testAdZonePresenter = AdZonePresenter(AdViewHandler(testContext), AdClient)
+        fakeClockSeconds = 0L
+        testAdZonePresenter = AdZonePresenter(AdViewHandler(testContext), AdClient) { fakeClockSeconds }
     }
 
     @After
@@ -119,9 +121,12 @@ class AdZonePresenterTest {
         testAdZonePresenter.onDetach()
     }
 
-    //The virtual clock runs in milliseconds, the refresh times under test are in seconds
-    private fun advanceTimeBySeconds(seconds: Long) =
+    //The virtual clock runs in milliseconds, the refresh times under test are in seconds. Both
+    //clocks move together, so time spent frozen still counts against the ad's age
+    private fun advanceTimeBySeconds(seconds: Long) {
+        fakeClockSeconds += seconds
         testTransporter.scheduler.advanceTimeBy(TimeUnit.SECONDS.toMillis(seconds))
+    }
 
     @Test
     fun testOnAttach() {
@@ -169,26 +174,6 @@ class AdZonePresenterTest {
         testAdZonePresenter.onAdDisplayed(Ad("TestAdId"), false)
 
         assert(testAdEventListener.testAdEvent == null)
-    }
-
-    @Test
-    fun testOnAdCompletedButZoneNotVisible() {
-        testAdZonePresenter.init("testZoneId", mockWebView!!)
-        val testAd = Ad(id = "TestAdId")
-        val testAdEventListener = TestAdEventClientListener()
-        EventClient.addListener(testAdEventListener)
-        testAdZonePresenter.onAdDisplayed(testAd, false)
-        testAdZonePresenter.onAttach(object : AdZonePresenterListener{
-            override fun onZoneAvailable(adZoneData: AdZoneData) {}
-            override fun onAdAvailable(ad: Ad) {}
-            override fun onNoAdAvailable() {}
-            override fun onAdVisibilityChanged(ad: Ad) {}
-        })
-        testAdZonePresenter.onAdClicked(testAd)
-        testAdZonePresenter.onAdDisplayed(testAd, false)
-        testAdZonePresenter.onAdClicked(testAd)
-
-        assertEquals(AdEventTypes.INVISIBLE_IMPRESSION, testAdEventListener.testAdEvent?.eventType)
     }
 
     @Test
@@ -460,6 +445,104 @@ class AdZonePresenterTest {
         )
     }
 
+    //A zone nobody can see has no reason to keep burning through ads, and the time it spent off
+    //screen is not time the ad it was holding was ever shown. Every way a zone leaves the screen -
+    //hidden by the host, the app backgrounded, the row recycled - freezes the same countdown
+    @Test
+    fun aZoneScrolledOutOfViewFreezesItsRefreshAndPicksUpTheTimeItHadLeft() =
+        assertTheRefreshFreezesAndPicksBackUp(
+            freeze = { testAdZonePresenter.onAdVisibilityChanged(false) },
+            unfreeze = { testAdZonePresenter.onAdVisibilityChanged(true) }
+        )
+
+    @Test
+    fun aBackgroundedAppFreezesItsRefreshAndPicksUpTheTimeItHadLeft() =
+        assertTheRefreshFreezesAndPicksBackUp(
+            freeze = { testAdZonePresenter.onAppBackgrounded() },
+            unfreeze = { testAdZonePresenter.onAppForegrounded() }
+        )
+
+    @Test
+    fun aZoneTakenOutOfTheWindowFreezesItsRefreshAndPicksUpTheTimeItHadLeft() =
+        assertTheRefreshFreezesAndPicksBackUp(
+            freeze = { testAdZonePresenter.onExitedWindow() },
+            unfreeze = { testAdZonePresenter.onEnteredWindow() }
+        )
+
+    private fun assertTheRefreshFreezesAndPicksBackUp(freeze: () -> Unit, unfreeze: () -> Unit) {
+        val servedRefreshSeconds = 300L
+        displayAVisibleAd(servedRefreshSeconds)
+        val requestsBeforeFreezing = testAdAdapter.requestCount
+
+        advanceTimeBySeconds(100) //100s of the refresh spent on screen, 200 left
+        freeze()
+        advanceTimeBySeconds(150)
+        assertEquals(
+            "A zone off screen should not have refreshed or fetched anything",
+            requestsBeforeFreezing,
+            testAdAdapter.requestCount
+        )
+
+        unfreeze()
+        advanceTimeBySeconds(servedRefreshSeconds - 100 - 1)
+        assertEquals(
+            "Coming back should pick the countdown up where it froze, not restart it",
+            requestsBeforeFreezing,
+            testAdAdapter.requestCount
+        )
+
+        advanceTimeBySeconds(2)
+        assertEquals(
+            "Should have refreshed once the time the countdown had left ran out",
+            requestsBeforeFreezing + 1,
+            testAdAdapter.requestCount
+        )
+    }
+
+    //An ad that sat off screen longer than it was ever meant to be shown is stale, and resuming it
+    //for its leftover seconds would show an ad the server has since moved on from. Every way back
+    //on screen resumes through the same check, so one of them covers it
+    @Test
+    fun aZoneComingBackToAnAdOlderThanItsRefreshTimeRefetchesImmediately() {
+        displayAVisibleAd(refreshSeconds = 30L)
+        val requestsBeforeHiding = testAdAdapter.requestCount
+
+        advanceTimeBySeconds(10)
+        testAdZonePresenter.onAdVisibilityChanged(false)
+        advanceTimeBySeconds(100) //Well past the ad's own refresh time
+        assertEquals(
+            "A zone off screen should not have refetched on its own",
+            requestsBeforeHiding,
+            testAdAdapter.requestCount
+        )
+
+        testAdZonePresenter.onAdVisibilityChanged(true)
+
+        assertEquals(
+            "An ad older than its refresh time should be refetched as soon as the zone is back",
+            requestsBeforeHiding + 1,
+            testAdAdapter.requestCount
+        )
+    }
+
+    //Backgrounding an app whose zone is also out of view must not arm anything on the way back in
+    @Test
+    fun aZoneOutOfViewStaysFrozenWhenTheAppComesBackToTheForeground() {
+        displayAVisibleAd(refreshSeconds = 300L)
+        val requestsBeforeHiding = testAdAdapter.requestCount
+
+        testAdZonePresenter.onAdVisibilityChanged(false)
+        testAdZonePresenter.onAppBackgrounded()
+        testAdZonePresenter.onAppForegrounded()
+        advanceTimeBySeconds(301)
+
+        assertEquals(
+            "A zone still out of view should stay frozen no matter what the app does",
+            requestsBeforeHiding,
+            testAdAdapter.requestCount
+        )
+    }
+
     //The zone's mount is the host's start/stop. It has to be reported for a zone that never gets an
     //ad back, and going out of view and back is not a second mount
     @Test
@@ -584,9 +667,9 @@ class AdZonePresenterTest {
         assertEquals(1, countOf(AdEventTypes.IMPRESSION_END))
     }
 
-    //An ad the user never saw has no dwell to report, so there is nothing to end
+    //An ad the user never saw is not an impression, so there is nothing to report and nothing to end
     @Test
-    fun anInvisibleImpressionNeverEnds() {
+    fun anAdRenderedWhileTheZoneIsNotVisibleReportsNoImpressionAtAll() {
         val servedAd = Ad(id = "TestAdId", impressionId = "testZoneId:456")
         testAdAdapter.setMockData(AdZoneData(servedAd))
         testAdZonePresenter.init("testZoneId", mockWebView!!)
@@ -596,14 +679,14 @@ class AdZonePresenterTest {
         testAdZonePresenter.onDetach()
         EventClient.onPublishEvents()
 
-        assertEquals(1, countOf(AdEventTypes.INVISIBLE_IMPRESSION))
+        assertEquals(0, countOf(AdEventTypes.IMPRESSION))
         assertEquals(0, countOf(AdEventTypes.IMPRESSION_END))
     }
 
     //The served Ad instance is the presenter's current ad, the same way the web view hands back the
     //instance it was given
-    private fun displayAVisibleAd(): Ad {
-        val servedAd = Ad(id = "TestAdId", impressionId = "testZoneId:123")
+    private fun displayAVisibleAd(refreshSeconds: Long = Ad.NO_REFRESH_TIME): Ad {
+        val servedAd = Ad(id = "TestAdId", impressionId = "testZoneId:123", refreshTime = refreshSeconds)
         testAdAdapter.setMockData(AdZoneData(servedAd))
         testAdZonePresenter.init("testZoneId", mockWebView!!)
         testAdZonePresenter.onAttach(TestAdZonePresenterListener())
