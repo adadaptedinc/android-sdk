@@ -150,7 +150,7 @@ class AdZonePresenter(
     }
 
     private fun reportZoneUnfilled(reason: String) {
-        if (unfilledReported || !attached || !isZoneVisible) return
+        if (unfilledReported || !zoneIsOnScreen()) return
         unfilledReported = true
         eventClient.trackZoneUnfilled(zoneId, reason)
     }
@@ -248,8 +248,9 @@ class AdZonePresenter(
         AALogger.logDebug("Pixel Tracking Called.")
     }
 
-    //The countdown only runs while the zone is on screen in a foregrounded app
-    private fun canRunTimer() = attached && isZoneVisible && isAppInForeground && isInWindow
+    //A zone is only in front of someone while it is attached and visible, in the window, and the app
+    //is in the foreground. The countdown and the no-fill report both hang off that
+    private fun zoneIsOnScreen() = attached && isZoneVisible && isAppInForeground && isInWindow
 
     //Arms the countdown fresh from the current Ad's refresh time
     private fun restartTimer() {
@@ -274,7 +275,7 @@ class AdZonePresenter(
     //An Ad that outlived its own refresh time while the countdown was frozen is refetched instead
     //of being shown for the leftover time it never spent on screen
     private fun resumeTimer() {
-        if (timerRunning || !canRunTimer()) return
+        if (timerRunning || !zoneIsOnScreen()) return
         if (zoneLoaded && now() - adFetchedAt >= currentAd.refreshTimeOrDefault) {
             getNextAd()
         } else {
@@ -283,7 +284,7 @@ class AdZonePresenter(
     }
 
     private fun startTimer() {
-        if (!zoneLoaded || timerRunning || !canRunTimer()) return
+        if (!zoneLoaded || timerRunning || !zoneIsOnScreen()) return
         AALogger.logDebug("Zone timer starting with ${secondsLeftOnRefresh}s left of a ${currentAd.refreshTimeOrDefault}s refresh")
         timerRunning = true
         countdownResumedAt = now()

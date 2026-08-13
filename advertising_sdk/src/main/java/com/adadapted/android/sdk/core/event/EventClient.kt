@@ -151,7 +151,9 @@ object EventClient {
         }
         ad.setImpressionEndTracked()
         AALogger.logDebug("Ad Impression End Tracked.")
-        fileEvent(AdEvent.forAd(ad, AdEventTypes.IMPRESSION_END))
+        transporter.dispatchToThread {
+            fileEvent(AdEvent.forAd(ad, AdEventTypes.IMPRESSION_END))
+        }
     }
 
     fun trackInteraction(ad: Ad) {

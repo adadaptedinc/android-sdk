@@ -758,6 +758,24 @@ class AdZonePresenterTest {
         assertEquals(emptyList<String>(), unfilledEvents().map { it.eventName })
     }
 
+    //A backgrounded app and a zone out of the window are as unseen as one scrolled out of view, and
+    //the fetch each one started can still land afterwards
+    @Test
+    fun aZoneNobodyCanSeeDoesNotReportItselfUnfilled() {
+        AdClient.createInstance(SilentAdAdapter(), testTransporterScope)
+        testAdZonePresenter.init("unfilledZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+
+        testAdZonePresenter.onAppBackgrounded()
+        testAdZonePresenter.onAdLoadFailed() //The fetch comes back to a backgrounded app
+        testAdZonePresenter.onAppForegrounded()
+        testAdZonePresenter.onExitedWindow()
+        testAdZonePresenter.onAdLoadFailed() //And again with the zone out of the window
+        EventClient.onPublishEvents()
+
+        assertEquals(emptyList<String>(), unfilledEvents().map { it.eventName })
+    }
+
     //One report per fetch attempt, not one per zone. A zone that refetches into another no-fill is
     //unfilled again, and a fetch that fails only reports the one time
     @Test
