@@ -570,6 +570,26 @@ class AdZonePresenterTest {
         }
     }
 
+    //init() and onStart() are two separate calls on the host's side with nothing ordering them. A
+    //zone event carries no impression_id, so a mount reported with an empty zone_id is a row the
+    //server cannot attribute to anything - better to report nothing and say so in the log
+    @Test
+    fun aZoneStartedBeforeItIsInitialisedReportsNothingAndStillMountsOnceItHasAnId() {
+        testAdZonePresenter.onStart(TestAdZonePresenterListener()) //No init() yet
+        testAdZonePresenter.onStop()
+        EventClient.onPublishEvents()
+
+        assertEquals(0, countOf(AdEventTypes.ZONE_MOUNTED))
+        assertEquals("An unmount cannot fire for a mount that never did", 0, countOf(AdEventTypes.ZONE_UNMOUNTED))
+
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onStart(TestAdZonePresenterListener())
+        EventClient.onPublishEvents()
+
+        assertEquals(1, countOf(AdEventTypes.ZONE_MOUNTED))
+        assertEquals("testZoneId", TestEventAdapter.testAdEvents.first { it.eventType == AdEventTypes.ZONE_MOUNTED }.zoneId)
+    }
+
     //A zone stopped while it is out of view is already detached, and still has to report itself
     //unmounted or its mount is never closed out
     @Test
@@ -605,6 +625,19 @@ class AdZonePresenterTest {
         val end = TestEventAdapter.testAdEvents.first { it.eventType == AdEventTypes.IMPRESSION_END }
         assertEquals(servedAd.impressionId, end.impressionId)
         assertEquals(servedAd.id, end.adId)
+    }
+
+    //Android can freeze the process the moment the app backgrounds, so the publish timer may never
+    //tick again. The end backgrounding produces has to reach the adapter without waiting for one
+    @Test
+    fun theEndAnAppBackgroundingProducesIsPublishedWithoutWaitingForTheNextTick() {
+        val servedAd = displayAVisibleAd()
+
+        testAdZonePresenter.onAppBackgrounded() //No publish tick and no onPublishEvents() after this
+
+        assertEquals(1, countOf(AdEventTypes.IMPRESSION_END))
+        val end = TestEventAdapter.testAdEvents.first { it.eventType == AdEventTypes.IMPRESSION_END }
+        assertEquals(servedAd.impressionId, end.impressionId)
     }
 
     //A zone scrolling in and out of view is still the one impression, and dwell only closes once

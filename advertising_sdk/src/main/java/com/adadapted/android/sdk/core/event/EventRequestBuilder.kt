@@ -3,14 +3,14 @@ package com.adadapted.android.sdk.core.event
 import com.adadapted.android.sdk.core.device.DeviceInfo
 
 object EventRequestBuilder {
-    fun buildAdEventRequest(sessionId: String, deviceInfo: DeviceInfo, adEvents: Set<AdEvent>): AdEventRequest {
+    fun buildAdEventRequest(sessionId: String, deviceInfo: DeviceInfo, adEvents: List<AdEvent>): AdEventRequest {
         deviceInfo.run {
             return AdEventRequest(
                 sessionId,
                 deviceInfo.appId,
                 deviceInfo.udid,
                 deviceInfo.sdkVersion,
-                adEvents.toList()
+                adEvents
             )
         }
     }

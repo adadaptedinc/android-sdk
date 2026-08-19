@@ -42,20 +42,23 @@ data class Ad(
         return AdContent.createAddToListContent(this)
     }
 
+    @Synchronized
     fun setImpressionTracked() {
         isImpressionTracked = true
     }
 
+    @Synchronized
     fun impressionWasTracked(): Boolean {
         return isImpressionTracked
     }
 
-    fun setImpressionEndTracked() {
+    @Synchronized
+    fun claimImpressionEnd(): Boolean {
+        if (!isImpressionTracked || isImpressionEndTracked) {
+            return false
+        }
         isImpressionEndTracked = true
-    }
-
-    fun impressionEndWasTracked(): Boolean {
-        return isImpressionEndTracked
+        return true
     }
 
     val zoneId: String

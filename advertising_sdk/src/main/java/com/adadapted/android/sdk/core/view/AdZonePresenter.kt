@@ -7,11 +7,12 @@ import com.adadapted.android.sdk.core.ad.AdClient
 import com.adadapted.android.sdk.core.ad.AdContentPublisher
 import com.adadapted.android.sdk.core.ad.AdZoneData
 import com.adadapted.android.sdk.core.concurrency.Timer
-import com.adadapted.android.sdk.core.concurrency.nowInSeconds
+import com.adadapted.android.sdk.core.concurrency.uptimeSeconds
 import com.adadapted.android.sdk.core.event.EventClient
 import com.adadapted.android.sdk.core.event.ZoneUnfilledReasons
 import com.adadapted.android.sdk.core.interfaces.ZoneAdListener
 import com.adadapted.android.sdk.core.log.AALogger
+import kotlin.jvm.Synchronized
 
 interface AdZonePresenterListener {
     fun onZoneAvailable(adZoneData: AdZoneData)
@@ -23,19 +24,19 @@ interface AdZonePresenterListener {
 class AdZonePresenter(
     private val adViewHandler: AdViewHandler,
     private val adClient: AdClient,
-    private val now: () -> Long = ::nowInSeconds
+    private val now: () -> Long = ::uptimeSeconds //The countdown's own clock, not the wall clock
 ) : ZoneAdListener {
-    private var currentAd: Ad = Ad()
+    @Volatile private var currentAd: Ad = Ad()
     private var zoneId: String = ""
-    private var isZoneVisible: Boolean = true
-    private var isAppInForeground: Boolean = true
-    private var isInWindow: Boolean = true
+    @Volatile private var isZoneVisible: Boolean = true
+    @Volatile private var isAppInForeground: Boolean = true
+    @Volatile private var isInWindow: Boolean = true
     private var adZonePresenterListener: AdZonePresenterListener? = null
-    private var attached: Boolean
+    @Volatile private var attached: Boolean
     private var zoneMounted = false
     private var unfilledReported = false
     private var zoneContextId: String = ""
-    private var zoneLoaded: Boolean
+    @Volatile private var zoneLoaded: Boolean
     private var currentAdZoneData: AdZoneData
     private var adFetchedAt: Long = 0
     private var secondsLeftOnRefresh: Long = 0
@@ -54,8 +55,12 @@ class AdZonePresenter(
 
     fun onStart(adZonePresenterListener: AdZonePresenterListener?) {
         if (!zoneMounted) {
-            zoneMounted = true
-            eventClient.trackZoneMounted(zoneId) //Reported for every zone, ad or not
+            if (zoneId.isEmpty()) {
+                AALogger.logError("AdZoneId is empty. Was onStart() called before init()?")
+            } else {
+                zoneMounted = true
+                eventClient.trackZoneMounted(zoneId)
+            }
         }
         onAttach(adZonePresenterListener)
     }
@@ -99,7 +104,7 @@ class AdZonePresenter(
 
     fun onAppBackgrounded() {
         isAppInForeground = false
-        endImpression()
+        endImpression(publishNow = true) //The process can be frozen before the next publish tick
         pauseTimer()
     }
 
@@ -108,8 +113,6 @@ class AdZonePresenter(
         resumeTimer()
     }
 
-    //A zone can leave the hierarchy without ever going invisible or being stopped - a recycled row,
-    //a destroyed fragment view - and it is showing an ad to no one either way
     fun onExitedWindow() {
         isInWindow = false
         endImpression()
@@ -239,8 +242,13 @@ class AdZonePresenter(
         eventClient.trackImpression(ad)
     }
 
-    internal fun endImpression() {
-        eventClient.trackImpressionEnd(currentAd) //Only fires once, and only if a real impression was tracked
+    internal fun endImpression(publishNow: Boolean = false) {
+        //Only fires once, and only if a real impression was tracked
+        if (publishNow) {
+            eventClient.trackImpressionEndAndPublish(currentAd)
+        } else {
+            eventClient.trackImpressionEnd(currentAd)
+        }
     }
 
     private fun callPixelTrackingJavaScript() {
@@ -252,7 +260,9 @@ class AdZonePresenter(
     //is in the foreground. The countdown and the no-fill report both hang off that
     private fun zoneIsOnScreen() = attached && isZoneVisible && isAppInForeground && isInWindow
 
+
     //Arms the countdown fresh from the current Ad's refresh time
+    @Synchronized
     private fun restartTimer() {
         cancelTimer()
         adFetchedAt = now()
@@ -265,6 +275,7 @@ class AdZonePresenter(
 
     //Freezes what is left of the countdown, so a zone off screen or an app in the background
     //neither refreshes nor fetches
+    @Synchronized
     private fun pauseTimer() {
         if (!timerRunning) return
         secondsLeftOnRefresh = (secondsLeftOnRefresh - (now() - countdownResumedAt)).coerceAtLeast(0)
@@ -274,6 +285,7 @@ class AdZonePresenter(
 
     //An Ad that outlived its own refresh time while the countdown was frozen is refetched instead
     //of being shown for the leftover time it never spent on screen
+    @Synchronized
     private fun resumeTimer() {
         if (timerRunning || !zoneIsOnScreen()) return
         if (zoneLoaded && now() - adFetchedAt >= currentAd.refreshTimeOrDefault) {

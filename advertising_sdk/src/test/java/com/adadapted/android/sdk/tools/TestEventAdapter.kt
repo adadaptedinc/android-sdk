@@ -20,7 +20,7 @@ object TestEventAdapter: EventAdapter {
     override suspend fun publishAdEvents(
         sessionId: String,
         deviceInfo: DeviceInfo,
-        adEvents: Set<AdEvent>
+        adEvents: List<AdEvent>
     ) {
         testAdEvents.addAll(adEvents)
     }
