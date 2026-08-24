@@ -21,6 +21,7 @@ import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.json.Json
 
 import org.junit.Before
 import org.junit.Test
@@ -43,12 +44,10 @@ class AdTest {
     fun verifyAdEventStructure() {
         val adEventTypes = AdEventTypes
         val adEventImp = adEventTypes.IMPRESSION
-        val adEventInv = adEventTypes.INVISIBLE_IMPRESSION
         val adEventInt = adEventTypes.INTERACTION
         val adEventPop = adEventTypes.POPUP_BEGIN
 
         assertEquals(AdEventTypes.IMPRESSION, adEventImp)
-        assertEquals(AdEventTypes.INVISIBLE_IMPRESSION, adEventInv)
         assertEquals(AdEventTypes.INTERACTION, adEventInt)
         assertEquals(AdEventTypes.POPUP_BEGIN, adEventPop)
     }
@@ -57,6 +56,51 @@ class AdTest {
     fun verifyAdEventCreation() {
         val testAdEvent = AdEvent("adId", "zoneId", "impressionId", AdEventTypes.IMPRESSION)
         assertEquals("impressionId", testAdEvent.impressionId)
+    }
+
+    //The server reads snake_case keys. It resolves an ad event's zone from the impression id, so a
+    //camelCase zone key went unnoticed until zone events started shipping without an impression id
+    @Test
+    fun adEventIsSerializedWithTheKeysTheServerReads() {
+        val json = Json.encodeToString(
+            AdEvent.serializer(),
+            AdEvent.forZone("102691", AdEventTypes.ZONE_MOUNTED).copy(createdAt = 1)
+        )
+
+        assertEquals(
+            """{"ad_id":"","zone_id":"102691","impression_id":"","event_type":"zone_mounted","created_at":1}""",
+            json
+        )
+    }
+
+    //event_name is optional on the server, so an unnamed event must omit the key rather than send null
+    @Test
+    fun eventNameIsOnlySerializedWhenItIsSet() {
+        val json = Json.encodeToString(
+            AdEvent.serializer(),
+            AdEvent.forZone("102691", AdEventTypes.ZONE_MOUNTED, "mounted_on_launch")
+                .copy(createdAt = 1)
+        )
+
+        assertEquals(
+            """{"ad_id":"","zone_id":"102691","impression_id":"","event_type":"zone_mounted","event_name":"mounted_on_launch","created_at":1}""",
+            json
+        )
+    }
+
+    //An event's timestamp is the only thing the server can order or measure dwell from, and a
+    //default-valued property is compared against a freshly evaluated nowInSeconds() at encode time -
+    //so without @EncodeDefault an event published in the second it was filed ships without one
+    @Test
+    fun createdAtSurvivesBeingSerializedInTheSecondTheEventWasFiled() {
+        val event = AdEvent.forZone("102691", AdEventTypes.ZONE_MOUNTED)
+
+        val json = Json.encodeToString(AdEvent.serializer(), event)
+
+        assertEquals(
+            """{"ad_id":"","zone_id":"102691","impression_id":"","event_type":"zone_mounted","created_at":${event.createdAt}}""",
+            json
+        )
     }
 
     @Test

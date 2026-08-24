@@ -62,6 +62,18 @@ class NewSessionClientTest {
         assertEquals(initialSessionId, SessionClient.getSessionId()) // Session ID should remain unchanged
     }
 
+    //A process is usually killed from the background. Anything still batched when that happens is
+    //lost, so backgrounding has to push what it has instead of waiting out the publish timer
+    @Test
+    fun `backgrounding publishes batched events instead of waiting for the timer`() {
+        SessionClient.createOrResumeSession()
+        TestEventAdapter.cleanupEvents()
+
+        SessionClient.sessionBackgrounded() //No onPublishEvents() by hand, no timer advanced
+
+        assertTrue(TestEventAdapter.testSdkEvents.any { it.name == EventStrings.SESSION_BACKGROUNDED })
+    }
+
     @Test
     fun `generateId produces correct format`() {
         val generateIdMethod = SessionClient::class.java.getDeclaredMethod("generateId")

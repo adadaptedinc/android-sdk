@@ -7,7 +7,9 @@ import com.adadapted.android.sdk.core.ad.AdClient
 import com.adadapted.android.sdk.core.ad.AdContentPublisher
 import com.adadapted.android.sdk.core.ad.AdZoneData
 import com.adadapted.android.sdk.core.concurrency.Timer
+import com.adadapted.android.sdk.core.concurrency.monotonicSeconds
 import com.adadapted.android.sdk.core.event.EventClient
+import com.adadapted.android.sdk.core.event.ZoneUnfilledReasons
 import com.adadapted.android.sdk.core.interfaces.ZoneAdListener
 import com.adadapted.android.sdk.core.log.AALogger
 
@@ -18,17 +20,26 @@ interface AdZonePresenterListener {
     fun onAdVisibilityChanged(ad: Ad)
 }
 
-class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adClient: AdClient) : ZoneAdListener {
-    private var currentAd: Ad = Ad()
+class AdZonePresenter(
+    private val adViewHandler: AdViewHandler,
+    private val adClient: AdClient,
+    private val now: () -> Long = ::monotonicSeconds //The countdown's own clock, not the wall clock
+) : ZoneAdListener {
+    @Volatile private var currentAd: Ad = Ad()
     private var zoneId: String = ""
-    private var isZoneVisible: Boolean = true
+    @Volatile private var isZoneVisible: Boolean = true
+    @Volatile private var isAppInForeground: Boolean = true
+    @Volatile private var isInWindow: Boolean = true
     private var adZonePresenterListener: AdZonePresenterListener? = null
-    private var attached: Boolean
+    @Volatile private var attached: Boolean = false
+    @Volatile private var zoneMounted = false
+    @Volatile private var unfilledReported = false
     private var zoneContextId: String = ""
-    private var zoneLoaded: Boolean
-    private var currentAdZoneData: AdZoneData
-    private var adStarted = false
-    private var adCompleted = false
+    @Volatile private var zoneLoaded: Boolean = false
+    private var currentAdZoneData: AdZoneData = AdZoneData()
+    private var adFetchedAt: Long = 0
+    private var secondsLeftOnRefresh: Long = 0
+    private var countdownResumedAt: Long = 0
     private var timerRunning = false
     private lateinit var timer: Timer
     private val eventClient: EventClient = EventClient
@@ -41,6 +52,26 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
         this.webView = webView
     }
 
+    fun onStart(adZonePresenterListener: AdZonePresenterListener?) {
+        if (!zoneMounted) {
+            if (zoneId.isEmpty()) {
+                AALogger.logError("AdZoneId is empty. Was onStart() called before init()?")
+            } else {
+                zoneMounted = true
+                eventClient.trackZoneMounted(zoneId)
+            }
+        }
+        onAttach(adZonePresenterListener)
+    }
+
+    fun onStop() {
+        onDetach()
+        if (zoneMounted) {
+            zoneMounted = false
+            eventClient.trackZoneUnmounted(zoneId)
+        }
+    }
+
     fun onAttach(adZonePresenterListener: AdZonePresenterListener?) {
         if (adZonePresenterListener == null) {
             AALogger.logError("NULL Listener provided")
@@ -50,9 +81,9 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
             attached = true
             this.adZonePresenterListener = adZonePresenterListener
             if(currentAd.id.isEmpty()) { //First attach only
-                adClient.fetchNewAd(zoneId, contextId = zoneContextId, listener = this) //FIRST INITIAL CALL
+                fetchAd(this) //FIRST INITIAL CALL
             }
-            startZoneTimer()
+            resumeTimer()
         }
     }
 
@@ -60,9 +91,31 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
         if (attached) {
             attached = false
             adZonePresenterListener = null
-            completeCurrentAd()
-            stopTimer()
+            endImpression()
+            pauseTimer()
         }
+    }
+
+    fun onAppForegrounded() {
+        isAppInForeground = true
+        resumeTimer()
+    }
+
+    fun onAppBackgrounded() {
+        isAppInForeground = false
+        endImpression(publishNow = true) //The process can be frozen before the next publish tick
+        pauseTimer()
+    }
+
+    fun onEnteredWindow() {
+        isInWindow = true
+        resumeTimer()
+    }
+
+    fun onExitedWindow() {
+        isInWindow = false
+        endImpression()
+        pauseTimer()
     }
 
     fun setZoneContext(contextId: String) {
@@ -78,51 +131,51 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
         restartTimer()
         if (!zoneLoaded) return
 
-        completeCurrentAd()
+        endImpression() //Rotated out, the ad the zone was showing is done
 
-        adClient.fetchNewAd(
-            zoneId = zoneId,
-            contextId = zoneContextId,
-            listener = object : ZoneAdListener {
-                //Reported like the first fetch does, so a refresh that comes back a no-fill tells
-                //the host app the zone no longer has an ad to show
-                override fun onAdLoaded(adZoneData: AdZoneData) {
-                    updateCurrentZone(adZoneData)
-                    notifyZoneAvailable()
-                }
-                override fun onAdLoadFailed() = handleAd(clearedAdKeepingRefreshTime())
-            })
+        fetchAd(object : ZoneAdListener {
+            override fun onAdLoaded(adZoneData: AdZoneData) {
+                updateCurrentZone(adZoneData)
+                notifyZoneAvailable()
+            }
+
+            override fun onAdLoadFailed() {
+                reportZoneUnfilled(ZoneUnfilledReasons.REQUEST_FAILED)
+                handleAd(clearedAdKeepingRefreshTime())
+            }
+        })
+    }
+
+    private fun fetchAd(listener: ZoneAdListener) {
+        unfilledReported = false
+        adClient.fetchNewAd(zoneId = zoneId, contextId = zoneContextId, listener = listener)
+    }
+
+    @Synchronized
+    private fun reportZoneUnfilled(reason: String) {
+        if (unfilledReported || !zoneIsOnScreen()) return
+        unfilledReported = true
+        eventClient.trackZoneUnfilled(zoneId, reason)
     }
 
     private fun handleAd(ad: Ad) {
         currentAd = ad
-        adStarted = false
-        adCompleted = false
         restartTimer() //Pick up the new Ad's refresh time
         displayAd()
     }
 
     private fun displayAd() {
         if (currentAd.isEmpty) {
+            reportZoneUnfilled(ZoneUnfilledReasons.NO_AD)
             notifyNoAdAvailable()
         } else {
             notifyAdAvailable(currentAd)
         }
     }
 
-    private fun completeCurrentAd() {
-        if (!currentAd.isEmpty && adStarted && !adCompleted) {
-            if (!isZoneVisible && !currentAd.impressionWasTracked()) {
-                eventClient.trackInvisibleImpression(currentAd)
-            }
-            adCompleted = true
-        }
-    }
-
     fun onAdDisplayed(ad: Ad, isAdVisible: Boolean) {
         isZoneVisible = isAdVisible
-        startZoneTimer()
-        adStarted = true
+        if (isAdVisible) resumeTimer() else pauseTimer()
         trackAdImpression(ad, isAdVisible)
     }
 
@@ -130,24 +183,25 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
         isZoneVisible = isAdVisible
         adZonePresenterListener?.onAdVisibilityChanged(currentAd)
         trackAdImpression(currentAd, isAdVisible)
+        if (isAdVisible) {
+            resumeTimer()
+        } else {
+            endImpression()
+            pauseTimer()
+        }
     }
 
     fun onAdDisplayFailed() {
-        adStarted = true
+        reportZoneUnfilled(ZoneUnfilledReasons.RENDER_FAILED)
         currentAd = clearedAdKeepingRefreshTime()
-        startZoneTimer()
+        resumeTimer()
     }
 
     fun onBlankDisplayed() {
-        adStarted = true
         currentAd = clearedAdKeepingRefreshTime()
-        startZoneTimer()
+        resumeTimer()
     }
 
-    //Clears the Ad content but keeps the served refresh, which on a no-fill is the backoff the
-    //server asked for and is often the value the zone timer is first armed with. Also used when a
-    //refetch fails, so the zone does not fall back to the faster default against a server that
-    //asked to be hit less often.
     private fun clearedAdKeepingRefreshTime() = Ad(refreshTime = currentAd.refreshTime)
 
     fun onAdClicked(ad: Ad) {
@@ -188,41 +242,70 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
         eventClient.trackImpression(ad)
     }
 
+    //Only fires once, and only if a real impression was tracked
+    internal fun endImpression(publishNow: Boolean = false) {
+        eventClient.trackImpressionEnd(currentAd)
+        if (publishNow) {
+            eventClient.onPublishEvents()
+        }
+    }
+
     private fun callPixelTrackingJavaScript() {
         webView?.evaluateJavascript(PIXEL_TRACKING_JS) {}
         AALogger.logDebug("Pixel Tracking Called.")
     }
 
-    private fun startZoneTimer() {
-        if (!zoneLoaded || timerRunning) {
-            return
-        }
-        val refreshSeconds = currentAd.refreshTimeOrDefault
-        if (currentAd.refreshTimeWasRejected) {
-            AALogger.logError("Ad refresh time of ${currentAd.refreshTime}s was served but not honored. Using ${refreshSeconds}s")
-        }
-        AALogger.logDebug("Zone timer starting with a refresh of ${refreshSeconds}s")
-        timerRunning = true
-        timer = Timer(
-            { getNextAd() },
-            repeatSeconds = refreshSeconds,
-            delaySeconds = refreshSeconds
-        )
-    }
+    //A zone is only in front of someone while it is attached and visible, in the window, and the app
+    //is in the foreground. The countdown and the no-fill report both hang off that
+    private fun zoneIsOnScreen() = attached && isZoneVisible && isAppInForeground && isInWindow
 
+    //Arms the countdown fresh from the current Ad's refresh time
+    @Synchronized
     private fun restartTimer() {
-        if (::timer.isInitialized) {
-            timer.cancelTimer()
-            timerRunning = false
-            startZoneTimer()
+        cancelTimer()
+        adFetchedAt = now()
+        secondsLeftOnRefresh = currentAd.refreshTimeOrDefault
+        if (currentAd.refreshTimeWasRejected) {
+            AALogger.logError("Ad refresh time of ${currentAd.refreshTime}s was served but not honored. Using ${secondsLeftOnRefresh}s")
+        }
+        startTimer()
+    }
+
+    //Freezes what is left of the countdown, so a zone off screen or an app in the background
+    //neither refreshes nor fetches
+    @Synchronized
+    private fun pauseTimer() {
+        if (!timerRunning) return
+        secondsLeftOnRefresh = (secondsLeftOnRefresh - (now() - countdownResumedAt)).coerceAtLeast(0)
+        cancelTimer()
+        AALogger.logDebug("Zone timer paused with ${secondsLeftOnRefresh}s left")
+    }
+
+    //An Ad that outlived its own refresh time while the countdown was frozen is refetched instead
+    //of being shown for the leftover time it never spent on screen
+    @Synchronized
+    private fun resumeTimer() {
+        if (timerRunning || !zoneIsOnScreen()) return
+        if (zoneLoaded && now() - adFetchedAt >= currentAd.refreshTimeOrDefault) {
+            getNextAd()
+        } else {
+            startTimer()
         }
     }
 
-    private fun stopTimer() {
+    private fun startTimer() {
+        if (!zoneLoaded || timerRunning || !zoneIsOnScreen()) return
+        AALogger.logDebug("Zone timer starting with ${secondsLeftOnRefresh}s left of a ${currentAd.refreshTimeOrDefault}s refresh")
+        timerRunning = true
+        countdownResumedAt = now()
+        timer = Timer({ getNextAd() }, repeatSeconds = 0, delaySeconds = secondsLeftOnRefresh)
+    }
+
+    private fun cancelTimer() {
         if (::timer.isInitialized) {
             timer.cancelTimer()
-            timerRunning = false
         }
+        timerRunning = false
     }
 
     private fun handleContentAction(ad: Ad) {
@@ -271,14 +354,8 @@ class AdZonePresenter(private val adViewHandler: AdViewHandler, private val adCl
     }
 
     override fun onAdLoadFailed() {
+        reportZoneUnfilled(ZoneUnfilledReasons.REQUEST_FAILED)
         updateCurrentZone(AdZoneData())
-        notifyNoAdAvailable()
-    }
-
-    init {
-        attached = false
-        zoneLoaded = false
-        currentAdZoneData = AdZoneData()
     }
 
     companion object {

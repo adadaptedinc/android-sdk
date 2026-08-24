@@ -3,7 +3,7 @@ package com.adadapted.android.sdk.constants
 object Config {
     private var isProd = false
 
-    const val LIBRARY_VERSION: String = "5.1.0"
+    const val LIBRARY_VERSION: String = "6.0.0"
     const val LOG_TAG = "ADADAPTED_ANDROID_SDK"
 
     const val DEFAULT_EVENT_POLLING_SECONDS = 3L // Events will be pushed to the server every 3 seconds

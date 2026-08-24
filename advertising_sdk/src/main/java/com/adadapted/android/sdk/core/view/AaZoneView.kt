@@ -8,6 +8,9 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageButton
 import android.widget.RelativeLayout
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdContentListener
 import com.adadapted.android.sdk.core.ad.AdContentPublisher
@@ -32,6 +35,10 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     private var webViewLoaded = false
     private var isFixedAspectRatioEnabled = false
     private var fixedAspectPaddingOffset = 0
+    private val appLifecycleObserver = object : DefaultLifecycleObserver {
+        override fun onStart(owner: LifecycleOwner) = presenter.onAppForegrounded()
+        override fun onStop(owner: LifecycleOwner) = presenter.onAppBackgrounded()
+    }
 
     constructor(context: Context) : super(context.applicationContext) {
         setup(context)
@@ -74,7 +81,7 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     }
 
     fun onStart() {
-        presenter.onAttach(this)
+        presenter.onStart(this)
     }
 
     fun onStart(listener: Listener) {
@@ -107,7 +114,7 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
 
     fun onStop() {
         zoneViewListener = null
-        presenter.onDetach()
+        presenter.onStop()
     }
 
     fun onStop(listener: AdContentListener) {
@@ -186,6 +193,18 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
 
     override fun onBlankAdInWebViewLoaded() {
         presenter.onBlankDisplayed()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        presenter.onEnteredWindow()
+        ProcessLifecycleOwner.get().lifecycle.addObserver(appLifecycleObserver)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        ProcessLifecycleOwner.get().lifecycle.removeObserver(appLifecycleObserver)
+        presenter.onExitedWindow()
     }
 
     override fun onVisibilityChanged(changedView: View, visibility: Int) {

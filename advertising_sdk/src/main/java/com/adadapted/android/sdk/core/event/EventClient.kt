@@ -18,7 +18,7 @@ object EventClient {
     private lateinit var eventAdapter: EventAdapter
     private var transporter: TransporterCoroutineScope = Transporter()
     private val listeners: MutableSet<EventClientListener> = HashSet()
-    private val adEvents: MutableSet<AdEvent> = HashSet()
+    private val adEvents: MutableList<AdEvent> = mutableListOf()
     private val sdkEvents: MutableSet<SdkEvent> = HashSet()
     private val sdkErrors: MutableSet<SdkError> = HashSet()
     private var eventTimerRunning: Boolean = false
@@ -63,7 +63,7 @@ object EventClient {
         if (adEvents.isEmpty() || (!::eventAdapter.isInitialized)) {
             return
         }
-        val currentAdEvents: Set<AdEvent> = adEvents.map { it.copy() }.toSet()
+        val currentAdEvents: List<AdEvent> = adEvents.toList()
         adEvents.clear()
         transporter.dispatchToThread {
             DeviceInfoClient.getCachedDeviceInfo().let { eventAdapter.publishAdEvents(SessionClient.getSessionId(), it, currentAdEvents) }
@@ -71,15 +71,11 @@ object EventClient {
     }
 
     @Synchronized
-    private fun fileEvent(ad: Ad, eventType: String) {
-        val event = AdEvent(
-            ad.id,
-            ad.zoneId,
-            ad.impressionId,
-            eventType
-        )
+    private fun fileEvent(event: AdEvent) {
         adEvents.add(event)
-        notifyAdEventTracked(event)
+        transporter.dispatchToThread {
+            notifyAdEventTracked(event)
+        }
     }
 
     @Synchronized
@@ -145,29 +141,39 @@ object EventClient {
     fun trackImpression(ad: Ad) {
         AALogger.logDebug("Ad Impression Tracked.")
         ad.setImpressionTracked()
-        transporter.dispatchToThread {
-            fileEvent(ad, AdEventTypes.IMPRESSION)
-        }
+        fileEvent(AdEvent.forAd(ad, AdEventTypes.IMPRESSION))
     }
 
-    fun trackInvisibleImpression(ad: Ad) {
-        AALogger.logDebug("Ad Invisible Impression Tracked.")
-        transporter.dispatchToThread {
-            fileEvent(ad, AdEventTypes.INVISIBLE_IMPRESSION)
+    fun trackImpressionEnd(ad: Ad) {
+        if (!ad.claimImpressionEnd()) {
+            return
         }
+        AALogger.logDebug("Ad Impression End Tracked.")
+        fileEvent(AdEvent.forAd(ad, AdEventTypes.IMPRESSION_END))
     }
 
     fun trackInteraction(ad: Ad) {
         AALogger.logDebug("Ad Interaction Tracked.")
-        transporter.dispatchToThread {
-            fileEvent(ad, AdEventTypes.INTERACTION)
-        }
+        fileEvent(AdEvent.forAd(ad, AdEventTypes.INTERACTION))
     }
 
     fun trackPopupBegin(ad: Ad) {
-        transporter.dispatchToThread {
-            fileEvent(ad, AdEventTypes.POPUP_BEGIN)
-        }
+        fileEvent(AdEvent.forAd(ad, AdEventTypes.POPUP_BEGIN))
+    }
+
+    fun trackZoneMounted(zoneId: String) {
+        AALogger.logDebug("Zone Mounted Tracked.")
+        fileEvent(AdEvent.forZone(zoneId, AdEventTypes.ZONE_MOUNTED))
+    }
+
+    fun trackZoneUnmounted(zoneId: String) {
+        AALogger.logDebug("Zone Unmounted Tracked.")
+        fileEvent(AdEvent.forZone(zoneId, AdEventTypes.ZONE_UNMOUNTED))
+    }
+
+    fun trackZoneUnfilled(zoneId: String, reason: String) {
+        AALogger.logDebug("Zone Unfilled Tracked: $reason")
+        fileEvent(AdEvent.forZone(zoneId, AdEventTypes.ZONE_UNFILLED, reason))
     }
 
     fun trackRecipeContextEvent(contextId: String, zoneId: String) {
