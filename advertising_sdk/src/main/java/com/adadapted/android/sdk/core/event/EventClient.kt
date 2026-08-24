@@ -152,11 +152,6 @@ object EventClient {
         fileEvent(AdEvent.forAd(ad, AdEventTypes.IMPRESSION_END))
     }
 
-    fun trackImpressionEndAndPublish(ad: Ad) {
-        trackImpressionEnd(ad)
-        onPublishEvents()
-    }
-
     fun trackInteraction(ad: Ad) {
         AALogger.logDebug("Ad Interaction Tracked.")
         fileEvent(AdEvent.forAd(ad, AdEventTypes.INTERACTION))

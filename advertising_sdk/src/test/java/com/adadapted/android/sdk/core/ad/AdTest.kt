@@ -88,6 +88,21 @@ class AdTest {
         )
     }
 
+    //An event's timestamp is the only thing the server can order or measure dwell from, and a
+    //default-valued property is compared against a freshly evaluated nowInSeconds() at encode time -
+    //so without @EncodeDefault an event published in the second it was filed ships without one
+    @Test
+    fun createdAtSurvivesBeingSerializedInTheSecondTheEventWasFiled() {
+        val event = AdEvent.forZone("102691", AdEventTypes.ZONE_MOUNTED)
+
+        val json = Json.encodeToString(AdEvent.serializer(), event)
+
+        assertEquals(
+            """{"ad_id":"","zone_id":"102691","impression_id":"","event_type":"zone_mounted","created_at":${event.createdAt}}""",
+            json
+        )
+    }
+
     @Test
     fun defaultAdIsCreated() {
         val mockAd = Ad()

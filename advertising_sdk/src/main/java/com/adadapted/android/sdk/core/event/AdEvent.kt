@@ -2,9 +2,12 @@ package com.adadapted.android.sdk.core.event
 
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.concurrency.nowInSeconds
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class AdEvent(
     @SerialName("ad_id")
@@ -17,6 +20,7 @@ data class AdEvent(
     val eventType: String,
     @SerialName("event_name") //Optional server-side field. Left out of the payload entirely when null
     val eventName: String? = null,
+    @EncodeDefault(EncodeDefault.Mode.ALWAYS)
     @SerialName("created_at")
     val createdAt: Long = nowInSeconds()
 ) {

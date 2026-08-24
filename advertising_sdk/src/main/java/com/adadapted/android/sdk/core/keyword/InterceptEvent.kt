@@ -1,9 +1,12 @@
 package com.adadapted.android.sdk.core.keyword
 
 import com.adadapted.android.sdk.core.concurrency.nowInSeconds
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class InterceptEvent(
     @SerialName("search_id")
@@ -15,6 +18,7 @@ data class InterceptEvent(
     @SerialName("term_id")
     val termId: String = "",
     val term: String = "",
+    @EncodeDefault(EncodeDefault.Mode.ALWAYS)
     @SerialName("created_at")
     val createdAt: Long = nowInSeconds()
 ) {

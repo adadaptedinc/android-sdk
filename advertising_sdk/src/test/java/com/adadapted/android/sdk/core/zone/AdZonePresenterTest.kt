@@ -832,6 +832,18 @@ class AdZonePresenterTest {
     private fun unfilledEvents() =
         TestEventAdapter.testAdEvents.filter { it.eventType == AdEventTypes.ZONE_UNFILLED }
 
+    //A host app hides its zone off onNoAdAvailable, so reporting the same empty fetch twice makes
+    //it do that work twice for one thing that happened
+    @Test
+    fun aFailedFetchTellsTheHostAppNoAdIsAvailableOnceRatherThanTwice() {
+        AdClient.createInstance(AlwaysFailingAdAdapter(), testTransporterScope)
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        val testListener = TestAdZonePresenterListener()
+        testAdZonePresenter.onAttach(testListener)
+
+        assertEquals(1, testListener.noAdAvailableCount)
+    }
+
     @Test
     fun testNullListener() {
         testAdZonePresenter.init("testZoneId", mockWebView!!)
@@ -929,6 +941,7 @@ class SilentAdAdapter: AdAdapter {
 class TestAdZonePresenterListener: AdZonePresenterListener {
     var testZoneData = AdZoneData()
     var testAd = Ad()
+    var noAdAvailableCount = 0
 
     override fun onZoneAvailable(adZoneData: AdZoneData) {
         testZoneData = adZoneData
@@ -940,6 +953,7 @@ class TestAdZonePresenterListener: AdZonePresenterListener {
 
     override fun onNoAdAvailable() {
         testAd = Ad("NoAdAvail")
+        noAdAvailableCount++
     }
 
     override fun onAdVisibilityChanged(ad: Ad) {
@@ -955,9 +969,8 @@ class TestAdEventClientListener: EventClientListener {
     }
 }
 
-//Events are batched into a Set of AdEvents stamped in whole seconds, so a second end for the same
-//ad in the same second collapses into the first before anything is published. Counting them as
-//they are filed is what proves the event only fired once instead of the batch hiding that it did not
+//Counted as they are filed rather than as they are published, so the assertion is about the event
+//firing once and not about what a batch did or did not keep on its way out
 class ImpressionEndCounter: EventClientListener {
     var filed = 0
 

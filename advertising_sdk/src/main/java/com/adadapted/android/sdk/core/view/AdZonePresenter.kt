@@ -7,12 +7,11 @@ import com.adadapted.android.sdk.core.ad.AdClient
 import com.adadapted.android.sdk.core.ad.AdContentPublisher
 import com.adadapted.android.sdk.core.ad.AdZoneData
 import com.adadapted.android.sdk.core.concurrency.Timer
-import com.adadapted.android.sdk.core.concurrency.uptimeSeconds
+import com.adadapted.android.sdk.core.concurrency.monotonicSeconds
 import com.adadapted.android.sdk.core.event.EventClient
 import com.adadapted.android.sdk.core.event.ZoneUnfilledReasons
 import com.adadapted.android.sdk.core.interfaces.ZoneAdListener
 import com.adadapted.android.sdk.core.log.AALogger
-import kotlin.jvm.Synchronized
 
 interface AdZonePresenterListener {
     fun onZoneAvailable(adZoneData: AdZoneData)
@@ -24,7 +23,7 @@ interface AdZonePresenterListener {
 class AdZonePresenter(
     private val adViewHandler: AdViewHandler,
     private val adClient: AdClient,
-    private val now: () -> Long = ::uptimeSeconds //The countdown's own clock, not the wall clock
+    private val now: () -> Long = ::monotonicSeconds //The countdown's own clock, not the wall clock
 ) : ZoneAdListener {
     @Volatile private var currentAd: Ad = Ad()
     private var zoneId: String = ""
@@ -32,12 +31,12 @@ class AdZonePresenter(
     @Volatile private var isAppInForeground: Boolean = true
     @Volatile private var isInWindow: Boolean = true
     private var adZonePresenterListener: AdZonePresenterListener? = null
-    @Volatile private var attached: Boolean
-    private var zoneMounted = false
-    private var unfilledReported = false
+    @Volatile private var attached: Boolean = false
+    @Volatile private var zoneMounted = false
+    @Volatile private var unfilledReported = false
     private var zoneContextId: String = ""
-    @Volatile private var zoneLoaded: Boolean
-    private var currentAdZoneData: AdZoneData
+    @Volatile private var zoneLoaded: Boolean = false
+    private var currentAdZoneData: AdZoneData = AdZoneData()
     private var adFetchedAt: Long = 0
     private var secondsLeftOnRefresh: Long = 0
     private var countdownResumedAt: Long = 0
@@ -152,6 +151,7 @@ class AdZonePresenter(
         adClient.fetchNewAd(zoneId = zoneId, contextId = zoneContextId, listener = listener)
     }
 
+    @Synchronized
     private fun reportZoneUnfilled(reason: String) {
         if (unfilledReported || !zoneIsOnScreen()) return
         unfilledReported = true
@@ -242,12 +242,11 @@ class AdZonePresenter(
         eventClient.trackImpression(ad)
     }
 
+    //Only fires once, and only if a real impression was tracked
     internal fun endImpression(publishNow: Boolean = false) {
-        //Only fires once, and only if a real impression was tracked
+        eventClient.trackImpressionEnd(currentAd)
         if (publishNow) {
-            eventClient.trackImpressionEndAndPublish(currentAd)
-        } else {
-            eventClient.trackImpressionEnd(currentAd)
+            eventClient.onPublishEvents()
         }
     }
 
@@ -259,7 +258,6 @@ class AdZonePresenter(
     //A zone is only in front of someone while it is attached and visible, in the window, and the app
     //is in the foreground. The countdown and the no-fill report both hang off that
     private fun zoneIsOnScreen() = attached && isZoneVisible && isAppInForeground && isInWindow
-
 
     //Arms the countdown fresh from the current Ad's refresh time
     @Synchronized
@@ -358,13 +356,6 @@ class AdZonePresenter(
     override fun onAdLoadFailed() {
         reportZoneUnfilled(ZoneUnfilledReasons.REQUEST_FAILED)
         updateCurrentZone(AdZoneData())
-        notifyNoAdAvailable()
-    }
-
-    init {
-        attached = false
-        zoneLoaded = false
-        currentAdZoneData = AdZoneData()
     }
 
     companion object {
