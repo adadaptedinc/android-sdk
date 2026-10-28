@@ -4,9 +4,8 @@ import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 
 plugins {
     id("com.android.library")
-    id("kotlin-android")
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.0"
-    id("org.jetbrains.kotlin.plugin.compose") version "2.3.0"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.21"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.3.21"
     id("org.barfuin.gradle.jacocolog") version "3.1.0"
     id("maven-publish")
 }
@@ -14,16 +13,22 @@ plugins {
 group='com.adadapted'
 
 android {
-    compileSdk = 36
+    compileSdk = 37
     namespace 'com.adadapted'
 
     defaultConfig {
         minSdkVersion 23
-        targetSdkVersion 36
-        versionName "6.0.0"
+        targetSdkVersion 37
+        versionName "6.0.1"
         buildConfigField("String","VERSION_NAME", "\"${defaultConfig.versionName}\"")
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'aasdk-proguard-rules.pro'
+
+        // AGP 9 defaults this to compileSdk, which would force clients onto compileSdk 37.
+        // Keep it at the floor our dependencies already require.
+        aarMetadata {
+            minCompileSdk = 35
+        }
     }
 
     compileOptions {
@@ -45,7 +50,7 @@ android {
         }
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'aasdk-proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'aasdk-proguard-rules.pro'
         }
     }
 
@@ -53,30 +58,34 @@ android {
         buildConfig = true
         compose = true
     }
+
+    publishing {
+        singleVariant("release")
+    }
 }
 
 dependencies {
     implementation 'androidx.lifecycle:lifecycle-process:2.10.0'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
-    implementation 'io.ktor:ktor-client-core:3.4.0'
-    implementation 'io.ktor:ktor-client-encoding:3.4.0'
-    implementation 'io.ktor:ktor-client-android:3.4.0'
-    implementation 'io.ktor:ktor-serialization-kotlinx-json:3.4.0'
-    implementation 'io.ktor:ktor-client-content-negotiation:3.4.0'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.3.0'
+    implementation 'io.ktor:ktor-client-core:3.4.3'
+    implementation 'io.ktor:ktor-client-encoding:3.4.3'
+    implementation 'io.ktor:ktor-client-android:3.4.3'
+    implementation 'io.ktor:ktor-serialization-kotlinx-json:3.4.3'
+    implementation 'io.ktor:ktor-client-content-negotiation:3.4.3'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.3.21'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2'
-    implementation 'com.google.android.material:material:1.13.0'
+    implementation 'com.google.android.material:material:1.14.0'
     implementation 'com.google.android.gms:play-services-ads-identifier:18.3.0'
-    implementation 'androidx.compose.ui:ui:1.10.2'
-    implementation 'androidx.compose.foundation:foundation:1.10.2'
-    implementation 'androidx.compose.material:material:1.10.2'
+    implementation 'androidx.compose.ui:ui:1.11.4'
+    implementation 'androidx.compose.foundation:foundation:1.11.4'
+    implementation 'androidx.compose.material:material:1.11.4'
 
     testImplementation 'androidx.test:core-ktx:1.7.0'
     testImplementation 'junit:junit:4.13.2'
     //testImplementation 'io.ktor:ktor-client-mock2.2.4'
-    testImplementation 'org.json:json:20251224'
-    testImplementation 'org.robolectric:robolectric:4.16.1'
+    testImplementation 'org.json:json:20260814'
+    testImplementation 'org.robolectric:robolectric:4.17'
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2'
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
@@ -104,7 +113,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.adadapted'
                 artifactId = 'android-sdk'
-                version = '6.0.0'
+                version = '6.0.1'
             }
         }
     }
