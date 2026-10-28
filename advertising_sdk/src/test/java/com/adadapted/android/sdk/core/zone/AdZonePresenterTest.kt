@@ -71,7 +71,6 @@ class AdZonePresenterTest {
         whenever(mockContext.resources).thenReturn(mock())
         whenever(mockContext.resources.displayMetrics).thenReturn(mock())
         mockWebView = AdWebView(ApplicationProvider.getApplicationContext(), mock())
-        mockWebView?.loaded = true
         testAdAdapter.setMockData(
             AdZoneData(
                 Ad(
@@ -157,6 +156,7 @@ class AdZonePresenterTest {
     @Test
     fun testOnAdDisplayed() {
         testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
 
         val testAdEventListener = TestAdEventClientListener()
         EventClient.addListener(testAdEventListener)
@@ -191,7 +191,11 @@ class AdZonePresenterTest {
         })
         testAdZonePresenter.onAdClicked(testAd)
 
-        assertEquals(null, testAdEventListener.testAdEvent)
+        assertEquals(
+            "The only event should be the zone's own mount, nothing about the ad",
+            AdEventTypes.ZONE_MOUNTED,
+            testAdEventListener.testAdEvent?.eventType
+        )
     }
 
    @Test
@@ -387,6 +391,37 @@ class AdZonePresenterTest {
         )
     }
 
+    //A recycled or re-shown zone attaches again, and a no-fill leaves it with no Ad to show. Neither
+    //is a reason to cut the server's backoff short
+    @Test
+    fun reattachingAZoneDoesNotSkipTheNoFillBackoff() {
+        val noFillRefreshSeconds = 300L
+        testAdAdapter.setMockData(AdZoneData(Ad(refreshTime = noFillRefreshSeconds)))
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        val requestsAfterNoFill = testAdAdapter.requestCount
+
+        repeat(3) {
+            advanceTimeBySeconds(10)
+            testAdZonePresenter.onDetach()
+            testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        }
+        assertEquals(
+            "Re-attaching inside the backoff should not refetch",
+            requestsAfterNoFill,
+            testAdAdapter.requestCount
+        )
+
+        testAdZonePresenter.onDetach()
+        advanceTimeBySeconds(noFillRefreshSeconds)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        assertEquals(
+            "Re-attaching after the backoff should refetch exactly once",
+            requestsAfterNoFill + 1,
+            testAdAdapter.requestCount
+        )
+    }
+
     @Test
     fun zoneTimerWaitsForTheDefaultRefreshTimeWhenTheServerSuppliesNone() {
         val testAd = Ad(id = "TestAdId", impressionId = "123")
@@ -440,6 +475,40 @@ class AdZonePresenterTest {
         advanceTimeBySeconds(serverRefreshSeconds - SdkConfig.DEFAULT_AD_REFRESH_SECONDS)
         assertEquals(
             "Should have refetched again once the served refresh time elapsed a second time",
+            3,
+            failingAdapter.requestCount
+        )
+    }
+
+    //The other side of keeping the served backoff: a fast ad's refresh is not a retry rate for a
+    //server that is failing, so the retry waits at least the default
+    @Test
+    fun aFailedRefetchOfAFastAdRetriesOnTheDefaultInsteadOfTheServedRefreshTime() {
+        val serverRefreshSeconds = 30L
+        val servedAd = Ad(id = "TestAdId", impressionId = "123", refreshTime = serverRefreshSeconds)
+        val failingAdapter = FailAfterFirstAdAdapter(servedAd)
+        AdClient.createInstance(failingAdapter, testTransporterScope)
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        testAdZonePresenter.onAdDisplayed(servedAd, true)
+
+        advanceTimeBySeconds(serverRefreshSeconds + 1) //First refetch fires on the served time, and fails
+        assertEquals(
+            "The first refetch should have fired once the served refresh time elapsed",
+            2,
+            failingAdapter.requestCount
+        )
+
+        advanceTimeBySeconds(serverRefreshSeconds + 1)
+        assertEquals(
+            "A failed refetch should not retry on the fast ad's refresh time",
+            2,
+            failingAdapter.requestCount
+        )
+
+        advanceTimeBySeconds(SdkConfig.DEFAULT_AD_REFRESH_SECONDS - serverRefreshSeconds)
+        assertEquals(
+            "Should have retried once the default refresh time elapsed",
             3,
             failingAdapter.requestCount
         )
@@ -590,6 +659,34 @@ class AdZonePresenterTest {
         assertEquals("testZoneId", TestEventAdapter.testAdEvents.first { it.eventType == AdEventTypes.ZONE_MOUNTED }.zoneId)
     }
 
+    //The view re-attaches itself whenever it is shown, whether or not the host called onStart, so a
+    //zone serving after onStop has to report itself mounted again
+    @Test
+    fun aZoneShownAgainAfterOnStopIsMountedAgain() {
+        startZoneThatNeverGetsAnAd()
+        testAdZonePresenter.onStop()
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener()) //View comes back VISIBLE, no onStart
+        EventClient.onPublishEvents()
+
+        assertEquals("A zone serving again after onStop should be mounted again", 2, countOf(AdEventTypes.ZONE_MOUNTED))
+
+        testAdZonePresenter.onStop()
+        EventClient.onPublishEvents()
+
+        assertEquals("And its second mount should be closed out by the next onStop", 2, countOf(AdEventTypes.ZONE_UNMOUNTED))
+    }
+
+    @Test
+    fun aZoneTheHostNeverStartsIsStillMountedWhenItIsShown() {
+        AdClient.createInstance(SilentAdAdapter(), testTransporterScope)
+        testAdZonePresenter.init("mountedZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener()) //View attached to a window, VISIBLE
+        EventClient.onPublishEvents()
+
+        assertEquals(1, countOf(AdEventTypes.ZONE_MOUNTED))
+        assertEquals("mountedZoneId", TestEventAdapter.testAdEvents.first { it.eventType == AdEventTypes.ZONE_MOUNTED }.zoneId)
+    }
+
     //A zone stopped while it is out of view is already detached, and still has to report itself
     //unmounted or its mount is never closed out
     @Test
@@ -700,6 +797,28 @@ class AdZonePresenterTest {
         assertEquals(1, countOf(AdEventTypes.IMPRESSION_END))
     }
 
+    //A creative that fails after it rendered - a reload inside the ad, a crashed renderer - clears the
+    //zone, and the impression it was showing is over with it
+    @Test
+    fun anImpressionEndsWhenTheAdItWasShowingFailsToDisplay() {
+        displayAVisibleAd()
+
+        testAdZonePresenter.onAdDisplayFailed()
+        EventClient.onPublishEvents()
+
+        assertEquals(1, countOf(AdEventTypes.IMPRESSION_END))
+    }
+
+    @Test
+    fun anImpressionEndsWhenTheZoneGoesBlank() {
+        displayAVisibleAd()
+
+        testAdZonePresenter.onBlankDisplayed()
+        EventClient.onPublishEvents()
+
+        assertEquals(1, countOf(AdEventTypes.IMPRESSION_END))
+    }
+
     //An ad the user never saw is not an impression, so there is nothing to report and nothing to end
     @Test
     fun anAdRenderedWhileTheZoneIsNotVisibleReportsNoImpressionAtAll() {
@@ -714,6 +833,78 @@ class AdZonePresenterTest {
 
         assertEquals(0, countOf(AdEventTypes.IMPRESSION))
         assertEquals(0, countOf(AdEventTypes.IMPRESSION_END))
+    }
+
+    //The request was in flight when the app went away, and the web view finished loading it in the background
+    @Test
+    fun anAdRenderedWhileTheAppIsBackgroundedReportsNoImpression() {
+        assertAnAdRenderedOffScreenReportsNoImpression { testAdZonePresenter.onAppBackgrounded() }
+    }
+
+    @Test
+    fun anAdRenderedWhileTheZoneIsOutOfTheWindowReportsNoImpression() {
+        assertAnAdRenderedOffScreenReportsNoImpression { testAdZonePresenter.onExitedWindow() }
+    }
+
+    @Test
+    fun anAdRenderedWhileTheAppIsBackgroundedIsImpressedOnceTheUserComesBack() {
+        assertAnAdRenderedOffScreenIsImpressedOnceWhenItComesBack(
+            leaveTheScreen = { testAdZonePresenter.onAppBackgrounded() },
+            comeBack = { testAdZonePresenter.onAppForegrounded() }
+        )
+    }
+
+    @Test
+    fun anAdRenderedWhileTheZoneIsOutOfTheWindowIsImpressedOnceItIsBack() {
+        assertAnAdRenderedOffScreenIsImpressedOnceWhenItComesBack(
+            leaveTheScreen = { testAdZonePresenter.onExitedWindow() },
+            comeBack = { testAdZonePresenter.onEnteredWindow() }
+        )
+    }
+
+    @Test
+    fun anAdStillLoadingWhenTheUserComesBackIsNotImpressed() {
+        serveAnAd()
+        testAdZonePresenter.onAppBackgrounded()
+        testAdZonePresenter.onAppForegrounded()
+
+        testAdZonePresenter.onDetach()
+        EventClient.onPublishEvents()
+
+        assertEquals("An ad the web view has not rendered yet was never seen", 0, countOf(AdEventTypes.IMPRESSION))
+    }
+
+    private fun assertAnAdRenderedOffScreenReportsNoImpression(leaveTheScreen: () -> Unit) {
+        val servedAd = serveAnAd()
+        leaveTheScreen()
+        testAdZonePresenter.onAdDisplayed(servedAd, true)
+
+        testAdZonePresenter.onDetach()
+        EventClient.onPublishEvents()
+
+        assertEquals("An ad that rendered with nothing on screen was never impressed", 0, countOf(AdEventTypes.IMPRESSION))
+    }
+
+    private fun assertAnAdRenderedOffScreenIsImpressedOnceWhenItComesBack(leaveTheScreen: () -> Unit, comeBack: () -> Unit) {
+        val servedAd = serveAnAd()
+        leaveTheScreen()
+        testAdZonePresenter.onAdDisplayed(servedAd, true)
+        comeBack()
+        leaveTheScreen()
+        comeBack()
+
+        testAdZonePresenter.onDetach()
+        EventClient.onPublishEvents()
+
+        assertEquals("The user saw the ad once they were back, and it is still the one impression", 1, countOf(AdEventTypes.IMPRESSION))
+    }
+
+    private fun serveAnAd(): Ad {
+        val servedAd = Ad(id = "TestAdId", impressionId = "testZoneId:789")
+        testAdAdapter.setMockData(AdZoneData(servedAd))
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        return servedAd
     }
 
     //The served Ad instance is the presenter's current ad, the same way the web view hands back the
