@@ -24,8 +24,7 @@ android {
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'aasdk-proguard-rules.pro'
 
-        // AGP 9 defaults this to compileSdk, which would force clients onto compileSdk 37.
-        // Keep it at the floor our dependencies already require.
+        // AGP 9 defaults this to compileSdk; don't force clients onto 37
         aarMetadata {
             minCompileSdk = 35
         }

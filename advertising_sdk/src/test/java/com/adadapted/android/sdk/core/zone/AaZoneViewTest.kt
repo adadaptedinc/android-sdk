@@ -292,7 +292,7 @@ class AaZoneViewTest {
         testAaZoneView.init("TestZoneId")
         testAaZoneView.onStart(TestAaZoneViewListener())
         Shadows.shadowOf(Looper.getMainLooper()).idle()
-        testAaZoneView.onAdLoadedInWebView(servedAd) //The impression only fires once the creative is up
+        testAaZoneView.onAdLoadedInWebView(servedAd)
         EventClient.onPublishEvents()
         assertEquals("The ad has to be impressed before detaching can end it", 1, countOf(AdEventTypes.IMPRESSION))
 

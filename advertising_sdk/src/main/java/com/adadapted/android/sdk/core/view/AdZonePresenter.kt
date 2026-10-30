@@ -38,6 +38,7 @@ class AdZonePresenter(
     private var zoneContextId: String = ""
     @Volatile private var zoneLoaded: Boolean = false
     @Volatile private var isCurrentAdRendered = false
+    @Volatile private var presentationMissed = false
     private var currentAdZoneData: AdZoneData = AdZoneData()
     private var adFetchedAt: Long = 0
     private var secondsLeftOnRefresh: Long = 0
@@ -62,8 +63,6 @@ class AdZonePresenter(
         onAttach(adZonePresenterListener)
     }
 
-    //The host's onStart is the mount, but the view also attaches itself whenever it is shown, so a
-    //zone shown again after onStop (or never started at all) is mounted here instead of serving unmounted
     private fun mountZone() {
         if (zoneMounted || zoneId.isEmpty()) return
         zoneMounted = true
@@ -87,9 +86,10 @@ class AdZonePresenter(
             attached = true
             this.adZonePresenterListener = adZonePresenterListener
             mountZone()
-            //First attach only. After that resumeTimer refetches once the refresh time, or a no-fill's backoff, is up
             if (!zoneLoaded) {
                 fetchAd(this) //FIRST INITIAL CALL
+            } else if (presentationMissed) {
+                replayPresentation()
             }
             resumeIfOnScreen()
         }
@@ -183,10 +183,9 @@ class AdZonePresenter(
     }
 
     fun onAdDisplayed(ad: Ad, isAdVisible: Boolean) {
+        //Drop stale loads; by instance, since a re-served creative shares the id
+        if (ad !== currentAd) return
         isZoneVisible = isAdVisible
-        if (ad.id != currentAd.id) {
-            currentAd = ad
-        }
         isCurrentAdRendered = true
         if (isAdVisible) resumeTimer() else pauseTimer()
         trackAdImpression()
@@ -221,7 +220,6 @@ class AdZonePresenter(
 
     private fun clearedAdKeepingRefreshTime() = Ad(refreshTime = currentAd.refreshTime)
 
-    //A failing server keeps a longer served backoff, but is never retried faster than the default
     private fun clearedAdBackingOffAfterFailedRequest() =
         Ad(refreshTime = maxOf(currentAd.refreshTimeOrDefault, Config.DEFAULT_AD_REFRESH_SECONDS))
 
@@ -263,7 +261,6 @@ class AdZonePresenter(
         eventClient.trackImpression(currentAd)
     }
 
-    //Also catches up on the impression the zone missed while it was off screen
     private fun resumeIfOnScreen() {
         trackAdImpression()
         resumeTimer()
@@ -350,17 +347,23 @@ class AdZonePresenter(
         AdContentPublisher.publishNonContentNotification(zoneId, ad.id)
     }
 
+    private fun replayPresentation() {
+        presentationMissed = false
+        notifyZoneAvailable()
+        displayAd()
+    }
+
     private fun notifyZoneAvailable() {
-        adZonePresenterListener?.onZoneAvailable(currentAdZoneData)
+        adZonePresenterListener?.onZoneAvailable(currentAdZoneData) ?: run { presentationMissed = true }
     }
 
     private fun notifyAdAvailable(ad: Ad) {
-        adZonePresenterListener?.onAdAvailable(ad)
+        adZonePresenterListener?.onAdAvailable(ad) ?: run { presentationMissed = true }
     }
 
     private fun notifyNoAdAvailable() {
         AALogger.logInfo("No ad available")
-        adZonePresenterListener?.onNoAdAvailable()
+        adZonePresenterListener?.onNoAdAvailable() ?: run { presentationMissed = true }
     }
 
     private fun updateCurrentZone(adZoneData: AdZoneData) {

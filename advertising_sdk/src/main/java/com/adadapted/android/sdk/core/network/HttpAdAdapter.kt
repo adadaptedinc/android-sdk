@@ -37,7 +37,7 @@ class HttpAdAdapter internal constructor(
         )
         try {
             val response: HttpResponse = client.post(zoneAdRequestUrl) {
-                //A non-2xx with a JSON body would otherwise decode to an empty Ad and read as a no-fill
+                //Otherwise a 5xx JSON body decodes as a no-fill
                 expectSuccess = true
                 contentType(ContentType.Application.Json)
                 setBody(zoneAdRequest)

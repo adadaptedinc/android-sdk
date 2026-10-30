@@ -45,8 +45,6 @@ class HttpAdAdapterTest {
         TestEventAdapter.cleanupEvents()
     }
 
-    //A server error that still sends a JSON body decodes cleanly into an empty Ad, and would be
-    //reported as the zone having no demand instead of the request having failed
     @Test
     fun aServerErrorWithAJsonBodyIsAFailedRequestNotANoFill() = runBlocking {
         val listener = RecordingZoneAdListener()
@@ -63,8 +61,6 @@ class HttpAdAdapterTest {
         )
     }
 
-    //The other side of it: a no-fill is a successful response carrying an empty Ad, and must still
-    //reach the zone as one so it backs off on the served refresh time
     @Test
     fun aNoFillIsStillALoadedEmptyAd() = runBlocking {
         val listener = RecordingZoneAdListener()
@@ -77,8 +73,6 @@ class HttpAdAdapterTest {
         assertEquals(300L, listener.loaded?.ad?.refreshTime)
     }
 
-    //Mirrors HttpConnector's client, its default retry policy included, over a mock engine. Retries
-    //run with no delay so the 5xx case exercises the same give-up path production does without waiting it out
     private fun adapterRespondingWith(status: HttpStatusCode, body: String): HttpAdAdapter {
         val client = HttpClient(MockEngine {
             respond(body, status, headersOf(HttpHeaders.ContentType, "application/json"))
