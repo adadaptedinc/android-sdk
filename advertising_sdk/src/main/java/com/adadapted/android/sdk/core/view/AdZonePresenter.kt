@@ -1,5 +1,6 @@
 package com.adadapted.android.sdk.core.view
 
+import com.adadapted.android.sdk.constants.Config
 import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.ad.AdActionType
@@ -36,6 +37,8 @@ class AdZonePresenter(
     @Volatile private var unfilledReported = false
     private var zoneContextId: String = ""
     @Volatile private var zoneLoaded: Boolean = false
+    @Volatile private var isCurrentAdRendered = false
+    @Volatile private var presentationMissed = false
     private var currentAdZoneData: AdZoneData = AdZoneData()
     private var adFetchedAt: Long = 0
     private var secondsLeftOnRefresh: Long = 0
@@ -53,15 +56,17 @@ class AdZonePresenter(
     }
 
     fun onStart(adZonePresenterListener: AdZonePresenterListener?) {
-        if (!zoneMounted) {
-            if (zoneId.isEmpty()) {
-                AALogger.logError("AdZoneId is empty. Was onStart() called before init()?")
-            } else {
-                zoneMounted = true
-                eventClient.trackZoneMounted(zoneId)
-            }
+        if (!zoneMounted && zoneId.isEmpty()) {
+            AALogger.logError("AdZoneId is empty. Was onStart() called before init()?")
         }
+        mountZone()
         onAttach(adZonePresenterListener)
+    }
+
+    private fun mountZone() {
+        if (zoneMounted || zoneId.isEmpty()) return
+        zoneMounted = true
+        eventClient.trackZoneMounted(zoneId)
     }
 
     fun onStop() {
@@ -80,10 +85,13 @@ class AdZonePresenter(
         if (!attached) {
             attached = true
             this.adZonePresenterListener = adZonePresenterListener
-            if(currentAd.id.isEmpty()) { //First attach only
+            mountZone()
+            if (!zoneLoaded) {
                 fetchAd(this) //FIRST INITIAL CALL
+            } else if (presentationMissed) {
+                replayPresentation()
             }
-            resumeTimer()
+            resumeIfOnScreen()
         }
     }
 
@@ -98,7 +106,7 @@ class AdZonePresenter(
 
     fun onAppForegrounded() {
         isAppInForeground = true
-        resumeTimer()
+        resumeIfOnScreen()
     }
 
     fun onAppBackgrounded() {
@@ -109,7 +117,7 @@ class AdZonePresenter(
 
     fun onEnteredWindow() {
         isInWindow = true
-        resumeTimer()
+        resumeIfOnScreen()
     }
 
     fun onExitedWindow() {
@@ -141,7 +149,7 @@ class AdZonePresenter(
 
             override fun onAdLoadFailed() {
                 reportZoneUnfilled(ZoneUnfilledReasons.REQUEST_FAILED)
-                handleAd(clearedAdKeepingRefreshTime())
+                handleAd(clearedAdBackingOffAfterFailedRequest())
             }
         })
     }
@@ -160,6 +168,7 @@ class AdZonePresenter(
 
     private fun handleAd(ad: Ad) {
         currentAd = ad
+        isCurrentAdRendered = false
         restartTimer() //Pick up the new Ad's refresh time
         displayAd()
     }
@@ -174,17 +183,19 @@ class AdZonePresenter(
     }
 
     fun onAdDisplayed(ad: Ad, isAdVisible: Boolean) {
+        //Drop stale loads; by instance, since a re-served creative shares the id
+        if (ad !== currentAd) return
         isZoneVisible = isAdVisible
+        isCurrentAdRendered = true
         if (isAdVisible) resumeTimer() else pauseTimer()
-        trackAdImpression(ad, isAdVisible)
+        trackAdImpression()
     }
 
     fun onAdVisibilityChanged(isAdVisible: Boolean) {
         isZoneVisible = isAdVisible
         adZonePresenterListener?.onAdVisibilityChanged(currentAd)
-        trackAdImpression(currentAd, isAdVisible)
         if (isAdVisible) {
-            resumeTimer()
+            resumeIfOnScreen()
         } else {
             endImpression()
             pauseTimer()
@@ -193,16 +204,24 @@ class AdZonePresenter(
 
     fun onAdDisplayFailed() {
         reportZoneUnfilled(ZoneUnfilledReasons.RENDER_FAILED)
-        currentAd = clearedAdKeepingRefreshTime()
-        resumeTimer()
+        clearCurrentAd()
     }
 
     fun onBlankDisplayed() {
+        clearCurrentAd()
+    }
+
+    private fun clearCurrentAd() {
+        endImpression()
         currentAd = clearedAdKeepingRefreshTime()
+        isCurrentAdRendered = false
         resumeTimer()
     }
 
     private fun clearedAdKeepingRefreshTime() = Ad(refreshTime = currentAd.refreshTime)
+
+    private fun clearedAdBackingOffAfterFailedRequest() =
+        Ad(refreshTime = maxOf(currentAd.refreshTimeOrDefault, Config.DEFAULT_AD_REFRESH_SECONDS))
 
     fun onAdClicked(ad: Ad) {
         val actionType = ad.actionType
@@ -236,10 +255,15 @@ class AdZonePresenter(
         adViewHandler.handleReportAd(adId, udid)
     }
 
-    private fun trackAdImpression(ad: Ad, isAdVisible: Boolean) {
-        if (!isAdVisible || ad.impressionWasTracked() || ad.isEmpty || webView?.loaded == false) return
+    private fun trackAdImpression() {
+        if (!zoneIsOnScreen() || !isCurrentAdRendered || currentAd.impressionWasTracked() || currentAd.isEmpty) return
         callPixelTrackingJavaScript()
-        eventClient.trackImpression(ad)
+        eventClient.trackImpression(currentAd)
+    }
+
+    private fun resumeIfOnScreen() {
+        trackAdImpression()
+        resumeTimer()
     }
 
     //Only fires once, and only if a real impression was tracked
@@ -323,17 +347,23 @@ class AdZonePresenter(
         AdContentPublisher.publishNonContentNotification(zoneId, ad.id)
     }
 
+    private fun replayPresentation() {
+        presentationMissed = false
+        notifyZoneAvailable()
+        displayAd()
+    }
+
     private fun notifyZoneAvailable() {
-        adZonePresenterListener?.onZoneAvailable(currentAdZoneData)
+        adZonePresenterListener?.onZoneAvailable(currentAdZoneData) ?: run { presentationMissed = true }
     }
 
     private fun notifyAdAvailable(ad: Ad) {
-        adZonePresenterListener?.onAdAvailable(ad)
+        adZonePresenterListener?.onAdAvailable(ad) ?: run { presentationMissed = true }
     }
 
     private fun notifyNoAdAvailable() {
         AALogger.logInfo("No ad available")
-        adZonePresenterListener?.onNoAdAvailable()
+        adZonePresenterListener?.onNoAdAvailable() ?: run { presentationMissed = true }
     }
 
     private fun updateCurrentZone(adZoneData: AdZoneData) {

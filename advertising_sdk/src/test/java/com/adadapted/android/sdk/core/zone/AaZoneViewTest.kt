@@ -23,7 +23,6 @@ import com.adadapted.android.sdk.core.event.EventClient
 import com.adadapted.android.sdk.core.payload.Payload
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.view.AaZoneView
-import com.adadapted.android.sdk.core.view.AdWebView
 import com.adadapted.android.sdk.core.view.DimensionConverter
 import com.adadapted.android.sdk.tools.TestDeviceInfoExtractor
 import com.adadapted.android.sdk.tools.TestEventAdapter
@@ -293,7 +292,6 @@ class AaZoneViewTest {
         testAaZoneView.init("TestZoneId")
         testAaZoneView.onStart(TestAaZoneViewListener())
         Shadows.shadowOf(Looper.getMainLooper()).idle()
-        markTheWebViewLoaded() //The impression only fires once the creative is up
         testAaZoneView.onAdLoadedInWebView(servedAd)
         EventClient.onPublishEvents()
         assertEquals("The ad has to be impressed before detaching can end it", 1, countOf(AdEventTypes.IMPRESSION))
@@ -329,11 +327,6 @@ class AaZoneViewTest {
             requestsBeforeLeavingTheWindow,
             testAdAdapter.requestCount
         )
-    }
-
-    private fun markTheWebViewLoaded() {
-        val webViewField = AaZoneView::class.java.getDeclaredField("webView").apply { isAccessible = true }
-        (webViewField.get(testAaZoneView) as AdWebView).loaded = true
     }
 
     private fun countOf(eventType: String) =

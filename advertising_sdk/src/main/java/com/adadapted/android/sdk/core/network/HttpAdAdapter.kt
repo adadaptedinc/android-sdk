@@ -10,15 +10,19 @@ import com.adadapted.android.sdk.core.log.AALogger
 import com.adadapted.android.sdk.core.network.HttpConnector.API_HEADER
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.ad.AdZoneResponse
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.*
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 
-class HttpAdAdapter(
+class HttpAdAdapter internal constructor(
     private val zoneAdRequestUrl: String,
-    private val httpConnector: HttpConnector
+    private val client: HttpClient
 ) : AdAdapter {
+    constructor(zoneAdRequestUrl: String, httpConnector: HttpConnector) : this(zoneAdRequestUrl, httpConnector.client)
+
     override suspend fun requestAd(zoneId: String, listener: ZoneAdListener, storeId: String, contextId: String, extra: String) {
         val deviceInfo = DeviceInfoClient.getCachedDeviceInfo()
         val zoneAdRequest = ZoneAdRequest(
@@ -32,7 +36,9 @@ class HttpAdAdapter(
             extra = extra
         )
         try {
-            val response: HttpResponse = httpConnector.client.post(zoneAdRequestUrl) {
+            val response: HttpResponse = client.post(zoneAdRequestUrl) {
+                //Otherwise a 5xx JSON body decodes as a no-fill
+                expectSuccess = true
                 contentType(ContentType.Application.Json)
                 setBody(zoneAdRequest)
                 header(API_HEADER, deviceInfo.appId)
