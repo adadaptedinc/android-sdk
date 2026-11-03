@@ -974,19 +974,39 @@ class AdZonePresenterTest {
         assertEquals(emptyList<String>(), unfilledEvents().map { it.eventName })
     }
 
+    @Test
+    fun aZoneThatComesBackIntoViewStillEmptyReportsItselfUnfilled() {
+        AdClient.createInstance(SilentAdAdapter(), testTransporterScope)
+        testAdZonePresenter.init("unfilledZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        testAdZonePresenter.onAdVisibilityChanged(false)
+        testAdZonePresenter.onAdLoadFailed()
+
+        testAdZonePresenter.onAdVisibilityChanged(true)
+        testAdZonePresenter.onAdVisibilityChanged(false)
+        testAdZonePresenter.onAdVisibilityChanged(true)
+        EventClient.onPublishEvents()
+
+        assertEquals(listOf(ZoneUnfilledReasons.REQUEST_FAILED), unfilledEvents().map { it.eventName })
+    }
+
     //A backgrounded app and a zone out of the window are as unseen as one scrolled out of view, and
     //the fetch each one started can still land afterwards
     @Test
-    fun aZoneNobodyCanSeeDoesNotReportItselfUnfilled() {
+    fun aZoneInABackgroundedAppDoesNotReportItselfUnfilled() =
+        assertAZoneNobodyCanSeeDoesNotReportItselfUnfilled { testAdZonePresenter.onAppBackgrounded() }
+
+    @Test
+    fun aZoneOutOfTheWindowDoesNotReportItselfUnfilled() =
+        assertAZoneNobodyCanSeeDoesNotReportItselfUnfilled { testAdZonePresenter.onExitedWindow() }
+
+    private fun assertAZoneNobodyCanSeeDoesNotReportItselfUnfilled(leaveTheScreen: () -> Unit) {
         AdClient.createInstance(SilentAdAdapter(), testTransporterScope)
         testAdZonePresenter.init("unfilledZoneId", mockWebView!!)
         testAdZonePresenter.onAttach(TestAdZonePresenterListener())
 
-        testAdZonePresenter.onAppBackgrounded()
-        testAdZonePresenter.onAdLoadFailed() //The fetch comes back to a backgrounded app
-        testAdZonePresenter.onAppForegrounded()
-        testAdZonePresenter.onExitedWindow()
-        testAdZonePresenter.onAdLoadFailed() //And again with the zone out of the window
+        leaveTheScreen()
+        testAdZonePresenter.onAdLoadFailed()
         EventClient.onPublishEvents()
 
         assertEquals(emptyList<String>(), unfilledEvents().map { it.eventName })
@@ -1069,6 +1089,47 @@ class AdZonePresenterTest {
         testAdZonePresenter.onDetach()
         testAdZonePresenter.onAttach(reattachedListener)
         assertEquals("Once shown, it is not shown again", 1, reattachedListener.noAdAvailableCount)
+    }
+
+    @Test
+    fun aFailedRequestThatLandsWhileDetachedIsReplayedAsTheFailureItWas() {
+        AdClient.createInstance(SilentAdAdapter(), testTransporterScope)
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        testAdZonePresenter.onDetach()
+        testAdZonePresenter.onAdLoadFailed()
+
+        val reattachedListener = TestAdZonePresenterListener()
+        testAdZonePresenter.onAttach(reattachedListener)
+        EventClient.onPublishEvents()
+
+        assertEquals(listOf(ZoneUnfilledReasons.REQUEST_FAILED), unfilledEvents().map { it.eventName })
+        assertEquals(1, reattachedListener.noAdAvailableCount)
+        assertEquals("A live failure sends no zone update, so the replay should not either", 0, reattachedListener.zoneAvailableCount)
+    }
+
+    @Test
+    fun aZoneStartedWhileNotShownWaitsToAttachUntilItIs() {
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onStart(TestAdZonePresenterListener(), isShown = false)
+        assertEquals(0, testAdAdapter.requestCount)
+
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        assertEquals(1, testAdAdapter.requestCount)
+        testAdZonePresenter.onStop()
+    }
+
+    @Test
+    fun theNextAdIsNotImpressedOnAResumeBeforeItRenders() {
+        displayAVisibleAd()
+        val nextAd = Ad(id = "NextAdId", impressionId = "testZoneId:456")
+        testAdAdapter.setMockData(AdZoneData(nextAd))
+        advanceTimeBySeconds(SdkConfig.DEFAULT_AD_REFRESH_SECONDS + 1)
+
+        testAdZonePresenter.onAppBackgrounded()
+        testAdZonePresenter.onAppForegrounded()
+
+        assertFalse(nextAd.impressionWasTracked())
     }
 
     @Test
@@ -1169,9 +1230,11 @@ class TestAdZonePresenterListener: AdZonePresenterListener {
     var testZoneData = AdZoneData()
     var testAd = Ad()
     var noAdAvailableCount = 0
+    var zoneAvailableCount = 0
 
     override fun onZoneAvailable(adZoneData: AdZoneData) {
         testZoneData = adZoneData
+        zoneAvailableCount++
     }
 
     override fun onAdAvailable(ad: Ad) {

@@ -38,7 +38,9 @@ class AdZonePresenter(
     private var zoneContextId: String = ""
     @Volatile private var zoneLoaded: Boolean = false
     @Volatile private var isCurrentAdRendered = false
-    @Volatile private var presentationMissed = false
+    @Volatile private var zoneUpdateMissed = false
+    @Volatile private var adUpdateMissed = false
+    @Volatile private var pendingUnfilledReason: String? = null
     private var currentAdZoneData: AdZoneData = AdZoneData()
     private var adFetchedAt: Long = 0
     private var secondsLeftOnRefresh: Long = 0
@@ -55,12 +57,12 @@ class AdZonePresenter(
         this.webView = webView
     }
 
-    fun onStart(adZonePresenterListener: AdZonePresenterListener?) {
+    fun onStart(adZonePresenterListener: AdZonePresenterListener?, isShown: Boolean = true) {
         if (!zoneMounted && zoneId.isEmpty()) {
             AALogger.logError("AdZoneId is empty. Was onStart() called before init()?")
         }
         mountZone()
-        onAttach(adZonePresenterListener)
+        if (isShown) onAttach(adZonePresenterListener)
     }
 
     private fun mountZone() {
@@ -88,8 +90,8 @@ class AdZonePresenter(
             mountZone()
             if (!zoneLoaded) {
                 fetchAd(this) //FIRST INITIAL CALL
-            } else if (presentationMissed) {
-                replayPresentation()
+            } else {
+                replayMissedPresentation()
             }
             resumeIfOnScreen()
         }
@@ -156,14 +158,26 @@ class AdZonePresenter(
 
     private fun fetchAd(listener: ZoneAdListener) {
         unfilledReported = false
+        pendingUnfilledReason = null
         adClient.fetchNewAd(zoneId = zoneId, contextId = zoneContextId, listener = listener)
     }
 
     @Synchronized
     private fun reportZoneUnfilled(reason: String) {
-        if (unfilledReported || !zoneIsOnScreen()) return
+        if (unfilledReported) return
+        val firstReason = pendingUnfilledReason ?: reason
+        if (!zoneIsOnScreen()) {
+            pendingUnfilledReason = firstReason
+            return
+        }
         unfilledReported = true
-        eventClient.trackZoneUnfilled(zoneId, reason)
+        pendingUnfilledReason = null
+        eventClient.trackZoneUnfilled(zoneId, firstReason)
+    }
+
+    private fun reportPendingZoneUnfilled() {
+        val reason = pendingUnfilledReason ?: return
+        if (currentAd.isEmpty) reportZoneUnfilled(reason)
     }
 
     private fun handleAd(ad: Ad) {
@@ -263,6 +277,7 @@ class AdZonePresenter(
 
     private fun resumeIfOnScreen() {
         trackAdImpression()
+        reportPendingZoneUnfilled()
         resumeTimer()
     }
 
@@ -347,23 +362,28 @@ class AdZonePresenter(
         AdContentPublisher.publishNonContentNotification(zoneId, ad.id)
     }
 
-    private fun replayPresentation() {
-        presentationMissed = false
-        notifyZoneAvailable()
-        displayAd()
+    private fun replayMissedPresentation() {
+        if (zoneUpdateMissed) {
+            zoneUpdateMissed = false
+            notifyZoneAvailable()
+        }
+        if (adUpdateMissed) {
+            adUpdateMissed = false
+            displayAd()
+        }
     }
 
     private fun notifyZoneAvailable() {
-        adZonePresenterListener?.onZoneAvailable(currentAdZoneData) ?: run { presentationMissed = true }
+        adZonePresenterListener?.onZoneAvailable(currentAdZoneData) ?: run { zoneUpdateMissed = true }
     }
 
     private fun notifyAdAvailable(ad: Ad) {
-        adZonePresenterListener?.onAdAvailable(ad) ?: run { presentationMissed = true }
+        adZonePresenterListener?.onAdAvailable(ad) ?: run { adUpdateMissed = true }
     }
 
     private fun notifyNoAdAvailable() {
         AALogger.logInfo("No ad available")
-        adZonePresenterListener?.onNoAdAvailable() ?: run { presentationMissed = true }
+        adZonePresenterListener?.onNoAdAvailable() ?: run { adUpdateMissed = true }
     }
 
     private fun updateCurrentZone(adZoneData: AdZoneData) {

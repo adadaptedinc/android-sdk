@@ -2,6 +2,7 @@ package com.adadapted.android.sdk.core.view
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.view.MotionEvent
 import android.view.View
@@ -23,10 +24,12 @@ class AdWebView(context: Context, private val listener: Listener) :
 
     var currentAd: Ad? = null
     var loaded = false
+    private var started = false
 
     fun loadAd(ad: Ad) {
         currentAd = ad
         loaded = false
+        started = false
         currentAd?.url?.let { loadUrl(it) }
     }
 
@@ -62,7 +65,7 @@ class AdWebView(context: Context, private val listener: Listener) :
             when (event.action) {
                 MotionEvent.ACTION_MOVE -> return@OnTouchListener true
                 MotionEvent.ACTION_UP -> {
-                    currentAd?.id?.let { notifyAdClicked() }
+                    if (currentAd?.isEmpty == false) notifyAdClicked()
                     return@OnTouchListener true
                 }
             }
@@ -77,9 +80,15 @@ class AdWebView(context: Context, private val listener: Listener) :
                 return true
             }
 
+            override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
+                super.onPageStarted(view, url, favicon)
+                started = true
+            }
+
+            //A load cancelled by loadAd still reports finished, but never started after it
             override fun onPageFinished(view: WebView, url: String) {
                 super.onPageFinished(view, url)
-                if (currentAd?.id?.isNotEmpty() == true && !loaded) {
+                if (started && currentAd?.id?.isNotEmpty() == true && !loaded) {
                     loaded = true
                     notifyAdLoaded()
                 }

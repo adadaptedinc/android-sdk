@@ -81,7 +81,8 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
     }
 
     fun onStart() {
-        presenter.onStart(this)
+        isVisible = isShown
+        presenter.onStart(this, isVisible) //Not shown yet, it attaches once it is
     }
 
     fun onStart(listener: Listener) {
@@ -199,6 +200,7 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
         super.onAttachedToWindow()
         presenter.onEnteredWindow()
         ProcessLifecycleOwner.get().lifecycle.addObserver(appLifecycleObserver)
+        if (isShown) setVisible() //API 23 sends no onVisibilityChanged on attach
     }
 
     override fun onDetachedFromWindow() {
@@ -209,11 +211,7 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
 
     override fun onVisibilityChanged(changedView: View, visibility: Int) {
         super.onVisibilityChanged(changedView, visibility)
-        when (visibility) {
-            GONE -> setInvisible()
-            INVISIBLE -> setInvisible()
-            VISIBLE -> setVisible()
-        }
+        if (isShown) setVisible() else setInvisible() //changedView may be an ancestor, so not its visibility
     }
 
     private fun loadWebViewAd(ad: Ad) {

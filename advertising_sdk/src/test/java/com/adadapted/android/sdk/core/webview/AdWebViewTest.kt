@@ -4,6 +4,8 @@ import android.view.MotionEvent
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.view.AdWebView
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,6 +31,30 @@ class AdWebViewTest {
         testAdWebView.loadAd(testAd)
         testAdWebView.dispatchTouchEvent(MotionEvent.obtain(1, 1, MotionEvent.ACTION_UP, 0f, 0f, 0))
         assert(testAdWebViewListener.clickedAd)
+    }
+
+    @Test
+    fun tappingABlankZoneIsNotAClick() {
+        testAdWebView.loadBlank()
+        testAdWebView.dispatchTouchEvent(MotionEvent.obtain(1, 1, MotionEvent.ACTION_UP, 0f, 0f, 0))
+        assertFalse(testAdWebViewListener.clickedAd)
+    }
+
+    @Test
+    fun aCancelledLoadFinishingIsNotTheNextAdLoading() {
+        val client = testAdWebView.webViewClient
+        val previousAd = Ad("PreviousAdId", url = "http://www.example.com/previous")
+        val nextAd = Ad("NextAdId", url = "http://www.example.com/next")
+        testAdWebView.loadAd(previousAd)
+        client.onPageStarted(testAdWebView, previousAd.url, null)
+
+        testAdWebView.loadAd(nextAd)
+        client.onPageFinished(testAdWebView, previousAd.url)
+        assertFalse("The cancelled load must not count as the next ad rendering", testAdWebViewListener.loadedAd)
+
+        client.onPageStarted(testAdWebView, nextAd.url, null)
+        client.onPageFinished(testAdWebView, nextAd.url)
+        assertTrue(testAdWebViewListener.loadedAd)
     }
 
     @Test
