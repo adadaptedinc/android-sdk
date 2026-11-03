@@ -100,7 +100,8 @@ class AdWebView(context: Context, private val listener: Listener) :
                 error: WebResourceError
             ) {
                 super.onReceivedError(view, request, error)
-                if (currentAd?.id?.isNotEmpty() == true && !loaded) {
+                //A failed image or pixel inside the creative is not the ad failing
+                if (request.isForMainFrame && currentAd?.id?.isNotEmpty() == true && !loaded) {
                     loaded = true
                     notifyAdLoadFailed()
                 }

@@ -1,9 +1,14 @@
 package com.adadapted.android.sdk.core.webview
 
+import android.net.Uri
 import android.view.MotionEvent
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.view.AdWebView
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.mock
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -55,6 +60,30 @@ class AdWebViewTest {
         client.onPageStarted(testAdWebView, nextAd.url, null)
         client.onPageFinished(testAdWebView, nextAd.url)
         assertTrue(testAdWebViewListener.loadedAd)
+    }
+
+    @Test
+    fun aFailedImageInsideTheCreativeIsNotTheAdFailing() {
+        val client = testAdWebView.webViewClient
+        val ad = Ad("AdId", url = "http://www.example.com/ad")
+        testAdWebView.loadAd(ad)
+        client.onPageStarted(testAdWebView, ad.url, null)
+
+        client.onReceivedError(testAdWebView, failedRequest(isForMainFrame = false), failure())
+        assertFalse(testAdWebViewListener.adFailed)
+
+        client.onReceivedError(testAdWebView, failedRequest(isForMainFrame = true), failure())
+        assertTrue(testAdWebViewListener.adFailed)
+    }
+
+    private fun failedRequest(isForMainFrame: Boolean): WebResourceRequest = mock {
+        on { this.isForMainFrame } doReturn isForMainFrame
+        on { url } doReturn Uri.parse("http://www.example.com/ad")
+    }
+
+    private fun failure(): WebResourceError = mock {
+        on { errorCode } doReturn -2
+        on { description } doReturn "net::ERR_NAME_NOT_RESOLVED"
     }
 
     @Test

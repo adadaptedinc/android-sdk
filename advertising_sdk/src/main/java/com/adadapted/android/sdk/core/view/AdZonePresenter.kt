@@ -1,5 +1,7 @@
 package com.adadapted.android.sdk.core.view
 
+import android.os.Handler
+import android.os.Looper
 import com.adadapted.android.sdk.constants.Config
 import com.adadapted.android.sdk.constants.EventStrings
 import com.adadapted.android.sdk.core.ad.Ad
@@ -49,6 +51,8 @@ class AdZonePresenter(
     private lateinit var timer: Timer
     private val eventClient: EventClient = EventClient
     private var webView: AdWebView? = null
+    private val viewportWatcher = ViewportWatcher()
+    private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
 
     fun init(zoneId: String, webView: AdWebView) {
         if (this.zoneId.isEmpty()) {
@@ -101,8 +105,7 @@ class AdZonePresenter(
         if (attached) {
             attached = false
             adZonePresenterListener = null
-            endImpression()
-            pauseTimer()
+            leaveScreen()
         }
     }
 
@@ -113,8 +116,7 @@ class AdZonePresenter(
 
     fun onAppBackgrounded() {
         isAppInForeground = false
-        endImpression(publishNow = true) //The process can be frozen before the next publish tick
-        pauseTimer()
+        leaveScreen(publishNow = true) //The process can be frozen before the next publish tick
     }
 
     fun onEnteredWindow() {
@@ -124,8 +126,7 @@ class AdZonePresenter(
 
     fun onExitedWindow() {
         isInWindow = false
-        endImpression()
-        pauseTimer()
+        leaveScreen()
     }
 
     fun setZoneContext(contextId: String) {
@@ -166,13 +167,20 @@ class AdZonePresenter(
     private fun reportZoneUnfilled(reason: String) {
         if (unfilledReported) return
         val firstReason = pendingUnfilledReason ?: reason
-        if (!zoneIsOnScreen()) {
+        if (!isOnMainThread()) {
             pendingUnfilledReason = firstReason
+            mainHandler.post { reportPendingZoneUnfilled() } //The viewport can only be read on main
+            return
+        }
+        if (!zoneIsOnScreen() || !isZoneInViewport()) {
+            pendingUnfilledReason = firstReason
+            watchViewportIfWaitingOnIt()
             return
         }
         unfilledReported = true
         pendingUnfilledReason = null
         eventClient.trackZoneUnfilled(zoneId, firstReason)
+        watchViewportIfWaitingOnIt()
     }
 
     private fun reportPendingZoneUnfilled() {
@@ -181,6 +189,7 @@ class AdZonePresenter(
     }
 
     private fun handleAd(ad: Ad) {
+        endImpression()
         currentAd = ad
         isCurrentAdRendered = false
         restartTimer() //Pick up the new Ad's refresh time
@@ -211,8 +220,7 @@ class AdZonePresenter(
         if (isAdVisible) {
             resumeIfOnScreen()
         } else {
-            endImpression()
-            pauseTimer()
+            leaveScreen()
         }
     }
 
@@ -270,10 +278,43 @@ class AdZonePresenter(
     }
 
     private fun trackAdImpression() {
-        if (!zoneIsOnScreen() || !isCurrentAdRendered || currentAd.impressionWasTracked() || currentAd.isEmpty) return
-        callPixelTrackingJavaScript()
-        eventClient.trackImpression(currentAd)
+        if (zoneIsOnScreen() && isZoneInViewport() && isCurrentAdRendered && !currentAd.impressionWasTracked() && !currentAd.isEmpty) {
+            callPixelTrackingJavaScript()
+            eventClient.trackImpression(currentAd)
+        }
+        watchViewportIfWaitingOnIt()
     }
+
+    private fun leaveScreen(publishNow: Boolean = false) {
+        endImpression(publishNow)
+        viewportWatcher.stop()
+        pauseTimer()
+    }
+
+    private fun isWaitingOnViewport(): Boolean {
+        if (!zoneIsOnScreen()) return false
+        val impressionHeld = isCurrentAdRendered && !currentAd.isEmpty && !currentAd.impressionWasTracked()
+        val unfilledHeld = pendingUnfilledReason != null && currentAd.isEmpty
+        return impressionHeld || unfilledHeld
+    }
+
+    //Hosts are not required to report scrolling, so a held zone checks again as it scrolls
+    private fun watchViewportIfWaitingOnIt() {
+        val zoneView = webView
+        if (!isWaitingOnViewport() || zoneView == null) {
+            viewportWatcher.stop()
+            return
+        }
+        viewportWatcher.watch(zoneView) {
+            trackAdImpression()
+            reportPendingZoneUnfilled()
+        }
+    }
+
+    //Being in the window is tracked on its own, so only a zone that is there gets measured
+    private fun isZoneInViewport() = webView?.takeIf { it.isAttachedToWindow }?.isPositionedInViewport() ?: true
+
+    private fun isOnMainThread() = Looper.myLooper() == Looper.getMainLooper()
 
     private fun resumeIfOnScreen() {
         trackAdImpression()

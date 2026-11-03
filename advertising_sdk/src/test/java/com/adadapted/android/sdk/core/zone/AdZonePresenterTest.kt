@@ -781,6 +781,18 @@ class AdZonePresenterTest {
         return counter.filed
     }
 
+    //The fetch that replaces an ad can land after the zone came back and impressed it, past the end the fetch already ran
+    @Test
+    fun anImpressionEndsWhenTheNextAdArrives() {
+        displayAVisibleAd()
+
+        val ends = impressionEndsFiledDuring {
+            testAdZonePresenter.onAdLoaded(AdZoneData(Ad(id = "NextAdId", impressionId = "testZoneId:124")))
+        }
+
+        assertEquals(1, ends)
+    }
+
     //The end reports how long a rendered ad was on screen, and a click does not cut that short
     @Test
     fun aClickedAdStillEndsItsImpression() {

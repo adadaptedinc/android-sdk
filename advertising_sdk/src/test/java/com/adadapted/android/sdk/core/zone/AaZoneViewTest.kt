@@ -5,7 +5,10 @@ import android.os.Looper
 import android.util.DisplayMetrics
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.ScrollView
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.test.platform.app.InstrumentationRegistry
@@ -369,6 +372,40 @@ class AaZoneViewTest {
         testAaZoneView.onStart(TestAaZoneViewListener())
         root.visibility = View.VISIBLE
         Shadows.shadowOf(Looper.getMainLooper()).idle()
+    }
+
+    //The host never reports visibility here, so scrolling alone has to bring the impression in
+    @Test
+    fun aCreativeRenderedBelowTheFoldIsImpressedOnlyOnceItIsScrolledIntoView() {
+        val testAdAdapter = SilentAdAdapter()
+        AdClient.createInstance(testAdAdapter, testTransporterScope)
+        val hostActivity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val scrollView = ScrollView(hostActivity)
+        val content = LinearLayout(hostActivity).apply { orientation = LinearLayout.VERTICAL }
+        content.addView(View(hostActivity), LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 3000))
+        content.addView(testAaZoneView, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 100))
+        scrollView.addView(content)
+        hostActivity.setContentView(scrollView)
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(TestAaZoneViewListener())
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+        val servedAd = Ad(id = "BelowTheFoldAdId", impressionId = "TestZoneId:790", url = "http://www.example.com/below")
+        testAdAdapter.deliver(servedAd)
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+
+        testAaZoneView.onAdLoadedInWebView(servedAd)
+        assertFalse("Nobody has seen the creative below the fold", servedAd.impressionWasTracked())
+
+        scrollView.scrollTo(0, 3000)
+        dispatchScrollChanged(scrollView)
+        assertTrue(servedAd.impressionWasTracked())
+    }
+
+    //Android tells scroll listeners on its draw pass, which Robolectric never runs
+    private fun dispatchScrollChanged(view: View) {
+        ViewTreeObserver::class.java.getDeclaredMethod("dispatchOnScrollChanged")
+            .apply { isAccessible = true }
+            .invoke(view.viewTreeObserver)
     }
 
     @Test
