@@ -108,5 +108,7 @@ class AdWebView(context: Context, private val listener: Listener) :
             }
         }
         settings.javaScriptEnabled = true
+        settings.allowContentAccess = false
+        settings.allowFileAccess = false
     }
 }

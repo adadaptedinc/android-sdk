@@ -85,6 +85,8 @@ class AaWebViewPopupActivity : Activity() {
             return
         }
         popupWebView.settings.javaScriptEnabled = true
+        popupWebView.settings.allowContentAccess = false
+        popupWebView.settings.allowFileAccess = false
         popupWebView.addJavascriptInterface(JavascriptBridge(ad), "AdAdapted")
         popupWebView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(
