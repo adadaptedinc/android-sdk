@@ -5,6 +5,7 @@ import android.os.Looper
 import android.util.DisplayMetrics
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.test.platform.app.InstrumentationRegistry
@@ -22,8 +23,6 @@ import com.adadapted.android.sdk.core.event.AdEventTypes
 import com.adadapted.android.sdk.core.event.EventClient
 import com.adadapted.android.sdk.core.payload.Payload
 import com.adadapted.android.sdk.core.session.SessionClient
-import com.adadapted.android.sdk.core.interfaces.AdAdapter
-import com.adadapted.android.sdk.core.interfaces.ZoneAdListener
 import com.adadapted.android.sdk.core.view.AaZoneView
 import com.adadapted.android.sdk.core.view.AdWebView
 import com.adadapted.android.sdk.core.view.DimensionConverter
@@ -374,7 +373,7 @@ class AaZoneViewTest {
 
     @Test
     fun anAdThatLandsWhileTheActivityIsStoppedIsLoadedWhenItComesBack() {
-        val testAdAdapter = DeferredAdAdapter()
+        val testAdAdapter = SilentAdAdapter()
         AdClient.createInstance(testAdAdapter, testTransporterScope)
         val hostActivity = Robolectric.buildActivity(Activity::class.java).setup().get()
         hostActivity.setContentView(testAaZoneView)
@@ -398,7 +397,7 @@ class AaZoneViewTest {
         val testAdAdapter = TestAdAdapter().apply { setMockData(AdZoneData(Ad(id = "HiddenAdId", refreshTime = refreshSeconds))) }
         AdClient.createInstance(testAdAdapter, testTransporterScope)
         val hostActivity = Robolectric.buildActivity(Activity::class.java).setup().get()
-        val container = android.widget.FrameLayout(hostActivity).apply { addView(testAaZoneView) }
+        val container = FrameLayout(hostActivity).apply { addView(testAaZoneView) }
         hostActivity.setContentView(container)
         testAaZoneView.init("TestZoneId")
         testAaZoneView.onStart(TestAaZoneViewListener())
@@ -425,25 +424,6 @@ class AaZoneViewTest {
 
         assertEquals(testListener.adLoaded, true)
         assert(TestEventAdapter.testSdkEvents.any { event -> event.name == EventStrings.ATL_AD_CLICKED })
-    }
-}
-
-//Holds each request until the test answers it
-class DeferredAdAdapter: AdAdapter {
-    private var pending: ZoneAdListener? = null
-
-    fun deliver(ad: Ad) {
-        pending?.also { pending = null }?.onAdLoaded(AdZoneData(ad))
-    }
-
-    override suspend fun requestAd(
-        zoneId: String,
-        listener: ZoneAdListener,
-        storeId: String,
-        contextId: String,
-        extra: String
-    ) {
-        pending = listener
     }
 }
 

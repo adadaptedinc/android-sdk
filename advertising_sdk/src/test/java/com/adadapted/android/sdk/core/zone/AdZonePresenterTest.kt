@@ -1116,7 +1116,6 @@ class AdZonePresenterTest {
 
         testAdZonePresenter.onAttach(TestAdZonePresenterListener())
         assertEquals(1, testAdAdapter.requestCount)
-        testAdZonePresenter.onStop()
     }
 
     @Test
@@ -1214,6 +1213,11 @@ class AlwaysFailingAdAdapter: AdAdapter {
 //Dispatches nothing back, so the presenter stays unloaded until a response is delivered by hand
 class SilentAdAdapter: AdAdapter {
     var requestCount = 0
+    private var pending: ZoneAdListener? = null
+
+    fun deliver(ad: Ad) {
+        pending?.also { pending = null }?.onAdLoaded(AdZoneData(ad))
+    }
 
     override suspend fun requestAd(
         zoneId: String,
@@ -1223,6 +1227,7 @@ class SilentAdAdapter: AdAdapter {
         extra: String
     ) {
         requestCount++
+        pending = listener
     }
 }
 

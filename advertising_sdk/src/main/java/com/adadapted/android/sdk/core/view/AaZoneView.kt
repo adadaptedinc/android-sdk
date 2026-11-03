@@ -211,7 +211,7 @@ class AaZoneView : RelativeLayout, AdZonePresenterListener, AdWebView.Listener {
 
     override fun onVisibilityChanged(changedView: View, visibility: Int) {
         super.onVisibilityChanged(changedView, visibility)
-        if (isShown) setVisible() else setInvisible() //changedView may be an ancestor, so not its visibility
+        if (isShown) setVisible() else setInvisible() //changedView can be an ancestor, so check the zone itself
     }
 
     private fun loadWebViewAd(ad: Ad) {
