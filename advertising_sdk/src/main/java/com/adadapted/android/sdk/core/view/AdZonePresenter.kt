@@ -225,8 +225,8 @@ class AdZonePresenter(
     }
 
     fun onAdDisplayFailed() {
-        reportZoneUnfilled(ZoneUnfilledReasons.RENDER_FAILED)
         clearCurrentAd()
+        reportZoneUnfilled(ZoneUnfilledReasons.RENDER_FAILED)
     }
 
     fun onBlankDisplayed() {

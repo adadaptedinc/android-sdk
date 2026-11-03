@@ -24,6 +24,7 @@ import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.AdEventTypes
 import com.adadapted.android.sdk.core.event.EventClient
+import com.adadapted.android.sdk.core.event.ZoneUnfilledReasons
 import com.adadapted.android.sdk.core.payload.Payload
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.view.AaZoneView
@@ -399,6 +400,37 @@ class AaZoneViewTest {
         scrollView.scrollTo(0, 3000)
         dispatchScrollChanged(scrollView)
         assertTrue(servedAd.impressionWasTracked())
+    }
+
+    @Test
+    fun aCreativeThatFailsToRenderBelowTheFoldReportsItselfUnfilledOnceItIsScrolledIntoView() {
+        val testAdAdapter = SilentAdAdapter()
+        AdClient.createInstance(testAdAdapter, testTransporterScope)
+        val hostActivity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val scrollView = ScrollView(hostActivity)
+        val content = LinearLayout(hostActivity).apply { orientation = LinearLayout.VERTICAL }
+        content.addView(View(hostActivity), LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 3000))
+        content.addView(testAaZoneView, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 100))
+        scrollView.addView(content)
+        hostActivity.setContentView(scrollView)
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(TestAaZoneViewListener())
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+        testAdAdapter.deliver(Ad(id = "RenderFailedAdId", impressionId = "TestZoneId:793", url = "http://www.example.com/failed"))
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+
+        testAaZoneView.onAdLoadInWebViewFailed()
+        EventClient.onPublishEvents()
+        assertEquals("Nobody has seen the zone below the fold fail to render", 0, countOf(AdEventTypes.ZONE_UNFILLED))
+
+        scrollView.scrollTo(0, 3000)
+        dispatchScrollChanged(scrollView)
+        EventClient.onPublishEvents()
+
+        assertEquals(
+            listOf(ZoneUnfilledReasons.RENDER_FAILED),
+            TestEventAdapter.testAdEvents.filter { it.eventType == AdEventTypes.ZONE_UNFILLED }.map { it.eventName }
+        )
     }
 
     //Android tells scroll listeners on its draw pass, which Robolectric never runs
