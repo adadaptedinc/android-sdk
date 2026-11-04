@@ -71,7 +71,6 @@ class AdZonePresenterTest {
         whenever(mockContext.resources).thenReturn(mock())
         whenever(mockContext.resources.displayMetrics).thenReturn(mock())
         mockWebView = AdWebView(ApplicationProvider.getApplicationContext(), mock())
-        mockWebView?.loaded = true
         testAdAdapter.setMockData(
             AdZoneData(
                 Ad(
@@ -157,10 +156,12 @@ class AdZonePresenterTest {
     @Test
     fun testOnAdDisplayed() {
         testAdZonePresenter.init("testZoneId", mockWebView!!)
+        val testListener = TestAdZonePresenterListener()
+        testAdZonePresenter.onAttach(testListener)
 
         val testAdEventListener = TestAdEventClientListener()
         EventClient.addListener(testAdEventListener)
-        testAdZonePresenter.onAdDisplayed(Ad("TestAdId"), true)
+        testAdZonePresenter.onAdDisplayed(testListener.testAd, true)
 
         assertEquals(AdEventTypes.IMPRESSION, testAdEventListener.testAdEvent?.eventType)
     }
@@ -191,7 +192,11 @@ class AdZonePresenterTest {
         })
         testAdZonePresenter.onAdClicked(testAd)
 
-        assertEquals(null, testAdEventListener.testAdEvent)
+        assertEquals(
+            "The only event should be the zone's own mount, nothing about the ad",
+            AdEventTypes.ZONE_MOUNTED,
+            testAdEventListener.testAdEvent?.eventType
+        )
     }
 
    @Test
@@ -388,6 +393,35 @@ class AdZonePresenterTest {
     }
 
     @Test
+    fun reattachingAZoneDoesNotSkipTheNoFillBackoff() {
+        val noFillRefreshSeconds = 300L
+        testAdAdapter.setMockData(AdZoneData(Ad(refreshTime = noFillRefreshSeconds)))
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        val requestsAfterNoFill = testAdAdapter.requestCount
+
+        repeat(3) {
+            advanceTimeBySeconds(10)
+            testAdZonePresenter.onDetach()
+            testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        }
+        assertEquals(
+            "Re-attaching inside the backoff should not refetch",
+            requestsAfterNoFill,
+            testAdAdapter.requestCount
+        )
+
+        testAdZonePresenter.onDetach()
+        advanceTimeBySeconds(noFillRefreshSeconds)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        assertEquals(
+            "Re-attaching after the backoff should refetch exactly once",
+            requestsAfterNoFill + 1,
+            testAdAdapter.requestCount
+        )
+    }
+
+    @Test
     fun zoneTimerWaitsForTheDefaultRefreshTimeWhenTheServerSuppliesNone() {
         val testAd = Ad(id = "TestAdId", impressionId = "123")
         testAdAdapter.setMockData(AdZoneData(testAd))
@@ -423,7 +457,7 @@ class AdZonePresenterTest {
         testAdZonePresenter.onAttach(TestAdZonePresenterListener())
         testAdZonePresenter.onAdDisplayed(servedAd, true)
 
-        advanceTimeBySeconds(serverRefreshSeconds + 1) //First refetch fires on the served time, and fails
+        advanceTimeBySeconds(serverRefreshSeconds + 1)
         assertEquals(
             "The first refetch should have fired once the served refresh time elapsed",
             2,
@@ -440,6 +474,38 @@ class AdZonePresenterTest {
         advanceTimeBySeconds(serverRefreshSeconds - SdkConfig.DEFAULT_AD_REFRESH_SECONDS)
         assertEquals(
             "Should have refetched again once the served refresh time elapsed a second time",
+            3,
+            failingAdapter.requestCount
+        )
+    }
+
+    @Test
+    fun aFailedRefetchOfAFastAdRetriesOnTheDefaultInsteadOfTheServedRefreshTime() {
+        val serverRefreshSeconds = 30L
+        val servedAd = Ad(id = "TestAdId", impressionId = "123", refreshTime = serverRefreshSeconds)
+        val failingAdapter = FailAfterFirstAdAdapter(servedAd)
+        AdClient.createInstance(failingAdapter, testTransporterScope)
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        testAdZonePresenter.onAdDisplayed(servedAd, true)
+
+        advanceTimeBySeconds(serverRefreshSeconds + 1)
+        assertEquals(
+            "The first refetch should have fired once the served refresh time elapsed",
+            2,
+            failingAdapter.requestCount
+        )
+
+        advanceTimeBySeconds(serverRefreshSeconds + 1)
+        assertEquals(
+            "A failed refetch should not retry on the fast ad's refresh time",
+            2,
+            failingAdapter.requestCount
+        )
+
+        advanceTimeBySeconds(SdkConfig.DEFAULT_AD_REFRESH_SECONDS - serverRefreshSeconds)
+        assertEquals(
+            "Should have retried once the default refresh time elapsed",
             3,
             failingAdapter.requestCount
         )
@@ -590,6 +656,32 @@ class AdZonePresenterTest {
         assertEquals("testZoneId", TestEventAdapter.testAdEvents.first { it.eventType == AdEventTypes.ZONE_MOUNTED }.zoneId)
     }
 
+    @Test
+    fun aZoneShownAgainAfterOnStopIsMountedAgain() {
+        startZoneThatNeverGetsAnAd()
+        testAdZonePresenter.onStop()
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        EventClient.onPublishEvents()
+
+        assertEquals("A zone serving again after onStop should be mounted again", 2, countOf(AdEventTypes.ZONE_MOUNTED))
+
+        testAdZonePresenter.onStop()
+        EventClient.onPublishEvents()
+
+        assertEquals("And its second mount should be closed out by the next onStop", 2, countOf(AdEventTypes.ZONE_UNMOUNTED))
+    }
+
+    @Test
+    fun aZoneTheHostNeverStartsIsStillMountedWhenItIsShown() {
+        AdClient.createInstance(SilentAdAdapter(), testTransporterScope)
+        testAdZonePresenter.init("mountedZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        EventClient.onPublishEvents()
+
+        assertEquals(1, countOf(AdEventTypes.ZONE_MOUNTED))
+        assertEquals("mountedZoneId", TestEventAdapter.testAdEvents.first { it.eventType == AdEventTypes.ZONE_MOUNTED }.zoneId)
+    }
+
     //A zone stopped while it is out of view is already detached, and still has to report itself
     //unmounted or its mount is never closed out
     @Test
@@ -689,12 +781,44 @@ class AdZonePresenterTest {
         return counter.filed
     }
 
+    //The fetch that replaces an ad can land after the zone came back and impressed it, past the end the fetch already ran
+    @Test
+    fun anImpressionEndsWhenTheNextAdArrives() {
+        displayAVisibleAd()
+
+        val ends = impressionEndsFiledDuring {
+            testAdZonePresenter.onAdLoaded(AdZoneData(Ad(id = "NextAdId", impressionId = "testZoneId:124")))
+        }
+
+        assertEquals(1, ends)
+    }
+
     //The end reports how long a rendered ad was on screen, and a click does not cut that short
     @Test
     fun aClickedAdStillEndsItsImpression() {
         val servedAd = displayAVisibleAd()
 
         testAdZonePresenter.onAdClicked(servedAd)
+        EventClient.onPublishEvents()
+
+        assertEquals(1, countOf(AdEventTypes.IMPRESSION_END))
+    }
+
+    @Test
+    fun anImpressionEndsWhenTheAdItWasShowingFailsToDisplay() {
+        displayAVisibleAd()
+
+        testAdZonePresenter.onAdDisplayFailed()
+        EventClient.onPublishEvents()
+
+        assertEquals(1, countOf(AdEventTypes.IMPRESSION_END))
+    }
+
+    @Test
+    fun anImpressionEndsWhenTheZoneGoesBlank() {
+        displayAVisibleAd()
+
+        testAdZonePresenter.onBlankDisplayed()
         EventClient.onPublishEvents()
 
         assertEquals(1, countOf(AdEventTypes.IMPRESSION_END))
@@ -714,6 +838,77 @@ class AdZonePresenterTest {
 
         assertEquals(0, countOf(AdEventTypes.IMPRESSION))
         assertEquals(0, countOf(AdEventTypes.IMPRESSION_END))
+    }
+
+    @Test
+    fun anAdRenderedWhileTheAppIsBackgroundedReportsNoImpression() {
+        assertAnAdRenderedOffScreenReportsNoImpression { testAdZonePresenter.onAppBackgrounded() }
+    }
+
+    @Test
+    fun anAdRenderedWhileTheZoneIsOutOfTheWindowReportsNoImpression() {
+        assertAnAdRenderedOffScreenReportsNoImpression { testAdZonePresenter.onExitedWindow() }
+    }
+
+    @Test
+    fun anAdRenderedWhileTheAppIsBackgroundedIsImpressedOnceTheUserComesBack() {
+        assertAnAdRenderedOffScreenIsImpressedOnceWhenItComesBack(
+            leaveTheScreen = { testAdZonePresenter.onAppBackgrounded() },
+            comeBack = { testAdZonePresenter.onAppForegrounded() }
+        )
+    }
+
+    @Test
+    fun anAdRenderedWhileTheZoneIsOutOfTheWindowIsImpressedOnceItIsBack() {
+        assertAnAdRenderedOffScreenIsImpressedOnceWhenItComesBack(
+            leaveTheScreen = { testAdZonePresenter.onExitedWindow() },
+            comeBack = { testAdZonePresenter.onEnteredWindow() }
+        )
+    }
+
+    @Test
+    fun anAdStillLoadingWhenTheUserComesBackIsNotImpressed() {
+        serveAnAd()
+        testAdZonePresenter.onAppBackgrounded()
+        testAdZonePresenter.onAppForegrounded()
+
+        testAdZonePresenter.onDetach()
+        EventClient.onPublishEvents()
+
+        assertEquals("An ad the web view has not rendered yet was never seen", 0, countOf(AdEventTypes.IMPRESSION))
+    }
+
+    private fun assertAnAdRenderedOffScreenReportsNoImpression(leaveTheScreen: () -> Unit) {
+        val servedAd = serveAnAd()
+        leaveTheScreen()
+        testAdZonePresenter.onAdDisplayed(servedAd, true)
+
+        testAdZonePresenter.onDetach()
+        EventClient.onPublishEvents()
+
+        assertEquals("An ad that rendered with nothing on screen was never impressed", 0, countOf(AdEventTypes.IMPRESSION))
+    }
+
+    private fun assertAnAdRenderedOffScreenIsImpressedOnceWhenItComesBack(leaveTheScreen: () -> Unit, comeBack: () -> Unit) {
+        val servedAd = serveAnAd()
+        leaveTheScreen()
+        testAdZonePresenter.onAdDisplayed(servedAd, true)
+        comeBack()
+        leaveTheScreen()
+        comeBack()
+
+        testAdZonePresenter.onDetach()
+        EventClient.onPublishEvents()
+
+        assertEquals("The user saw the ad once they were back, and it is still the one impression", 1, countOf(AdEventTypes.IMPRESSION))
+    }
+
+    private fun serveAnAd(): Ad {
+        val servedAd = Ad(id = "TestAdId", impressionId = "testZoneId:789")
+        testAdAdapter.setMockData(AdZoneData(servedAd))
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        return servedAd
     }
 
     //The served Ad instance is the presenter's current ad, the same way the web view hands back the
@@ -791,19 +986,39 @@ class AdZonePresenterTest {
         assertEquals(emptyList<String>(), unfilledEvents().map { it.eventName })
     }
 
+    @Test
+    fun aZoneThatComesBackIntoViewStillEmptyReportsItselfUnfilled() {
+        AdClient.createInstance(SilentAdAdapter(), testTransporterScope)
+        testAdZonePresenter.init("unfilledZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        testAdZonePresenter.onAdVisibilityChanged(false)
+        testAdZonePresenter.onAdLoadFailed()
+
+        testAdZonePresenter.onAdVisibilityChanged(true)
+        testAdZonePresenter.onAdVisibilityChanged(false)
+        testAdZonePresenter.onAdVisibilityChanged(true)
+        EventClient.onPublishEvents()
+
+        assertEquals(listOf(ZoneUnfilledReasons.REQUEST_FAILED), unfilledEvents().map { it.eventName })
+    }
+
     //A backgrounded app and a zone out of the window are as unseen as one scrolled out of view, and
     //the fetch each one started can still land afterwards
     @Test
-    fun aZoneNobodyCanSeeDoesNotReportItselfUnfilled() {
+    fun aZoneInABackgroundedAppDoesNotReportItselfUnfilled() =
+        assertAZoneNobodyCanSeeDoesNotReportItselfUnfilled { testAdZonePresenter.onAppBackgrounded() }
+
+    @Test
+    fun aZoneOutOfTheWindowDoesNotReportItselfUnfilled() =
+        assertAZoneNobodyCanSeeDoesNotReportItselfUnfilled { testAdZonePresenter.onExitedWindow() }
+
+    private fun assertAZoneNobodyCanSeeDoesNotReportItselfUnfilled(leaveTheScreen: () -> Unit) {
         AdClient.createInstance(SilentAdAdapter(), testTransporterScope)
         testAdZonePresenter.init("unfilledZoneId", mockWebView!!)
         testAdZonePresenter.onAttach(TestAdZonePresenterListener())
 
-        testAdZonePresenter.onAppBackgrounded()
-        testAdZonePresenter.onAdLoadFailed() //The fetch comes back to a backgrounded app
-        testAdZonePresenter.onAppForegrounded()
-        testAdZonePresenter.onExitedWindow()
-        testAdZonePresenter.onAdLoadFailed() //And again with the zone out of the window
+        leaveTheScreen()
+        testAdZonePresenter.onAdLoadFailed()
         EventClient.onPublishEvents()
 
         assertEquals(emptyList<String>(), unfilledEvents().map { it.eventName })
@@ -842,6 +1057,90 @@ class AdZonePresenterTest {
         testAdZonePresenter.onAttach(testListener)
 
         assertEquals(1, testListener.noAdAvailableCount)
+    }
+
+    @Test
+    fun aLateRenderOfThePreviousAdIsNotCountedAsTheNextAdsImpression() {
+        val firstAd = Ad(id = "TestAdId", impressionId = "testZoneId:1")
+        testAdAdapter.setMockData(AdZoneData(firstAd))
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        val testListener = TestAdZonePresenterListener()
+        testAdZonePresenter.onAttach(testListener)
+        testAdZonePresenter.onAdDisplayed(firstAd, true)
+
+        val nextAd = Ad(id = "TestAdId", impressionId = "testZoneId:2")
+        testAdAdapter.setMockData(AdZoneData(nextAd))
+        advanceTimeBySeconds(SdkConfig.DEFAULT_AD_REFRESH_SECONDS + 1)
+        assertTrue("The refresh should have served the next Ad", testListener.testAd === nextAd)
+
+        testAdZonePresenter.onAdDisplayed(firstAd, true)
+        assertFalse("A stale render must not impress the next Ad", nextAd.impressionWasTracked())
+
+        testAdZonePresenter.onAdDisplayed(nextAd, true)
+        assertTrue(nextAd.impressionWasTracked())
+    }
+
+    @Test
+    fun aNoFillThatLandsWhileDetachedIsShownOnReattachWithoutRefetching() {
+        val servedAd = Ad(id = "TestAdId", impressionId = "testZoneId:1")
+        testAdAdapter.setMockData(AdZoneData(servedAd))
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        testAdZonePresenter.onAdDisplayed(servedAd, true)
+
+        testAdZonePresenter.onDetach()
+        testAdZonePresenter.onAdLoaded(AdZoneData())
+
+        val requestsBeforeReattach = testAdAdapter.requestCount
+        val reattachedListener = TestAdZonePresenterListener()
+        testAdZonePresenter.onAttach(reattachedListener)
+
+        assertEquals("The missed no-fill should be shown on reattach", 1, reattachedListener.noAdAvailableCount)
+        assertEquals("Showing it should not refetch", requestsBeforeReattach, testAdAdapter.requestCount)
+
+        testAdZonePresenter.onDetach()
+        testAdZonePresenter.onAttach(reattachedListener)
+        assertEquals("Once shown, it is not shown again", 1, reattachedListener.noAdAvailableCount)
+    }
+
+    @Test
+    fun aFailedRequestThatLandsWhileDetachedIsReplayedAsTheFailureItWas() {
+        AdClient.createInstance(SilentAdAdapter(), testTransporterScope)
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        testAdZonePresenter.onDetach()
+        testAdZonePresenter.onAdLoadFailed()
+
+        val reattachedListener = TestAdZonePresenterListener()
+        testAdZonePresenter.onAttach(reattachedListener)
+        EventClient.onPublishEvents()
+
+        assertEquals(listOf(ZoneUnfilledReasons.REQUEST_FAILED), unfilledEvents().map { it.eventName })
+        assertEquals(1, reattachedListener.noAdAvailableCount)
+        assertEquals("A live failure sends no zone update, so the replay should not either", 0, reattachedListener.zoneAvailableCount)
+    }
+
+    @Test
+    fun aZoneStartedWhileNotShownWaitsToAttachUntilItIs() {
+        testAdZonePresenter.init("testZoneId", mockWebView!!)
+        testAdZonePresenter.onStart(TestAdZonePresenterListener(), isShown = false)
+        assertEquals(0, testAdAdapter.requestCount)
+
+        testAdZonePresenter.onAttach(TestAdZonePresenterListener())
+        assertEquals(1, testAdAdapter.requestCount)
+    }
+
+    @Test
+    fun theNextAdIsNotImpressedOnAResumeBeforeItRenders() {
+        displayAVisibleAd()
+        val nextAd = Ad(id = "NextAdId", impressionId = "testZoneId:456")
+        testAdAdapter.setMockData(AdZoneData(nextAd))
+        advanceTimeBySeconds(SdkConfig.DEFAULT_AD_REFRESH_SECONDS + 1)
+
+        testAdZonePresenter.onAppBackgrounded()
+        testAdZonePresenter.onAppForegrounded()
+
+        assertFalse(nextAd.impressionWasTracked())
     }
 
     @Test
@@ -926,6 +1225,11 @@ class AlwaysFailingAdAdapter: AdAdapter {
 //Dispatches nothing back, so the presenter stays unloaded until a response is delivered by hand
 class SilentAdAdapter: AdAdapter {
     var requestCount = 0
+    private var pending: ZoneAdListener? = null
+
+    fun deliver(ad: Ad) {
+        pending?.also { pending = null }?.onAdLoaded(AdZoneData(ad))
+    }
 
     override suspend fun requestAd(
         zoneId: String,
@@ -935,6 +1239,7 @@ class SilentAdAdapter: AdAdapter {
         extra: String
     ) {
         requestCount++
+        pending = listener
     }
 }
 
@@ -942,9 +1247,11 @@ class TestAdZonePresenterListener: AdZonePresenterListener {
     var testZoneData = AdZoneData()
     var testAd = Ad()
     var noAdAvailableCount = 0
+    var zoneAvailableCount = 0
 
     override fun onZoneAvailable(adZoneData: AdZoneData) {
         testZoneData = adZoneData
+        zoneAvailableCount++
     }
 
     override fun onAdAvailable(ad: Ad) {

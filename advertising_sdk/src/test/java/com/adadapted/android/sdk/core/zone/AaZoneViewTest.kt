@@ -5,6 +5,10 @@ import android.os.Looper
 import android.util.DisplayMetrics
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.ScrollView
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.test.platform.app.InstrumentationRegistry
@@ -20,6 +24,7 @@ import com.adadapted.android.sdk.core.concurrency.TransporterCoroutineScope
 import com.adadapted.android.sdk.core.device.DeviceInfoClient
 import com.adadapted.android.sdk.core.event.AdEventTypes
 import com.adadapted.android.sdk.core.event.EventClient
+import com.adadapted.android.sdk.core.event.ZoneUnfilledReasons
 import com.adadapted.android.sdk.core.payload.Payload
 import com.adadapted.android.sdk.core.session.SessionClient
 import com.adadapted.android.sdk.core.view.AaZoneView
@@ -293,7 +298,6 @@ class AaZoneViewTest {
         testAaZoneView.init("TestZoneId")
         testAaZoneView.onStart(TestAaZoneViewListener())
         Shadows.shadowOf(Looper.getMainLooper()).idle()
-        markTheWebViewLoaded() //The impression only fires once the creative is up
         testAaZoneView.onAdLoadedInWebView(servedAd)
         EventClient.onPublishEvents()
         assertEquals("The ad has to be impressed before detaching can end it", 1, countOf(AdEventTypes.IMPRESSION))
@@ -331,11 +335,6 @@ class AaZoneViewTest {
         )
     }
 
-    private fun markTheWebViewLoaded() {
-        val webViewField = AaZoneView::class.java.getDeclaredField("webView").apply { isAccessible = true }
-        (webViewField.get(testAaZoneView) as AdWebView).loaded = true
-    }
-
     private fun countOf(eventType: String) =
         TestEventAdapter.testAdEvents.count { it.eventType == eventType }
 
@@ -363,6 +362,122 @@ class AaZoneViewTest {
             observersBeforeTheZone,
             processLifecycle.observerCount
         )
+    }
+
+    //Android stops the activity before hiding its root view, and starts it again before showing it
+    private fun stopAndRestart(hostActivity: Activity, whileStopped: () -> Unit = {}) {
+        val root = hostActivity.window.decorView
+        testAaZoneView.onStop()
+        root.visibility = View.INVISIBLE
+        whileStopped()
+        testAaZoneView.onStart(TestAaZoneViewListener())
+        root.visibility = View.VISIBLE
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+    }
+
+    //The host never reports visibility here, so scrolling alone has to bring the impression in
+    @Test
+    fun aCreativeRenderedBelowTheFoldIsImpressedOnlyOnceItIsScrolledIntoView() {
+        val testAdAdapter = SilentAdAdapter()
+        AdClient.createInstance(testAdAdapter, testTransporterScope)
+        val hostActivity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val scrollView = ScrollView(hostActivity)
+        val content = LinearLayout(hostActivity).apply { orientation = LinearLayout.VERTICAL }
+        content.addView(View(hostActivity), LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 3000))
+        content.addView(testAaZoneView, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 100))
+        scrollView.addView(content)
+        hostActivity.setContentView(scrollView)
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(TestAaZoneViewListener())
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+        val servedAd = Ad(id = "BelowTheFoldAdId", impressionId = "TestZoneId:790", url = "http://www.example.com/below")
+        testAdAdapter.deliver(servedAd)
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+
+        testAaZoneView.onAdLoadedInWebView(servedAd)
+        assertFalse("Nobody has seen the creative below the fold", servedAd.impressionWasTracked())
+
+        scrollView.scrollTo(0, 3000)
+        dispatchScrollChanged(scrollView)
+        assertTrue(servedAd.impressionWasTracked())
+    }
+
+    @Test
+    fun aCreativeThatFailsToRenderBelowTheFoldReportsItselfUnfilledOnceItIsScrolledIntoView() {
+        val testAdAdapter = SilentAdAdapter()
+        AdClient.createInstance(testAdAdapter, testTransporterScope)
+        val hostActivity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val scrollView = ScrollView(hostActivity)
+        val content = LinearLayout(hostActivity).apply { orientation = LinearLayout.VERTICAL }
+        content.addView(View(hostActivity), LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 3000))
+        content.addView(testAaZoneView, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 100))
+        scrollView.addView(content)
+        hostActivity.setContentView(scrollView)
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(TestAaZoneViewListener())
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+        testAdAdapter.deliver(Ad(id = "RenderFailedAdId", impressionId = "TestZoneId:793", url = "http://www.example.com/failed"))
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+
+        testAaZoneView.onAdLoadInWebViewFailed()
+        EventClient.onPublishEvents()
+        assertEquals("Nobody has seen the zone below the fold fail to render", 0, countOf(AdEventTypes.ZONE_UNFILLED))
+
+        scrollView.scrollTo(0, 3000)
+        dispatchScrollChanged(scrollView)
+        EventClient.onPublishEvents()
+
+        assertEquals(
+            listOf(ZoneUnfilledReasons.RENDER_FAILED),
+            TestEventAdapter.testAdEvents.filter { it.eventType == AdEventTypes.ZONE_UNFILLED }.map { it.eventName }
+        )
+    }
+
+    //Android tells scroll listeners on its draw pass, which Robolectric never runs
+    private fun dispatchScrollChanged(view: View) {
+        ViewTreeObserver::class.java.getDeclaredMethod("dispatchOnScrollChanged")
+            .apply { isAccessible = true }
+            .invoke(view.viewTreeObserver)
+    }
+
+    @Test
+    fun anAdThatLandsWhileTheActivityIsStoppedIsLoadedWhenItComesBack() {
+        val testAdAdapter = SilentAdAdapter()
+        AdClient.createInstance(testAdAdapter, testTransporterScope)
+        val hostActivity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        hostActivity.setContentView(testAaZoneView)
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(TestAaZoneViewListener())
+        val firstAd = Ad(id = "FirstAdId", url = "http://www.example.com/first", actionType = "c", refreshTime = 300L)
+        testAdAdapter.deliver(firstAd)
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+        val webView = (0 until testAaZoneView.childCount).map { testAaZoneView.getChildAt(it) }.filterIsInstance<AdWebView>().single()
+        testAaZoneView.onAdInWebViewClicked(firstAd)
+
+        val nextAd = Ad(id = "NextAdId", url = "http://www.example.com/next", refreshTime = 300L)
+        stopAndRestart(hostActivity) { testAdAdapter.deliver(nextAd) }
+
+        assertEquals(nextAd.url, Shadows.shadowOf(webView).lastLoadedUrl)
+    }
+
+    @Test
+    fun aZoneTheHostHidBehindAGoneParentStaysPausedWhenTheActivityComesBack() {
+        val refreshSeconds = 300L
+        val testAdAdapter = TestAdAdapter().apply { setMockData(AdZoneData(Ad(id = "HiddenAdId", refreshTime = refreshSeconds))) }
+        AdClient.createInstance(testAdAdapter, testTransporterScope)
+        val hostActivity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val container = FrameLayout(hostActivity).apply { addView(testAaZoneView) }
+        hostActivity.setContentView(container)
+        testAaZoneView.init("TestZoneId")
+        testAaZoneView.onStart(TestAaZoneViewListener())
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+        container.visibility = View.GONE
+        val requestsWhileHidden = testAdAdapter.requestCount
+
+        stopAndRestart(hostActivity)
+        testTransporter.scheduler.advanceTimeBy(TimeUnit.SECONDS.toMillis(refreshSeconds + 1))
+
+        assertEquals(requestsWhileHidden, testAdAdapter.requestCount)
     }
 
     @Test

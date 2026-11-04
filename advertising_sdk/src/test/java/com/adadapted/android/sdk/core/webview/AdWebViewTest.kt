@@ -1,9 +1,16 @@
 package com.adadapted.android.sdk.core.webview
 
+import android.net.Uri
 import android.view.MotionEvent
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adadapted.android.sdk.core.ad.Ad
 import com.adadapted.android.sdk.core.view.AdWebView
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.mock
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,6 +36,54 @@ class AdWebViewTest {
         testAdWebView.loadAd(testAd)
         testAdWebView.dispatchTouchEvent(MotionEvent.obtain(1, 1, MotionEvent.ACTION_UP, 0f, 0f, 0))
         assert(testAdWebViewListener.clickedAd)
+    }
+
+    @Test
+    fun tappingABlankZoneIsNotAClick() {
+        testAdWebView.loadBlank()
+        testAdWebView.dispatchTouchEvent(MotionEvent.obtain(1, 1, MotionEvent.ACTION_UP, 0f, 0f, 0))
+        assertFalse(testAdWebViewListener.clickedAd)
+    }
+
+    @Test
+    fun aCancelledLoadFinishingIsNotTheNextAdLoading() {
+        val client = testAdWebView.webViewClient
+        val previousAd = Ad("PreviousAdId", url = "http://www.example.com/previous")
+        val nextAd = Ad("NextAdId", url = "http://www.example.com/next")
+        testAdWebView.loadAd(previousAd)
+        client.onPageStarted(testAdWebView, previousAd.url, null)
+
+        testAdWebView.loadAd(nextAd)
+        client.onPageFinished(testAdWebView, previousAd.url)
+        assertFalse("The cancelled load must not count as the next ad rendering", testAdWebViewListener.loadedAd)
+
+        client.onPageStarted(testAdWebView, nextAd.url, null)
+        client.onPageFinished(testAdWebView, nextAd.url)
+        assertTrue(testAdWebViewListener.loadedAd)
+    }
+
+    @Test
+    fun aFailedImageInsideTheCreativeIsNotTheAdFailing() {
+        val client = testAdWebView.webViewClient
+        val ad = Ad("AdId", url = "http://www.example.com/ad")
+        testAdWebView.loadAd(ad)
+        client.onPageStarted(testAdWebView, ad.url, null)
+
+        client.onReceivedError(testAdWebView, failedRequest(isForMainFrame = false), failure())
+        assertFalse(testAdWebViewListener.adFailed)
+
+        client.onReceivedError(testAdWebView, failedRequest(isForMainFrame = true), failure())
+        assertTrue(testAdWebViewListener.adFailed)
+    }
+
+    private fun failedRequest(isForMainFrame: Boolean): WebResourceRequest = mock {
+        on { this.isForMainFrame } doReturn isForMainFrame
+        on { url } doReturn Uri.parse("http://www.example.com/ad")
+    }
+
+    private fun failure(): WebResourceError = mock {
+        on { errorCode } doReturn -2
+        on { description } doReturn "net::ERR_NAME_NOT_RESOLVED"
     }
 
     @Test
